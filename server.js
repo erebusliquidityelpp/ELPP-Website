@@ -2,13 +2,14 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 // Works whether the app files are in /public or loose at the top level of the repo.
 const ROOT = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
+const BLOCK_EXT = new Set(['.pem', '.key', '.jks', '.keystore', '.env']);
 const BLOCK = new Set(['server.js', 'package.json', 'package-lock.json', '.env', '.gitignore', 'readme.md']);
 const TYPES = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.webmanifest':'application/manifest+json', '.png':'image/png', '.json':'application/json', '.ico':'image/x-icon' };
 http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (p === '/' || p === '') p = '/index.html';
   const f = path.normalize(path.join(ROOT, p));
-  if (BLOCK.has(path.basename(f).toLowerCase())) { res.writeHead(404); return res.end('Not found'); }
+  if (BLOCK.has(path.basename(f).toLowerCase()) || BLOCK_EXT.has(path.extname(f).toLowerCase())) { res.writeHead(404); return res.end('Not found'); }
   if (!f.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden'); }
   fs.readFile(f, (err, data) => {
     if (err) { res.writeHead(404, {'Content-Type':'text/plain'}); return res.end('Not found'); }
