@@ -569,6 +569,12 @@ td.h{background:color-mix(in srgb,var(--c) calc(var(--a) * 55%),transparent)}
   pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 }
 @media (max-width:820px) and (prefers-color-scheme:light){#mbTab{box-shadow:0 -4px 14px rgba(0,0,0,.08)}}
+
+#hbNav{display:inline-flex;align-items:center;gap:4px;margin-right:10px;flex:0 0 auto}
+#hbNav .btn{min-width:34px;padding:5px 9px;line-height:1}
+#hbNav .btn[disabled]{opacity:.35;cursor:default}
+#hbBell.on{color:var(--accent);border-color:var(--accent)}
+@media (max-width:820px){#hbNav{margin-right:6px;gap:3px}#hbNav .btn{min-width:38px;min-height:38px}}
 </style>
 </head>
 <body>
@@ -5487,7 +5493,7 @@ function mkCalc(all){
   return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
-  const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r;
+  const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
   el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span></div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
@@ -5625,10 +5631,53 @@ function sigStats(list){
   return {n:list.length, open:list.length - g.length, tp1:g.filter(x => x.status === 'tp1done').length, tp2:g.filter(x => x.status === 'tp2').length, stop:st, exp:g.filter(x => x.status === 'expired').length, win:(w + st) ? w / (w + st) * 100 : null, avgR:g.length ? sum / g.length : null, totR:sum};
 }
 function beep(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value = 880; g.gain.value = 0.15; o.start(); setTimeout(() => { o.stop(); a.close(); }, 350); } catch(e){} }
+/* ---------- notifications: phone app (native), service worker (installed web app), plain browser ---------- */
+const NB = () => (window.AndroidBridge && typeof window.AndroidBridge.notifyNow === 'function') ? window.AndroidBridge : null;
+function notifyPerm(){
+  const b = NB(); if (b){ try { return b.hasPermission() ? 'granted' : 'default'; } catch(e){ return 'default'; } }
+  return typeof Notification === 'undefined' ? 'unsupported' : Notification.permission;
+}
+async function notifyAsk(){
+  const b = NB();
+  if (b){ try { b.requestPermission(); } catch(e){} for (let i = 0; i < 12; i++){ await new Promise(r => setTimeout(r, 800)); if (notifyPerm() === 'granted') break; } return notifyPerm(); }
+  if (typeof Notification === 'undefined') return 'unsupported';
+  try { return await Notification.requestPermission(); } catch(e){ return Notification.permission; }
+}
+function elppNotify(title, body, tag){
+  const b = NB(); if (b){ try { b.notifyNow(String(title), String(body)); return true; } catch(e){} }
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+  const plain = () => { try { new Notification(title, {body:body, tag:tag}); } catch(e){} };
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(reg => { if (reg && reg.showNotification) reg.showNotification(title, {body:body, tag:tag, icon:'icon-192.png', badge:'icon-192.png', vibrate:[120, 60, 120]}); else plain(); }).catch(plain);
+    } else plain();
+    return true;
+  } catch(e){ return false; }
+}
+async function bellClick(){
+  const AC = state.alerts || {};
+  if (AC.on && AC.notify){ state.alerts = Object.assign({}, AC, {on:false, notify:false}); saveState(); toast('Notifications off'); try { renderSignals(); } catch(e){} return; }
+  const p = await notifyAsk();
+  state.alerts = Object.assign({}, state.alerts, {on:true, notify:true}); saveState();
+  if (p === 'granted'){ elppNotify('ELPP notifications are on', 'You will get a message when a strong, confirmed set-up appears or the market verdict changes' + (NB() ? '.' : ' (while this page is open).'), 'elpp-on'); toast('Notifications on'); }
+  else if (p === 'unsupported') toast('This browser cannot show notifications');
+  else toast(NB() ? 'Allow notifications for ELPP in the Android prompt or phone settings' : 'Notifications are blocked: allow them in the browser site settings');
+  try { renderSignals(); } catch(e){}
+}
+window.__elppBell = {status: () => { const AC = state.alerts || {}; return {on: !!(AC.on && AC.notify), perm: notifyPerm()}; }, click: bellClick};
+const VW = {k:null, at:0};
+function verdictWatch(r){
+  if (!r) return; const AC = state.alerts || {}, k = r.state + '|' + r.grade; if (VW.k === k) return;
+  const prev = VW.k; VW.k = k; if (prev === null) return;
+  if (!(AC.on && AC.notify && AC.verdict !== false)) return;
+  const now = Date.now(); if (now - VW.at < 15 * 60000) return; VW.at = now;
+  elppNotify('ELPP market verdict: ' + r.state, r.grade + ' · score ' + r.score + ' (was ' + prev.split('|')[0] + ')', 'elpp-verdict');
+  AL.log.unshift({t:now, txt:'Market verdict: ' + prev.split('|')[0] + ' → ' + r.state + ' (' + r.grade + ' · ' + r.score + ')'}); AL.log.length = Math.min(AL.log.length, 30);
+}
 function fireAlert(c, dir, why, test){
   const AC = state.alerts || {}, pl = planFor(c), txt = `${c.name} ${dir.toUpperCase()} · score ${c.m && isNum(c.m.verdictScore) ? c.m.verdictScore : '?'}${pl ? ` · entry ${fmtPx(pl.entry)} · stop ${fmtPx(pl.sl)} · TP1 ${fmtPx(pl.tp1)} · TP2 ${fmtPx(pl.tp2)}` : ''}${why ? ' · ' + why : ''}`;
   if (AC.sound) beep();
-  if (AC.notify && typeof Notification !== 'undefined' && Notification.permission === 'granted'){ try { new Notification('ELPP: ' + c.name + ' ' + dir, {body:txt}); } catch(e){} }
+  if (AC.notify || test) elppNotify('ELPP: ' + c.name + ' ' + dir.toUpperCase(), txt, 'elpp-' + c.name);
   if (AC.tgToken && AC.tgChat){ fetch('https://api.telegram.org/bot' + encodeURIComponent(AC.tgToken) + '/sendMessage', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id:AC.tgChat, text:'ELPP alert\n' + txt})}).catch(() => {}); }
   AL.log.unshift({t:Date.now(), txt}); AL.log.length = Math.min(AL.log.length, 30); toast(txt.slice(0, 80)); renderSignals();
 }
@@ -5694,7 +5743,8 @@ function renderSignals(){
       <div class="row"><label class="hint"><input type="checkbox" id="sgStrict"> Strict filters (recommended): only log a trade when the market verdict allows it, a sweep breakout and an institutional candle confirm it, price has not already run, and at most 3 per side per hour</label></div><div id="sgSkip" class="hint"></div><div id="sgBatch" class="hint"></div><div id="sgStats"></div><div class="row"><button class="btn" id="sgCsv" type="button">Download CSV</button><button class="btn" id="sgClear" type="button">Clear log</button></div><div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th>Opened</th><th style="text-align:left">Coin</th><th>Side</th><th style="text-align:left">Source</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th style="text-align:left">Result</th><th>R</th></tr></thead><tbody id="sgBody"></tbody></table></div></div>
     <div class="nsec"><h3>Alerts</h3>
       <p class="hint">Fires when all of these are true: the verdict is Strong, the 1h sweep breakout is confirmed, an institutional candle backs it, and the score is at least the number below. Each coin alerts at most once every 2 hours. The page must stay open.</p>
-      <div class="row"><label class="hint"><input type="checkbox" id="alOn"> Alerts on</label><label class="hint"><input type="checkbox" id="alSound"> Sound</label><label class="hint"><input type="checkbox" id="alNotify"> Browser notification</label><button class="btn sm" id="alEnable" type="button">Allow notifications</button><label class="hint">Minimum score <input type="text" id="alMin" style="width:56px"></label></div>
+      <div class="row"><label class="hint"><input type="checkbox" id="alOn"> Alerts on</label><label class="hint"><input type="checkbox" id="alSound"> Sound</label><label class="hint"><input type="checkbox" id="alNotify"> Notification</label><button class="btn sm" id="alEnable" type="button">Allow notifications</button><label class="hint">Minimum score <input type="text" id="alMin" style="width:56px"></label></div>
+      <div class="row"><label class="hint"><input type="checkbox" id="alVerdict"> Also alert when the market verdict changes</label><label class="hint" id="alKeepWrap" hidden><input type="checkbox" id="alKeep"> Keep running in the background (phone app)</label></div>
       <div class="row" style="margin-top:6px"><input type="password" id="alTok" placeholder="Telegram bot token (optional)" style="min-width:260px"><input type="text" id="alChat" placeholder="Telegram chat id" style="width:170px"><button class="btn" id="alTest" type="button">Send test alert</button></div>
       <p class="hint">Telegram: create a bot with @BotFather, send it a message, then use the token and your chat id here. They are stored only in this browser.</p><div id="alLog" class="hint"></div></div>
     <div class="nsec"><h3>Macro calendar</h3>
@@ -5720,17 +5770,17 @@ function renderSignals(){
       <p class="hint"><label class="tg"><input type="checkbox" id="pxOn"> Use free public proxies for blocked low-volume data (extra exchanges, DEX, DefiLlama). Never used for your keys.</label><br><label class="tg"><input type="checkbox" id="pxMain"> Also use them for the main exchange scan (many calls: can get your IP rate-limited, leave off unless needed).</label></p></div>
     <div class="nsec"><h3>My execution settings</h3><div class="row"><label class="hint">My typical position size, $ <input type="text" id="mySize" style="width:110px"></label></div>
       <p class="hint">Used by the Execution filters (book depth, slippage). Depth and slippage come from the first 20 levels of the Hyperliquid order book, so a very large size on a liquid coin can read "more than the book" even when real liquidity is deeper.</p></div>`;
-    $('sgStrict').checked = state.sigStrict !== false; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
+    $('sgStrict').checked = state.sigStrict !== false; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
     $('macUrl').value = MC.url === undefined ? MAC_URL : MC.url; $('macManual').value = MC.manual || ''; $('pfAddr').value = PC.addr || ''; $('mySize').value = state.mySize || 10000; $('hlpAddrs').value = state.hlpAddrs === undefined ? HLP_DEFAULT : state.hlpAddrs; $('czKey').value = (state.cz || {}).key || ''; $('cmcKey').value = (state.cmc || {}).key || ''; $('alchKey').value = (state.alch || {}).key || ''; $('helKey').value = (state.hel || {}).key || ''; $('ocLabels').value = state.ocl || ''; $('pxOn').checked = state.pubProxy !== false; $('pxMain').checked = state.pxMain === true; ocStatShow();
     const setA = (k, v) => { state.alerts = Object.assign({}, state.alerts, {[k]:v}); saveState(); };
     el.addEventListener('change', e => { const id = e.target.id;
-      if (id === 'sgStrict'){ state.sigStrict = e.target.checked; saveState(); toast('Strict signal filters ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'alOn') setA('on', e.target.checked); else if (id === 'alSound'){ setA('sound', e.target.checked); if (e.target.checked) beep(); } else if (id === 'alNotify') setA('notify', e.target.checked); else if (id === 'alMin') setA('minScore', e.target.value.trim()); else if (id === 'alTok') setA('tgToken', e.target.value.trim()); else if (id === 'alChat') setA('tgChat', e.target.value.trim());
+      if (id === 'sgStrict'){ state.sigStrict = e.target.checked; saveState(); toast('Strict signal filters ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'alOn') setA('on', e.target.checked); else if (id === 'alSound'){ setA('sound', e.target.checked); if (e.target.checked) beep(); } else if (id === 'alNotify') setA('notify', e.target.checked); else if (id === 'alVerdict') setA('verdict', e.target.checked); else if (id === 'alKeep'){ const kb = NB(); if (kb){ try { kb.keepAlive(e.target.checked); } catch(x){} toast('Background running ' + (e.target.checked ? 'on' : 'off')); } } else if (id === 'alMin') setA('minScore', e.target.value.trim()); else if (id === 'alTok') setA('tgToken', e.target.value.trim()); else if (id === 'alChat') setA('tgChat', e.target.value.trim());
       else if (id === 'macUrl'){ state.mac = Object.assign({}, state.mac, {url:e.target.value.trim()}); saveState(); } else if (id === 'macManual'){ state.mac = Object.assign({}, state.mac, {manual:e.target.value}); saveState(); loadMacro(); }
       else if (id === 'pfAddr'){ state.pf = {addr:e.target.value.trim()}; saveState(); } else if (id === 'mySize'){ state.mySize = e.target.value.trim(); saveState(); requestRender(); } else if (id === 'hlpAddrs'){ state.hlpAddrs = e.target.value; saveState(); loadHlp(); } else if (id === 'cmcKey'){ state.cmc = {key:e.target.value.trim()}; saveState(); } else if (id === 'czKey'){ state.cz = {key:e.target.value.trim()}; saveState(); CZ.mk = null; CZ.cycleAt = 0; CZ.until = 0; } });
     el.addEventListener('click', e => {
       if (e.target.closest('#sgClear')){ if (confirm('Clear the whole signal log?')){ SIG.list = []; sigSave(); renderSignals(); } return; }
       if (e.target.closest('#sgCsv')){ const rows = [['opened','coin','side','source','entry','stop','tp1','tp2','status','R']].concat(SIG.list.map(x => [new Date(x.t).toISOString(), x.name, x.dir, x.src, x.entry, x.sl, x.tp1, x.tp2, x.status, x.r === undefined ? '' : x.r.toFixed(2)])); const b = new Blob([rows.map(r => r.join(',')).join('\n')], {type:'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'elpp_signals.csv'; a.click(); return; }
-      if (e.target.closest('#alEnable')){ if (typeof Notification === 'undefined') toast('This browser has no notifications'); else Notification.requestPermission().then(r => toast('Notifications: ' + r)); return; }
+      if (e.target.closest('#alEnable')){ notifyAsk().then(r => toast(r === 'unsupported' ? 'This browser has no notifications' : 'Notifications: ' + r)); return; }
       if (e.target.closest('#alTest')){ const c = state.coins.get('BTC') || [...state.coins.values()][0]; if (c) fireAlert(c, 'long', 'this is a test', true); else toast('No coin data yet'); return; }
       if (e.target.closest('#macReload')){ state.mac = Object.assign({}, state.mac, {url:$('macUrl').value.trim(), manual:$('macManual').value}); saveState(); loadMacro(); return; }
       if (e.target.closest('#pfLoad')){ state.pf = {addr:$('pfAddr').value.trim()}; saveState(); loadPf(); return; }
@@ -7030,6 +7080,42 @@ setInterval(loadLb, 1800000); setInterval(loadCg, 300000); setInterval(loadTrend
   var mk = document.getElementById('mktBar'); if (mk) mk.addEventListener('click', function(){ mk.classList.toggle('mbx'); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') openMenu(false); });
   if (matchMedia('(max-width: 820px)').matches) setTimeout(function(){ var w = document.getElementById('wrap'); if (w && !w.classList.contains('nofilters') && !sessionStorage.getItem('mbf')){ sessionStorage.setItem('mbf', '1'); if (pb) pb.click(); } }, 1800);
+})();
+</script>
+<script>
+/* back / forward arrows (also wired to the browser and Android back button) + notification bell */
+(function(){
+  var side = document.getElementById('side'), top = document.querySelector('header.top'); if (!side || !top) return;
+  var box = document.createElement('div'); box.id = 'hbNav';
+  box.innerHTML = '<button class="btn sm" id="hbBack" type="button" aria-label="Back" title="Back" disabled>&#9664;</button><button class="btn sm" id="hbFwd" type="button" aria-label="Forward" title="Forward" disabled>&#9654;</button><button class="btn sm" id="hbBell" type="button" aria-label="Notifications" title="Turn notifications on or off">&#128277;</button>';
+  var anchor = top.querySelector('.brand'); top.insertBefore(box, anchor || top.firstChild);
+  var bB = document.getElementById('hbBack'), bF = document.getElementById('hbFwd'), bell = document.getElementById('hbBell');
+  function key(){ var n = side.querySelector('.nv.on[data-view]') || side.querySelector('.nv.on[data-mode]'); return !n ? null : n.dataset.view ? 'view:' + n.dataset.view : 'mode:' + n.dataset.mode; }
+  function btn(k){ if (!k) return null; var a = k.split(':'); return side.querySelector('.nv[data-' + a[0] + '="' + a[1] + '"]'); }
+  var cur = 0, max = 0, last = null, first = null;
+  function upd(){ bB.disabled = cur <= 0; bF.disabled = cur >= max; }
+  function tick(){
+    var k = key(); if (!k) return;
+    if (first === null){ first = k; last = k; try { history.replaceState({i:0, k:k}, ''); } catch(e){} return; }
+    if (k === last) return;
+    last = k; cur++; max = cur;
+    try { history.pushState({i:cur, k:k}, '', location.pathname + location.search + '#' + k.replace(':', '-')); } catch(e){}
+    upd();
+  }
+  setInterval(tick, 250);
+  window.addEventListener('popstate', function(e){
+    var st = e.state, i = st && typeof st.i === 'number' ? st.i : 0, k = (st && st.k) || first;
+    cur = i; last = k; var b = btn(k); if (b) b.click(); upd();
+  });
+  bB.addEventListener('click', function(){ history.back(); });
+  bF.addEventListener('click', function(){ history.forward(); });
+  bell.addEventListener('click', function(){ if (window.__elppBell) window.__elppBell.click(); });
+  setInterval(function(){
+    var s = window.__elppBell && window.__elppBell.status(); if (!s) return;
+    var live = s.on && s.perm === 'granted';
+    bell.innerHTML = live ? '&#128276;' : '&#128277;'; bell.classList.toggle('on', live);
+    bell.title = live ? 'Notifications on (tap to turn off)' : (s.on ? 'Notifications are on but blocked: allow them in phone/browser settings' : 'Notifications off (tap to turn on)');
+  }, 1000);
 })();
 </script>
 <script>
