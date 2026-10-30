@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.19</title>
+<title>ELPP CRYPTO SCANNER PRO V4.20</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.19</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.20</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -2003,6 +2003,9 @@ Object.assign(METRICS, {
   xDivBn:{label:"Hyperliquid price vs Binance futures (%)",tf:null,unit:"%",modes:'all'},
   xDivBy:{label:"Hyperliquid price vs Bybit futures (%)",tf:null,unit:"%",modes:'all'},
   xDivOk:{label:"Hyperliquid price vs OKX futures (%)",tf:null,unit:"%",modes:'all'},
+  dqScore:{label:"Data quality score (0-100)",tf:null,unit:"",modes:'all'},
+  dqSpread:{label:"Price difference between exchanges (%)",tf:null,unit:"%",modes:'all'},
+  fundSpread:{label:"Funding difference between exchanges (%/h)",tf:null,unit:"%/h",modes:'all'},
   xDivGt:{label:"Hyperliquid price vs Gate futures (%)",tf:null,unit:"%",modes:'all'},
   xDivBg:{label:"Hyperliquid price vs Bitget futures (%)",tf:null,unit:"%",modes:'all'},
   spotVolAll:{label:"Spot volume, all exchanges added up (USD)",tf:null,unit:"$",modes:'all'},
@@ -2075,7 +2078,7 @@ Object.assign(METRICS, {
   cmcTotChg:{label:"Total crypto market cap change 24h (CoinMarketCap, %)",tf:null,unit:"%",modes:'all'},
 });
 Object.assign(OPTFMT, {cmcRank:v => '#' + Math.round(v), cmcMcap:v => fmtUsd(v), cmcTurn:v => v.toFixed(0) + '%', cmcVolChg:v => sgn(v, 0, '%'), cmcPairs:v => String(Math.round(v)), cmcAge:v => v.toFixed(v < 10 ? 1 : 0) + ' d', cmcCirc:v => v.toFixed(0) + '%', cmcFdvMc:v => v.toFixed(1) + 'x', cmcChg30:v => sgn(v, 1, '%'), cmcChg60:v => sgn(v, 1, '%'), cmcChg90:v => sgn(v, 1, '%'), cmcDomBtc:v => v.toFixed(1) + '%', cmcDomEth:v => v.toFixed(1) + '%', cmcDomChg:v => sgn(v, 2, ' pp'), cmcTotChg:v => sgn(v, 2, '%')});
-Object.assign(OPTFMT, {xDivGt:v => sgn(v, 3, '%'), xDivBg:v => sgn(v, 3, '%'), spotVolAll:v => fmtUsd(v), cbPrem:v => sgn(v, 3, '%'), seasAvg:v => sgn(v, 3, '%'), seasHit:v => Math.round(v) + '%', feeYield:v => v.toFixed(1) + '%', fngVal:v => String(Math.round(v)), fundPred:v => sgn(v, 4, '%'), fundZ:v => sgn(v, 1), volPct:v => Math.round(v) + '%', todX:v => v.toFixed(2) + 'x', xDivBn:v => sgn(v, 3, '%'), xDivBy:v => sgn(v, 3, '%'), xDivOk:v => sgn(v, 3, '%'), hlpNet:v => (v < 0 ? '-' : '+') + fmtUsd(Math.abs(v)), hitRate:v => Math.round(v) + '%', hitN:v => String(Math.round(v)), hitPool:v => Math.round(v) + '%', tvl:v => fmtUsd(v), tvlChg7:v => sgn(v, 1, '%'), fees24:v => fmtUsd(v), feesChg7:v => sgn(v, 1, '%'), dxLiq:v => fmtUsd(v), dxVol:v => fmtUsd(v), dxRatio:v => v.toFixed(2) + 'x', dxBuy:v => Math.round(v) + '%', dxFdvLiq:v => v.toFixed(0) + 'x', dxAge:v => v.toFixed(v < 10 ? 1 : 0) + ' d', newsDelist:v => String(v), exCg:numTxt, exNf:numTxt, exSoc:numTxt, exRev:numTxt, exPx:numTxt, mkDxy:v => sgn(v, 2, '%'), mkSpx:v => sgn(v, 2, '%'), mkNdx:v => sgn(v, 2, '%'), mkGold:v => sgn(v, 2, '%'), mkJpy:v => sgn(v, 2, '%'), mkEur:v => sgn(v, 2, '%'), mkAud:v => sgn(v, 2, '%'), mkTnx:v => sgn(v, 1, ' bp'), mkYield:v => v.toFixed(2) + '%'});
+Object.assign(OPTFMT, {dqScore:v => String(Math.round(v)), dqSpread:v => v.toFixed(2) + '%', fundSpread:v => v.toFixed(4) + '%', xDivGt:v => sgn(v, 3, '%'), xDivBg:v => sgn(v, 3, '%'), spotVolAll:v => fmtUsd(v), cbPrem:v => sgn(v, 3, '%'), seasAvg:v => sgn(v, 3, '%'), seasHit:v => Math.round(v) + '%', feeYield:v => v.toFixed(1) + '%', fngVal:v => String(Math.round(v)), fundPred:v => sgn(v, 4, '%'), fundZ:v => sgn(v, 1), volPct:v => Math.round(v) + '%', todX:v => v.toFixed(2) + 'x', xDivBn:v => sgn(v, 3, '%'), xDivBy:v => sgn(v, 3, '%'), xDivOk:v => sgn(v, 3, '%'), hlpNet:v => (v < 0 ? '-' : '+') + fmtUsd(Math.abs(v)), hitRate:v => Math.round(v) + '%', hitN:v => String(Math.round(v)), hitPool:v => Math.round(v) + '%', tvl:v => fmtUsd(v), tvlChg7:v => sgn(v, 1, '%'), fees24:v => fmtUsd(v), feesChg7:v => sgn(v, 1, '%'), dxLiq:v => fmtUsd(v), dxVol:v => fmtUsd(v), dxRatio:v => v.toFixed(2) + 'x', dxBuy:v => Math.round(v) + '%', dxFdvLiq:v => v.toFixed(0) + 'x', dxAge:v => v.toFixed(v < 10 ? 1 : 0) + ' d', newsDelist:v => String(v), exCg:numTxt, exNf:numTxt, exSoc:numTxt, exRev:numTxt, exPx:numTxt, mkDxy:v => sgn(v, 2, '%'), mkSpx:v => sgn(v, 2, '%'), mkNdx:v => sgn(v, 2, '%'), mkGold:v => sgn(v, 2, '%'), mkJpy:v => sgn(v, 2, '%'), mkEur:v => sgn(v, 2, '%'), mkAud:v => sgn(v, 2, '%'), mkTnx:v => sgn(v, 1, ' bp'), mkYield:v => v.toFixed(2) + '%'});
 
 function fmtVal(metric, v){
   const u = METRICS[metric].unit;
@@ -3165,7 +3168,7 @@ function liqFill(c){
 }
 
 /* ===== V4.19: multi-exchange backup (if one exchange is blocked, the others fill the same data) ===== */
-var RD = {src:{}, agg:new Map(), px:{gt:new Map(), bg:new Map()}, at:0, busy:false};
+var RD = {src:{}, agg:new Map(), px:{gt:new Map(), bg:new Map()}, dq:new Map(), rej:0, at:0, busy:false};
 Object.assign(X, {spotAlt:new Map(), futAlt:new Map()});
 const rdSkip = b => b.length > 4 && /(UP|DOWN|BULL|BEAR|3L|3S|5L|5S)$/.test(b);
 const rdUnit = (sym, suf) => { let b = sym.slice(0, -suf.length); const mm = b.match(/^1(0{3,})/), mult = mm ? +mm[0] : 1; return [b.replace(/^10{3,}/, ''), mult]; };
@@ -3181,29 +3184,62 @@ const RD_FUT = [
   ['bitget', 'Bitget', async () => { const j = await ext('https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES', null, 15000); return (j.data || []).filter(t => t.symbol.endsWith('USDT')).map(t => { const [b, mu] = rdUnit(t.symbol, 'USDT'); return {b, mark:+(t.markPrice || t.lastPr) / mu, index:+t.indexPrice / mu, fund:+t.fundingRate * 100 / 8}; }); }],
   ['gate', 'Gate', async () => { const j = await ext('https://api.gateio.ws/api/v4/futures/usdt/tickers', null, 15000); return (Array.isArray(j) ? j : []).filter(t => /_USDT$/.test(t.contract)).map(t => { const [b, mu] = rdUnit(t.contract.replace('_', ''), 'USDT'); return {b, mark:+(t.mark_price || t.last) / mu, index:+t.index_price / mu, fund:+t.funding_rate * 100 / 8}; }); }]
 ];
+const dqMed = a => { const b = a.filter(isFinite).sort((x, y) => x - y); if (!b.length) return NaN; const h = b.length >> 1; return b.length % 2 ? b[h] : (b[h - 1] + b[h]) / 2; };
 async function rdLoad(){
   if (RD.busy || Date.now() - RD.at < 60000) return; RD.busy = true;
   try {
     const sp = await Promise.allSettled(RD_SPOT.map(s => s[2]())), fu = await Promise.allSettled(RD_FUT.map(s => s[2]()));
-    const agg = new Map(), alt = new Map(), add = (k, ex, px, vol, chg) => { let o = agg.get(k); if (!o){ o = {vol:0, n:0, best:null}; agg.set(k, o); } if (vol > 0){ o.vol += vol; o.n++; } if (px > 0 && (!o.best || vol > o.best.vol)) o.best = {px, vol:vol || 0, chg:isFinite(chg) ? chg : null, src:ex + ' spot'}; };
+    const rows = new Map(), R = k => { let o = rows.get(k); if (!o){ o = {spot:[], fut:[]}; rows.set(k, o); } return o; };
     sp.forEach((r, i) => { const id = RD_SPOT[i][0], nm = RD_SPOT[i][1];
       if (r.status !== 'fulfilled' || !r.value.length){ RD.src['s:' + id] = {ok:false, at:Date.now(), err:r.status === 'rejected' ? errTxt(r.reason) : 'empty answer'}; return; }
-      let n = 0; for (const [sy, px, vol, chg] of r.value){ if (!sy.endsWith('USDT')) continue; const b = sy.slice(0, -4); if (!b || rdSkip(b) || !(px > 0)) continue; add(b, nm, px, vol, chg); n++; }
+      let n = 0; for (const [sy, px, vol, chg] of r.value){ if (!sy.endsWith('USDT')) continue; const b = sy.slice(0, -4); if (!b || rdSkip(b) || !(px > 0)) continue; R(b).spot.push({ex:nm, px, vol:vol > 0 ? vol : 0, chg:isFinite(chg) ? chg : null}); n++; }
       RD.src['s:' + id] = {ok:true, at:Date.now(), n}; });
-    for (const [k, v] of X.bnSpot){ add(k, 'Binance', v.px, v.vol, v.chg); } for (const [k, v] of X.mxSpot){ add(k, 'MEXC', v.px, v.vol, null); }
-    for (const [k, o] of agg){ if (o.best){ const bs = X.bnSpot.get(k); if (!bs) alt.set(k, {px:o.best.px, vol:o.best.vol, chg:o.best.chg, src:o.best.src}); } }
-    RD.agg = agg; X.spotAlt = alt;
-    const f = new Map(), gt = new Map(), bg = new Map();
+    if (X.bnSpot && Date.now() - (X.bnAt || 0) < 600000) for (const [k, v] of X.bnSpot) if (v.px > 0) R(k).spot.push({ex:'Binance', px:v.px, vol:v.vol > 0 ? v.vol : 0, chg:v.chg});
+    if (X.mxSpot) for (const [k, v] of X.mxSpot) if (v.px > 0) R(k).spot.push({ex:'MEXC', px:v.px, vol:v.vol > 0 ? v.vol : 0, chg:null});
     fu.forEach((r, i) => { const id = RD_FUT[i][0];
       if (r.status !== 'fulfilled' || !r.value.length){ RD.src['f:' + id] = {ok:false, at:Date.now(), err:r.status === 'rejected' ? errTxt(r.reason) : 'empty answer'}; return; }
-      let n = 0; for (const t of r.value){ if (!t.b || !(t.mark > 0)) continue; let o = f.get(t.b); if (!o){ o = {m:[], i:[], f:[], s:[]}; f.set(t.b, o); } o.m.push(t.mark); if (t.index > 0) o.i.push(t.index); if (isFinite(t.fund)) o.f.push(t.fund); o.s.push(RD_FUT[i][1]); n++;
-        if (id === 'gate') gt.set(t.b, {px:t.mark}); if (id === 'bitget') bg.set(t.b, {px:t.mark}); }
+      let n = 0; for (const t of r.value){ if (!t.b || !(t.mark > 0)) continue; R(t.b).fut.push({ex:RD_FUT[i][1], mark:t.mark, index:t.index, fund:t.fund}); n++; }
       RD.src['f:' + id] = {ok:true, at:Date.now(), n}; });
-    const av = a => a.reduce((x, y) => x + y, 0) / a.length, fa = new Map();
-    for (const [k, o] of f) fa.set(k, {mark:av(o.m), index:o.i.length ? av(o.i) : NaN, fund:o.f.length ? av(o.f) : NaN, src:o.s.join(' + '), n:o.s.length});
-    X.futAlt = fa; RD.px = {gt:new Map([...gt].map(([k, v]) => [k, v.px])), bg:new Map([...bg].map(([k, v]) => [k, v.px]))};
-    RD.at = Date.now(); requestRender();
+    if (X.bnFut && !X.bnFutErr) for (const [k, v] of X.bnFut) if (v.mark > 0) R(k).fut.push({ex:'Binance', mark:v.mark, index:v.index, fund:v.fund});
+    const anchor = k => { const c = state.coins.get(k) || state.coins.get('k' + k); if (!c || !c.m || !isNum(c.m.px)) return null; return c.m.px / (/^k[A-Z0-9]{2,}$/.test(c.name) ? 1000 : 1); };
+    const agg = new Map(), alt = new Map(), fa = new Map(), dq = new Map(), gt = new Map(), bg = new Map(); let rejN = 0;
+    for (const [k, o] of rows){
+      const a = anchor(k), all = o.spot.map(x => x.px).concat(o.fut.map(x => x.mark)), ref = a || (all.length >= 3 ? dqMed(all) : NaN), rej = [];
+      const ok = x => { const p = x.px || x.mark; if (!isFinite(ref) || !(ref > 0)) return true; if (Math.abs(p / ref - 1) <= 0.06) return true; rej.push(x.ex); return false; };
+      const sp2 = o.spot.filter(ok), fu2 = o.fut.filter(ok); rejN += rej.length;
+      if (!sp2.length && !fu2.length) continue;
+      let vol = 0, n = 0, best = null, vw = 0; for (const x of sp2){ if (x.vol > 0){ vol += x.vol; n++; vw += x.px * x.vol; } if (!best || x.vol > best.vol) best = x; }
+      if (sp2.length){ agg.set(k, {vol, n:n || sp2.length, best:{px:best.px, vol:best.vol, chg:best.chg, src:best.ex + ' spot'}, vw:vol > 0 ? vw / vol : best.px, top:vol > 0 ? Math.max(...sp2.map(x => x.vol)) / vol : null, venues:sp2.map(x => x.ex)});
+        if (!sp2.some(x => x.ex === 'Binance')) alt.set(k, {px:best.px, vol:best.vol, chg:best.chg, src:best.ex + ' spot'}); }
+      const fx = fu2.filter(x => x.ex !== 'Binance');
+      if (fx.length){ const av = f => { const v = fx.map(f).filter(isFinite); return v.length ? v.reduce((p, q) => p + q, 0) / v.length : NaN; }; fa.set(k, {mark:av(x => x.mark), index:av(x => x.index), fund:av(x => x.fund), src:fx.map(x => x.ex).join(' + '), n:fx.length}); }
+      for (const x of fu2){ if (x.ex === 'Gate') gt.set(k, x.mark); if (x.ex === 'Bitget') bg.set(k, x.mark); }
+      const fv = fu2.map(x => x.fund).filter(isFinite), prices = sp2.map(x => x.px).concat(fu2.map(x => x.mark)); if (a !== null && isFinite(a)) prices.push(a);
+      const md = dqMed(prices), spread = prices.length >= 2 && md > 0 ? (Math.max(...prices) - Math.min(...prices)) / md * 100 : null;
+      dq.set(k, {nSpot:sp2.length, nFut:fu2.length, rej, spread, cons:md, fundMed:dqMed(fv), fundSpread:fv.length >= 2 ? Math.max(...fv) - Math.min(...fv) : null, fundN:fv.length, conc:agg.get(k) ? agg.get(k).top : null, venues:sp2.map(x => x.ex).concat(fu2.map(x => x.ex + ' perp'))});
+    }
+    RD.agg = agg; X.spotAlt = alt; X.futAlt = fa; RD.px = {gt, bg}; RD.dq = dq; RD.rej = rejN; RD.at = Date.now(); requestRender();
   } catch(e){ RD.err = errTxt(e); RD.at = Date.now() - 30000; } finally { RD.busy = false; }
+}
+/* data quality per coin: how many exchanges, do they agree, is it fresh, is the book and tape there */
+function dqFill(c, now){
+  const m = c.m; m.dqScore = null; m.dqLabel = null; m.dqVenues = null; m.dqSpread = null; m.dqRej = null; m.fundMed = null; m.fundSpread = null; m.spotConc = null; m.dqWhy = '';
+  const k = normSym(c.name), d = RD.dq && RD.dq.get(k), why = [], cb = X9.cb.get(c.name);
+  let venues = 1 + (d ? d.nSpot + d.nFut : 0) + (cb && now - cb.at < 300000 ? 1 : 0);
+  let sc = 0; sc += Math.min(25, venues * 4); why.push(venues + ' price source' + (venues === 1 ? '' : 's'));
+  let sp = d ? d.spread : null; if (cb && now - cb.at < 300000 && isNum(m.px) && m.px > 0 && d && isNum(d.cons)){ const p = Math.abs(cb.px * (/^k[A-Z0-9]{2,}$/.test(c.name) ? 1000 : 1) / m.px - 1) * 100; if (p < 6) sp = Math.max(sp || 0, p); }
+  if (isNum(sp)){ sc += sp <= 0.15 ? 25 : sp <= 0.4 ? 15 : sp <= 1 ? 6 : 0; why.push('exchanges differ by ' + sp.toFixed(2) + '%'); } else why.push('no second price to compare');
+  const lastC = c.candles && c.candles.length ? c.candles[c.candles.length - 1].t : 0, cAge = lastC ? now - lastC : null;
+  const tAge = state.lastCtx ? now - state.lastCtx : null; sc += tAge !== null && tAge <= 90000 ? 8 : tAge !== null && tAge <= 300000 ? 3 : 0; sc += cAge !== null && cAge <= 900000 ? 7 : cAge !== null && cAge <= 3600000 ? 3 : 0;
+  if (tAge === null || tAge > 300000) why.push('live prices are stale');
+  sc += c.candles && c.candles.length >= 150 ? 10 : c.candles && c.candles.length >= 60 ? 5 : 0; if (!(c.candles && c.candles.length >= 60)) why.push('short candle history');
+  if (c.l2 && now - c.l2.at < 420000){ sc += 10; } else why.push('no order book');
+  if (m.ofState && (m.ofState['5m'] || m.ofState['15m'])) sc += 5; else why.push('no live trade tape');
+  if (d && isNum(d.fundSpread)){ const fs = d.fundSpread; sc += fs <= 0.004 ? 10 : fs <= 0.01 ? 6 : fs <= 0.02 ? 2 : 0; if (fs > 0.01) why.push('funding differs a lot between exchanges'); m.fundSpread = fs; }
+  if (d && isNum(d.fundMed)) m.fundMed = d.fundMed;
+  if (d && d.rej && d.rej.length){ why.push('dropped bad data from ' + d.rej.join(', ')); m.dqRej = d.rej.length; }
+  if (d && isNum(d.conc)){ m.spotConc = d.conc * 100; if (d.conc >= 0.9 && d.nSpot >= 2) why.push('spot volume is ' + Math.round(d.conc * 100) + '% on one exchange'); }
+  m.dqScore = Math.round(Math.min(100, sc)); m.dqLabel = m.dqScore >= 70 ? 3 : m.dqScore >= 45 ? 2 : 1; m.dqVenues = venues; m.dqSpread = isNum(sp) ? sp : null; m.dqWhy = why.join(' · ');
 }
 /* liquidations from three exchanges at once: if one stream is blocked the others keep it alive */
 LQ.s = {bn:false, ok:false, by:false}; LQ.okErr = ''; LQ.byErr = '';
@@ -3794,6 +3830,8 @@ function verdictFill(c){
       if (m.fngState === 1) add(2, 'the whole market is in extreme fear (contrarian long)'); else if (m.fngState === 2) add(-2, 'the whole market is in extreme greed (contrarian short)');
       if (m.cbState === 1) add(2, 'Coinbase (US spot) trades above Hyperliquid by ' + m.cbPrem.toFixed(2) + '%: US buyers are paying up'); else if (m.cbState === 2) add(-2, 'Coinbase (US spot) trades below Hyperliquid by ' + Math.abs(m.cbPrem).toFixed(2) + '%: US sellers are pressing');
       if (m.seasState === 1) add(1, 'this hour of the day has leaned up for this coin over the last 45 days (' + m.seasHit.toFixed(0) + '% of days up)'); else if (m.seasState === 2) add(-1, 'this hour of the day has leaned down for this coin over the last 45 days (' + (100 - m.seasHit).toFixed(0) + '% of days down)');
+      if (isNum(m.dqScore) && m.dqScore < 45) flags.push('data quality is low for this coin (' + m.dqWhy + '): trust the signal less');
+      if (isNum(m.dqSpread) && m.dqSpread >= 1) flags.push('exchanges disagree on the price by ' + m.dqSpread.toFixed(2) + '%: a bad tick, thin market or wick on one exchange');
       if (isNum(m.feeYield) && m.feeYield >= 10) flags.push('the protocol earns ' + m.feeYield.toFixed(0) + '% of its market cap a year in fees (real revenue)');
       if (m.xDivState === 1) add(2, 'Hyperliquid trades cheaper than Binance, Bybit and OKX (catch-up buying)'); else if (m.xDivState === 2) add(-2, 'Hyperliquid trades richer than Binance, Bybit and OKX (catch-down selling)');
       if (m.fundFlip === 1) flags.push('predicted funding turns positive: shorts stop being paid'); else if (m.fundFlip === 2) flags.push('predicted funding turns negative: longs stop being paid');
@@ -4144,7 +4182,7 @@ function cmcFill(c, now){
   m.cmcRank = d.rank; m.cmcMcap = d.mcap; m.cmcPairs = d.pairs; m.cmcCirc = d.circ; m.cmcVolChg = d.volChg; m.cmcChg30 = d.c30; m.cmcChg60 = d.c60; m.cmcChg90 = d.c90; m.cmcTags = d.tags || '';
   m.cmcTurn = d.mcap > 0 && d.vol > 0 ? d.vol / d.mcap * 100 : null; m.cmcFdvMc = d.mcap > 0 && d.fdv > 0 ? d.fdv / d.mcap : null; m.cmcAge = d.added ? (now - d.added) / 864e5 : null;
 }
-function compute(c, now){ computeCore(c, now); postFill(c, now); instFill(c, now); takeoffFill(c); whFill(c); walFill(c); swpFill(c, now); optFill(c); ofFill(c); execFill(c); sessFill(c, now); liqFill(c); crowdFill(c); macFill(c); ctxFill(c, now); pfFill(c, now); fxFill(c, now); x9Fill(c, now); czFill(c, now); cmcFill(c, now); verdictFill(c); hitFill(c, now); planFill(c); }
+function compute(c, now){ computeCore(c, now); postFill(c, now); instFill(c, now); takeoffFill(c); whFill(c); walFill(c); swpFill(c, now); optFill(c); ofFill(c); execFill(c); sessFill(c, now); liqFill(c); crowdFill(c); macFill(c); ctxFill(c, now); pfFill(c, now); fxFill(c, now); x9Fill(c, now); dqFill(c, now); czFill(c, now); cmcFill(c, now); verdictFill(c); hitFill(c, now); planFill(c); }
 function pressMinV(){ const v = parseNum(state.pressMin); return isNum(v) && v > 0 ? v : 15; }
 function takeMinV(){ const v = parseNum(state.takeMin); return isNum(v) && v > 0 ? v : 60; }
 function sweepDir(m){ const a = m.sweep && m.sweep['4h'], b = m.sweep && m.sweep['1h']; return (isNum(a) && a !== 0) ? a : (isNum(b) ? b : 0); }
@@ -4626,6 +4664,9 @@ function extCols(num, cols){
     nc('xDivBy', 'Gap vs Bybit', v => Math.abs(v) >= 0.15 ? 'warn' : '');
     nc('xDivOk', 'Gap vs OKX', v => Math.abs(v) >= 0.15 ? 'warn' : '');
     nc('hlpNet', 'HLP vault net position', v => '');
+    nc('dqScore', 'Data quality (0-100)', v => v >= 70 ? 'up' : v >= 45 ? 'warn' : 'dn');
+    nc('dqSpread', 'Exchange price difference', v => v > 0.4 ? 'warn' : '');
+    nc('fundSpread', 'Funding spread between exchanges', v => v > 0.01 ? 'warn' : '');
     nc('xDivGt', 'Gap vs Gate', v => Math.abs(v) >= 0.15 ? 'warn' : '');
     nc('xDivBg', 'Gap vs Bitget', v => Math.abs(v) >= 0.15 ? 'warn' : '');
     nc('spotVolAll', 'Spot volume (all exchanges)', v => v >= 5e6 ? 'up' : '');
@@ -4711,7 +4752,7 @@ function extCols(num, cols){
 }
 const CGCOLN = {phase:'Market phase', cgTrend:'Trend (30d)', pch_1h:'Change 1h', pch_24h:'Change 24h', pch_7d:'Change 7d', pch_30d:'Change 30d', pch_200d:'Change 200d', pch_1y:'Change 1y', rank:'Rank', cgVol:'24h volume', supplyPct:'Supply in circulation', atlDist:'Above all-time low', hypeStage:'Hype timing', newsTag:'News', where:'Where to trade'};
 Object.assign(COLNAMES, CGCOLN, {takeoff:'Take-off (ready to go long or short)', buildup:'Build-up (phase + pressure)', takeWhy:'Take-off reasons', spotPx:'Spot price', gapSpot:'Perp vs spot gap', bnFund:'Binance funding', newsCount:'News stories', sector:'Sector'});
-Object.assign(COLNAMES, {"xDivGt": "Gap vs Gate", "xDivBg": "Gap vs Bitget", "spotVolAll": "Spot volume, all exchanges", "cbPrem": "Coinbase vs Hyperliquid", "seasAvg": "This UTC hour: average move", "seasHit": "This UTC hour: days up", "feeYield": "Protocol fee yield", "depthX": "Book depth vs my size", "slipPct": "Slippage at my size", "tpAtr": "TP1 distance (ATR)", "slAtr": "Stop distance (ATR)", "rr1": "R:R to TP1", "liqL5": "Longs liquidated 5m", "liqS5": "Shorts liquidated 5m", "liqX": "Liquidations vs normal", "fund8": "Funding % per 8h", "fundGap": "Funding gap vs Binance", "lsRatio": "Binance long/short ratio", "eventMin": "Minutes to macro event", "domChg": "BTC dominance change 24h", "beta": "Beta vs BTC", "relBeta": "Relative strength (beta-adjusted)", "sectorChg": "Sector median 1h", "pocDist": "Yesterday POC distance", "vahDist": "Yesterday value-area high", "valDist": "Yesterday value-area low", "optIvRank": "Options IV rank (DVOL, 1y)", "optRv": "Realized volatility 48h", "optIvRv": "Options IV minus realized volatility", "optExpiryH": "Next big options expiry", "optFlipDist": "Gamma flip distance", "pfCorr": "Portfolio correlation", "pfSector": "Positions in this sector", "session": "Session", "asiaSweep": "Asia range sweep", "kzSweep": "Kill-zone sweep", "liqFlush": "Liquidation flush", "lsState": "Crowd positioning", "eventRisk": "Macro event risk", "rotation": "Market rotation", "sectorLead": "Sector position", "vaPos": "Vs yesterday value area", "vpNear": "At yesterday value level", "optPin": "Options expiry pinning", "pfHeld": "My position", "oiPx_15m": "Open interest vs price 15m", "oiPx_1h": "Open interest vs price 1h", "cvdDiv_15m": "CVD divergence 15m", "cvdDiv_1h": "CVD divergence 1h"});
+Object.assign(COLNAMES, {"dqScore": "Data quality (0-100)", "dqSpread": "Exchange price difference", "fundSpread": "Funding spread between exchanges", "xDivGt": "Gap vs Gate", "xDivBg": "Gap vs Bitget", "spotVolAll": "Spot volume, all exchanges", "cbPrem": "Coinbase vs Hyperliquid", "seasAvg": "This UTC hour: average move", "seasHit": "This UTC hour: days up", "feeYield": "Protocol fee yield", "depthX": "Book depth vs my size", "slipPct": "Slippage at my size", "tpAtr": "TP1 distance (ATR)", "slAtr": "Stop distance (ATR)", "rr1": "R:R to TP1", "liqL5": "Longs liquidated 5m", "liqS5": "Shorts liquidated 5m", "liqX": "Liquidations vs normal", "fund8": "Funding % per 8h", "fundGap": "Funding gap vs Binance", "lsRatio": "Binance long/short ratio", "eventMin": "Minutes to macro event", "domChg": "BTC dominance change 24h", "beta": "Beta vs BTC", "relBeta": "Relative strength (beta-adjusted)", "sectorChg": "Sector median 1h", "pocDist": "Yesterday POC distance", "vahDist": "Yesterday value-area high", "valDist": "Yesterday value-area low", "optIvRank": "Options IV rank (DVOL, 1y)", "optRv": "Realized volatility 48h", "optIvRv": "Options IV minus realized volatility", "optExpiryH": "Next big options expiry", "optFlipDist": "Gamma flip distance", "pfCorr": "Portfolio correlation", "pfSector": "Positions in this sector", "session": "Session", "asiaSweep": "Asia range sweep", "kzSweep": "Kill-zone sweep", "liqFlush": "Liquidation flush", "lsState": "Crowd positioning", "eventRisk": "Macro event risk", "rotation": "Market rotation", "sectorLead": "Sector position", "vaPos": "Vs yesterday value area", "vpNear": "At yesterday value level", "optPin": "Options expiry pinning", "pfHeld": "My position", "oiPx_15m": "Open interest vs price 15m", "oiPx_1h": "Open interest vs price 1h", "cvdDiv_15m": "CVD divergence 15m", "cvdDiv_1h": "CVD divergence 1h"});
 Object.assign(COLNAMES, {"fngVal": "Fear & Greed", "fundPred": "Predicted funding %/h", "fundZ": "Funding z-score 72h", "volPct": "Volatility percentile", "todX": "Last-hour volume vs usual", "xDivBn": "Gap vs Binance", "xDivBy": "Gap vs Bybit", "xDivOk": "Gap vs OKX", "hlpNet": "HLP vault net position", "hitRate": "Past hit rate of setup", "hitN": "Past setups counted", "hitPool": "Hit rate, all coins", "tvl": "Protocol TVL", "tvlChg7": "TVL change 7d", "fees24": "Protocol fees 24h", "feesChg7": "Fees change 7d", "dxLiq": "DEX pool liquidity", "dxVol": "DEX volume 24h", "dxRatio": "DEX volume vs Hyperliquid", "dxBuy": "DEX buys share (1h)", "dxFdvLiq": "FDV vs pool liquidity", "dxAge": "DEX pool age", "newsDelist": "Delisting news 24h", "exCg": "Your Coinglass field", "exNf": "Your netflow field", "exSoc": "Your social field", "exRev": "Your revenue field", "exPx": "Your PrimeXBT field", "mkDxy": "Dollar index today", "mkSpx": "S&P 500 today", "mkNdx": "Nasdaq today", "mkGold": "Gold today", "mkJpy": "Dollar vs yen today", "mkEur": "Euro vs dollar today", "mkAud": "Australian dollar today", "mkTnx": "US 10-year yield change", "mkYield": "US 10-year yield", "fngState": "Market mood", "fundFlip": "Funding flip", "fundTrend": "Funding trend", "volRegime": "Volatility regime", "dayType": "Day type", "xDivState": "Cross-exchange gap", "hlpState": "HLP vault side", "mkRisk": "Cross-market mood"});
 Object.assign(COLNAMES, {"cOiUsd": "Open interest, 3 exchanges", "cOiChg1h": "Open interest change 1h, 3 exchanges", "cOiHl": "Hyperliquid share of open interest", "cLiqL15": "Longs liquidated 15m, 3 exchanges", "cLiqS15": "Shorts liquidated 15m, 3 exchanges", "cLiqX": "Liquidations vs normal, 3 exchanges", "cLiqFlush": "Liquidation flush, 3 exchanges", "cLs": "Long/short ratio, exchanges averaged", "cLsState": "Crowd positioning, exchanges averaged"});
 Object.assign(COLNAMES, {"cmcRank": "CoinMarketCap rank", "cmcMcap": "CoinMarketCap market cap", "cmcTurn": "Turnover vs market cap", "cmcVolChg": "Volume change 24h (CoinMarketCap)", "cmcPairs": "Markets listed", "cmcAge": "Days on CoinMarketCap", "cmcCirc": "Circulating supply share", "cmcFdvMc": "FDV vs market cap", "cmcChg30": "Change 30d (CoinMarketCap)", "cmcChg60": "Change 60d (CoinMarketCap)", "cmcChg90": "Change 90d (CoinMarketCap)", "cmcDomBtc": "Bitcoin dominance (CoinMarketCap)", "cmcDomEth": "Ethereum dominance (CoinMarketCap)", "cmcDomChg": "Bitcoin dominance change 24h", "cmcTotChg": "Total crypto market cap change 24h", "cmcTags": "CoinMarketCap tags"});
@@ -6796,6 +6837,7 @@ function instConf(c, rd, setup, kind){
   { const o5 = (m.ofPct || {})['5m'], o15 = (m.ofPct || {})['15m'], v = n(o5) ? o5 : o15, tg = n(o5) ? '5m' : '15m';
     single('flow5', 'Live trade flow (taker buys vs sells) agrees', 'live taker flow ' + (long ? '+' : '-') + '15% or more over the last 5 to 15 minutes', n(v) ? R(v * dir >= 15 ? INS_OK : INS_NO, 'taker flow ' + spc(v) + ' (' + tg + ')') : R(INS_NA, 'live trades are not streaming for this coin'));
     single('book', 'Order book leans your way', 'order book imbalance ' + (long ? '+' : '-') + '10% or more (more resting size on your side)', n(m.obiPct) ? R(m.obiPct * dir >= 10 ? INS_OK : INS_NO, 'book ' + spc(m.obiPct)) : R(INS_NA, 'no order book yet'));
+    single('dq', 'Data is trustworthy', 'data quality score 60 or more (several exchanges agree, fresh data, book and tape present)', n(m.dqScore) ? R(m.dqScore >= 60 ? INS_OK : INS_NO, 'quality ' + m.dqScore + '/100: ' + (m.dqWhy || '')) : R(INS_NA, 'not scored yet'));
     single('slip', 'Cheap to enter at your size', 'estimated slippage 0.10% or less at your position size', n(m.slipPct) ? R(m.slipPct <= 0.1 ? INS_OK : INS_NO, m.slipPct >= 9.99 ? 'your size is larger than the visible book' : 'slippage ' + m.slipPct.toFixed(3) + '%') : R(INS_NA, 'no order book yet'));
     single('cb', 'Coinbase (US spot) not against you', 'Coinbase price not more than 0.05% against your direction versus Hyperliquid', n(m.cbPrem) ? R(m.cbPrem * dir > -0.05 ? INS_OK : INS_NO, 'Coinbase ' + (m.cbPrem > 0 ? '+' : '') + m.cbPrem.toFixed(2) + '% vs Hyperliquid') : R(INS_NA, 'not listed on Coinbase or not loaded'));
     if (!spot){
@@ -6820,7 +6862,7 @@ function instScore(c, rd, setup, conf, kind){
   if (kind === 'spot') add('Spot volume is real', ok('spotvol', '15m') ? 5 : 0, 5); else add('Open interest rising with price', ok('oi', '15m') ? 5 : ok('oi', '1h') ? 3 : 0, 5);
   add('CVD agrees', ok('cvd', '15m') ? 5 : ok('cvd', '1h') ? 3 : 0, 5); add('Buy/sell pressure agrees', ok('press', '15m') ? 5 : ok('press', '1h') ? 3 : 0, 5); add('Tracked wallets (about 100) agree', ok('wallet', '15m') ? 10 : 0, 10); add('Funding not crowded against you', ok('fund', '15m') ? 5 : 0, 5);
   { const pa = (id, l, mx) => { const x = it(id); if (x && x.res['15m'].s !== INS_NA) add(l, ok(id, '15m') ? mx : 0, mx); };
-    pa('flow5', 'Live trade flow agrees', 5); pa('book', 'Order book leans your way', 4); pa('slip', 'Cheap to enter at your size', 3); pa('cb', 'Coinbase (US spot) not against', 3); pa('hlp', 'HLP vault not against', 3); pa('xdiv', 'Other exchanges not against', 3); }
+    pa('dq', 'Data is trustworthy', 4); pa('flow5', 'Live trade flow agrees', 5); pa('book', 'Order book leans your way', 4); pa('slip', 'Cheap to enter at your size', 3); pa('cb', 'Coinbase (US spot) not against', 3); pa('hlp', 'HLP vault not against', 3); pa('xdiv', 'Other exchanges not against', 3); }
   const score = Math.round(parts.reduce((a, x) => a + x[1], 0) / parts.reduce((a, x) => a + x[2], 0) * 100);
   return {score, parts};
 }
@@ -8870,6 +8912,8 @@ function ptRows(c, rd){
   { const o5 = (m.ofPct || {})['5m'], o15 = (m.ofPct || {})['15m'], big = (m.ofBig || {})['15m']; if (n(o5) || n(o15)) row('Order flow and book', 'Live taker flow 5m / 15m (real trades)', [o5, o15].map(v => n(v) ? (v > 0 ? '+' : '') + v.toFixed(0) + '%' : '?').join(' / ') + (n(big) ? ' · big prints ' + (big >= 0 ? '+' : '-') + fmtUsd(Math.abs(big)) : ''), n(o5 || o15) ? ((o5 != null ? o5 : o15) * (dir || 1) >= 15 ? 'up' : (o5 != null ? o5 : o15) * (dir || 1) <= -15 ? 'dn' : 'warn') : 'na', 'Counts real trades: who hit the book, buyers or sellers. Unlike candle estimates this is the actual tape. It should agree with your direction before you enter.'); }
   if (n(m.obiPct)) row('Order flow and book', 'Order book imbalance · spread', spc(m.obiPct) + (n(m.spread) ? ' · spread ' + m.spread.toFixed(3) + '%' : ''), m.obiPct * (dir || 1) >= 10 ? 'up' : m.obiPct * (dir || 1) <= -10 ? 'dn' : 'warn', 'Positive means more resting size on the buy side. Thick support under price helps a long; a thin side is easy to push through. Resting orders can be pulled, so treat it as a clue only.');
   if (n(m.slipPct)) row('Order flow and book', 'Slippage and depth at your size', (m.slipPct >= 9.99 ? 'larger than the visible book' : m.slipPct.toFixed(3) + '% slippage') + (n(m.depthX) ? ' · depth within 0.2% = ' + m.depthX.toFixed(1) + 'x your size' : ''), m.slipPct <= 0.1 ? 'up' : m.slipPct <= 0.3 ? 'warn' : 'dn', 'What you would really pay to get in at your position size (set in the trade settings). Over 0.3% eats a scalp before it starts.');
+  if (n(m.dqScore)) row('Data quality', 'Data quality score (' + (m.dqVenues || 1) + ' price sources)', m.dqScore + ' / 100 · ' + (m.dqWhy || ''), m.dqScore >= 70 ? 'up' : m.dqScore >= 45 ? 'warn' : 'dn', 'How far to trust this coin\'s numbers. It rises with more exchanges that agree on price, fresh data, an order book and live trades. Wrong-ticker or bad prices from any exchange are dropped before they reach the signals.');
+  if (n(m.fundMed)) row('Data quality', 'Funding across exchanges (middle value)', m.fundMed.toFixed(4) + '% per hour' + (n(m.fundSpread) ? ' · spread ' + m.fundSpread.toFixed(4) + '%' : ''), n(m.fundSpread) && m.fundSpread > 0.01 ? 'warn' : 'up', 'The middle funding rate across the exchanges that list this coin, so one odd exchange cannot mislead you.');
   if (n(m.cbPrem)) row('Venues', 'Coinbase (US spot) vs Hyperliquid', (m.cbPrem > 0 ? '+' : '') + m.cbPrem.toFixed(3) + '%', m.cbState === 0 ? 'warn' : (m.cbPrem * (dir || 1) > 0 ? 'up' : 'dn'), 'The Coinbase premium: positive means US spot buyers pay more than Hyperliquid, a sign of US institutional demand. Negative means US selling. Under 0.08% either way is noise.');
   { const xs = [['Binance', m.xDivBn], ['Bybit', m.xDivBy], ['OKX', m.xDivOk], ['Gate', m.xDivGt], ['Bitget', m.xDivBg]].filter(x => n(x[1])); if (xs.length) row('Venues', 'Hyperliquid vs other exchanges (Binance, Bybit, OKX, Gate, Bitget)', xs.map(x => x[0] + ' ' + (x[1] > 0 ? '+' : '') + x[1].toFixed(2) + '%').join(' · '), m.xDivState === 1 ? (long ? 'up' : 'dn') : m.xDivState === 2 ? (long ? 'dn' : 'up') : 'warn', 'Negative means Hyperliquid is cheaper than the big exchanges. When all three agree, Hyperliquid tends to catch up. A one-sided gap is lead-lag information.'); }
   if (n(m.hlpNet)) row('Venues', 'HLP vault (Hyperliquid house) net position', (m.hlpNet >= 0 ? 'long ' : 'short ') + fmtUsd(Math.abs(m.hlpNet)), m.hlpState === 0 ? 'warn' : ((m.hlpState === 1 && long) || (m.hlpState === 2 && !long) ? 'up' : 'dn'), 'The HLP vault takes the other side of many traders. When it is heavily short, traders are net long and a squeeze needs fuel; this reads the crowd, not the future.');
@@ -8894,6 +8938,8 @@ function ptCautions(c, rd, plan){
   if (String(c.name).includes(':')) out.push('This is a HIP-3 market (builder-deployed). Liquidity and oracle rules differ from native Hyperliquid coins: use smaller size.');
   { const b = snapshot.get('BTC'); if (b && b.m && c.name !== 'BTC'){ const h = (b.m.chg || {})['1h']; if (dir && n(h) && h * dir <= -0.6) out.push('Bitcoin is moving against this trade (' + ovSg(h, 2) + ' in 1h). Altcoin trades against Bitcoin rarely work.'); } }
   if (CF.total && CF.ok / CF.total < 0.5) out.push('Only ' + CF.ok + ' of ' + CF.total + ' confirmation checks match on 15m. The setup is early.');
+  if (n(m.dqScore) && m.dqScore < 45) out.push('Data quality is low (' + m.dqScore + '/100: ' + m.dqWhy + '). Few exchanges or disagreeing prices mean the signals are less reliable: use smaller size or wait.');
+  if (n(m.dqSpread) && m.dqSpread >= 1) out.push('Exchanges disagree on this coin\'s price by ' + m.dqSpread.toFixed(2) + '%. Check the chart for a wick before entering.');
   if (CF.na >= 4) out.push(CF.na + ' checks have no data for this coin, so the picture is incomplete.');
   if (n(m.newsRisk) && m.newsRisk > 0) out.push('Risk or delisting headlines were found for this coin in the last 24h.');
   if (n(m.fdvRatio) && m.fdvRatio >= 2.5) out.push('Fully diluted value is ' + m.fdvRatio.toFixed(1) + 'x market cap: unlocks can create steady selling.');
@@ -8920,7 +8966,7 @@ function ptCard(r){
     planHtml = `<div class="ovk"><div><small>Side</small><b class="${up ? 'up' : 'dn'}">${up ? 'LONG' : 'SHORT'}</b><em class="dim">${plan.lean ? 'lean only' : 'clean lean'}</em></div><div><small>Entry zone (limit, after confirmation)</small><b>${esc(fmtPx(Math.min(z0, z1)))} – ${esc(fmtPx(Math.max(z0, z1)))}</b><em class="dim">do not chase beyond ${esc(fmtPx(up ? plan.entry + 0.5 * a : plan.entry - 0.5 * a))}</em></div><div><small>Stop loss</small><b class="dn">${esc(fmtPx(plan.sl))}</b><em class="dn">${pc(plan.sl)} · ${esc(plan.slWhy)}</em></div><div><small>Take profit 1</small><b class="up">${esc(fmtPx(plan.tp1))}</b><em class="up">${pc(plan.tp1)} · R:R ${plan.rr1.toFixed(1)} · ${esc(plan.t1Why)}</em></div><div><small>Take profit 2</small><b class="up">${esc(fmtPx(plan.tp2))}</b><em class="up">${pc(plan.tp2)} · R:R ${plan.rr2.toFixed(1)} · ${esc(plan.t2Why || '')}</em></div><div><small>Leverage and size</small><b>${plan.lev}x</b><em class="dim">risking ${esc(fmtUsd(bal * rk / 100))} (${rk}% of ${esc(fmtUsd(bal))}) → margin about ${esc(fmtUsd(margin))}</em></div></div><p class="hint">Scalp plan: aim to be finished the same day or the next. If neither stop nor first target is reached by then, leave near your entry instead of holding hope. Your account size and risk % come from the trade-plan box on the chart window.</p>`; }
   const cau = ptCautions(c, rd, plan);
   const open = PT.open.has(id) || (PT.open.size === 0 && r.first);
-  return `<details class="ovd ptc" data-ptd="${esc(id)}"${open ? ' open' : ''}><summary><b>${esc(c.name)}</b> <span class="ovv ov-${bias[1]}">${bias[0]}</span> <span class="hint">price ${esc(fmtPx(m.px))} · institutional score ${SC.score === null ? '—' : SC.score + '/100'} · checks ${CF.ok || 0}/${CF.total || 0}${r.pinned ? ' · your pick' : ''}${fin.final ? ' · <b class="' + (fin.final === 'long' ? 'up' : 'dn') + '">FINAL ' + fin.final.toUpperCase() + '</b>' : ''}</span></summary>
+  return `<details class="ovd ptc" data-ptd="${esc(id)}"${open ? ' open' : ''}><summary><b>${esc(c.name)}</b> <span class="ovv ov-${bias[1]}">${bias[0]}</span> <span class="hint">price ${esc(fmtPx(m.px))} · data ${isNum(m.dqScore) ? m.dqScore : '—'}/100 · institutional score ${SC.score === null ? '—' : SC.score + '/100'} · checks ${CF.ok || 0}/${CF.total || 0}${r.pinned ? ' · your pick' : ''}${fin.final ? ' · <b class="' + (fin.final === 'long' ? 'up' : 'dn') + '">FINAL ' + fin.final.toUpperCase() + '</b>' : ''}</span></summary>
     <div class="row" style="gap:6px;margin:8px 0;flex-wrap:wrap"><a href="#" class="btn sm" data-chart="${esc(c.name)}">Open chart</a>${r.pinned ? `<button class="btn sm" type="button" data-ptrm="${esc(c.name)}">Remove from my list</button>` : `<button class="btn sm" type="button" data-ptpin="${esc(c.name)}">Keep on my list</button>`}</div>
     <h4>1. Why this coin is on the list</h4><ul class="ovstory">${why.map(w => `<li>${esc(w)}</li>`).join('') || '<li>No institutional lean yet.</li>'}</ul>
     <h4>2. Institutional data and what each one means</h4>${table}
@@ -9290,8 +9336,9 @@ function renderSources(){
   const html = L.map(x => `<div class="srow"><i class="dot ${x.ok ? 'ok' : x.err ? 'bad' : 'wait'}"></i><span>${esc(x.label)}${x.ok ? ' · ' + esc(ago(x.at)) : x.err ? ' · ' + esc(x.err) : ' · loading'}</span></div>`).join('');
   const el = $('srcList'); if (el && el._h !== html){ el.innerHTML = html; el._h = html; }
   const ch = (x, n) => n + (x.ok ? ' ✓' : x.err ? ' ✗' : ' …');
+  const dqv = [...state.coins.values()].filter(c => c.m && isNum(c.m.dqScore)), dqh = dqv.filter(c => c.m.dqScore >= 70).length, dqt = dqv.length ? ' · data quality: ' + dqh + ' of ' + dqv.length + ' coins high' + (RD.rej ? ' · ' + RD.rej + ' bad quotes dropped' : '') : '';
   const bk = (X.bnErr || X.bnFutErr) && (X.spotAlt.size || X.futAlt.size) ? ' · backup exchanges ✓' : '';
-  $('srcTxt').textContent = [ch(L[0], 'CG'), ch(L[2], 'BN'), ch(L[4], 'News'), ch(L[5], 'USD')].join(' · ') + bk;
+  $('srcTxt').textContent = [ch(L[0], 'CG'), ch(L[2], 'BN'), ch(L[4], 'News'), ch(L[5], 'USD')].join(' · ') + bk + dqt;
 }
 function renderScopes(counts){
   const el = $('scopes'); if (!el) return;
@@ -9500,6 +9547,9 @@ const GUIDE = {
   todX:{say:"Volume of the last full hour divided by the same clock hour on earlier days (needs one earlier day). Under 0.6 = thin market, moves are less trustworthy.",perp:["0.6 or more", "0.6 or more", "0.6 or more"]},
   dayType:{say:"Saturday and Sunday (UTC) have thinner books and more false breaks.",perp:["Weekday", "Weekday", "Weekday"]},
   xDivBn:{say:"Hyperliquid price versus Binance futures, in percent. Negative = Hyperliquid cheaper.",perp:["0.15 or more gap is a lead-lag", "Same", "Same"]},
+  dqScore:{say:"How much to trust the data for this coin, 0 to 100. It counts how many exchanges report it, whether their prices agree, how fresh the prices and candles are, and whether the order book, live trades and funding are there. Bad data from a mismatched ticker is dropped automatically.",perp:["70 or more is solid; under 45 means treat signals with care", "Same", "Same"]},
+  dqSpread:{say:"Biggest price gap between the exchanges that list this coin. A wide gap means a bad tick, a thin market or a wick on one exchange.",perp:["Under 0.15% is clean; over 1% is suspicious", "Same", "Same"]},
+  fundSpread:{say:"Biggest difference in funding between exchanges, in percent per hour.",perp:["Under 0.004 is in line", "Same", "Same"]},
   xDivGt:{say:"Hyperliquid price versus Gate futures, in percent.",perp:["0.15 or more gap", "Same", "Same"]},
   xDivBg:{say:"Hyperliquid price versus Bitget futures, in percent.",perp:["0.15 or more gap", "Same", "Same"]},
   spotVolAll:{say:"Spot volume of this coin on Binance, Bybit, OKX, KuCoin, Gate, Bitget and MEXC added together. Real spot demand does not depend on one exchange being reachable.",perp:["$5M or more is real", "Same", "Same"]},
@@ -9942,7 +9992,7 @@ const PERP_GROUPS = [
     ['Crowding and liquidations', ['liqFlush','liqL5','liqS5','liqX','fund8','fundGap','lsRatio','lsState','oiPx_15m','oiPx_1h']],
     ['CVD and value area', ['cvdDiv_15m','cvdDiv_1h','vaPos','vpNear','pocDist','vahDist','valDist']],
     ['Context and portfolio', ['beta','relBeta','sectorChg','sectorLead','pfHeld','pfCorr','pfSector']],
-    ['Funding and venues', ['fundPred','fundFlip','fundTrend','fundZ','xDivState','xDivBn','xDivBy','xDivOk','hlpState','hlpNet','xDivGt','xDivBg','spotVolAll','cbPrem','seasAvg','seasHit','feeYield']],
+    ['Funding and venues', ['fundPred','fundFlip','fundTrend','fundZ','xDivState','xDivBn','xDivBy','xDivOk','hlpState','hlpNet','dqScore','dqSpread','fundSpread','xDivGt','xDivBg','spotVolAll','cbPrem','seasAvg','seasHit','feeYield']],
     ['Regime and timing', ['volRegime','volPct','todX','dayType','fngVal','fngState']],
     ['Setup history', ['hitRate','hitN','hitPool']],
     ['Protocol and DEX data', ['tvl','tvlChg7','fees24','feesChg7','dxLiq','dxVol','dxRatio','dxBuy','dxFdvLiq','dxAge','newsDelist']],
