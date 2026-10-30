@@ -42,6 +42,7 @@ async function jf(url, opt){
 const coinOf = s => { let c = String(s).toUpperCase().replace(/[-_\/]?(USDT|USDC|BUSD|USD|PERP|SWAP)$/g, '').replace(/[-_](USDT|USDC|USD)[-_]?(SWAP|PERP)?$/, ''); c = c.replace(/-SWAP$|-PERP$/, ''); const m = /^1000(?!0)(.+)$/.exec(c); if (m) c = 'k' + m[1]; return c; };
 
 /* flat to flat grouping of fills into trades. fill = {t, side:'B'|'A', px, sz, fee, pnl?} */
+let GROUP_OPEN = [];
 function group(src, coin, fills, mkt){
   fills = fills.slice().sort((a, b) => a.t - b.t); const out = []; let cur = null, pos = 0;
   const wavg = a => { const d = a.reduce((s, f) => s + f.sz, 0); return d > 0 ? a.reduce((s, f) => s + f.px * f.sz, 0) / d : null; };
@@ -57,6 +58,7 @@ function group(src, coin, fills, mkt){
     if (Math.abs(next) <= tiny){ pos = 0; fin(); }
     else if (crossing){ fin(); cur = {side:next > 0 ? 'long' : 'short', t0:f.t, t1:f.t, open:[{px:f.px, sz:Math.abs(next)}], close:[], fees:0, pnl:0, hasPnl:false}; }
   }
+  if (cur && cur.open.length && Math.abs(pos) > 1e-9){ const en = wavg(cur.open); if (en && (mkt !== 'spot' || Math.abs(pos) * en >= 20)) GROUP_OPEN.push({id:src + ':' + coin + ':' + cur.side + ':open', src, coin, side:cur.side, entry:en, size:Math.abs(pos), pnl:null, lev:null, open:cur.t0, mkt:mkt || 'perp'}); }
   return out;
 }
 const groupAll = (src, fills, mkt) => { const by = new Map(); for (const f of fills){ if (!by.has(f.k)) by.set(f.k, {coin:f.coin, a:[]}); by.get(f.k).a.push(f); } let o = []; for (const {coin, a} of by.values()) o = o.concat(group(src, coin, a, mkt)); return o; };
@@ -128,18 +130,37 @@ async function kraken(days){
     if (j.error && j.error.length) throw new Error('Kraken: ' + j.error.join(', ')); const T = (j.result || {}).trades || {}; count = +(j.result || {}).count || 0; const ks = Object.keys(T); if (!ks.length) break;
     for (const id of ks){ const r = T[id], t = Math.round(+r.time * 1000), m = /^(?:X|Z)?([A-Z0-9]{2,6}?)(?:Z?USD[TC]?)$/.exec(String(r.pair).toUpperCase()); if (!m || t < cut) continue; const c = m[1] === 'XBT' ? 'BTC' : m[1] === 'XDG' ? 'DOGE' : m[1]; all.push({k:c, coin:c, t, side:r.type === 'buy' ? 'B' : 'A', px:+r.price, sz:+r.vol, fee:+r.fee || 0}); }
     ofs += ks.length; await sleep(1200); }
-  return groupAll('kraken', all, 'spot');
+  GROUP_OPEN = []; const g = groupAll('kraken', all, 'spot'); KRAKEN_OPEN = GROUP_OPEN.slice(); return g;
 }
+
+/* ---------- running (open) positions ---------- */
+const oid = (src, coin, side) => src + ':' + coin + ':' + side + ':open';
+const OPEN = {
+  async binance(){ const L = await binSigned('/fapi/v2/positionRisk', {}); return L.filter(r => +r.positionAmt).map(r => { const a = +r.positionAmt, side = r.positionSide === 'SHORT' || (r.positionSide !== 'LONG' && a < 0) ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('binance', coin, side), src:'binance', coin, side, entry:+r.entryPrice, size:Math.abs(a), pnl:+r.unRealizedProfit, lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:null, mkt:'perp'}; }); },
+  async bybit(){ const q = 'category=linear&settleCoin=USDT&limit=200', ts = String(Date.now()), rw = '20000', j = await jf(BASE.bybit + '/v5/position/list?' + q, {headers:{'X-BAPI-API-KEY':env('BYBIT_KEY'), 'X-BAPI-TIMESTAMP':ts, 'X-BAPI-RECV-WINDOW':rw, 'X-BAPI-SIGN':hmac('sha256', env('BYBIT_SECRET'), ts + env('BYBIT_KEY') + rw + q, 'hex')}}); if (j.retCode !== 0) throw new Error('Bybit: ' + j.retMsg);
+    return ((j.result || {}).list || []).filter(r => +r.size).map(r => { const side = r.side === 'Sell' ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('bybit', coin, side), src:'bybit', coin, side, entry:+r.avgPrice, size:+r.size, pnl:+r.unrealisedPnl, lev:num(r.leverage), liqPx:num(r.liqPrice) || null, open:+r.createdTime || null, mkt:'perp'}; }); },
+  async okx(){ const ins = new Map(); try { const i = await jf(BASE.okx + '/api/v5/public/instruments?instType=SWAP'); for (const r of i.data || []) ins.set(r.instId, r); } catch(e){}
+    const j = await okxGet('/api/v5/account/positions?instType=SWAP'); if (j.code !== '0') throw new Error('OKX: ' + j.msg + ' (' + j.code + ')');
+    return (j.data || []).filter(r => +r.pos).map(r => { const p = +r.pos, side = r.posSide === 'long' || r.posSide === 'short' ? r.posSide : p > 0 ? 'long' : 'short', i = ins.get(r.instId) || {}, en = +r.avgPx, sz = i.ctValCcy === 'USD' ? Math.abs(p) * (+i.ctVal || 1) / en : Math.abs(p) * (+i.ctVal || 1) * (+i.ctMult || 1), coin = coinOf(r.instId.split('-')[0]); return {id:oid('okx', coin, side), src:'okx', coin, side, entry:en, size:sz, pnl:+r.upl, lev:num(r.lever), liqPx:num(r.liqPx) || null, open:+r.cTime || null, mkt:'perp'}; }); },
+  async gate(){ const mult = new Map(); try { for (const c of await jf(BASE.gate + '/api/v4/futures/usdt/contracts')) mult.set(c.name, +c.quanto_multiplier || 1); } catch(e){}
+    const L = await gateGet('/futures/usdt/positions', ''); if (!Array.isArray(L)) throw new Error('Gate: ' + JSON.stringify(L).slice(0, 120));
+    return L.filter(r => +r.size).map(r => { const a = +r.size, side = a > 0 ? 'long' : 'short', coin = coinOf(r.contract); return {id:oid('gate', coin, side), src:'gate', coin, side, entry:+r.entry_price, size:Math.abs(a) * (mult.get(r.contract) || 1), pnl:+r.unrealised_pnl, lev:num(r.leverage), liqPx:num(r.liq_price) || null, open:r.open_time ? +r.open_time * 1000 : null, mkt:'perp'}; }); },
+  async bitget(){ const q = 'productType=USDT-FUTURES&marginCoin=USDT', p = '/api/v2/mix/position/all-position', ts = String(Date.now()), j = await jf(BASE.bitget + p + '?' + q, {headers:{'ACCESS-KEY':env('BITGET_KEY'), 'ACCESS-SIGN':hmac('sha256', env('BITGET_SECRET'), ts + 'GET' + p + '?' + q, 'base64'), 'ACCESS-TIMESTAMP':ts, 'ACCESS-PASSPHRASE':env('BITGET_PASSPHRASE'), 'Content-Type':'application/json'}}); if (j.code !== '00000') throw new Error('Bitget: ' + j.msg);
+    return (j.data || []).filter(r => +r.total).map(r => { const side = r.holdSide === 'short' ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('bitget', coin, side), src:'bitget', coin, side, entry:+r.openPriceAvg, size:+r.total, pnl:+r.unrealizedPL, lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:+r.cTime || null, mkt:'perp'}; }); },
+  async kraken(){ return KRAKEN_OPEN; }
+};
+let KRAKEN_OPEN = [];
 const ADAPTERS = {binance:{f:binance, need:['BINANCE_KEY', 'BINANCE_SECRET']}, bybit:{f:bybit, need:['BYBIT_KEY', 'BYBIT_SECRET']}, okx:{f:okx, need:['OKX_KEY', 'OKX_SECRET', 'OKX_PASSPHRASE']}, gate:{f:gate, need:['GATE_KEY', 'GATE_SECRET']}, bitget:{f:bitget, need:['BITGET_KEY', 'BITGET_SECRET', 'BITGET_PASSPHRASE']}, kraken:{f:kraken, need:['KRAKEN_KEY', 'KRAKEN_SECRET']}};
 const configured = () => Object.keys(ADAPTERS).filter(k => ADAPTERS[k].need.every(n => env(n)));
 const cache = new Map();
 async function collect(days){
   const ck = String(days), c = cache.get(ck); if (c && Date.now() - c.at < 45000) return c.v;
-  const ex = configured(), status = {}, trades = [];
-  await Promise.all(ex.map(async k => { try { const L = (await ADAPTERS[k].f(days)).filter(t => t && isFinite(t.entry) && isFinite(t.exit) && isFinite(t.pnl) && t.size > 0); status[k] = {ok:true, n:L.length}; for (const t of L) trades.push(t); } catch(e){ status[k] = {ok:false, err:String(e.message || e).slice(0, 220)}; } }));
+  const ex = configured(), status = {}, trades = [], openTrades = [];
+  await Promise.all(ex.map(async k => { try { const L = (await ADAPTERS[k].f(days)).filter(t => t && isFinite(t.entry) && isFinite(t.exit) && isFinite(t.pnl) && t.size > 0); status[k] = {ok:true, n:L.length, openOk:false, open:0}; for (const t of L) trades.push(t); } catch(e){ status[k] = {ok:false, err:String(e.message || e).slice(0, 220)}; return; }
+    try { const O = (await OPEN[k]()).filter(t => t && isFinite(t.entry) && t.entry > 0 && t.size > 0); status[k].openOk = true; status[k].open = O.length; for (const t of O) openTrades.push(t); } catch(e){ status[k].openErr = String(e.message || e).slice(0, 160); } }));
   const ids = new Set(), uniq = trades.filter(t => !ids.has(t.id) && ids.add(t.id)); trades.length = 0; for (const t of uniq) trades.push(t);
   for (const k of Object.keys(status)) if (status[k].ok) status[k].n = trades.filter(t => t.src === k).length;
-  trades.sort((a, b) => (b.close || 0) - (a.close || 0)); const v = {ok:true, at:Date.now(), days, status, trades}; cache.set(ck, {at:Date.now(), v}); return v;
+  trades.sort((a, b) => (b.close || 0) - (a.close || 0)); const v = {ok:true, at:Date.now(), days, status, trades, openTrades}; cache.set(ck, {at:Date.now(), v}); return v;
 }
 function main(){
   if (!TOKEN || TOKEN.length < 12){ console.error('Set JOURNAL_TOKEN to a long random password (at least 12 characters), then start again.'); process.exit(1); }
