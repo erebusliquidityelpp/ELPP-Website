@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.16</title>
+<title>ELPP CRYPTO SCANNER PRO V4.17</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -730,6 +730,10 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 @media (max-width:760px){.mxb{grid-template-columns:100px 1fr 52px}.mxt td:nth-child(n){width:auto!important}}
 .jrf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.jrf label,.jrn{display:block;font-size:11.5px;color:var(--muted)}.jrf input,.jrf select,.jrn textarea{display:block;width:100%;margin-top:2px;box-sizing:border-box}.jrn{margin-top:8px}
 .jrt td:nth-child(n){width:auto}.jrt td small{display:block}.jrt td.up{color:var(--up)}.jrt td.dn{color:var(--down)}.ovgl2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.jrch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.jrc{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface2);min-width:0}.jrc h4{margin:0 0 2px;font-size:13px}.jrc svg{color:var(--muted)}
+.jrh>div{display:grid;grid-template-columns:78px 1fr 70px;gap:8px;align-items:center;font-size:12px;margin:3px 0}.jrh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.jrh i{display:block;height:9px;border-radius:5px;background:var(--muted)}.jrh i.up{background:var(--up)}.jrh i.dn{background:var(--down)}.jrh b{text-align:right;font-variant-numeric:tabular-nums}
+.ptc{margin:8px 0}.ptc summary{line-height:1.6}.ptc h4{margin:14px 0 4px;font-size:13px}.ptc .ovt td:nth-child(n){width:auto}.ptc .mxg td{background:var(--surface2);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:11px;padding:6px 10px}
+#btnUpdate.newv{background:var(--accent,#2f6df6);color:#fff;border-color:transparent;animation:updp 1.6s ease-in-out infinite}@keyframes updp{50%{opacity:.65}}
 /* ===== V4.12 listings ===== */
 .lic{display:inline-flex;flex-wrap:wrap;gap:3px;align-items:center}.lib{display:inline-block;border:1px solid var(--line2);border-radius:4px;padding:0 5px;font:600 10px var(--sans);color:var(--muted);white-space:nowrap}.lib.dex{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line2))}.lib.pre{color:var(--warn);border-color:var(--warn)}
 .lim{font-size:10px;color:var(--muted);margin-left:6px;white-space:nowrap}
@@ -741,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.16</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.17</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -750,6 +754,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <span class="chip" id="chipSrc">Data <b id="srcTxt">–</b></span>
     <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
+    <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
   </div>
 </header>
@@ -770,6 +775,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-view="listings">All coins &amp; where they are listed</button>
     </details>
   <details class="ng" data-g="trade" open><summary>Trade desk</summary>
+    <button class="nv" type="button" data-view="prep">Pre-trade preparation</button>
     <button class="nv" type="button" data-view="sdesk">Signal desk</button>
     <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
     <button class="nv" type="button" data-view="journal">Trading journal</button>
@@ -973,6 +979,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewOverview" class="vcol" hidden></div>
     <div id="viewListings" class="vcol" hidden></div>
     <div id="viewJournal" class="vcol" hidden></div>
+    <div id="viewPrep" class="vcol" hidden></div>
   </section>
 </main>
 <div id="panelBd" aria-hidden="true"></div>
@@ -1846,7 +1853,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -4735,7 +4742,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -7511,7 +7518,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -7819,14 +7826,14 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   $('scopes').hidden = state.view !== 'table';
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -8484,6 +8491,66 @@ function jrTable(rows, label){
   if (!rows.length) return '<p class="hint">Nothing yet.</p>';
   return `<div class="ovwrap"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">${esc(label)}</th><th>Trades</th><th>Win rate</th><th>Net P&amp;L</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(String(r.k))}</td><td>${r.n}</td><td>${r.wr.toFixed(0)}%</td><td class="${r.pnl >= 0 ? 'up' : 'dn'}">${esc(fmtUsd(r.pnl, true))}</td></tr>`).join('')}</tbody></table></div>`;
 }
+/* ---- journal progress charts ---- */
+const jrDay = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function jrSvgLine(series, o){
+  /* series: [{v:[...], c:color, dash}], shared x by index */
+  const W = 420, H = o.h || 150, pl = 8, pr = 8, pt = 10, pb = 14, n = Math.max(...series.map(s => s.v.length));
+  let vals = []; series.forEach(s => vals = vals.concat(s.v.filter(isNum))); if (o.zero) vals.push(0); if (o.ref !== undefined) vals.push(o.ref);
+  let mn = Math.min(...vals), mx = Math.max(...vals); if (mx === mn){ mx += 1; mn -= 1; } const X = i => pl + (n > 1 ? i / (n - 1) : 0.5) * (W - pl - pr), Y = v => H - pb - (v - mn) / (mx - mn) * (H - pt - pb);
+  let g = '';
+  if (o.zero) g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" stroke="currentColor" opacity=".25" stroke-dasharray="4 4"/>`;
+  if (o.ref !== undefined) g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(o.ref).toFixed(1)}" y2="${Y(o.ref).toFixed(1)}" stroke="currentColor" opacity=".25" stroke-dasharray="4 4"/>`;
+  if (o.area){ const s = o.area, base = Y(Math.max(mn, Math.min(mx, 0))); g += `<polygon fill="${s.c}" opacity=".18" points="${X(0).toFixed(1)},${base.toFixed(1)} ${s.v.map((v, i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join(' ')} ${X(s.v.length - 1).toFixed(1)},${base.toFixed(1)}"/>`; }
+  for (const s of series) g += `<polyline fill="none" stroke="${s.c}" stroke-width="2" ${s.dash ? 'stroke-dasharray="5 4"' : ''} points="${s.v.map((v, i) => isNum(v) ? X(i).toFixed(1) + ',' + Y(v).toFixed(1) : null).filter(Boolean).join(' ')}"/>`;
+  const fm = o.fmt || (v => fmtUsd(v, true));
+  g += `<text x="${pl}" y="${pt - 1}" font-size="10" fill="currentColor" opacity=".65">${esc(fm(mx))}</text><text x="${pl}" y="${H - 3}" font-size="10" fill="currentColor" opacity=".65">${esc(fm(mn))}</text>`;
+  if (o.x0) g += `<text x="${W - pr}" y="${H - 3}" font-size="10" text-anchor="end" fill="currentColor" opacity=".65">${esc(o.x0)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="${esc(o.label || 'chart')}">${g}</svg>`;
+}
+function jrSvgBars(items, o){
+  /* items: [{k, v, t}] vertical bars */
+  if (!items.length) return '';
+  const W = 420, H = o.h || 150, pl = 8, pr = 8, pt = 12, pb = 14, mx = Math.max(1e-9, ...items.map(i => Math.abs(i.v))), z = pt + (H - pt - pb) / 2, hh = (H - pt - pb) / 2, bw = (W - pl - pr) / items.length;
+  let g = `<line x1="${pl}" x2="${W - pr}" y1="${z}" y2="${z}" stroke="currentColor" opacity=".25"/>`;
+  items.forEach((it, i) => { const h = Math.abs(it.v) / mx * hh, x = pl + i * bw + bw * 0.12, y = it.v >= 0 ? z - h : z; g += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw * 0.76).toFixed(1)}" height="${Math.max(1, h).toFixed(1)}" rx="1.5" fill="${it.v >= 0 ? 'var(--up)' : 'var(--down)'}"><title>${esc(it.t)}</title></rect>`; });
+  g += `<text x="${pl}" y="${pt - 2}" font-size="10" fill="currentColor" opacity=".65">${esc(fmtUsd(mx, true))}</text><text x="${pl}" y="${H - 3}" font-size="10" fill="currentColor" opacity=".65">${esc(items[0].k)}</text><text x="${W - pr}" y="${H - 3}" font-size="10" text-anchor="end" fill="currentColor" opacity=".65">${esc(items[items.length - 1].k)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="${esc(o.label || 'bars')}">${g}</svg>`;
+}
+function jrCharts(L, S){
+  const asc = L.slice().sort((a, b) => (a.close || 0) - (b.close || 0)), card = (t, sub, body) => `<div class="jrc"><h4>${esc(t)}</h4><p class="hint" style="margin:0 0 4px">${esc(sub)}</p>${body}</div>`;
+  /* 1 equity and drawdown */
+  let eq = 0, pk = 0; const ev = [0], dd = [0]; for (const t of asc){ eq += t.pnl; pk = Math.max(pk, eq); ev.push(eq); dd.push(eq - pk); }
+  const c1 = card('Profit curve and drawdown', 'Green line: total profit after every trade. Red shading: how far you are below your best point.', ev.length > 2 ? jrSvgLine([{v:ev, c:eq >= 0 ? 'var(--up)' : 'var(--down)'}, {v:dd, c:'var(--down)', dash:true}], {zero:true, label:'Profit curve and drawdown', x0:asc.length + ' trades'}) : '<p class="hint">Appears after your second trade.</p>');
+  /* 2 daily pnl */
+  const byD = new Map(); for (const t of asc){ const k = jrDay(t.close || t.open); byD.set(k, (byD.get(k) || 0) + t.pnl); }
+  const days = []; for (let i = 44; i >= 0; i--){ const k = jrDay(Date.now() - i * 864e5); days.push({k:k.slice(5), v:byD.get(k) || 0, t:k + ': ' + fmtUsd(byD.get(k) || 0, true)}); }
+  const c2 = card('Profit per day (last 45 days)', 'Each bar is one day. Look for steady small greens, not one huge green and many reds.', jrSvgBars(days, {label:'Daily profit'}));
+  /* 3 rolling win rate */
+  const win = asc.length >= 30 ? 20 : 10, rw = []; for (let i = 0; i < asc.length; i++){ if (i + 1 < win) continue; const s = asc.slice(i + 1 - win, i + 1); rw.push(s.filter(t => t.pnl > 0).length / win * 100); }
+  const c3 = card('Win rate over time', 'Win rate of your last ' + win + ' trades at each point. Dotted line = 50%. A rising line means you are improving.', rw.length > 1 ? jrSvgLine([{v:rw, c:'var(--accent, #6aa9ff)'}], {ref:50, label:'Rolling win rate', fmt:v => v.toFixed(0) + '%', x0:'latest ' + rw[rw.length - 1].toFixed(0) + '%'}) : '<p class="hint">Appears after ' + (win + 1) + ' trades.</p>');
+  /* 4 calendar heatmap, 12 weeks */
+  const today = new Date(); today.setHours(0, 0, 0, 0); const dow = (today.getDay() + 6) % 7, start = new Date(today.getTime() - (dow + 11 * 7) * 864e5), vals = [...byD.values()].map(Math.abs), mxv = Math.max(1e-9, ...vals); let cells = '';
+  for (let w = 0; w < 12; w++) for (let d = 0; d < 7; d++){ const dt = new Date(start.getTime() + (w * 7 + d) * 864e5); if (dt > today) continue; const k = jrDay(dt), v = byD.get(k), a = v ? Math.min(1, 0.25 + Math.abs(v) / mxv * 0.75) : 0;
+    cells += `<rect x="${w * 22}" y="${d * 22}" width="19" height="19" rx="3" fill="${v ? (v > 0 ? 'var(--up)' : 'var(--down)') : 'currentColor'}" opacity="${v ? a.toFixed(2) : '.08'}"><title>${esc(k + (v ? ': ' + fmtUsd(v, true) : ': no closed trades'))}</title></rect>`; }
+  const c4 = card('Trading calendar (12 weeks)', 'Each square is a day, Monday at the top. Green = profit day, red = loss day, darker = bigger. Shows your rhythm and over-trading days.', `<svg viewBox="0 0 264 154" style="width:100%;max-width:420px;height:auto" role="img" aria-label="Trading calendar">${cells}</svg>`);
+  /* 5 pnl by coin */
+  const bc = jrGroup(L, t => t.coin).sort((a, b) => Math.abs(b.pnl) - Math.abs(a.pnl)).slice(0, 8), mc = Math.max(1e-9, ...bc.map(r => Math.abs(r.pnl)));
+  const c5 = card('Profit by coin', 'Which coins pay you and which cost you. Top 8 by size.', bc.length ? `<div class="jrh">${bc.map(r => `<div><span>${esc(r.k)}</span><i class="${r.pnl >= 0 ? 'up' : 'dn'}" style="width:${Math.max(2, Math.abs(r.pnl) / mc * 100).toFixed(0)}%"></i><b class="${r.pnl >= 0 ? 'up' : 'dn'}">${esc(fmtUsd(r.pnl, true))}</b></div>`).join('')}</div>` : '');
+  /* 6 R distribution */
+  const Rs = L.map(jrR).filter(isNum); let c6;
+  if (Rs.length >= 3){ const edges = [-Infinity, -2, -1, -0.25, 0.25, 1, 2, 3, Infinity], lab = ['< -2R', '-2 to -1', '-1 to 0', 'about 0', '0 to 1', '1 to 2', '2 to 3', '3R +'], cnt = lab.map(() => 0); Rs.forEach(r => { for (let i = 0; i < lab.length; i++) if (r >= edges[i] && r < edges[i + 1]){ cnt[i]++; break; } }); const mxc = Math.max(...cnt);
+    c6 = card('Result in R (risk units)', 'How many trades ended at each multiple of what you risked. You want a short left side (small losses) and a long right side. Needs a stop price on each trade.', `<div class="jrh">${lab.map((l, i) => `<div><span>${l}</span><i class="${i < 3 ? 'dn' : i === 3 ? 'dim' : 'up'}" style="width:${cnt[i] ? Math.max(3, cnt[i] / mxc * 100).toFixed(0) : 0}%"></i><b>${cnt[i]}</b></div>`).join('')}</div>`); }
+  else c6 = card('Result in R (risk units)', 'Shows how big your wins and losses are compared with what you risked.', '<p class="hint">Add a stop-loss price to at least 3 trades (Edit on a trade) to see this chart.</p>');
+  /* 7 plan vs off-plan */
+  const pl = asc.filter(t => t.plan === true), npl = asc.filter(t => t.plan === false), cum = a => { let s = 0; return [0].concat(a.map(t => s += t.pnl)); };
+  const c7 = card('Discipline: on-plan vs off-plan', 'Profit curve of trades you marked "followed my plan" (green) against those you marked "no" (red).', pl.length >= 2 && npl.length >= 1 ? jrSvgLine([{v:cum(pl), c:'var(--up)'}, {v:cum(npl), c:'var(--down)'}], {zero:true, label:'On plan versus off plan'}) + `<p class="hint">On plan: ${pl.length} trades, ${esc(fmtUsd(pl.reduce((s, t) => s + t.pnl, 0), true))} · Off plan: ${npl.length} trades, ${esc(fmtUsd(npl.reduce((s, t) => s + t.pnl, 0), true))}</p>` : '<p class="hint">Mark each trade "Followed your plan? Yes / No" to compare your disciplined and undisciplined results.</p>');
+  /* 8 monthly */
+  const byM = new Map(); for (const t of asc){ const d = new Date(t.close || t.open), k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); byM.set(k, (byM.get(k) || 0) + t.pnl); }
+  const months = [...byM].slice(-12).map(([k, v]) => ({k, v, t:k + ': ' + fmtUsd(v, true)}));
+  const c8 = card('Profit per month', 'Month by month result of closed trades.', months.length ? jrSvgBars(months, {label:'Monthly profit'}) : '');
+  return `<div class="nsec"><h3>Your progress</h3><div class="jrch">${c1}${c2}${c3}${c4}${c5}${c6}${c7}${c8}</div></div>`;
+}
 function jrCoach(S, L){
   const out = [];
   if (S.n < 10) out.push('You have ' + S.n + ' trades in this view. Numbers become reliable after about 30 trades, so treat these as early hints.');
@@ -8546,7 +8613,7 @@ function jrHtml(){
   ${openHtml}
   <div class="nsec"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><span>${sel('per', [['7', '7 days'], ['30', '30 days'], ['90', '90 days'], ['all', 'All time']])}</span><span>${sel('src', [['all', 'All trades']].concat([...new Set(JR.trades.map(t => t.src))].sort().map(k => [k, jrName(k)])))}</span></div></div>
   ${S ? `<div class="nsec"><h3>Your numbers</h3><div class="ovk">${tiles}</div></div>
-  <div class="nsec"><h3>Profit curve</h3>${jrCurve(S.curve)}</div>
+  ${jrCharts(L, S)}
   <div class="nsec"><h3>What your journal is telling you</h3><ul class="ovstory">${coach.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : '<div class="nsec"><p class="hint">No closed trades in this view yet. Connect an exchange above to pull them in, or log one by hand below.</p></div>'}
   ${jrForm()}
   ${S ? `<div class="nsec"><h3>All trades</h3><div class="ovwrap"><table class="ovt jrt"><thead><tr><th>Closed</th><th>Coin</th><th>Entry → exit</th><th>Result</th><th>Setup and feeling</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>${L.length > 200 ? '<p class="hint">Showing the latest 200. The statistics use all trades in the view.</p>' : ''}</div>
@@ -8596,6 +8663,155 @@ function renderJournal(){
   const html = jrHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
 setInterval(() => { try { jrLoad(); if (JR.auto && !JR.busy && document.visibilityState !== 'hidden' && (String((state.pf || {}).addr || '').trim() || JR.cfg.relay || JR.cfg.dydx) && Date.now() - JR.at > (JR.trades.some(t => t.status === 'open') ? 120000 : 600000)) jrSync(false); } catch(e){} }, 60000);
+/* ===== V4.17: pre-trade preparation (scanner-prepared watchlist with institutional data and reasons) ===== */
+const PT = {pins:[], n:8, side:'all', cache:null, at:0, open:new Set(), loaded:false, q:''};
+function ptLoad(){ if (PT.loaded) return; PT.loaded = true; const s = LS.get('elpp_pt_v1'); if (s){ PT.pins = Array.isArray(s.pins) ? s.pins : []; PT.n = s.n || 8; PT.side = s.side || 'all'; } }
+function ptSave(){ LS.set('elpp_pt_v1', {pins:PT.pins, n:PT.n, side:PT.side}); }
+const PT_VOL = ['compressed (quiet, a move is building)', 'normal', 'expanding', 'explosive'];
+function ptBuild(){
+  if (PT.cache && Date.now() - PT.at < 15000) return PT.cache;
+  const live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)), byName = new Map(live.map(c => [c.name, c]));
+  const top = live.filter(c => isNum(c.m.vol24)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 90), rows = new Map();
+  const mk = (c, pinned) => { try { const rd = instRow(c, 'perp'), sc = rd.sc && isNum(rd.sc.score) ? rd.sc.score : 0, fin = rd.fin || {}, dir = rd.conf && rd.conf.dir ? rd.conf.dir : 0; return {c, rd, pinned, dir, sc, rank:(dir ? sc : sc * 0.3) + (fin.final ? 20 : fin.building ? 6 : 0)}; } catch(e){ return null; } };
+  for (const c of top){ const r = mk(c, false); if (r) rows.set(c.name, r); }
+  const out = []; const used = new Set();
+  for (const nm of PT.pins){ const c = byName.get(nm) || byName.get(normSym(nm)); if (!c) { out.push({missing:nm, pinned:true}); continue; } const r = rows.get(c.name) || mk(c, true); if (r){ r.pinned = true; out.push(r); used.add(c.name); } }
+  const auto = [...rows.values()].filter(r => !used.has(r.c.name) && r.dir && r.sc >= 30 && (PT.side === 'all' || (PT.side === 'long') === (r.dir > 0))).sort((a, b) => b.rank - a.rank).slice(0, PT.n);
+  PT.cache = {list:out.concat(auto), total:rows.size}; PT.at = Date.now(); return PT.cache;
+}
+function ptBackdrop(){
+  const L = [], add = (k, t, why) => L.push({k, t, why});
+  try { const o = ovCalc(), sc = o.mood.sc; if (o.mood.n >= 2) add(sc >= 3 ? 'up' : sc <= -3 ? 'dn' : 'warn', 'Crypto market mood: ' + (sc >= 3 ? 'buyers in control' : sc <= -3 ? 'sellers in control' : 'undecided') + ' (score ' + (sc > 0 ? '+' : '') + sc + ' of 6)', 'The Overview tab shows what is behind this score. Trade with the mood, not against it.'); } catch(e){}
+  { const b = snapshot.get('BTC'); if (b && b.m){ const h = (b.m.chg || {})['1h'], d = (b.m.chg || {})['1d']; if (isNum(h)) add(h > 0.4 ? 'up' : h < -0.4 ? 'dn' : 'warn', 'Bitcoin: ' + ovSg(h, 2) + ' in 1h' + (isNum(d) ? ', ' + ovSg(d, 2) + ' in 24h' : ''), 'Altcoins follow Bitcoin. A long on a coin while Bitcoin falls fast is trading against the tide.'); } }
+  try { if (MX.q.size >= 5){ const r = mxModel().regime; if (r) add(r.tone, 'Outside markets: ' + r.name.split(':')[0].toLowerCase(), r.say); } } catch(e){}
+  try { const n = macNext(); if (n && n.min < 24 * 60) add(n.min < 90 ? 'dn' : 'warn', 'Next big US event: ' + n.ev.name + ' in ' + (n.min < 90 ? Math.round(n.min) + ' minutes' : (n.min / 60).toFixed(1) + ' hours'), 'Scheduled news makes every market jump at once. Many pros stay flat or cut size before it.'); } catch(e){}
+  try { const f = FX.fng; if (f && isNum(f.v)) add(f.v >= 75 || f.v <= 25 ? 'warn' : 'up', 'Fear & Greed: ' + f.v + ' (' + f.cls + ')', 'Extremes are contrarian: extreme greed means late buyers, extreme fear means panic sellers.'); } catch(e){}
+  { const s = $('sessTxt'); if (s && s.textContent && s.textContent !== '–') add('warn', 'Session now: ' + s.textContent, 'Liquidity and sweeps cluster in the London and New York kill zones. Quiet hours move less and fake out more.'); }
+  return L;
+}
+function ptRows(c, rd){
+  const m = c.m, R = [], n = isNum, F = (c._inst && c._inst.flat) || {}, dir = rd.conf.dir || 0, long = dir > 0, name = c.name, row = (g, label, val, tone, why) => R.push({g, label, val, tone, why});
+  const fp = tf => (m.flowPct || {})[tf];
+  row('Money flow', 'Net money flow 15m / 1h / 4h', [fp('15m'), fp('1h'), fp('4h')].map(v => n(v) ? (v > 0 ? '+' : '') + v.toFixed(0) + '%' : '?').join(' / '), n(fp('1h')) ? (fp('1h') * (dir || 1) >= 5 ? 'up' : fp('1h') * (dir || 1) <= -5 ? 'dn' : 'warn') : 'na', 'Estimated money buying minus money selling. Institutions build positions over hours, so flow that agrees across timeframes is the strongest clue.');
+  { const r = (m.rvol || {})['15m']; row('Money flow', 'Volume versus normal (15m)', n(r) ? r.toFixed(1) + 'x normal' : '?', n(r) ? (r >= 1.5 ? 'up' : r < 0.8 ? 'dn' : 'warn') : 'na', 'Big players leave footprints in volume. Under 0.8x means nobody is really interested yet; over 1.5x means something is happening.'); }
+  { const p = (m.pressure || {})['15m']; if (n(p)) row('Money flow', 'Buy/sell pressure (15m)', (p > 0 ? '+' : '') + Math.round(p) + '%', p * (dir || 1) >= 10 ? 'up' : p * (dir || 1) <= -10 ? 'dn' : 'warn', 'Which side hits the book harder. It should agree with the direction you plan to trade.'); }
+  { const f = n(m.funding) ? m.funding * 24 * 365 : null; row('Positioning', 'Funding rate (per year)', n(f) ? Math.round(f) + '%' : '?', n(f) ? (dir && ((long && f > 60) || (!long && f < -60)) ? 'dn' : Math.abs(f) > 60 ? 'warn' : 'up') : 'na', 'The fee the crowded side pays. Very high positive funding means too many longs are paying to stay in: squeezes of the crowd are common. Normal is around +11%.'); }
+  { const oc = (m.oiChg || {})['1h']; row('Positioning', 'Open interest change (1h)', n(oc) ? ovSg(oc, 2) : '?', n(oc) ? (oc > 1 ? 'warn' : 'up') : 'na', 'Rising open interest with a moving price means new money is entering and the move is real. Rising open interest in a flat market means a squeeze is being loaded.'); }
+  { const l = m.lsRatio; if (n(l)) row('Positioning', 'Long / short account ratio (crowd)', l.toFixed(2) + (l >= 2 ? ' (very long)' : l <= 0.6 ? ' (very short)' : ''), l >= 2 || l <= 0.6 ? 'warn' : 'up', 'The retail crowd is usually wrong at extremes. Big long crowds get liquidated by moves down, and the reverse.'); }
+  try { const arr = LQ.coins.get(normSym(name)); if (arr && arr.length){ const cut = Date.now() - 36e5, rec = arr.filter(x => x.t >= cut), lg = rec.filter(x => x.long).reduce((s, x) => s + x.usd, 0), sh = rec.filter(x => !x.long).reduce((s, x) => s + x.usd, 0); row('Positioning', 'Liquidations in the last hour', 'longs ' + fmtUsd(lg) + ' · shorts ' + fmtUsd(sh), lg + sh < 5e4 ? 'na' : 'warn', 'Forced selling and buying. A burst of long liquidations often marks a short-term low, a burst of short liquidations a short-term high.'); } } catch(e){}
+  { const w = n(m.walScore) ? m.walScore : null; row('Smart money', 'Tracked wallets (about 100)', n(w) ? (w > 0 ? 'lean long ' : 'lean short ') + Math.abs(w) + ' · ' + m.walLong + ' long / ' + m.walShort + ' short of ' + m.walTracked : 'few or none hold it', n(w) ? (w * (dir || 1) >= WAL_T ? 'up' : w * (dir || 1) <= -WAL_T ? 'dn' : 'warn') : 'na', 'Wallets that have been profitable before. If they hold the same side as your plan, you are with the smart money.'); }
+  { const pools = (m.pools || []), px = m.px, below = pools.filter(q => q.p < px).sort((a, b) => b.p - a.p)[0], above = pools.filter(q => q.p > px).sort((a, b) => a.p - b.p)[0];
+    row('Liquidity', 'Nearest liquidity above / below', (above ? fmtPx(above.p) + ' (' + ovSg((above.p / px - 1) * 100, 2) + ', ' + above.name + ')' : 'none found') + ' / ' + (below ? fmtPx(below.p) + ' (' + ovSg((below.p / px - 1) * 100, 2) + ', ' + below.name + ')' : 'none found'), 'warn', 'Stop orders cluster at old highs and lows. Institutions push price into these pools to fill their size, then reverse. Your stop should sit beyond a pool, and your target just before the next one.'); }
+  if (n(F.pocP)) row('Liquidity', 'Volume profile: value area low / point of control / high', fmtPx(F.valP) + ' / ' + fmtPx(F.pocP) + ' / ' + fmtPx(F.vahP), F.vaPos === 1 ? 'up' : F.vaPos === 3 ? 'dn' : 'warn', 'Where most trading happened today. Price above the value area is accepted higher; inside it, expect chop; the point of control acts like a magnet.');
+  if (n(F.volState)) row('Context', 'Volatility regime', PT_VOL[F.volState], F.volState === 0 ? 'warn' : F.volState >= 3 ? 'dn' : 'up', 'Compression usually comes before expansion. Explosive ranges mean wide stops and a higher chance of getting hunted.');
+  { const a = (m.atr || {})['1h']; if (n(a)) row('Context', 'Typical 1h range (ATR)', a.toFixed(2) + '% of price', 'warn', 'Used to size your stop and judge whether the target is realistic for a same-day scalp.'); }
+  { const t = rd.tf || {}; const s = ['15m', '1h', '4h', '1d'].filter(k => t[k] && t[k].have).map(k => k + ' ' + (t[k].dir > 0 ? 'up' : t[k].dir < 0 ? 'down' : 'flat')).join(' · '); if (s) row('Context', 'Timeframe agreement', s, dir ? (['15m', '1h', '4h'].filter(k => t[k] && t[k].dir === dir).length >= 2 ? 'up' : 'warn') : 'na', 'Institutional read on each timeframe. Three or four agreeing is a clean trade; a split means a messy one.'); }
+  if (name === 'BTC' || name === 'ETH'){ try { const o = OPT.by && OPT.by[name]; if (o) row('Options', 'Options: put/call ratio · skew · bias', (isNum(o.pcr) ? 'PCR ' + o.pcr.toFixed(2) : '') + (isNum(o.skew) ? ' · skew ' + o.skew.toFixed(1) : '') + (o.an ? ' · ' + o.an.bias : ''), 'warn', 'Options traders pay for protection ahead of moves. High put demand (skew) means fear; it is a read on what professionals expect.'); } catch(e){} }
+  { const L = instListed(c); row('Context', 'Listed on', L.on.join(', ') || 'Hyperliquid only', L.on.length >= 3 ? 'up' : 'warn', 'More venues means deeper liquidity and arbitrage keeping the price fair; very few venues means thin books and wild wicks.'); }
+  { const g = m.gapSpot; if (n(g)) row('Context', 'Perp versus spot price', (g > 0 ? '+' : '') + g.toFixed(2) + '%', Math.abs(g) <= 0.3 ? 'up' : 'warn', 'A big premium or discount means the perp is crowded or the spot is lagging.'); }
+  return R;
+}
+function ptCautions(c, rd, plan){
+  const m = c.m, n = isNum, dir = rd.conf.dir || 0, long = dir > 0, out = [], CF = rd.conf;
+  out.push('This is preparation, not a signal. Wait for your 15m confirmation before any entry, and size so that the stop costs you only your planned risk.');
+  try { const e = macNext(); if (e && e.min < 90) out.push('Big US event "' + e.ev.name + '" is ' + (e.min < 0 ? 'happening now' : 'in ' + Math.round(e.min) + ' minutes') + '. Spreads widen and stops get hit by noise.'); } catch(e){}
+  { const f = n(m.funding) ? m.funding * 24 * 365 : null; if (dir && n(f) && ((long && f > 60) || (!long && f < -60))) out.push('Funding is crowded against you (' + Math.round(f) + '% a year). If the move stalls, the crowd unwinds into you.'); }
+  { const mx = (m.moveX || {})['1h']; if (n(mx) && mx >= 2.5) out.push('Price already moved ' + mx.toFixed(1) + ' ATR in the last hour. Chasing a stretched move is the classic way to buy a top.'); }
+  if (n(m.vol24) && m.vol24 < 5e6) out.push('Daily volume is only ' + fmtUsd(m.vol24) + '. Thin books mean slippage and wicks that ignore your stop.');
+  if (String(c.name).includes(':')) out.push('This is a HIP-3 market (builder-deployed). Liquidity and oracle rules differ from native Hyperliquid coins: use smaller size.');
+  { const b = snapshot.get('BTC'); if (b && b.m && c.name !== 'BTC'){ const h = (b.m.chg || {})['1h']; if (dir && n(h) && h * dir <= -0.6) out.push('Bitcoin is moving against this trade (' + ovSg(h, 2) + ' in 1h). Altcoin trades against Bitcoin rarely work.'); } }
+  if (CF.total && CF.ok / CF.total < 0.5) out.push('Only ' + CF.ok + ' of ' + CF.total + ' confirmation checks match on 15m. The setup is early.');
+  if (CF.na >= 4) out.push(CF.na + ' checks have no data for this coin, so the picture is incomplete.');
+  if (n(m.newsRisk) && m.newsRisk > 0) out.push('Risk or delisting headlines were found for this coin in the last 24h.');
+  if (n(m.fdvRatio) && m.fdvRatio >= 2.5) out.push('Fully diluted value is ' + m.fdvRatio.toFixed(1) + 'x market cap: unlocks can create steady selling.');
+  if (m.pfHeld) out.push('You already hold this coin' + (m.pfHeld === 1 ? ' (long)' : ' (short)') + ' on your connected wallet.'); else if (n(m.pfSector) && m.pfSector >= 1) out.push('You already hold ' + m.pfSector + ' other coin(s) in the same sector, so risk adds up.');
+  if (plan && plan.dir !== (long ? 'long' : 'short')) out.push('The scanner\'s own trade plan leans the other way. Institutions and the plan disagree, so wait for them to align.');
+  return out;
+}
+function ptCard(r){
+  if (r.missing) return `<div class="nsec"><p class="hint"><b>${esc(r.missing)}</b> is not in the scanner's live list right now (not on Hyperliquid or not loaded yet). <button class="btn sm" type="button" data-ptrm="${esc(r.missing)}">Remove</button></p></div>`;
+  const c = r.c, m = c.m, rd = r.rd, CF = rd.conf, SC = rd.sc, fin = rd.fin || {}, dir = CF.dir || 0, long = dir > 0, id = 'pt:' + c.name, spotless = false;
+  const bias = !dir ? ['WAIT', 'warn'] : long ? ['LONG', 'up'] : ['SHORT', 'dn'], plan = (() => { try { return planFor(snapshot.get(c.name) || c); } catch(e){ return null; } })();
+  const acct = state.acct || {}, bal = isNum(+acct.bal) && +acct.bal > 0 ? +acct.bal : 1000, rk = isNum(+acct.risk) && +acct.risk > 0 ? +acct.risk : 1;
+  const parts = (SC.parts || []).filter(p => p[1] > 0).sort((a, b) => b[1] / b[2] - a[1] / a[2]);
+  const why = []; if (rd.why) why.push('Institutions: ' + INS_LAB[rd.state] + ' (read ' + (rd.score > 0 ? '+' : '') + rd.score + '). ' + rd.why); if (fin.text && fin.dir) why.push(fin.text);
+  if (parts.length) why.push('Strongest evidence: ' + parts.slice(0, 5).map(p => p[0] + ' (' + p[1] + '/' + p[2] + ')').join('; ') + '.');
+  if (rd.setup && rd.setup.dir){ why.push(rd.setup.state === 'wait' ? '4h is ' + (rd.setup.dir > 0 ? 'accumulating' : 'distributing') + ', but 15m and 1h are not ready yet: this is a coin to PREPARE for, not to enter now.' : 'READY ' + (rd.setup.dir > 0 ? 'LONG' : 'SHORT') + ' on ' + (rd.setup.state === 'both' ? '15m and 1h' : rd.setup.state) + ' with 4h behind it.'); }
+  const miss = (CF.items || []).filter(it => it.res['15m'].s !== INS_OK), okI = (CF.items || []).filter(it => it.res['15m'].s === INS_OK);
+  const ex = ptRows(c, rd), groups = [...new Set(ex.map(x => x.g))];
+  const tn = t => t === 'up' ? 'ov-up' : t === 'dn' ? 'ov-dn' : t === 'warn' ? 'ov-warn' : 'ov-na', tl = t => t === 'up' ? 'SUPPORTS' : t === 'dn' ? 'AGAINST' : t === 'warn' ? 'CAREFUL' : 'NO DATA';
+  const table = `<div class="ovwrap"><table class="ovt jrt"><thead><tr><th>Institutional data</th><th>Now</th><th>Reading</th><th>Why it matters</th></tr></thead><tbody>${groups.map(g => `<tr class="mxg"><td colspan="4">${esc(g)}</td></tr>` + ex.filter(x => x.g === g).map(x => `<tr><td data-l="Data"><b>${esc(x.label)}</b></td><td data-l="Now">${esc(x.val)}</td><td data-l="Reading"><span class="ovv ${tn(x.tone)}">${tl(x.tone)}</span></td><td data-l="Why">${esc(x.why)}</td></tr>`).join('')).join('')}</tbody></table></div>`;
+  const chk = CF.items && CF.items.length ? `<div class="ovwrap"><table class="ovt jrt"><thead><tr><th>Confirmation check (15m)</th><th>Result</th><th>What counts as a match</th></tr></thead><tbody>${CF.items.map(it => { const x = it.res['15m']; return `<tr><td data-l="Check"><b>${esc(it.label)}</b></td><td data-l="Result"><span class="ovv ${x.s === INS_OK ? 'ov-up' : x.s === INS_NO ? 'ov-dn' : 'ov-na'}">${x.s === INS_OK ? 'MATCH' : x.s === INS_NO ? 'WAIT' : 'NO DATA'}</span><small>${esc(x.val)}</small></td><td data-l="Rule">${esc(it.rule)}</td></tr>`; }).join('')}</tbody></table></div>` : '<p class="hint">No direction yet, so there is nothing to confirm.</p>';
+  let planHtml = '<p class="hint">No trade plan yet: the scanner does not see clear liquidity levels or a lean on this coin. Keep it on the watch and re-check.</p>';
+  if (plan){ const dist = Math.abs(plan.entry - plan.sl), qty = bal * rk / 100 / dist, notional = qty * plan.entry, margin = notional / plan.lev, up = plan.dir === 'long', a = plan.a, z0 = up ? plan.entry - 0.35 * a : plan.entry, z1 = up ? plan.entry : plan.entry + 0.35 * a, pc = x => ovSg((x / plan.entry - 1) * 100, 2);
+    planHtml = `<div class="ovk"><div><small>Side</small><b class="${up ? 'up' : 'dn'}">${up ? 'LONG' : 'SHORT'}</b><em class="dim">${plan.lean ? 'lean only' : 'clean lean'}</em></div><div><small>Entry zone (limit, after confirmation)</small><b>${esc(fmtPx(Math.min(z0, z1)))} – ${esc(fmtPx(Math.max(z0, z1)))}</b><em class="dim">do not chase beyond ${esc(fmtPx(up ? plan.entry + 0.5 * a : plan.entry - 0.5 * a))}</em></div><div><small>Stop loss</small><b class="dn">${esc(fmtPx(plan.sl))}</b><em class="dn">${pc(plan.sl)} · ${esc(plan.slWhy)}</em></div><div><small>Take profit 1</small><b class="up">${esc(fmtPx(plan.tp1))}</b><em class="up">${pc(plan.tp1)} · R:R ${plan.rr1.toFixed(1)} · ${esc(plan.t1Why)}</em></div><div><small>Take profit 2</small><b class="up">${esc(fmtPx(plan.tp2))}</b><em class="up">${pc(plan.tp2)} · R:R ${plan.rr2.toFixed(1)} · ${esc(plan.t2Why || '')}</em></div><div><small>Leverage and size</small><b>${plan.lev}x</b><em class="dim">risking ${esc(fmtUsd(bal * rk / 100))} (${rk}% of ${esc(fmtUsd(bal))}) → margin about ${esc(fmtUsd(margin))}</em></div></div><p class="hint">Scalp plan: aim to be finished the same day or the next. If neither stop nor first target is reached by then, leave near your entry instead of holding hope. Your account size and risk % come from the trade-plan box on the chart window.</p>`; }
+  const cau = ptCautions(c, rd, plan);
+  const open = PT.open.has(id) || (PT.open.size === 0 && r.first);
+  return `<details class="ovd ptc" data-ptd="${esc(id)}"${open ? ' open' : ''}><summary><b>${esc(c.name)}</b> <span class="ovv ov-${bias[1]}">${bias[0]}</span> <span class="hint">price ${esc(fmtPx(m.px))} · institutional score ${SC.score === null ? '—' : SC.score + '/100'} · checks ${CF.ok || 0}/${CF.total || 0}${r.pinned ? ' · your pick' : ''}${fin.final ? ' · <b class="' + (fin.final === 'long' ? 'up' : 'dn') + '">FINAL ' + fin.final.toUpperCase() + '</b>' : ''}</span></summary>
+    <div class="row" style="gap:6px;margin:8px 0;flex-wrap:wrap"><a href="#" class="btn sm" data-chart="${esc(c.name)}">Open chart</a>${r.pinned ? `<button class="btn sm" type="button" data-ptrm="${esc(c.name)}">Remove from my list</button>` : `<button class="btn sm" type="button" data-ptpin="${esc(c.name)}">Keep on my list</button>`}</div>
+    <h4>1. Why this coin is on the list</h4><ul class="ovstory">${why.map(w => `<li>${esc(w)}</li>`).join('') || '<li>No institutional lean yet.</li>'}</ul>
+    <h4>2. Institutional data and what each one means</h4>${table}
+    <h4>3. Confirmation checklist: what is ready and what to wait for</h4><p class="hint"><b class="up">${okI.length} ready</b> · <b class="warn">${miss.length} still to wait for</b>${miss.length ? ': ' + esc(miss.slice(0, 6).map(x => x.label).join('; ')) + (miss.length > 6 ? '…' : '') : ''}</p>${chk}
+    <h4>4. Prepared trade plan</h4>${planHtml}
+    <h4>5. Caution before entry</h4><ul class="ovstory">${cau.map(w => `<li>${esc(w)}</li>`).join('')}</ul>
+    <details class="ovd" data-ptfull="${esc(c.name)}"><summary>Full institutional breakdown (score parts, all timeframes)</summary><div class="ptfull"></div></details></details>`;
+}
+function ptHtml(){
+  ptLoad(); const B = ptBackdrop(), D = ptBuild(), list = D.list; if (list[0]) list[0].first = true;
+  const bd = B.length ? `<div class="nsec"><h3>1. Read the backdrop first</h3><p class="hint">Before looking at any coin, know what the market around it is doing.</p><ul class="ovstory">${B.map(b => `<li class="${b.k === 'up' ? 'up' : b.k === 'dn' ? 'dn' : ''}"><b>${esc(b.t)}</b><br><span class="hint">${esc(b.why)}</span></li>`).join('')}</ul></div>` : '';
+  const sel = (k, v, t) => `<button type="button" class="btn sm${PT[k] === v ? ' primary' : ''}" data-ptset="${k}:${v}">${t}</button>`;
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Pre-trade preparation</h3><button class="btn sm" type="button" id="ptRefresh">↻ Re-scan now</button></div>
+    <p class="hint" style="margin:6px 0 8px">The scanner prepares your watchlist for you. It ranks every liquid coin by institutional evidence, then writes the full preparation for the best ones: why it is interesting, every institutional data point with its meaning, what still has to confirm, a liquidity-based plan, and the cautions. Go through it before the session, then wait for the 15m confirmation to trigger. It is preparation, never a signal on its own.</p>
+    <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center"><span class="hint">Coins:</span>${[5, 8, 12].map(v => sel('n', v, v)).join('')}<span class="hint" style="margin-left:8px">Side:</span>${sel('side', 'all', 'All')}${sel('side', 'long', 'Longs')}${sel('side', 'short', 'Shorts')}
+    <input type="text" id="ptAdd" placeholder="Add your own coin, e.g. SOL" style="width:190px;margin-left:8px"><button class="btn sm" type="button" id="ptAddBtn">Add</button></div>
+    <p class="hint">${D.total} liquid coins scanned · updated ${new Date(PT.at).toLocaleTimeString()}${PT.pins.length ? ' · ' + PT.pins.length + ' of your own on top' : ''}</p></div>
+  ${bd}
+  <div class="nsec"><h3>2. Coins to prepare for</h3>${list.length ? '' : '<p class="hint">No coin has enough institutional evidence yet. Data is still loading, or the market is quiet. Add a coin of your own above, or check back in a few minutes.</p>'}<div class="ptlist">${list.map(ptCard).join('')}</div></div>
+  <div class="nsec"><h3>How to use this before a trade</h3><ol class="ovstory"><li>Read the backdrop. If the mood, Bitcoin and the outside markets disagree with a coin's direction, skip it.</li><li>Open a coin card. Read why it is listed, then check the data table: how many rows support the side, and which are against.</li><li>Look at the checklist. "Wait" items are your trigger conditions. Do not enter until the sweep, volume and flow checks you rely on match on 15m.</li><li>Use the plan as a starting point: stop beyond the liquidity, target before the next pool, a size that makes the stop cost only your planned risk.</li><li>Read the cautions. Any item there that you cannot accept is a reason to pass.</li><li>After the trade, log it in the Journal with your setup and how you felt.</li></ol></div>`;
+}
+function renderPrep(){
+  const el = $('viewPrep'); if (!el) return; ptLoad();
+  if (!el._built){
+    el._built = true;
+    el.addEventListener('click', e => {
+      const T = e.target, c = s => T.closest(s); let b;
+      if (c('#ptRefresh')){ PT.at = 0; renderPrep(); return; }
+      if ((b = c('[data-ptset]'))){ const [k, v] = b.dataset.ptset.split(':'); PT[k] = k === 'n' ? +v : v; ptSave(); PT.at = 0; renderPrep(); return; }
+      if (c('#ptAddBtn')){ const v = normSym(($('ptAdd').value || '').trim().toUpperCase()); if (v){ if (!PT.pins.includes(v)) PT.pins.unshift(v); ptSave(); PT.at = 0; renderPrep(); } return; }
+      if ((b = c('[data-ptrm]'))){ PT.pins = PT.pins.filter(x => x !== b.dataset.ptrm && normSym(x) !== normSym(b.dataset.ptrm)); ptSave(); PT.at = 0; renderPrep(); return; }
+      if ((b = c('[data-ptpin]'))){ if (!PT.pins.includes(b.dataset.ptpin)) PT.pins.unshift(b.dataset.ptpin); ptSave(); PT.at = 0; renderPrep(); return; }
+    });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ptAdd'){ const b = $('ptAddBtn'); if (b) b.click(); } });
+    el.addEventListener('toggle', e => { const d = e.target; if (!d || !d.dataset) return; if (d.dataset.ptd){ if (d.open) PT.open.add(d.dataset.ptd); else PT.open.delete(d.dataset.ptd); }
+      if (d.dataset.ptfull && d.open){ const box = d.querySelector('.ptfull'); const c = snapshot.get(d.dataset.ptfull); if (box && c && !box.innerHTML){ try { box.innerHTML = instDetail(c, 'perp'); } catch(x){ box.innerHTML = '<p class="hint">Could not build the full breakdown: ' + esc(errTxt(x)) + '</p>'; } } } }, true);
+  }
+  const ae = document.activeElement; if (ae && el.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
+  if (el.querySelector('details[data-ptfull][open]')) return;
+  const html = ptHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
+}
+/* ---- update / refresh button ---- */
+const UPD = {checking:false, newer:false};
+const updVer = t => { const m = /class="v4b">\s*(V[\d.]+)\s*</.exec(t); return m ? m[1] : ''; };
+async function updCheck(manual){
+  if (UPD.checking) return; UPD.checking = true; const btn = $('btnUpdate'); if (btn && manual){ btn.disabled = true; btn.textContent = '⟳ Checking…'; }
+  try {
+    const cur = (document.querySelector('.v4b') || {}).textContent || '', url = location.href.split('#')[0].replace(/[?&]r=\d+/, '');
+    let latest = '';
+    if (/^https?:/.test(location.protocol)){ const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'chk=' + Date.now(), {cache:'no-store'}); if (r.ok) latest = updVer(await r.text()); }
+    UPD.newer = !!latest && latest !== cur;
+    if (btn){ btn.classList.toggle('newv', UPD.newer); btn.title = UPD.newer ? 'New version ' + latest + ' is ready. Press to update.' : 'Refresh all data (you have the latest version)'; if (!manual) btn.textContent = UPD.newer ? '⟳ Update ' + latest : '⟳ Refresh'; }
+    if (!manual) return;
+    if (UPD.newer){ toast('Updating to ' + latest + '…'); try { const rs = await navigator.serviceWorker.getRegistrations(); for (const x of rs) await x.unregister(); } catch(e){} try { for (const k of await caches.keys()) await caches.delete(k); } catch(e){} setTimeout(() => { location.replace(url.split('?')[0] + '?r=' + Date.now()); }, 400); return; }
+    toast('You have the latest version (' + cur + '). Refreshing all data…');
+    PT.at = 0; OV.cacheAt = 0; MX.cacheAt = 0; MX.at = 0;
+    for (const f of [() => ctxTick(), () => loadMarkets(), () => loadMacro(), () => ovLoadExtra(true), () => mxLoad(true), () => jrSync(false), () => requestRender()]){ try { const p = f(); if (p && p.catch) p.catch(() => {}); } catch(e){} }
+  } catch(e){ if (manual){ toast('Could not check for updates (' + errTxt(e) + '). Reloading…'); setTimeout(() => location.reload(), 700); } }
+  finally { UPD.checking = false; if (btn){ btn.disabled = false; if (manual) btn.textContent = UPD.newer ? '⟳ Update' : '⟳ Refresh'; } }
+}
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnUpdate')) updCheck(true); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updCheck(false); });
+setTimeout(() => updCheck(false), 8000); setInterval(() => updCheck(false), 20 * 60000);
+try { if (/[?&]r=\d+/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
 function renderOverview(){
   const el = $('viewOverview'); if (!el) return;
   if (!el._built){
