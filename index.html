@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.13</title>
+<title>ELPP CRYPTO SCANNER PRO V4.14</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -728,6 +728,8 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 .mxbars{display:grid;gap:3px;margin:8px 0}.mxb{display:grid;grid-template-columns:150px 1fr 60px;gap:8px;align-items:center;font-size:12px}.mxl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mxt2,.mxt{}.mxb .mxt{position:relative;height:10px;background:var(--surface2);border-radius:5px;display:block}.mxb .mxt i{position:absolute;top:0;bottom:0;border-radius:5px;background:currentColor}.mxb .mxt i.up{color:var(--good,#2fd27a)}.mxb .mxt i.dn{color:var(--bad,#ff5d5d)}.mxv{text-align:right;font-variant-numeric:tabular-nums}
 @media (max-width:760px){.mxb{grid-template-columns:100px 1fr 52px}.mxt td:nth-child(n){width:auto!important}}
+.jrf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.jrf label,.jrn{display:block;font-size:11.5px;color:var(--muted)}.jrf input,.jrf select,.jrn textarea{display:block;width:100%;margin-top:2px;box-sizing:border-box}.jrn{margin-top:8px}
+.jrt td:nth-child(n){width:auto}.jrt td small{display:block}.jrt td.up{color:var(--up)}.jrt td.dn{color:var(--down)}.ovgl2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
 /* ===== V4.12 listings ===== */
 .lic{display:inline-flex;flex-wrap:wrap;gap:3px;align-items:center}.lib{display:inline-block;border:1px solid var(--line2);border-radius:4px;padding:0 5px;font:600 10px var(--sans);color:var(--muted);white-space:nowrap}.lib.dex{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line2))}.lib.pre{color:var(--warn);border-color:var(--warn)}
 .lim{font-size:10px;color:var(--muted);margin-left:6px;white-space:nowrap}
@@ -739,7 +741,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.13</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.14</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -770,6 +772,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
   <details class="ng" data-g="trade" open><summary>Trade desk</summary>
     <button class="nv" type="button" data-view="sdesk">Signal desk</button>
     <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
+    <button class="nv" type="button" data-view="journal">Trading journal</button>
     <button class="nv" type="button" data-view="watch">★ Watchlist &amp; alerts</button>
     </details>
   <details class="ng" data-g="market" open><summary>Market data</summary>
@@ -969,6 +972,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewInstSpot" class="vcol" hidden></div>
     <div id="viewOverview" class="vcol" hidden></div>
     <div id="viewListings" class="vcol" hidden></div>
+    <div id="viewJournal" class="vcol" hidden></div>
   </section>
 </main>
 <div id="panelBd" aria-hidden="true"></div>
@@ -1842,7 +1846,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -4731,7 +4735,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -7507,7 +7511,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {journal:'Your trade log. Closed Hyperliquid trades are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -7815,14 +7819,14 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['signals','Signals'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   $('scopes').hidden = state.view !== 'table';
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -8355,6 +8359,178 @@ function ovOutside(){
   ${det('mxedu', 'How they affect each other: uptrend, downtrend and the feedback between them', edu)}
   ${det('mxextra', 'Other important data: what is included and what is not', extra)}`;
 }
+/* ===== V4.14: trading journal (manual trades + automatic Hyperliquid sync) ===== */
+const JR = {trades:[], loaded:false, per:'all', src:'all', edit:null, busy:false, err:'', at:0, nNew:0, auto:true, open:new Set(), fillN:0};
+const JR_KEY = 'elpp_journal_v1', JR_SETUPS = ['Liquidity sweep', 'Sweep + reclaim', 'Breakout', 'Retest', 'Reversal', 'Trend pullback', 'News / event', 'Memecoin', 'Other'], JR_EMO = ['Calm / by plan', 'FOMO', 'Revenge', 'Fear', 'Greedy', 'Bored', 'Impatient'];
+function jrLoad(){ if (JR.loaded) return; JR.loaded = true; const s = LS.get(JR_KEY); if (s && Array.isArray(s.trades)){ JR.trades = s.trades; JR.at = s.at || 0; JR.auto = s.auto !== false; } }
+function jrSave(){ LS.set(JR_KEY, {trades:JR.trades, at:JR.at, auto:JR.auto}); }
+const jrNum = v => { const x = parseFloat(String(v).replace(/[, $]/g, '')); return isFinite(x) ? x : null; };
+const jrD = t => new Date(t).toLocaleString([], {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+const jrDur = ms => !isNum(ms) || ms <= 0 ? '—' : ms < 3600e3 ? Math.round(ms / 60e3) + ' min' : ms < 48 * 3600e3 ? (ms / 3600e3).toFixed(1) + ' h' : (ms / 864e5).toFixed(1) + ' days';
+function jrR(t){ const risk = isNum(t.sl) && isNum(t.entry) && isNum(t.size) ? Math.abs(t.entry - t.sl) * t.size : null; return risk > 0 && isNum(t.pnl) ? t.pnl / risk : null; }
+function jrPnl(t){ if (isNum(t.pnl)) return t.pnl; if (!isNum(t.entry) || !isNum(t.exit) || !isNum(t.size)) return null; return (t.exit - t.entry) * t.size * (t.side === 'short' ? -1 : 1) - (t.fees || 0); }
+/* turn Hyperliquid fills into closed trades: a trade runs from flat to flat on one coin */
+function jrFromFills(fills){
+  const by = new Map(); for (const f of fills){ if (!f || !f.coin || /^@|^\d/.test(f.coin) || !/Open|Close|Long|Short|Liquidat/i.test(f.dir || '')) continue; if (!by.has(f.coin)) by.set(f.coin, []); by.get(f.coin).push(f); }
+  const out = [];
+  for (const [coin, L] of by){
+    L.sort((a, b) => a.time - b.time || (a.tid || 0) - (b.tid || 0)); let cur = null, pos = 0, first = true;
+    const fin = () => { if (!cur) return; const o = cur.open, c = cur.close, wavg = a => { const n = a.reduce((s, f) => s + f.px * f.sz, 0), d = a.reduce((s, f) => s + f.sz, 0); return d > 0 ? n / d : null; };
+      out.push({id:'hl:' + coin + ':' + cur.t0, src:'hl', coin, side:cur.side, entry:wavg(o), exit:wavg(c), size:o.reduce((s, f) => s + f.sz, 0), lev:null, sl:null, tp:null, open:cur.t0, close:cur.t1, fees:cur.fees, pnl:cur.pnl - cur.fees, setup:'', emo:'', plan:null, rating:null, notes:'', liq:cur.liq}); cur = null; };
+    for (const f of L){
+      const sz = +f.sz, px = +f.px, sp = first && isFinite(+f.startPosition) ? +f.startPosition : pos; first = false;
+      const d = f.side === 'B' ? sz : -sz, next = sp + d, tiny = 1e-9 * Math.max(1, Math.abs(sp) + sz);
+      if (!cur){ cur = {side:(Math.abs(sp) > tiny ? sp : d) > 0 ? 'long' : 'short', t0:f.time, t1:f.time, open:[], close:[], fees:0, pnl:0, liq:false}; }
+      const isOpen = (cur.side === 'long') === (f.side === 'B'); const fx = {px, sz};
+      (isOpen ? cur.open : cur.close).push(fx); cur.fees += +f.fee || 0; cur.pnl += +f.closedPnl || 0; cur.t1 = f.time; if (/liquidat/i.test(f.dir || '')) cur.liq = true;
+      pos = next;
+      if (Math.abs(next) <= tiny){ pos = 0; fin(); }
+      else if (sp * next < 0){ fin(); pos = next; cur = {side:next > 0 ? 'long' : 'short', t0:f.time, t1:f.time, open:[{px, sz:Math.abs(next)}], close:[], fees:0, pnl:0, liq:false}; }
+    }
+  }
+  return out.filter(t => isNum(t.entry) && isNum(t.exit));
+}
+async function jrSync(manual){
+  jrLoad(); const a = String((state.pf || {}).addr || '').trim();
+  if (!/^0x[0-9a-fA-F]{40}$/.test(a)){ JR.err = a ? 'That does not look like a wallet address (0x and 40 characters).' : 'Paste your Hyperliquid wallet address to sync trades automatically.'; jrRedraw(); return; }
+  if (JR.busy) return; JR.busy = true; JR.err = ''; jrRedraw();
+  try {
+    const fills = await hl({type:'userFills', user:a, aggregateByTime:true}, 20); if (!Array.isArray(fills)) throw new Error('Hyperliquid sent no fills');
+    JR.fillN = fills.length; const got = jrFromFills(fills), have = new Map(JR.trades.map(t => [t.id, t])); let n = 0;
+    for (const t of got){ const o = have.get(t.id); if (o){ Object.assign(o, {entry:t.entry, exit:t.exit, size:t.size, close:t.close, fees:t.fees, pnl:t.pnl, liq:t.liq}); } else { JR.trades.push(t); n++; } }
+    JR.trades.sort((x, y) => (y.close || 0) - (x.close || 0)); JR.nNew = n; JR.at = Date.now(); jrSave();
+    if (manual) toast(n ? n + ' new trades added to your journal.' : 'Journal is up to date.');
+  } catch(e){ JR.err = errTxt(e); }
+  finally { JR.busy = false; jrRedraw(); }
+}
+function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+function jrFiltered(){
+  const cut = JR.per === 'all' ? 0 : Date.now() - {'7':7, '30':30, '90':90}[JR.per] * 864e5;
+  return JR.trades.filter(t => (t.close || t.open || 0) >= cut && (JR.src === 'all' || t.src === JR.src)).map(t => Object.assign({}, t, {pnl:jrPnl(t)})).filter(t => isNum(t.pnl));
+}
+function jrStats(L){
+  const n = L.length; if (!n) return null; const W = L.filter(t => t.pnl > 0), Ls = L.filter(t => t.pnl < 0), sum = a => a.reduce((s, t) => s + t.pnl, 0);
+  const gw = sum(W), gl = Math.abs(sum(Ls)), asc = L.slice().sort((a, b) => (a.close || 0) - (b.close || 0));
+  let eq = 0, pk = 0, dd = 0, cw = 0, cl = 0, bw = 0, bl = 0; const curve = [0];
+  for (const t of asc){ eq += t.pnl; curve.push(eq); pk = Math.max(pk, eq); dd = Math.max(dd, pk - eq); if (t.pnl > 0){ cw++; cl = 0; bw = Math.max(bw, cw); } else if (t.pnl < 0){ cl++; cw = 0; bl = Math.max(bl, cl); } }
+  const Rs = L.map(jrR).filter(isNum), hold = L.filter(t => t.close && t.open).map(t => t.close - t.open);
+  const pl = L.filter(t => t.plan === true), npl = L.filter(t => t.plan === false);
+  return {n, wins:W.length, losses:Ls.length, wr:W.length / n * 100, net:sum(L), gw, gl, pf:gl > 0 ? gw / gl : null, avgW:W.length ? gw / W.length : null, avgL:Ls.length ? -gl / Ls.length : null, exp:sum(L) / n, best:asc.reduce((m, t) => t.pnl > m.pnl ? t : m), worst:asc.reduce((m, t) => t.pnl < m.pnl ? t : m), dd, bw, bl, avgR:Rs.length ? Rs.reduce((s, v) => s + v, 0) / Rs.length : null, nR:Rs.length, hold:hold.length ? hold.reduce((s, v) => s + v, 0) / hold.length : null, fees:L.reduce((s, t) => s + (t.fees || 0), 0), curve, plan:pl.length ? {n:pl.length, pnl:sum(pl), wr:pl.filter(t => t.pnl > 0).length / pl.length * 100} : null, off:npl.length ? {n:npl.length, pnl:sum(npl), wr:npl.filter(t => t.pnl > 0).length / npl.length * 100} : null};
+}
+function jrGroup(L, keyF){
+  const m = new Map(); for (const t of L){ const k = keyF(t); if (k === null || k === undefined || k === '') continue; if (!m.has(k)) m.set(k, []); m.get(k).push(t); }
+  return [...m].map(([k, a]) => ({k, n:a.length, pnl:a.reduce((s, t) => s + t.pnl, 0), wr:a.filter(t => t.pnl > 0).length / a.length * 100})).sort((x, y) => y.pnl - x.pnl);
+}
+function jrCurve(c){
+  if (c.length < 3) return '<p class="hint">The profit curve appears after your second trade.</p>';
+  const W = 640, H = 150, mn = Math.min(0, ...c), mx = Math.max(0, ...c), rg = (mx - mn) || 1, X = i => 8 + i / (c.length - 1) * (W - 16), Y = v => H - 10 - (v - mn) / rg * (H - 20);
+  const pts = c.map((v, i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join(' '), z = Y(0).toFixed(1), up = c[c.length - 1] >= 0;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:190px" role="img" aria-label="Cumulative profit and loss"><line x1="8" x2="${W - 8}" y1="${z}" y2="${z}" stroke="currentColor" opacity=".25" stroke-dasharray="4 4"/><polyline fill="none" stroke="${up ? 'var(--up)' : 'var(--down)'}" stroke-width="2" points="${pts}"/><text x="10" y="12" font-size="11" fill="currentColor" opacity=".7">${esc(fmtUsd(mx, true))}</text><text x="10" y="${H - 2}" font-size="11" fill="currentColor" opacity=".7">${esc(fmtUsd(mn, true))}</text></svg>`;
+}
+function jrTable(rows, label){
+  if (!rows.length) return '<p class="hint">Nothing yet.</p>';
+  return `<div class="ovwrap"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">${esc(label)}</th><th>Trades</th><th>Win rate</th><th>Net P&amp;L</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(String(r.k))}</td><td>${r.n}</td><td>${r.wr.toFixed(0)}%</td><td class="${r.pnl >= 0 ? 'up' : 'dn'}">${esc(fmtUsd(r.pnl, true))}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function jrCoach(S, L){
+  const out = [];
+  if (S.n < 10) out.push('You have ' + S.n + ' trades in this view. Numbers become reliable after about 30 trades, so treat these as early hints.');
+  if (isNum(S.pf)) out.push(S.pf >= 1.5 ? 'Profit factor ' + S.pf.toFixed(2) + ': your winners are paying for your losers well.' : S.pf >= 1 ? 'Profit factor ' + S.pf.toFixed(2) + ': slightly profitable. Fees and slippage can erase this, so protect it.' : 'Profit factor ' + S.pf.toFixed(2) + ': you lose more than you win. Fix losses first: smaller size, tighter plan, fewer trades.');
+  if (isNum(S.avgW) && isNum(S.avgL) && S.avgL < 0){ const r = S.avgW / -S.avgL; out.push('Your average win is ' + r.toFixed(2) + 'x your average loss' + (r < 1 && S.wr < 60 ? ': winners are too small for this win rate. Let winners reach the target or reduce the stop distance.' : '.')); }
+  if (S.plan && S.off) out.push('Trades you marked "followed my plan" made ' + fmtUsd(S.plan.pnl, true) + ' (' + S.plan.wr.toFixed(0) + '% win rate). Trades off-plan made ' + fmtUsd(S.off.pnl, true) + ' (' + S.off.wr.toFixed(0) + '%).' + (S.off.pnl < S.plan.pnl ? ' Discipline is paying you: skip the off-plan trades.' : ''));
+  const em = jrGroup(L, t => t.emo && !/^Calm/.test(t.emo) ? t.emo : null).filter(r => r.n >= 2 && r.pnl < 0)[0]; if (em) out.push('Trades taken while feeling "' + em.k + '" lost ' + fmtUsd(em.pnl, true) + ' over ' + em.n + ' trades. That is a cost you can remove.');
+  if (S.bl >= 4) out.push('Your longest losing streak was ' + S.bl + ' trades. Decide in advance to stop for the day after 3 losses.');
+  if (L.some(t => t.liq)) out.push('At least one trade ended in liquidation. Margin and leverage should never allow that: your stop must trigger long before.');
+  if (S.fees > 0 && S.gw > 0 && S.fees / S.gw > 0.2) out.push('Fees took ' + (S.fees / S.gw * 100).toFixed(0) + '% of your gross profit. Fewer, better trades and limit orders reduce this.');
+  return out;
+}
+function jrForm(){
+  const e = JR.edit ? JR.trades.find(t => t.id === JR.edit) : null, v = (k, d) => e && e[k] !== null && e[k] !== undefined ? esc(String(e[k])) : (d || ''), tm = k => e && e[k] ? new Date(e[k] - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : '';
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">${e ? 'Edit trade: ' + esc(e.coin) : 'Log a trade by hand'}</h3>${e ? '<button class="btn sm" type="button" id="jrCancel">Cancel edit</button>' : ''}</div>
+  ${e && e.src === 'hl' ? '<p class="hint">This trade came from Hyperliquid, so prices, size and P&amp;L are locked. You can add your stop, target, setup, feeling and notes.</p>' : '<p class="hint">Use this for trades on other exchanges, or any trade you want to add. P&amp;L is worked out from entry, exit and size if you leave it empty.</p>'}
+  <div class="jrf">
+    <label>Coin<input id="jrCoin" type="text" placeholder="SOL" value="${v('coin')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Side<select id="jrSide" ${e && e.src === 'hl' ? 'disabled' : ''}><option value="long"${e && e.side === 'short' ? '' : ' selected'}>Long</option><option value="short"${e && e.side === 'short' ? ' selected' : ''}>Short</option></select></label>
+    <label>Entry price<input id="jrEntry" type="text" inputmode="decimal" value="${v('entry')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Exit price<input id="jrExit" type="text" inputmode="decimal" value="${v('exit')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Size (coins)<input id="jrSize" type="text" inputmode="decimal" value="${v('size')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Fees paid ($)<input id="jrFees" type="text" inputmode="decimal" value="${v('fees')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Stop-loss price<input id="jrSl" type="text" inputmode="decimal" value="${v('sl')}"></label>
+    <label>Take-profit price<input id="jrTp" type="text" inputmode="decimal" value="${v('tp')}"></label>
+    <label>Opened<input id="jrOpen" type="datetime-local" value="${tm('open')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Closed<input id="jrClose" type="datetime-local" value="${tm('close')}" ${e && e.src === 'hl' ? 'disabled' : ''}></label>
+    <label>Setup<input id="jrSetup" list="jrSetups" type="text" placeholder="Liquidity sweep" value="${v('setup')}"></label>
+    <label>How did you feel?<input id="jrEmo" list="jrEmos" type="text" value="${v('emo')}"></label>
+    <label>Followed your plan?<select id="jrPlan"><option value="">Not set</option><option value="1"${e && e.plan === true ? ' selected' : ''}>Yes</option><option value="0"${e && e.plan === false ? ' selected' : ''}>No</option></select></label>
+    <label>Rating (1 to 5)<select id="jrRate"><option value="">—</option>${[1, 2, 3, 4, 5].map(n => `<option${e && e.rating === n ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+  </div>
+  <label class="jrn">Notes: why you entered, what you saw, what you would change<textarea id="jrNotes" rows="3">${e ? esc(e.notes || '') : ''}</textarea></label>
+  <datalist id="jrSetups">${JR_SETUPS.map(s => `<option value="${esc(s)}">`).join('')}</datalist><datalist id="jrEmos">${JR_EMO.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+  <div class="row" style="gap:6px;margin-top:8px"><button class="btn primary" type="button" id="jrSaveT">${e ? 'Save changes' : 'Add trade'}</button></div></div>`;
+}
+function jrHtml(){
+  jrLoad(); const L = jrFiltered(), S = jrStats(L), a = String((state.pf || {}).addr || '').trim(), okA = /^0x[0-9a-fA-F]{40}$/.test(a);
+  const sel = (k, o) => o.map(([v, t]) => `<button type="button" class="btn sm${JR[k] === v ? ' primary' : ''}" data-jr${k}="${v}">${t}</button>`).join(' ');
+  const tile = (lab, val, cls, sub) => `<div><small>${esc(lab)}</small><b${cls ? ` class="${cls}"` : ''}>${val}</b><em class="${cls || 'dim'}">${esc(sub || '')}</em></div>`, sg = v => v > 0 ? 'up' : v < 0 ? 'dn' : '';
+  const tiles = S ? [tile('Net profit', esc(fmtUsd(S.net, true)), sg(S.net), S.n + ' trades · fees ' + fmtUsd(S.fees)), tile('Win rate', S.wr.toFixed(0) + '%', S.wr >= 50 ? 'up' : 'warn', S.wins + ' wins · ' + S.losses + ' losses'), tile('Profit factor', isNum(S.pf) ? S.pf.toFixed(2) : '—', isNum(S.pf) ? (S.pf >= 1.3 ? 'up' : S.pf < 1 ? 'dn' : 'warn') : '', 'gross win ÷ gross loss'), tile('Average trade', esc(fmtUsd(S.exp, true)), sg(S.exp), 'expectancy per trade'), tile('Average win / loss', (isNum(S.avgW) ? fmtUsd(S.avgW) : '—') + ' / ' + (isNum(S.avgL) ? fmtUsd(S.avgL) : '—'), '', isNum(S.avgW) && isNum(S.avgL) && S.avgL < 0 ? (S.avgW / -S.avgL).toFixed(2) + 'x reward to risk' : ''), tile('Average R', isNum(S.avgR) ? S.avgR.toFixed(2) + 'R' : '—', isNum(S.avgR) ? sg(S.avgR) : '', S.nR ? 'on ' + S.nR + (S.nR === 1 ? ' trade' : ' trades') + ' with a stop' : 'add stop prices to see R'), tile('Biggest drawdown', esc(fmtUsd(-S.dd)), S.dd > 0 ? 'dn' : '', 'peak to trough'), tile('Streaks', S.bw + ' W / ' + S.bl + ' L', '', 'best run / worst run'), tile('Average hold', jrDur(S.hold), '', 'open to close')].join('') : '';
+  const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], ses = t => { const h = new Date(t.open || t.close).getUTCHours(); return h >= 0 && h < 7 ? 'Asia session (00-07 UTC)' : h >= 7 && h < 12 ? 'London open (07-12 UTC)' : h >= 12 && h < 21 ? 'New York (12-21 UTC)' : 'Late / rollover (21-24 UTC)'; };
+  const rows = L.slice().sort((x, y) => (y.close || 0) - (x.close || 0)).slice(0, 200).map(t => { const r = jrR(t); return `<tr><td data-l="Closed">${esc(jrD(t.close || t.open))}${t.src === 'hl' ? '<small>Hyperliquid</small>' : '<small>manual</small>'}</td><td data-l="Coin"><b>${esc(t.coin)}</b><small class="${t.side === 'long' ? 'up' : 'dn'}">${t.side}${t.liq ? ' · LIQUIDATED' : ''}</small></td><td data-l="Entry → Exit">${esc(fmtPx(t.entry))} → ${esc(fmtPx(t.exit))}<small>size ${esc(String(+(+t.size).toPrecision(4)))}</small></td><td data-l="P&L" class="${t.pnl >= 0 ? 'up' : 'dn'}">${esc(fmtUsd(t.pnl, true))}<small>${isNum(r) ? r.toFixed(2) + 'R' : ''}${t.fees ? ' · fee ' + esc(fmtUsd(t.fees)) : ''}</small></td><td data-l="Setup">${esc(t.setup || '—')}<small>${esc(t.emo || '')}${t.plan === true ? ' · on plan' : t.plan === false ? ' · off plan' : ''}${t.rating ? ' · ' + '★'.repeat(t.rating) : ''}</small></td><td data-l="Notes">${esc((t.notes || '').slice(0, 140))}${(t.notes || '').length > 140 ? '…' : ''}</td><td data-l=""><button class="btn sm" type="button" data-jredit="${esc(t.id)}">Edit</button> <button class="btn sm" type="button" data-jrdel="${esc(t.id)}">Delete</button></td></tr>`; }).join('');
+  const det = (id, t, b) => `<details class="ovd" data-ovd="${id}"${OV.open.has(id) ? ' open' : ''}><summary>${t}</summary>${b}</details>`;
+  const coach = S ? jrCoach(S, L) : [];
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Trading journal</h3><span class="row" style="gap:6px"><button class="btn sm" type="button" id="jrSync">${JR.busy ? 'Syncing…' : '↻ Sync Hyperliquid now'}</button></span></div>
+    <p class="hint" style="margin:6px 0 8px">Every closed Hyperliquid trade is added here by itself, with entry, exit, size, fees and profit. You add the part only you know: why you took it, how you felt, and whether you followed your plan. The numbers below then show what actually makes or loses you money.</p>
+    <div class="row" style="gap:6px"><input type="text" id="jrAddr" placeholder="0x… your Hyperliquid wallet address" value="${esc(a)}" style="flex:1;min-width:260px"><button class="btn" type="button" id="jrAddrSave">Save wallet</button></div>
+    <label class="hint" style="display:block;margin-top:6px"><input type="checkbox" id="jrAuto"${JR.auto ? ' checked' : ''}> Sync automatically every 10 minutes while this app is open</label>
+    ${JR.err ? `<p class="warn">${esc(JR.err)}</p>` : ''}<p class="hint">${okA ? 'Wallet saved' : 'No wallet yet'}${JR.at ? ' · last sync ' + esc(ago(JR.at)) + (JR.nNew ? ' · ' + JR.nNew + ' new' : '') + ' · ' + JR.fillN + ' recent fills read' : ''} · ${JR.trades.length} trades stored on this device.</p></div>
+  <div class="nsec"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><span>${sel('per', [['7', '7 days'], ['30', '30 days'], ['90', '90 days'], ['all', 'All time']])}</span><span>${sel('src', [['all', 'All trades'], ['hl', 'Hyperliquid'], ['manual', 'Manual']])}</span></div></div>
+  ${S ? `<div class="nsec"><h3>Your numbers</h3><div class="ovk">${tiles}</div></div>
+  <div class="nsec"><h3>Profit curve</h3>${jrCurve(S.curve)}</div>
+  <div class="nsec"><h3>What your journal is telling you</h3><ul class="ovstory">${coach.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : '<div class="nsec"><p class="hint">No trades in this view yet. Save your wallet address above to pull your Hyperliquid trades, or log one by hand below.</p></div>'}
+  ${jrForm()}
+  ${S ? `<div class="nsec"><h3>All trades</h3><div class="ovwrap"><table class="ovt jrt"><thead><tr><th>Closed</th><th>Coin</th><th>Entry → exit</th><th>Result</th><th>Setup and feeling</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>${L.length > 200 ? '<p class="hint">Showing the latest 200. The statistics use all trades in the view.</p>' : ''}</div>
+  ${det('jr1', 'Where you make and lose money', `<div class="ovgl2"><div><b>By coin</b>${jrTable(jrGroup(L, t => t.coin).slice(0, 12), 'Coin')}</div><div><b>By side</b>${jrTable(jrGroup(L, t => t.side), 'Side')}</div><div><b>By setup</b>${jrTable(jrGroup(L, t => t.setup || null), 'Setup')}</div><div><b>By feeling</b>${jrTable(jrGroup(L, t => t.emo || null), 'Feeling')}</div><div><b>By weekday</b>${jrTable(jrGroup(L, t => wd[new Date(t.open || t.close).getDay()]), 'Day')}</div><div><b>By session</b>${jrTable(jrGroup(L, ses), 'Session')}</div></div>`)}` : ''}
+  ${det('jr2', 'Back up, export or import', `<p class="hint">Your journal lives in this browser or app only. The phone app and the Windows app each keep their own copy, so export a backup now and then, and import it on the other device.</p><div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" id="jrCsv">Download CSV</button><button class="btn sm" type="button" id="jrJson">Download backup (JSON)</button><label class="btn sm" style="cursor:pointer">Import backup<input type="file" id="jrImp" accept=".json,application/json" hidden></label><button class="btn sm" type="button" id="jrWipe">Delete all journal data</button></div>`)}
+  ${det('jr3', 'How it works and its limits', '<ul class="ovstory"><li>Hyperliquid only returns your most recent fills (about 2,000). The journal keeps what it has already read, so keep the app open now and then and old trades are not lost.</li><li>A trade is counted from the moment your position on a coin goes from nothing to something until it is back to nothing. Adding to a position or closing in parts stays in one trade. Positions still open are shown in Signals, alerts &amp; portfolio and join the journal when they close.</li><li>Profit is after fees. Funding payments are not included, so a long hold can differ slightly from Hyperliquid\'s own number.</li><li>Stop-loss and take-profit prices are not stored by Hyperliquid once a trade ends, so add your stop to see R (profit divided by what you risked).</li><li>Spot trades and other exchanges are not read automatically. Log those by hand.</li><li>Your wallet address is public information and only used to read your trades. No keys are needed or stored.</li></ul>')}`;
+}
+function jrCollect(old){
+  const g = id => ($(id) || {}).value || '', hlk = old && old.src === 'hl', t = Object.assign({}, old || {id:'m:' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), src:'manual'});
+  if (!hlk){ t.coin = normSym(g('jrCoin').trim().toUpperCase()) || g('jrCoin').trim().toUpperCase(); t.side = g('jrSide'); t.entry = jrNum(g('jrEntry')); t.exit = jrNum(g('jrExit')); t.size = jrNum(g('jrSize')); t.fees = jrNum(g('jrFees')) || 0; t.open = g('jrOpen') ? new Date(g('jrOpen')).getTime() : null; t.close = g('jrClose') ? new Date(g('jrClose')).getTime() : (t.open || Date.now()); t.pnl = null;
+    if (!t.coin || !isNum(t.entry) || !isNum(t.exit) || !isNum(t.size) || t.size <= 0){ toast('Fill in coin, entry, exit and size.'); return null; } t.pnl = jrPnl(t); if (!t.open) t.open = t.close; }
+  t.sl = jrNum(g('jrSl')); t.tp = jrNum(g('jrTp')); t.setup = g('jrSetup').trim(); t.emo = g('jrEmo').trim(); t.plan = g('jrPlan') === '1' ? true : g('jrPlan') === '0' ? false : null; t.rating = g('jrRate') ? +g('jrRate') : null; t.notes = g('jrNotes').trim();
+  return t;
+}
+function jrDownload(name, text, type){ const b = new Blob([text], {type}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function jrCsv(){
+  const H = ['closed', 'opened', 'source', 'coin', 'side', 'entry', 'exit', 'size', 'fees', 'pnl_usd', 'r_multiple', 'stop', 'target', 'setup', 'feeling', 'followed_plan', 'rating', 'notes'], q = v => '"' + String(v === null || v === undefined ? '' : v).replace(/"/g, '""') + '"';
+  return [H.join(',')].concat(JR.trades.map(t => { const p = jrPnl(t), r = jrR(Object.assign({}, t, {pnl:p})); return [t.close ? new Date(t.close).toISOString() : '', t.open ? new Date(t.open).toISOString() : '', t.src, t.coin, t.side, t.entry, t.exit, t.size, t.fees, p, isNum(r) ? r.toFixed(3) : '', t.sl, t.tp, t.setup, t.emo, t.plan === true ? 'yes' : t.plan === false ? 'no' : '', t.rating, t.notes].map(q).join(','); })).join('\n');
+}
+function renderJournal(){
+  const el = $('viewJournal'); if (!el) return; jrLoad();
+  if (!el._built){
+    el._built = true;
+    el.addEventListener('click', e => {
+      const T = e.target, c = s => T.closest(s);
+      if (c('#jrSync')){ jrSync(true); return; }
+      if (c('#jrAddrSave')){ state.pf = {addr:($('jrAddr').value || '').trim()}; saveState(); try { loadPf(); } catch(x){} jrSync(true); return; }
+      let b; if ((b = c('[data-jrper]'))){ JR.per = b.dataset.jrper; renderJournal(); return; } if ((b = c('[data-jrsrc]'))){ JR.src = b.dataset.jrsrc; renderJournal(); return; }
+      if ((b = c('[data-jredit]'))){ JR.edit = b.dataset.jredit; renderJournal(); const f = $('jrNotes'); if (f) f.scrollIntoView({block:'center'}); return; }
+      if ((b = c('[data-jrdel]'))){ const t = JR.trades.find(x => x.id === b.dataset.jrdel); if (t && confirm('Delete this ' + t.coin + ' trade from the journal?' + (t.src === 'hl' ? ' It will come back on the next sync while Hyperliquid still holds it.' : ''))){ JR.trades = JR.trades.filter(x => x !== t); jrSave(); renderJournal(); } return; }
+      if (c('#jrCancel')){ JR.edit = null; renderJournal(); return; }
+      if (c('#jrSaveT')){ const old = JR.edit ? JR.trades.find(t => t.id === JR.edit) : null, t = jrCollect(old); if (!t) return; if (!old) JR.trades.push(t); JR.edit = null; JR.trades.sort((x, y) => (y.close || 0) - (x.close || 0)); jrSave(); toast(old ? 'Trade updated.' : 'Trade added.'); renderJournal(); return; }
+      if (c('#jrCsv')){ jrDownload('ELPP-journal.csv', jrCsv(), 'text/csv'); return; }
+      if (c('#jrJson')){ jrDownload('ELPP-journal-backup.json', JSON.stringify({v:1, trades:JR.trades}), 'application/json'); return; }
+      if (c('#jrWipe')){ if (confirm('Delete every trade in this journal? Export a backup first if unsure.')){ JR.trades = []; jrSave(); renderJournal(); } return; }
+    });
+    el.addEventListener('change', e => {
+      if (e.target.id === 'jrAuto'){ JR.auto = e.target.checked; jrSave(); return; }
+      if (e.target.id === 'jrImp' && e.target.files[0]){ const rd = new FileReader(); rd.onload = () => { try { const j = JSON.parse(rd.result), A = Array.isArray(j) ? j : j.trades; if (!Array.isArray(A)) throw new Error('no trades found'); const have = new Set(JR.trades.map(t => t.id)); let n = 0; for (const t of A){ if (t && t.id && t.coin && !have.has(t.id)){ JR.trades.push(t); n++; } } JR.trades.sort((x, y) => (y.close || 0) - (x.close || 0)); jrSave(); toast(n + ' trades imported.'); renderJournal(); } catch(x){ toast('That file is not a journal backup.'); } }; rd.readAsText(e.target.files[0]); }
+    });
+    el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
+    jrSync(false);
+  }
+  const ae = document.activeElement; if (ae && el.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
+  const html = jrHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
+}
+setInterval(() => { try { jrLoad(); if (JR.auto && !JR.busy && document.visibilityState !== 'hidden' && /^0x[0-9a-fA-F]{40}$/.test(String((state.pf || {}).addr || '').trim()) && Date.now() - JR.at > 600000) jrSync(false); } catch(e){} }, 60000);
 function renderOverview(){
   const el = $('viewOverview'); if (!el) return;
   if (!el._built){
