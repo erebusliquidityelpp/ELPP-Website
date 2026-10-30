@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.5</title>
+<title>ELPP CRYPTO SCANNER PRO V4.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -688,12 +688,16 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
   #mbMenu{border-radius:10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.cpb{font:600 11px/1 var(--mono,monospace);padding:5px 9px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--accent);cursor:pointer;white-space:nowrap}.cpb.sm{margin-left:6px;padding:3px 7px;font-size:10px;vertical-align:middle}.cpb.cp-up{color:var(--up);border-color:var(--up)}.cpb.cp-dn{color:var(--down);border-color:var(--down)}.cpb.cp-warn{color:var(--warn);border-color:var(--warn)}.cpb.cp-dim{color:var(--muted)}
+.cpv{border:1px solid var(--line2);border-left-width:5px;border-radius:12px;padding:12px 14px;margin-bottom:8px}.cpv-up{border-color:var(--up)}.cpv-dn{border-color:var(--down)}.cpv-warn{border-color:var(--warn)}.cpv1{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.cpv1 b{font-size:19px}.cpv1 span{color:var(--muted);font-size:12px}.cpv p{margin:6px 0;line-height:1.5}.cpbar{height:8px;border-radius:6px;background:var(--line2);overflow:hidden;margin:8px 0}.cpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--down),var(--warn),var(--up))}.cpcnt{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:600}
+.cpc{border:1px solid var(--line2);border-left-width:4px;border-radius:10px;margin:6px 0;background:var(--surface)}.cpc.cp-ok{border-left-color:var(--up)}.cpc.cp-warn{border-left-color:var(--warn)}.cpc.cp-bad{border-left-color:var(--down)}.cpc.cp-na{border-left-color:var(--muted);opacity:.8}.cpc summary{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer;list-style:none}.cpc summary::-webkit-details-marker{display:none}.cpi{font-style:normal;font-weight:700;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:12px;color:#fff;background:var(--muted)}.cp-ok .cpi{background:var(--up)}.cp-warn .cpi{background:var(--warn)}.cp-bad .cpi{background:var(--down)}.cpn1{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.cpn1 small{color:var(--muted);font-size:12px;line-height:1.45;white-space:normal}.cpval{font-family:var(--mono,monospace);font-size:11px;color:var(--muted);text-align:right;max-width:32%;flex:none}.cpbody{padding:2px 14px 12px 44px;font-size:12.5px;line-height:1.6}.cpbody h5{margin:10px 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent)}.cpbody p{margin:0}.cpbody ul{margin:0;padding-left:16px}.cpc1{white-space:nowrap}
+@media (max-width:640px){.cpval{display:none}.cpbody{padding-left:14px}.cpv1 b{font-size:16px}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.5</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.6</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -3625,6 +3629,7 @@ function verdictFill(c){
     if (isNum(m.whBias) && m.whN >= 2 && Math.abs(m.whBias) >= 40) add(m.whBias > 0 ? 8 : -8, m.whBias > 0 ? 'whale, orca and shark wallets are mostly long' : 'whale, orca and shark wallets are mostly short');
     if (isNum(m.walScore) && m.walN >= 5 && Math.abs(m.walScore) >= WAL_T) add(m.walScore > 0 ? 6 : -6, 'the ' + m.walTracked + ' tracked wallets lean ' + (m.walScore > 0 ? 'long' : 'short') + ' on this coin (' + m.walLong + ' long, ' + m.walShort + ' short)');
     { const sp = swpPick(m); if (sp){ const o = sp[1]; add(o.dir > 0 ? 3 : -3, 'on the ' + sp[0] + ', a ' + (o.dir > 0 ? 'low' : 'high') + ' was swept and reclaimed'); if (o.retest) add(o.dir > 0 ? 4 : -4, 'the 2nd test of that level held'); } }
+    { const cb = cpBias(c); if (cb){ const df = cb.long - cb.short; if (Math.abs(df) >= 20) add(Math.round(df / 100 * 6), 'the 13 extra institutional checks lean ' + (df > 0 ? 'long' : 'short') + ' (open the Confirm column for the reasons)'); } }
     { const pr = m.pressure && m.pressure['1h']; if (isNum(pr) && Math.abs(pr) >= PR_T.note) add(pr > 0 ? 4 : -4, (pr > 0 ? 'buying' : 'selling') + ' pressure is ' + Math.round(pr) + '% on the 1h'); }
     { const w1 = {2:[12,'a breakout was confirmed after a swept low was reclaimed'], 1:[4,'a low was swept and reclaimed, breakout not yet confirmed'], 4:[-12,'a breakdown was confirmed after a swept high was reclaimed'], 3:[-4,'a high was swept and reclaimed, breakdown not yet confirmed']}, a1 = w1[m.bo && m.bo['1h']], a15 = w1[m.bo && m.bo['15m']];
       if (a1) add(a1[0], 'on the 1h, ' + a1[1]); if (a15) add(Math.round(a15[0] / 2), 'on the 15m, ' + a15[1]); }
@@ -4343,7 +4348,7 @@ Object.assign(METRICS, {
   evKim:{label:"Korean premium (Upbit / Bithumb) vs Hyperliquid (%)",tf:null,unit:"%",modes:'all'},
   evN:{label:"Extra exchanges listing this coin (count)",tf:null,unit:"",modes:'all'}
 });
-const COLNAMES = {swpRe:'Sweep + reclaim and 2nd test (15m / 1h)', walScore:'Tracked wallets (100) lean', pressTh:'Buy/sell pressure % (15m / 1h / 4h) with thresholds', dataRead:'Data read (Orion-style long/short)',px:'Price',score:'Score',read:'Bias hint',chgUsd:'Change $',vol:'Volume $',volD:'Volume change %',volDUsd:'Volume change $',rvol:'RVOL',trades:'Trades',tradesX:'Trades vs average',vlt:'Volatility % (range)',vltX:'Volatility vs average',oiUsd:'Open interest $',oiChg:'OI change %',oiChgUsd:'OI change $',corr:'BTC correlation',funding:'Funding % per hour',basis:'Basis %',vol24:'24h volume',
+const COLNAMES = {cpConf:'Confirm: 13 extra institutional checks (click for the reasons)', swpRe:'Sweep + reclaim and 2nd test (15m / 1h)', walScore:'Tracked wallets (100) lean', pressTh:'Buy/sell pressure % (15m / 1h / 4h) with thresholds', dataRead:'Data read (Orion-style long/short)',px:'Price',score:'Score',read:'Bias hint',chgUsd:'Change $',vol:'Volume $',volD:'Volume change %',volDUsd:'Volume change $',rvol:'RVOL',trades:'Trades',tradesX:'Trades vs average',vlt:'Volatility % (range)',vltX:'Volatility vs average',oiUsd:'Open interest $',oiChg:'OI change %',oiChgUsd:'OI change $',corr:'BTC correlation',funding:'Funding % per hour',basis:'Basis %',vol24:'24h volume',
   rangePos:'Range position',vwapDay:'VWAP distance (UTC day)',distHi:'Distance below high',distLo:'Distance above low',sweep:'Sweep + reclaim',tfAgree:'Timeframe agreement',atr:'ATR %',fundChg:'Funding change',relStr:'Change vs BTC',rvolBest:'RVOL best of last 3',obi:'Order book imbalance',spread:'Spread %',maxLev:'Max leverage',iso:'Isolated-only',hist:'Candle history',flowUsd:'Net money flow $',flowPct:'Net money flow %',mcap:'Market cap',volMcap:'Trading heat',fdvRatio:'Unlock overhang',athDist:'Discount from all-time high',hype:'Hype score',hypeWhy:'Why it is hot',newsCount:'News stories',sector:'Sector',hypeStage:'Hype timing',pch_1h:'Change 1h',pch_24h:'Change 24h',pch_7d:'Change 7d',pch_30d:'Change 30d',pch_200d:'Change 200d',pch_1y:'Change 1y',cgVol:'24h volume',atlDist:'Rise from all-time low',supplyPct:'Supply in circulation',rank:'Rank',cgTrend:'Trend',phase:'Market phase',perpLink:'Perp on Hyperliquid',pressure:'Buy/sell pressure',obiPct:'Book imbalance %',liqUsd:'Liquidity $',liqPct:'Liquidity % of OI',regime:'Regime (chop / accumulation / distribution / manipulation)',trend:'Trend (up / down / consolidating)'};
 for (const tf of TFS) COLNAMES['chg_' + tf] = 'Change % ' + tf;
 function hiddenList(){ return state.mode === 'perp' ? state.hiddenCols : state.hiddenColsCg; }
@@ -4559,7 +4564,7 @@ function allColumnsCg(){
   const saved = state.mode; state.mode = 'perp'; let pc; try { pc = allColumns(); } finally { state.mode = saved; }
   const cols = [];
   cols.push({id:'sym', label:'Symbol', val:c => c.name, cell:c => [`<a href="#" data-chart="${esc(c.name)}" title="Open chart">${esc(c.name)}</a><a class="cp" href="${c.isCg && c.cg ? 'https://www.coingecko.com/en/coins/' + encodeURIComponent(c.cg.id) : 'https://app.hyperliquid.xyz/trade/' + encodeURIComponent(c.name)}" target="_blank" rel="noopener noreferrer" title="Open on the exchange or CoinGecko" style="text-decoration:none">↗</a>`, 'sym']});
-  cols.push(pc.find(x => x.id === 'px'), pc.find(x => x.id === 'score'), ...['verdict','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','takeoff','buildup','takeWhy','airdrop','unlock','hyp','mexc','optBias','optPcr','optPcrV','optIv','optTerm','optSkew','optMpDist','optCwDist','optPwDist','optGex','optFlow','optDvol','optDvolChg','optWhy','ofState_5m','ofState_15m','ofDelta_5m','ofDelta_15m','exf'].map(id => pc.find(x => x.id === id)));
+  cols.push(pc.find(x => x.id === 'px'), pc.find(x => x.id === 'score'), cpColumn(), ...['verdict','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','takeoff','buildup','takeWhy','airdrop','unlock','hyp','mexc','optBias','optPcr','optPcrV','optIv','optTerm','optSkew','optMpDist','optCwDist','optPwDist','optGex','optFlow','optDvol','optDvolChg','optWhy','ofState_5m','ofState_15m','ofDelta_5m','ofDelta_15m','exf'].map(id => pc.find(x => x.id === id)));
   const num = (id, label, fn, fmt, cls) => cols.push({id, label, val:fn, cell:c => { const v = fn(c); return [fmt(v), cls ? cls(v) : (isNum(v) ? '' : 'dim')]; }});
   const sgn = v => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(1) + '%' : '—', ud = v => isNum(v) ? (v >= 0 ? 'up' : 'dn') : 'dim';
   cols.push({id:'phase', label:'Market phase', val:c => c.m.phase, cell:c => { const v = c.m.phase; return [isNum(v) ? METRICS.phase.cat[v] : '—', !isNum(v) ? 'dim' : (v === 2 || v === 5) ? 'up' : v === 4 ? 'dn' : v === 0 || v === 1 || v === 3 ? 'warn' : 'dim']; }});
@@ -4595,6 +4600,7 @@ function allColumns(){
     const t = e.A ? 'A-grade' : e.ok ? 'Qualifies' : 'Rules';
     return [`<button class="badge ${g}" type="button" data-why="${esc(c.name)}">${t}</button><small>${e.passed}/${e.total}${e.unknown ? ' ~' : ''}</small>`, 'sc'];
   }});
+  cols.push(cpColumn());
   cols.push({id:'read', label:'Bias ' + state.readTf, val:c => { const r = readHint(c); return r[0]; }, cell:c => { const r = readHint(c); return [r[0], r[1]]; }});
   for (const tf of TFS) cols.push({id:'chg_'+tf, label:'Δ ' + tf, val:c => c.m.chg[tf], cell:c => {
     const v = c.m.chg[tf]; if (!isNum(v)) return ['—','dim'];
@@ -4714,6 +4720,7 @@ function render(){
     $('tbody').innerHTML = rows.map(c => '<tr' + (near.has(c.name) ? ' class="near" title="Closest match: does not pass all your filters yet"' : '') + '>' + cols.map(col => { const [h, cls, st] = col.cell(c); return `<td class="${cls || ''}"${st ? ` style="${st}"` : ''}>${h}</td>`; }).join('') + '</tr>').join('');
   }
 
+  try { cpAuto(rows.map(c => c.name)); } catch(e){}
   /* summary */
   $('summary').innerHTML = `<span><b>${nOk}</b> qualify</span><span><b>${nA}</b> A-grade</span><span><b>${live.length}</b> in ${esc(state.mode === 'perp' ? SCOPES[state.scope] : MODES[state.mode] + ' · ' + SCOPES[state.scope])}</span>` +
     (loading.length ? `<span><b>${loading.length}</b> loading</span>` : '') +
@@ -6358,13 +6365,13 @@ function renderScreener(){
   const f = (SCR_SORT[c.sort] || SCR_SORT.vol)[1];
   if (c.sort === 'funding' || c.sort === 'c1d' || c.sort === 'c1h' || c.sort === 'c5' || c.sort === 'oi1h') rows = rows.slice().sort((a, b) => (b.v1d || 0) - (a.v1d || 0)).slice(0, c.ex === 'bn' ? 20 : 80);
   rows = rows.slice().sort((a, b) => { const x = f(a), y = f(b); return (isNum(y) ? y : -1) - (isNum(x) ? x : -1); }).slice(0, c.n);
-  const cols = [['Coin', null], ['Data verdict', null], ['Scanner verdict', null], ['Price', null], ['5m', 'c5'], ['1h', 'c1h'], ['24h', 'c1d'], ['Vol 24h', 'vol'], ['Vol 1h', 'v1h'], ['15m range', null], ['Trades 15m', 't15'], ['Open interest', 'oi'], ['OI 1h', 'oi1h'], ['Funding/yr', 'funding'], ['Pressure 15m', null], ['Pressure 1h', null], ['Sweep + 2nd test', null], ['Tracked wallets', null], ['24h trend', null]];
+  const cols = [['Coin', null], ['Data verdict', null], ['Scanner verdict', null], ['Price', null], ['5m', 'c5'], ['1h', 'c1h'], ['24h', 'c1d'], ['Vol 24h', 'vol'], ['Vol 1h', 'v1h'], ['15m range', null], ['Trades 15m', 't15'], ['Open interest', 'oi'], ['OI 1h', 'oi1h'], ['Funding/yr', 'funding'], ['Pressure 15m', null], ['Pressure 1h', null], ['Sweep + 2nd test', null], ['Tracked wallets', null], ['24h trend', null], ['Confirm (13 checks)', null]];
   $('scrHead').innerHTML = cols.map(([l, k]) => `<th${k ? ` data-scs="${k}" class="${c.sort === k ? 'on' : ''}" style="cursor:pointer"` : ''}${SCR_TIP[l] ? ` title="${esc(SCR_TIP[l])}"` : ''}>${esc(l)}</th>`).join('');
   const cl = v => isNum(v) ? (v > 0 ? 'up' : v < 0 ? 'dn' : '') : 'dim';
   const bold = (v, t) => isNum(v) && Math.abs(v) >= t ? 'font-weight:700' : '';
   const scv = r => { const cc = state.coins.get(r.coin), v = cc && cc.m ? cc.m.verdict : null; return isNum(v) ? `<span title="${esc(cc.m.verdictWhy || '')}">${esc(VERDICT_LAB[v])}</span>` : '<span class="dim">—</span>'; };
   const scvK = r => { const cc = state.coins.get(r.coin), v = cc && cc.m ? cc.m.verdict : null; return isNum(v) ? (v >= 4 ? 'up' : (v === 2 || v === 3) ? 'dn' : v === 0 ? 'warn' : 'dim') : 'dim'; };
-  $('scrBody').innerHTML = rows.map(r => `<tr${state.coins.has(r.coin) ? ` data-chart="${esc(r.coin)}" style="cursor:pointer"` : ''}><td><b>${esc(r.coin)}</b></td><td class="${dvCell(r.dv)[1]}" style="font-weight:600">${dvCell(r.dv)[0]}</td><td class="${scvK(r)}">${scv(r)}</td><td>${esc(fmtPx(r.px))}</td><td class="${cl(r.c5)}" style="${bold(r.c5, DV_TH.c5 + 0.2)}">${esc(fmtPct(r.c5))}</td><td class="${cl(r.c1h)}" style="${bold(r.c1h, DV_TH.c1hX)}">${esc(fmtPct(r.c1h))}</td><td class="${cl(r.c1d)}" style="${bold(r.c1d, DV_TH.c1d)}">${esc(fmtPct(r.c1d))}</td><td>${esc(fmtUsd(r.v1d))}</td><td>${esc(fmtUsd(r.v1h))}</td><td>${esc(isNum(r.r15) ? r.r15.toFixed(2) + '%' : '—')}</td><td>${esc(fmtInt(r.t15))}</td><td>${esc(fmtUsd(r.oi))}</td><td class="${cl(r.oi1h)}" style="${bold(r.oi1h, DV_TH.oi1h)}">${esc(fmtPct(r.oi1h, 1))}</td><td class="${isNum(r.apr) && Math.abs(r.apr) >= 60 ? 'warn' : ''}">${esc(isNum(r.apr) ? Math.round(r.apr) + '%' : '—')}</td>${(() => { const pc = v => `<td class="${pressLab(v)[1]}" title="${esc(pressLab(v)[0] + '. Thresholds: ±' + PR_T.note + '% buying/selling, ±' + PR_T.strong + '% strong')}" style="${Math.abs(v) >= PR_T.strong ? 'font-weight:700' : ''}">${isNum(v) ? (v > 0 ? '+' : '') + Math.round(v) + '%' : '—'}</td>`, sw = r._m ? swpCell(r._m) : ['—', 'dim'], wl = r._m ? walCell(r._m) : ['—', 'dim']; return pc(r.p15) + pc(r.p1h) + `<td class="${sw[1]}" style="white-space:normal;min-width:180px;text-align:left">${sw[0]}</td><td class="${wl[1]}" style="white-space:nowrap">${wl[0]}</td>`; })()}<td>${scrSpark(r.spark)}</td></tr>`).join('') || `<tr><td colspan="19" class="dim" style="text-align:center;padding:14px">Nothing to show yet.</td></tr>`;
+  $('scrBody').innerHTML = rows.map(r => `<tr${state.coins.has(r.coin) ? ` data-chart="${esc(r.coin)}" style="cursor:pointer"` : ''}><td><b>${esc(r.coin)}</b></td><td class="${dvCell(r.dv)[1]}" style="font-weight:600">${dvCell(r.dv)[0]}</td><td class="${scvK(r)}">${scv(r)}</td><td>${esc(fmtPx(r.px))}</td><td class="${cl(r.c5)}" style="${bold(r.c5, DV_TH.c5 + 0.2)}">${esc(fmtPct(r.c5))}</td><td class="${cl(r.c1h)}" style="${bold(r.c1h, DV_TH.c1hX)}">${esc(fmtPct(r.c1h))}</td><td class="${cl(r.c1d)}" style="${bold(r.c1d, DV_TH.c1d)}">${esc(fmtPct(r.c1d))}</td><td>${esc(fmtUsd(r.v1d))}</td><td>${esc(fmtUsd(r.v1h))}</td><td>${esc(isNum(r.r15) ? r.r15.toFixed(2) + '%' : '—')}</td><td>${esc(fmtInt(r.t15))}</td><td>${esc(fmtUsd(r.oi))}</td><td class="${cl(r.oi1h)}" style="${bold(r.oi1h, DV_TH.oi1h)}">${esc(fmtPct(r.oi1h, 1))}</td><td class="${isNum(r.apr) && Math.abs(r.apr) >= 60 ? 'warn' : ''}">${esc(isNum(r.apr) ? Math.round(r.apr) + '%' : '—')}</td>${(() => { const pc = v => `<td class="${pressLab(v)[1]}" title="${esc(pressLab(v)[0] + '. Thresholds: ±' + PR_T.note + '% buying/selling, ±' + PR_T.strong + '% strong')}" style="${Math.abs(v) >= PR_T.strong ? 'font-weight:700' : ''}">${isNum(v) ? (v > 0 ? '+' : '') + Math.round(v) + '%' : '—'}</td>`, sw = r._m ? swpCell(r._m) : ['—', 'dim'], wl = r._m ? walCell(r._m) : ['—', 'dim']; return pc(r.p15) + pc(r.p1h) + `<td class="${sw[1]}" style="white-space:normal;min-width:180px;text-align:left">${sw[0]}</td><td class="${wl[1]}" style="white-space:nowrap">${wl[0]}</td>`; })()}<td>${scrSpark(r.spark)}</td><td>${cpChip(r.coin)}</td></tr>`).join('') || `<tr><td colspan="20" class="dim" style="text-align:center;padding:14px">Nothing to show yet.</td></tr>`;
 }
 
 
@@ -6695,6 +6702,487 @@ function instDlgInit(){
   });
   d.addEventListener('keydown', e => { if (!L().length) return; if (e.key === 'ArrowRight'){ INS_SCAN.i = (INS_SCAN.i + 1) % L().length; instDlgDraw(); } else if (e.key === 'ArrowLeft'){ INS_SCAN.i = (INS_SCAN.i - 1 + L().length) % L().length; instDlgDraw(); } });
 }
+/* ===================== V4.6 Confirmation pack: 13 extra institutional checks, one plain verdict, a full explanation window ===================== */
+const CP = {cache:new Map(), jobs:new Map(), dir:{}, kc:new Map(), liq:new Map(), ws:null, wsAt:0, wsErr:'', wsFail:0, open:'', q:[], qRun:false, autoAt:0, ex:true};
+const CP_TTL = 150000;
+const cpn = x => { const n = +x; return isFinite(n) ? n : NaN; };
+const cpUsd = v => isNum(v) ? fmtUsd(v) : '—';
+const cpPc = (v, d) => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(d === undefined ? 2 : d) + '%' : '—';
+const CP_ORDER = ['liq', 'book', 'tape', 'ratio', 'basis', 'xdiv', 'svp', 'stable', 'unlock', 'corr', 'atr', 'sess', 'opts'];
+const CP_CORE = new Set(['liq', 'book', 'tape', 'ratio', 'basis']);
+const CP_INFO = {
+  liq:{t:'Liquidations and stop-hunt zones',
+    why:'Big players push price into crowds of stop-losses and forced liquidations, because that is where the orders they need to fill their size are waiting. When the crowd has been cleared, price often turns around. So the nearest crowd of stops tells you which way price is likely to be pulled FIRST, and a stop-hunt that already happened tells you the path may now be clear.',
+    how:'Three parts. (1) Stop pools: repeated highs and lows (equal highs / equal lows and swing points) on the 1h chart that price has not touched since. These are where stops sit. (2) Liquidation ladder: a trader on 25x, 50x or 100x leverage is wiped out about 3.6%, 1.8% or 0.9% away from their entry. This is worked out from price, it is an estimate, not a paid heatmap. (3) Live liquidations: Binance publishes every forced liquidation as it happens. The app counts them while it is open: long liquidations are longs forced to sell, short liquidations are shorts forced to buy.',
+    read:'For a LONG: good when shorts are being liquidated (their forced buying fuels the move) or when the lows were just swept and price came back above them. Bad when a big untouched stop pool sits within 0.5% below you (price is likely pulled down to it first) or when longs are being flushed hard right now. For a SHORT it is the mirror image.'},
+  book:{t:'Order book depth and imbalance (within 0.5% and 1%)',
+    why:'The order book shows how much real money is waiting to buy and to sell close to the current price. More bids than asks near price means buyers are ready to defend it. Thin depth means a small order can move price, stops get skipped and fake breakouts are common.',
+    how:'We add up the dollar value of all buy orders and all sell orders within 0.5% and within 1% of the middle price. Hyperliquid (the exchange you trade on) is the main reading. Binance futures is shown as a second opinion. Imbalance = (bids − asks) ÷ (bids + asks). If the book data does not reach the full range, the number is marked partial.',
+    read:'+15% or more = buyers clearly ahead. −15% or less = sellers clearly ahead. In between = balanced. Under about $50k per side within 0.5% = thin, so use a smaller size and expect slippage. A big imbalance can be fake (orders get pulled), so it only counts together with the other checks.'},
+  tape:{t:'Large trades (whale prints)',
+    why:'Total volume mixes everybody together. Institutions trade in large clips. When the biggest trades are mostly buys, size is being bought at market (aggressive), which is far more meaningful than many small retail orders.',
+    how:'We take the last 1000 trades on Binance and on Bybit, rank them by size and call the biggest 5% (and at least $5,000 each) large trades. Then we add up large buys against large sells. The time window is shown, because a busy coin covers a few minutes and a quiet one covers hours.',
+    read:'Net +15% or more = large buyers in control. −15% or less = large sellers in control. Fewer than 4 large trades = not enough evidence either way, so this check stays neutral.'},
+  ratio:{t:'Top traders versus the crowd (long/short ratios)',
+    why:'Exchanges publish how many accounts are long or short. The top traders (biggest accounts by size) are usually better informed than the crowd of small accounts. The classic edge is to stand with the top traders and against an over-crowded crowd.',
+    how:'Binance publishes the long/short ratio of the top traders by position size, the top traders by account count, and all accounts. Bybit publishes its all-account ratio. We read the latest 15 minute value and the trend over the last 2 hours. A ratio of 1.00 means equal longs and shorts, 1.50 means 60% of accounts are long.',
+    read:'For a LONG: best case is top traders long (ratio above 1.10) while the crowd is not already piled in (all-account ratio under 1.8). Bad: top traders short (below 0.90). Warning: crowd extremely long (above 2.0), because a crowded trade tends to get flushed. For a SHORT it is the mirror image.'},
+  basis:{t:'Funding and perp-versus-spot basis',
+    why:'Funding is the fee longs pay shorts (or the reverse) every 8 hours. Very high funding means too many traders are leaning one way and paying a lot to do it, which makes the trade crowded and fragile. Basis (perp price minus spot price) shows the same pressure in the price itself.',
+    how:'Binance funding rate, its last 9 readings (3 days) to see if it is rising or falling, and the Binance perp price against its spot index. Hyperliquid funding is shown beside it. Hyperliquid pays hourly, so it is multiplied by 8 to compare.',
+    read:'Funding between −0.02% and +0.02% per 8h = calm. Above +0.05% = longs are crowded and paying a lot (bad for new longs, good for shorts). Below −0.05% = shorts are crowded (good for longs: a squeeze can start). Basis above +0.15% = perp is trading rich versus spot.'},
+  xdiv:{t:'Do the exchanges agree on price? (Hyperliquid, Binance, Bybit, Coinbase)',
+    why:'If one exchange is clearly ahead, the others tend to follow, so you can see which way pressure is coming from. Coinbase is the main US spot venue: a premium there means American spot buyers are paying up, which institutions watch. A large gap between exchanges also warns that the market is disturbed and fills will be poor.',
+    how:'We compare the Hyperliquid price with the average of the Binance and Bybit futures prices, and the Coinbase USD price with the Binance spot price. Open interest on Binance and Bybit is shown so you can see where the leveraged money sits.',
+    read:'All within 0.10% = the exchanges agree (good). Hyperliquid cheaper than the others by 0.08% or more = catch-up buying likely (good for longs). Hyperliquid richer by 0.25% or more = it is stretched (bad for new longs). Coinbase premium of +0.05% or more = US spot demand (good for longs). Any gap above 0.5% = disturbed market, be careful.'},
+  svp:{t:'Spot volume versus perpetual volume',
+    why:'Moves led by real spot buying are healthier and last longer. Moves that come only from leveraged futures are easier to reverse, because those traders get liquidated when price pauses.',
+    how:'Binance spot 24 hour volume divided by Binance perpetual 24 hour volume (Bybit is used if Binance does not answer). Both in dollars.',
+    read:'Ratio 0.35 or more = spot-led (strong, healthy). 0.15 to 0.35 = normal. Under 0.15 = mostly leverage, so moves can snap back fast. For a SHORT the reading flips: a leverage-only rally is a better short than a spot-backed one.'},
+  stable:{t:'Stablecoin supply and exchange reserves',
+    why:'Stablecoins are the dry powder of crypto. When their total supply grows, new money is entering the market and rallies have fuel. When it shrinks, money is leaving. This is a market-wide reading, it is the same for every coin.',
+    how:'DefiLlama publishes total stablecoin supply (free). We use the 7 day change. True exchange reserve data (coins held on exchanges) is a paid dataset everywhere, so it is not used. If you added an Alchemy key, the on-chain exchange flows from the On-chain panel are listed here as well.',
+    read:'+0.5% or more in 7 days = money flowing in (good for longs). −0.3% or less = money flowing out (bad for longs). In between = neutral. This is a slow background signal: it never decides a 15 minute trade alone.'},
+  unlock:{t:'Token unlocks and supply overhang',
+    why:'When a large amount of tokens is released to early investors and the team, some of it gets sold. That is steady selling pressure that no chart pattern can offset. Coins where only a small share of the total supply is in circulation carry this risk for years.',
+    how:'From CoinGecko we take the fully-diluted value divided by the market cap (how much bigger the coin would be if every token existed) and the share of supply already circulating. If you connected an unlock calendar in Airdrops and unlocks, the next unlock date and size are shown too. Exact dates are a paid dataset elsewhere.',
+    read:'Fully-diluted ÷ market cap under 1.5x = little overhang. 1.5x to 3x = some. Above 3x = heavy: be careful holding longs for long. An unlock within 14 days of more than 1% of supply is a warning for longs and supportive for shorts.'},
+  corr:{t:'BTC and ETH correlation and beta',
+    why:'Most coins follow Bitcoin. If your coin is just riding BTC, then your signal is really a Bitcoin signal, and a BTC dip will hurt you whatever the coin chart says. Beta tells you how much more (or less) the coin moves than BTC.',
+    how:'We compare the coin with BTC and ETH on 15 minute candles over the last 48 hours. Correlation runs from −1 to +1. Beta = how many percent the coin moves for a 1% BTC move. Alpha = what the coin did in the last 4 hours beyond what its beta to BTC explains.',
+    read:'Correlation under 0.40 = the coin moves on its own flow (good: the signal is independent). Above 0.70 = it follows BTC. Beta above 1.3 = amplifies BTC (dangerous when BTC is going against you). Positive alpha means the coin is stronger than BTC explains (good for longs).'},
+  atr:{t:'Realistic range check (ATR)',
+    why:'Every coin has a normal daily travel distance. If it already moved its whole normal day, the chance of another big leg is lower and your target may be unrealistic. This is the check that stops you from taking a scalp with a target the market does not have time to reach.',
+    how:'ATR (average true range) is the average daily high-to-low distance over the last 14 days. We compare today\'s range so far with it, and show the 1 hour ATR as well. If the scanner has a trade plan for this coin, the first target distance is compared with the daily ATR.',
+    read:'Today used under 70% of a normal day = room to move (good). 70% to 110% = most of the move is done, take profit early. Above 110% = more than a normal day already happened, new entries are late. A first target bigger than 60% of a day\'s ATR is unrealistic for a same-day scalp.'},
+  sess:{t:'Session and kill-zone timing',
+    why:'Liquidity is not the same all day. The big moves and the stop hunts happen when the London and New York markets open and big desks are active. Outside these times the market is thin and slow and fake moves are more common.',
+    how:'Pure clock check in your own time zone. Asia 00:00 to 08:00 UTC, London 07:00 to 16:00 UTC, New York 12:00 to 21:00 UTC. Kill zones (the first 3 hours of each big session) are London 07:00 to 10:00 UTC, New York 12:00 to 15:00 UTC, plus the Asia open 00:00 to 03:00 UTC. Weekends are thinner.',
+    read:'Inside a kill zone = best time for a scalp. In an open session but outside a kill zone = fine for strong setups. Late evening UTC or weekend = thin market, reduce size or wait.'},
+  opts:{t:'Options: put/call ratio and skew (Deribit)',
+    why:'Options traders pay for protection or for leverage, so their positioning shows what the informed money fears or expects. A high put/call ratio and puts costing more than calls (skew) mean fear. The reverse means optimism.',
+    how:'Deribit public data (free), already loaded in the Options view. Put/call ratio by open interest and by volume. Skew = implied volatility of puts minus calls about 10% away from price, in volatility points. Only coins with a liquid options market have this (mainly BTC, ETH, SOL).',
+    read:'Put/call under 0.6 = bullish, above 1.0 = bearish. Skew above +3 points = the market is paying up for downside protection (bearish). Below −2 = paying up for upside (bullish). Coins without an options market show "not available" and are left out of the score.'}
+};
+
+/* ---------- small helpers ---------- */
+async function cpKl(name, iv, n){
+  const key = name + '|' + iv + '|' + n, hit = CP.kc.get(key); if (hit && Date.now() - hit.at < 60000) return hit.v;
+  const bn = vSymFor('binance', name); let v = null;
+  try { const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/klines?symbol=' + encodeURIComponent(bn) + '&interval=' + iv + '&limit=' + n); v = j.map(k => ({t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]})); } catch(e){}
+  if (!v || v.length < 5){ try { const mp = {'15m':'15', '1h':'60', '4h':'240', '1d':'D'}; const j = await vget('bybit', 'https://api.bybit.com/v5/market/kline?category=linear&symbol=' + encodeURIComponent(bn) + '&interval=' + mp[iv] + '&limit=' + n); v = ((j.result || {}).list || []).map(k => ({t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]})).reverse(); } catch(e){} }
+  if ((!v || v.length < 5) && state.coins.has(name)){ try { const ms = {'15m':9e5, '1h':36e5, '4h':144e5, '1d':864e5}[iv], j = await hl({type:'candleSnapshot', req:{coin:name, interval:iv, startTime:Date.now() - n * ms, endTime:Date.now()}}, 20); v = j.map(k => ({t:+k.t, o:+k.o, h:+k.h, l:+k.l, c:+k.c, v:+k.v})); } catch(e){} }
+  if (!v || v.length < 5) throw new Error('no candles from Binance, Bybit or Hyperliquid');
+  CP.kc.set(key, {at:Date.now(), v}); return v;
+}
+function cpLiqStart(){
+  if (CP.ws || CP.wsFail || typeof WebSocket === 'undefined') return;
+  try {
+    const ws = new WebSocket('wss://fstream.binance.com/ws/!forceOrder@arr'); CP.ws = ws; CP.wsAt = Date.now();
+    ws.onmessage = ev => { try { const d = JSON.parse(ev.data), o = d.o || d, s = o.s, usd = cpn(o.ap || o.p) * cpn(o.z || o.q || o.l); if (!s || !(usd > 0)) return; let a = CP.liq.get(s); if (!a){ a = []; CP.liq.set(s, a); } a.push({t:Date.now(), long:o.S === 'SELL', usd}); if (a.length > 300) a.splice(0, a.length - 300); } catch(e){} };
+    ws.onerror = () => { CP.wsErr = 'the live liquidation feed is blocked or offline on your network'; };
+    ws.onclose = () => { CP.ws = null; CP.wsFail = Date.now(); setTimeout(() => { CP.wsFail = 0; }, 60000); };
+  } catch(e){ CP.wsErr = errTxt(e); CP.wsFail = Date.now(); }
+}
+function cpLiqSum(sym, ms){
+  const now = Date.now(), a = (CP.liq.get(sym) || []).filter(x => now - x.t <= ms); let L = 0, S = 0; for (const x of a){ if (x.long) L += x.usd; else S += x.usd; }
+  return {L, S, n:a.length};
+}
+function cpDepth(bids, asks){
+  const bb = bids[0][0], ba = asks[0][0], mid = (bb + ba) / 2, o = {mid, spread:(ba - bb) / mid * 100};
+  for (const pc of [0.5, 1]){ let B = 0, A = 0; for (const [p, s] of bids) if (p >= mid * (1 - pc / 100)) B += p * s; for (const [p, s] of asks) if (p <= mid * (1 + pc / 100)) A += p * s; o['b' + pc] = B; o['a' + pc] = A; o['i' + pc] = (B + A) > 0 ? (B - A) / (B + A) * 100 : null; }
+  o.reach = Math.min((mid - bids[bids.length - 1][0]) / mid, (asks[asks.length - 1][0] - mid) / mid) * 100; return o;
+}
+function cpRet(a){ const r = []; for (let i = 1; i < a.length; i++) r.push(a[i] / a[i - 1] - 1); return r; }
+function cpCorr(x, y){
+  const n = Math.min(x.length, y.length); if (n < 30) return null; x = x.slice(-n); y = y.slice(-n);
+  const mx = x.reduce((a, b) => a + b, 0) / n, my = y.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++){ const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  if (!(sxx > 0) || !(syy > 0)) return null; return {corr:sxy / Math.sqrt(sxx * syy), beta:sxy / syy};
+}
+
+/* ---------- the 13 data collectors ---------- */
+async function cpDoLiq(name, bn){
+  const k = await cpKl(name, '1h', 120); if (k.length < 30) throw new Error('not enough 1h candles');
+  const px = k[k.length - 1].c, piv = [];
+  for (let i = 3; i < k.length - 3; i++){ let isH = true, isL = true; for (let j = i - 3; j <= i + 3; j++){ if (j === i) continue; if (k[j].h >= k[i].h) isH = false; if (k[j].l <= k[i].l) isL = false; } if (isH) piv.push({p:k[i].h, i, hi:true}); if (isL) piv.push({p:k[i].l, i, hi:false}); }
+  const cl = []; for (const q of piv.sort((a, b) => a.p - b.p)){ const last = cl[cl.length - 1]; if (last && Math.abs(q.p / last.p - 1) <= 0.002){ last.n++; last.p = (last.p * (last.n - 1) + q.p) / last.n; last.i = Math.max(last.i, q.i); } else cl.push({p:q.p, n:1, i:q.i}); }
+  const un = cl.filter(q => { let hit = false; for (let j = q.i + 1; j < k.length; j++){ if (k[j].h > q.p * 1.0004 && q.p > px) hit = true; if (k[j].l < q.p * 0.9996 && q.p < px) hit = true; } return !hit; });
+  const up = un.filter(q => q.p > px).sort((a, b) => a.p - b.p)[0] || null, dn = un.filter(q => q.p < px).sort((a, b) => b.p - a.p)[0] || null;
+  const rec = k.slice(-8); let sweptLow = false, sweptHigh = false;
+  for (const q of cl){ if (q.p < px && rec.some(c => c.l < q.p * 0.9996) && px > q.p && q.i < k.length - 8) sweptLow = true; if (q.p > px && rec.some(c => c.h > q.p * 1.0004) && px < q.p && q.i < k.length - 8) sweptHigh = true; }
+  const ladder = [25, 50, 100].map(L => ({L, long:px * (1 - 0.9 / L), short:px * (1 + 0.9 / L), pct:90 / L}));
+  const l30 = cpLiqSum(bn, 18e5), mk = {L:0, S:0}; for (const [s, a] of CP.liq) { const z = cpLiqSum(s, 18e5); mk.L += z.L; mk.S += z.S; }
+  return {px, up:up ? {p:up.p, d:(up.p / px - 1) * 100, n:up.n} : null, dn:dn ? {p:dn.p, d:(dn.p / px - 1) * 100, n:dn.n} : null, sweptLow, sweptHigh, ladder, live:l30, mkt:mk, wsOn:!!CP.ws && CP.ws.readyState === 1, wsMin:(Date.now() - CP.wsAt) / 60000, wsErr:CP.wsErr};
+}
+async function cpDoBook(name, bn){
+  const out = {};
+  if (state.coins.has(name)){
+    for (const sf of [4, 3]){ try { const j = await hl({type:'l2Book', coin:name, nSigFigs:sf}, 2), lv = j && j.levels; if (lv && lv[0] && lv[0].length && lv[1] && lv[1].length){ out.hl = cpDepth(lv[0].map(x => [cpn(x.px), cpn(x.sz)]), lv[1].map(x => [cpn(x.px), cpn(x.sz)])); if (out.hl.reach >= 1) break; } } catch(e){ out.hlErr = errTxt(e); break; } }
+  }
+  try { const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/depth?symbol=' + encodeURIComponent(bn) + '&limit=1000'); if (j.bids && j.bids.length && j.asks && j.asks.length) out.bn = cpDepth(j.bids.map(x => [+x[0], +x[1]]), j.asks.map(x => [+x[0], +x[1]])); } catch(e){ out.bnErr = errTxt(e); }
+  if (!out.hl && !out.bn) throw new Error(out.hlErr || out.bnErr || 'no order book returned');
+  return out;
+}
+async function cpDoTape(bn, by){
+  let all = [], srcs = [];
+  try { all = all.concat(await XCT.binance(bn)); srcs.push('Binance'); } catch(e){}
+  try { all = all.concat(await XCT.bybit(by)); srcs.push('Bybit'); } catch(e){}
+  all = all.filter(t => isFinite(t.usd) && t.usd > 0); if (all.length < 30) throw new Error('Binance and Bybit returned too few recent trades');
+  const sz = all.map(t => t.usd).sort((a, b) => a - b), p95 = sz[Math.floor(sz.length * 0.95)], thr = Math.max(5000, p95);
+  let bb = 0, bs = 0, nb = 0, ns = 0, tb = 0, ts = 0, t0 = Infinity, t1 = 0;
+  for (const t of all){ if (t.buy) tb += t.usd; else ts += t.usd; if (isFinite(t.t)){ t0 = Math.min(t0, t.t); t1 = Math.max(t1, t.t); } if (t.usd >= thr){ if (t.buy){ bb += t.usd; nb++; } else { bs += t.usd; ns++; } } }
+  return {thr, bb, bs, nb, ns, net:(bb + bs) > 0 ? (bb - bs) / (bb + bs) * 100 : null, tb, ts, mins:isFinite(t0) && t1 > t0 ? (t1 - t0) / 6e4 : null, srcs, n:all.length};
+}
+async function cpDoRatio(bn, by){
+  const out = {}, q = encodeURIComponent(bn), B = 'https://fapi.binance.com/futures/data/';
+  const one = (key, p, mapf) => vget(p.v, p.u).then(j => { const r = mapf(j); if (r) out[key] = r; }).catch(() => {});
+  await Promise.all([
+    one('top', {v:'binance', u:B + 'topLongShortPositionRatio?symbol=' + q + '&period=15m&limit=8'}, j => j && j.length ? {r:cpn(j[j.length - 1].longShortRatio), l:cpn(j[j.length - 1].longAccount), r0:cpn(j[0].longShortRatio)} : null),
+    one('topAcc', {v:'binance', u:B + 'topLongShortAccountRatio?symbol=' + q + '&period=15m&limit=8'}, j => j && j.length ? {r:cpn(j[j.length - 1].longShortRatio), l:cpn(j[j.length - 1].longAccount), r0:cpn(j[0].longShortRatio)} : null),
+    one('all', {v:'binance', u:B + 'globalLongShortAccountRatio?symbol=' + q + '&period=15m&limit=8'}, j => j && j.length ? {r:cpn(j[j.length - 1].longShortRatio), l:cpn(j[j.length - 1].longAccount), r0:cpn(j[0].longShortRatio)} : null),
+    one('by', {v:'bybit', u:'https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=' + encodeURIComponent(by) + '&period=15min&limit=8'}, j => { const L = j && j.result && j.result.list; if (!L || !L.length) return null; const b = cpn(L[0].buyRatio), s = cpn(L[0].sellRatio); return b > 0 && s > 0 ? {r:b / s, l:b} : null; })
+  ]);
+  if (!out.top && !out.topAcc && !out.all && !out.by) throw new Error('Binance and Bybit did not return long/short ratios');
+  return out;
+}
+async function cpDoBasis(c, bn, by){
+  const out = {}, [pi, fh] = await Promise.all([vget('binance', 'https://fapi.binance.com/fapi/v1/premiumIndex?symbol=' + encodeURIComponent(bn)).catch(() => null), vget('binance', 'https://fapi.binance.com/fapi/v1/fundingRate?symbol=' + encodeURIComponent(bn) + '&limit=9').catch(() => null)]);
+  if (pi && isFinite(+pi.markPrice)){ out.src = 'Binance'; out.mark = +pi.markPrice; out.index = +pi.indexPrice; out.f8 = +pi.lastFundingRate * 100; out.basis = (out.mark / out.index - 1) * 100; }
+  else { try { const j = await vget('bybit', 'https://api.bybit.com/v5/market/tickers?category=linear&symbol=' + encodeURIComponent(by)), t = ((j.result || {}).list || [])[0]; if (t){ out.src = 'Bybit'; out.mark = +t.markPrice; out.index = +t.indexPrice; out.f8 = +t.fundingRate * 100; out.basis = (out.mark / out.index - 1) * 100; } } catch(e){} }
+  if (fh && fh.length >= 4){ out.hist = fh.map(x => +x.fundingRate * 100); const cur = out.hist[out.hist.length - 1], prev = out.hist.slice(0, -1).reduce((a, x) => a + x, 0) / (out.hist.length - 1); out.trend = cur - prev; }
+  if (c && c.m && isNum(c.m.funding)) out.hl8 = c.m.funding * 8;
+  if (!isNum(out.f8) && !isNum(out.hl8)) throw new Error('no funding data from Binance, Bybit or Hyperliquid');
+  return out;
+}
+async function cpDoXdiv(name, c, bn, by){
+  const plain = vPlain(name), mult = plain !== name ? 1000 : 1, out = {};
+  await Promise.all([
+    vget('binance', 'https://fapi.binance.com/fapi/v1/premiumIndex?symbol=' + encodeURIComponent(bn)).then(j => { out.bn = +j.markPrice; }).catch(() => {}),
+    vget('binance', 'https://fapi.binance.com/fapi/v1/openInterest?symbol=' + encodeURIComponent(bn)).then(j => { out.bnOi = +j.openInterest; }).catch(() => {}),
+    vget('bybit', 'https://api.bybit.com/v5/market/tickers?category=linear&symbol=' + encodeURIComponent(by)).then(j => { const t = ((j.result || {}).list || [])[0]; if (t){ out.by = +t.markPrice; out.byOi = +t.openInterestValue; } }).catch(() => {}),
+    vget('binance', 'https://api.binance.com/api/v3/ticker/price?symbol=' + encodeURIComponent(plain + 'USDT')).then(j => { out.spot = +j.price * mult; }).catch(() => {}),
+    evget('coinbase', 'https://api.exchange.coinbase.com/products/' + encodeURIComponent(plain) + '-USD/ticker').then(j => { out.cb = +j.price * mult; }).catch(() => {})
+  ]);
+  if (c && c.m && isNum(c.m.px)) out.hl = c.m.px;
+  if (isFinite(out.bnOi) && isFinite(out.bn)) out.bnOi = out.bnOi * out.bn;
+  const perp = [out.bn, out.by].filter(isFinite);
+  if (!isFinite(out.hl) && !perp.length && !isFinite(out.cb)) throw new Error('no prices returned');
+  const ref = perp.length ? perp.reduce((a, b) => a + b, 0) / perp.length : NaN;
+  out.hlD = isFinite(out.hl) && isFinite(ref) ? (out.hl / ref - 1) * 100 : null;
+  out.cbD = isFinite(out.cb) && isFinite(out.spot) ? (out.cb / out.spot - 1) * 100 : null;
+  const all = [out.hl, out.bn, out.by, out.spot, out.cb].filter(isFinite); out.spread = all.length > 1 ? (Math.max(...all) / Math.min(...all) - 1) * 100 : null; out.nVen = all.length;
+  return out;
+}
+async function cpDoSvp(name, bn, by){
+  const plain = vPlain(name), out = {};
+  await Promise.all([
+    vget('binance', 'https://api.binance.com/api/v3/ticker/24hr?symbol=' + encodeURIComponent(plain + 'USDT')).then(j => { out.sp = +j.quoteVolume; }).catch(() => {}),
+    vget('binance', 'https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=' + encodeURIComponent(bn)).then(j => { out.pp = +j.quoteVolume; }).catch(() => {}),
+    vget('bybit', 'https://api.bybit.com/v5/market/tickers?category=spot&symbol=' + encodeURIComponent(plain + 'USDT')).then(j => { const t = ((j.result || {}).list || [])[0]; if (t) out.bsp = +t.turnover24h; }).catch(() => {}),
+    vget('bybit', 'https://api.bybit.com/v5/market/tickers?category=linear&symbol=' + encodeURIComponent(by)).then(j => { const t = ((j.result || {}).list || [])[0]; if (t) out.bpp = +t.turnover24h; }).catch(() => {})
+  ]);
+  const sp = isFinite(out.sp) ? out.sp : out.bsp, pp = isFinite(out.pp) ? out.pp : out.bpp;
+  if (!isFinite(pp)) throw new Error('no perpetual volume returned');
+  out.spot = isFinite(sp) ? sp : null; out.perp = pp; out.ratio = isFinite(sp) && pp > 0 ? sp / pp : null; out.src = isFinite(out.sp) ? 'Binance' : 'Bybit'; return out;
+}
+async function cpDoStable(){
+  if (!isNum(OC.g.stChg7) && !OC.gBusy){ try { await ocGlobal(); } catch(e){} }
+  let n = 0; while (OC.gBusy && n++ < 40) await sleep(300);
+  const g = OC.g; if (!isNum(g.stChg7)) throw new Error('DefiLlama stablecoin data did not load');
+  return {chg7:g.stChg7, circ:g.stCirc, dex1:g.dexChg1, dex7:g.dexChg7};
+}
+function cpDoUnlock(name, c){
+  const plain = vPlain(name).toUpperCase(), e = X.dropIdx && X.dropIdx.get(plain), m = (c && c.m) || {};
+  const unl = e && e.unl ? e.unl.filter(u => u.t && u.t > Date.now() - 864e5).sort((a, b) => a.t - b.t)[0] || null : null;
+  if (!isNum(m.fdvRatio) && !isNum(m.supplyPct) && !unl) throw new Error('no supply data for this coin yet (CoinGecko list not loaded or coin not on it)');
+  return {fdv:m.fdvRatio, sup:m.supplyPct, mcap:m.mcap, unl, haveSrc:!!(X.dropAny && X.dropAny.unl)};
+}
+async function cpDoCorr(name){
+  const s = normSym(name); if (s === 'BTC' || s === 'ETH') return {self:s};
+  const ref = async sym => { const key = 'ref|' + sym, h = CP.kc.get(key); if (h && Date.now() - h.at < 300000) return h.v; const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/klines?symbol=' + sym + 'USDT&interval=15m&limit=192'), v = j.map(k => ({t:+k[0], c:+k[4]})); CP.kc.set(key, {at:Date.now(), v}); return v; };
+  const [a, b, e] = await Promise.all([cpKl(name, '15m', 192), ref('BTC'), ref('ETH').catch(() => null)]);
+  const align = (r) => { const mp = new Map(r.map(x => [x.t, x.c])); const xs = [], ys = []; for (const x of a){ if (mp.has(x.t)){ xs.push(x.c); ys.push(mp.get(x.t)); } } return [cpRet(xs), cpRet(ys), ys]; };
+  const out = {}; { const [x, y, ys] = align(b); out.btc = cpCorr(x, y); out.btc4h = ys.length > 17 ? (ys[ys.length - 1] / ys[ys.length - 17] - 1) * 100 : null; }
+  if (e){ const [x, y] = align(e); out.eth = cpCorr(x, y); }
+  out.coin4h = a.length > 17 ? (a[a.length - 1].c / a[a.length - 17].c - 1) * 100 : null;
+  out.alpha = out.btc && isNum(out.coin4h) && isNum(out.btc4h) ? out.coin4h - out.btc.beta * out.btc4h : null;
+  if (!out.btc) throw new Error('not enough overlapping candles with BTC'); return out;
+}
+async function cpDoAtr(name, c){
+  const d = await cpKl(name, '1d', 20); if (d.length < 8) throw new Error('fewer than 8 daily candles');
+  const done = d.slice(0, -1), trs = []; for (let i = 1; i < done.length; i++) trs.push(Math.max(done[i].h - done[i].l, Math.abs(done[i].h - done[i - 1].c), Math.abs(done[i].l - done[i - 1].c)));
+  const use = trs.slice(-14), atr = use.reduce((a, b) => a + b, 0) / use.length, today = d[d.length - 1], px = today.c;
+  const out = {atr, atrP:atr / px * 100, rng:today.h - today.l, rngP:(today.h - today.l) / px * 100, used:(today.h - today.l) / atr * 100, left:Math.max(0, atr - (today.h - today.l)) / px * 100, px, hrs:(Date.now() - today.t) / 36e5};
+  try { const h = await cpKl(name, '1h', 30), t2 = []; for (let i = 1; i < h.length; i++) t2.push(Math.max(h[i].h - h[i].l, Math.abs(h[i].h - h[i - 1].c), Math.abs(h[i].l - h[i - 1].c))); const u2 = t2.slice(-14); out.h1P = u2.reduce((a, b) => a + b, 0) / u2.length / px * 100; } catch(e){}
+  try { const pl = c ? planFor(c) : null; if (pl) out.plan = {dir:pl.dir, d1:Math.abs(pl.tp1 - pl.entry) / pl.entry * 100, d2:Math.abs(pl.tp2 - pl.entry) / pl.entry * 100}; } catch(e){}
+  return out;
+}
+function cpDoSess(){
+  const now = new Date(), h = now.getUTCHours() + now.getUTCMinutes() / 60, dow = now.getUTCDay(), we = dow === 0 || dow === 6;
+  const inr = (a, b) => h >= a && h < b;
+  const kz = inr(0, 3) ? 'Asia open' : inr(7, 10) ? 'London open' : inr(12, 15) ? 'New York open' : inr(15, 17) ? 'London close' : null;
+  const ses = []; if (inr(0, 8)) ses.push('Asia'); if (inr(7, 16)) ses.push('London'); if (inr(12, 21)) ses.push('New York');
+  let next = null; const kzs = [[0, 'Asia open', 3], [7, 'London open', 10], [12, 'New York open', 15], [15, 'London close', 17]];
+  for (const [a, nm] of kzs){ let dh = a - h; if (dh <= 0) dh += 24; if (!next || dh < next.dh) next = {nm, dh}; }
+  return {h, we, kz, ses, next, dow};
+}
+async function cpDoOpts(name){
+  const sym = normSym(name); if (!OPT.at && !OPT.busy){ try { await loadOptions(); } catch(e){} }
+  let n = 0; while (OPT.busy && n++ < 40) await sleep(300);
+  const o = OPT.by[sym]; if (!o) return {none:true, loaded:!!OPT.at, err:OPT.err};
+  return {pcr:o.pcr, pcrV:o.pcrV, skew:o.skew, iv:o.iv30, term:o.term, bias:o.an ? o.an.bias : null, why:o.an ? o.an.why : []};
+}
+async function cpFetch(name){
+  cpLiqStart();
+  const c = state.coins.get(name) || (typeof LK !== 'undefined' && LK.ext ? LK.ext.get(name) : null) || null, bn = vSymFor('binance', name), by = vSymFor('bybit', name);
+  const R = {name, at:Date.now(), err:{}}, T = (k, fn) => Promise.resolve().then(fn).then(v => { R[k] = v; }, e => { R[k] = null; R.err[k] = errTxt(e); });
+  await Promise.all([T('liq', () => cpDoLiq(name, bn)), T('book', () => cpDoBook(name, bn)), T('tape', () => cpDoTape(bn, by)), T('ratio', () => cpDoRatio(bn, by)), T('basis', () => cpDoBasis(c, bn, by)),
+    T('xdiv', () => cpDoXdiv(name, c, bn, by)), T('svp', () => cpDoSvp(name, bn, by)), T('stable', () => cpDoStable()), T('unlock', () => cpDoUnlock(name, c)), T('corr', () => cpDoCorr(name)), T('atr', () => cpDoAtr(name, c)), T('sess', () => cpDoSess()), T('opts', () => cpDoOpts(name))]);
+  return R;
+}
+function cpLoad(name, force){
+  const hit = CP.cache.get(name); if (hit && !force && Date.now() - hit.at < CP_TTL) return Promise.resolve(hit);
+  if (CP.jobs.has(name)) return CP.jobs.get(name);
+  const p = cpFetch(name).then(r => { CP.cache.set(name, r); return r; }).finally(() => { CP.jobs.delete(name); });
+  CP.jobs.set(name, p); return p;
+}
+
+/* ---------- the judge: turns the numbers into a plain verdict for LONG or SHORT ---------- */
+function cpEval(R, dir){
+  const long = dir === 'long', out = {}, E = R.err || {};
+  const mk = (id, st, v, say, lines) => { out[id] = {id, st, v, say, lines:lines || []}; };
+  const na = (id, why) => mk(id, 'na', 'not available', 'Not available: ' + why, []);
+  const sgn = long ? 1 : -1;
+  /* 1 liquidations */
+  { const d = R.liq; if (!d) na('liq', E.liq || 'no data'); else {
+      let st = 'warn', say = [], bad = false, good = false;
+      if (d.dn && d.dn.d > -0.5 && long){ bad = true; say.push('an untouched pool of stops sits only ' + Math.abs(d.dn.d).toFixed(2) + '% below price, so price is likely pulled down to it first'); }
+      if (d.up && d.up.d < 0.5 && !long){ bad = true; say.push('an untouched pool of stops sits only ' + d.up.d.toFixed(2) + '% above price, so price is likely pulled up to it first'); }
+      if (long && d.sweptLow){ good = true; say.push('a low was just swept and price came back above it (stop hunt done)'); }
+      if (!long && d.sweptHigh){ good = true; say.push('a high was just swept and price came back below it (stop hunt done)'); }
+      const tgt = long ? d.up : d.dn; if (tgt && Math.abs(tgt.d) >= 0.5 && !bad) say.push('the next stop pool in your direction is ' + Math.abs(tgt.d).toFixed(2) + '% away (a natural target)');
+      const lv = d.live; if (lv.n >= 2 && lv.L + lv.S > 100000){ const mine = long ? lv.S : lv.L, other = long ? lv.L : lv.S; if (mine > other * 1.5){ good = true; say.push('in the last 30 minutes ' + cpUsd(mine) + ' of ' + (long ? 'shorts' : 'longs') + ' were forced out (fuel for your direction)'); } else if (other > mine * 2.5 && other > 250000){ bad = true; say.push('in the last 30 minutes ' + cpUsd(other) + ' of ' + (long ? 'longs' : 'shorts') + ' were forced out (a flush is happening)'); } }
+      st = bad ? 'bad' : good ? 'ok' : (tgt && Math.abs(tgt.d) >= 0.5 ? 'ok' : 'warn');
+      if (!say.length) say.push('no clear stop pool or liquidation pressure either way right now');
+      const lines = [];
+      lines.push('Nearest untouched stop pool above price: ' + (d.up ? fmtPx(d.up.p) + ' (' + cpPc(d.up.d) + ', ' + d.up.n + ' touch' + (d.up.n > 1 ? 'es' : '') + ')' : 'none found in the last 5 days'));
+      lines.push('Nearest untouched stop pool below price: ' + (d.dn ? fmtPx(d.dn.p) + ' (' + cpPc(d.dn.d) + ', ' + d.dn.n + ' touch' + (d.dn.n > 1 ? 'es' : '') + ')' : 'none found in the last 5 days'));
+      lines.push('Recent stop hunt: ' + (d.sweptLow ? 'a low was swept and reclaimed' : d.sweptHigh ? 'a high was swept and reclaimed' : 'none in the last 8 hours'));
+      lines.push('Liquidation ladder (estimate): ' + d.ladder.map(x => x.L + 'x longs are wiped out at ' + fmtPx(x.long) + ', shorts at ' + fmtPx(x.short)).join('; '));
+      lines.push('Live liquidations on this coin, last 30 min: longs ' + cpUsd(d.live.L) + ', shorts ' + cpUsd(d.live.S) + ' (' + d.live.n + ' events)');
+      lines.push('All coins on Binance, last 30 min: longs ' + cpUsd(d.mkt.L) + ', shorts ' + cpUsd(d.mkt.S));
+      lines.push(d.wsOn ? 'The live liquidation feed has been running for ' + Math.max(1, Math.round(d.wsMin)) + ' minute(s); it only counts while the app is open, so a young count is incomplete.' : 'The live liquidation feed is not connected (' + (d.wsErr || 'starting') + '); only the stop pools are used.');
+      mk('liq', st, d.up || d.dn ? (d.dn ? 'stops ' + cpPc(d.dn.d, 1) + ' below' : '') + (d.dn && d.up ? ', ' : '') + (d.up ? cpPc(d.up.d, 1) + ' above' : '') : 'no pools', st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' + say.join('; ') + '.' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' + say.join('; ') + '.' : 'Neutral: ' + say.join('; ') + '.', lines); } }
+  /* 2 order book */
+  { const d = R.book; if (!d) na('book', E.book || 'no data'); else {
+      const main = d.hl && d.hl.reach >= 0.5 ? d.hl : (d.bn && d.bn.reach >= 0.5 ? d.bn : (d.hl || d.bn)), who = main === d.hl ? 'Hyperliquid' : 'Binance', full = main.reach >= 1, i5 = main['i0.5'], b5 = main['b0.5'], a5 = main['a0.5'];
+      const imb = isNum(main.reach) && main.reach >= 1 ? main.i1 : i5, thin = Math.min(b5, a5) < 50000;
+      const mine = imb * sgn; const st = thin && mine < 15 ? 'warn' : mine >= 15 ? 'ok' : mine <= -15 ? 'bad' : 'warn';
+      const lines = []; for (const [nm, x] of [['Hyperliquid', d.hl], ['Binance futures', d.bn]]) if (x) lines.push(nm + ': within 0.5% bids ' + cpUsd(x['b0.5']) + ' vs asks ' + cpUsd(x['a0.5']) + ' (imbalance ' + cpPc(x['i0.5'], 0) + '); within 1% bids ' + cpUsd(x.b1) + ' vs asks ' + cpUsd(x.a1) + ' (imbalance ' + cpPc(x.i1, 0) + (x.reach < 1 ? ', partial: the book only reaches ' + x.reach.toFixed(2) + '% from price' : '') + '); spread ' + x.spread.toFixed(3) + '%');
+      if (!d.hl && d.hlErr) lines.push('Hyperliquid book unavailable: ' + d.hlErr);
+      const side = imb >= 0 ? 'bids' : 'asks';
+      mk('book', st, cpPc(imb, 0) + ' ' + (full ? '±1%' : '±0.5%'), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + who + ' shows ' + (Math.abs(imb) < 15 ? 'a balanced book' : 'more ' + side + ' than ' + (imb >= 0 ? 'asks' : 'bids') + ' (' + cpPc(imb, 0) + ')') + (thin ? ', and the book is thin (under $50k per side within 0.5%), so use a smaller size' : '') + '.', lines); } }
+  /* 3 tape */
+  { const d = R.tape; if (!d) na('tape', E.tape || 'no data'); else {
+      const few = d.nb + d.ns < 4, mine = isNum(d.net) ? d.net * sgn : 0, st = few ? 'warn' : mine >= 15 ? 'ok' : mine <= -15 ? 'bad' : 'warn';
+      mk('tape', st, few ? 'few big trades' : cpPc(d.net, 0) + ' net', few ? 'Neutral: only ' + (d.nb + d.ns) + ' large trades in the window, not enough to judge.' : (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + 'large trades are ' + (Math.abs(d.net) < 15 ? 'balanced' : d.net > 0 ? 'mostly buys' : 'mostly sells') + ' (' + cpUsd(d.bb) + ' bought vs ' + cpUsd(d.bs) + ' sold).',
+        ['Large trade = $' + Math.round(d.thr).toLocaleString() + ' or more (biggest 5% of ' + d.n + ' recent trades on ' + d.srcs.join(' and ') + ')', 'Large buys: ' + d.nb + ' trades, ' + cpUsd(d.bb), 'Large sells: ' + d.ns + ' trades, ' + cpUsd(d.bs), 'All trades in the window: bought ' + cpUsd(d.tb) + ', sold ' + cpUsd(d.ts), isNum(d.mins) ? 'Window covered: about ' + (d.mins < 1 ? '<1' : Math.round(d.mins)) + ' minute(s)' : '']); } }
+  /* 4 ratio */
+  { const d = R.ratio; if (!d) na('ratio', E.ratio || 'no data'); else {
+      const top = d.top || d.topAcc, crowd = d.all || d.by, lines = [];
+      if (d.top) lines.push('Binance top traders by position size: ' + (d.top.l * 100).toFixed(0) + '% long, ratio ' + d.top.r.toFixed(2) + ' (2 hours ago ' + d.top.r0.toFixed(2) + ')');
+      if (d.topAcc) lines.push('Binance top traders by account count: ' + (d.topAcc.l * 100).toFixed(0) + '% long, ratio ' + d.topAcc.r.toFixed(2));
+      if (d.all) lines.push('Binance all accounts: ' + (d.all.l * 100).toFixed(0) + '% long, ratio ' + d.all.r.toFixed(2) + ' (2 hours ago ' + d.all.r0.toFixed(2) + ')');
+      if (d.by) lines.push('Bybit all accounts: ' + (d.by.l * 100).toFixed(0) + '% long, ratio ' + d.by.r.toFixed(2));
+      let st = 'warn', say = 'the data does not show a clear lean';
+      const tl = top ? (long ? top.r >= 1.1 : top.r <= 0.9) : false, ts = top ? (long ? top.r <= 0.9 : top.r >= 1.1) : false, crowded = crowd ? (long ? crowd.r >= 2.0 : crowd.r <= 0.5) : false, crowdOpp = crowd ? (long ? crowd.r <= 0.9 : crowd.r >= 1.1) : false;
+      if (ts){ st = 'bad'; say = 'the top traders are on the other side (' + (top.l * 100).toFixed(0) + '% long)'; }
+      else if (crowded){ st = 'warn'; say = 'the small-account crowd is already piled on your side (ratio ' + crowd.r.toFixed(2) + '), which makes the trade crowded'; }
+      else if (tl && crowdOpp){ st = 'ok'; say = 'the top traders are with you while the crowd is on the other side (the classic best case)'; }
+      else if (tl){ st = 'ok'; say = 'the top traders lean your way (' + (top.l * 100).toFixed(0) + '% long)'; }
+      mk('ratio', st, top ? 'top ' + top.r.toFixed(2) + (crowd ? ' / crowd ' + crowd.r.toFixed(2) : '') : 'crowd ' + crowd.r.toFixed(2), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + say + '.', lines); } }
+  /* 5 basis and funding */
+  { const d = R.basis; if (!d) na('basis', E.basis || 'no data'); else {
+      const f = isNum(d.f8) ? d.f8 : d.hl8, s = sgn > 0 ? f : -f, st = s > 0.05 ? 'bad' : s > 0.02 ? 'warn' : 'ok', lines = [];
+      if (isNum(d.f8)) lines.push(d.src + ' funding: ' + cpPc(d.f8, 4) + ' per 8h');
+      if (isNum(d.hl8)) lines.push('Hyperliquid funding: ' + cpPc(d.hl8, 4) + ' per 8h (hourly rate × 8)');
+      if (isNum(d.basis)) lines.push('Perp price versus spot index: ' + cpPc(d.basis, 3) + ' (mark ' + fmtPx(d.mark) + ', index ' + fmtPx(d.index) + ')');
+      if (d.hist) lines.push('Last ' + d.hist.length + ' funding readings (oldest first): ' + d.hist.map(x => x.toFixed(3)).join(', ') + (isNum(d.trend) ? ' → ' + (d.trend > 0.005 ? 'rising' : d.trend < -0.005 ? 'falling' : 'flat') : ''));
+      const sayB = s > 0.05 ? (long ? 'longs are crowded and paying heavily to hold (' + cpPc(f, 3) + ' per 8h)' : 'shorts are crowded and paying heavily to hold (' + cpPc(f, 3) + ' per 8h)') : s > 0.02 ? 'funding is leaning against you a little (' + cpPc(f, 3) + ' per 8h)' : s < -0.02 ? 'funding favours you (' + cpPc(f, 3) + ' per 8h), the other side is paying to hold and a squeeze is possible' : 'funding is calm (' + cpPc(f, 3) + ' per 8h)';
+      const basisWarn = isNum(d.basis) && d.basis * sgn > 0.15; const st2 = basisWarn && st === 'ok' ? 'warn' : st;
+      mk('basis', st2, cpPc(f, 3) + '/8h' + (isNum(d.basis) ? ', basis ' + cpPc(d.basis, 2) : ''), (st2 === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st2 === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + sayB + (basisWarn ? '; the perp trades rich to spot (' + cpPc(d.basis, 2) + ')' : '') + '.', lines); } }
+  /* 6 cross exchange */
+  { const d = R.xdiv; if (!d) na('xdiv', E.xdiv || 'no data'); else if (isNum(d.spread) && d.spread > 5) na('xdiv', 'the exchanges quote prices ' + d.spread.toFixed(1) + '% apart, which is a contract-size or listing mismatch and not a real price gap, so the comparison is skipped'); else {
+      let st = 'ok', say = [], lines = [];
+      const row = (n, v) => { if (isFinite(v)) lines.push(n + ': ' + fmtPx(v)); };
+      row('Hyperliquid', d.hl); row('Binance futures', d.bn); row('Bybit futures', d.by); row('Binance spot', d.spot); row('Coinbase spot', d.cb);
+      if (isFinite(d.bnOi) || isFinite(d.byOi)) lines.push('Open interest: Binance ' + cpUsd(d.bnOi) + ', Bybit ' + cpUsd(d.byOi));
+      if (isNum(d.hlD)) lines.push('Hyperliquid versus Binance/Bybit average: ' + cpPc(d.hlD, 3));
+      if (isNum(d.cbD)) lines.push('Coinbase versus Binance spot: ' + cpPc(d.cbD, 3));
+      if (isNum(d.spread)) lines.push('Widest gap between any two prices: ' + d.spread.toFixed(3) + '% across ' + d.nVen + ' venues');
+      if (isNum(d.spread) && d.spread > 0.5){ st = 'bad'; say.push('prices differ by ' + d.spread.toFixed(2) + '% between exchanges, a disturbed market with poor fills'); }
+      else { let good = 0, badc = 0;
+        if (isNum(d.hlD)){ if (d.hlD * sgn <= -0.08){ good++; say.push('Hyperliquid is ' + Math.abs(d.hlD).toFixed(2) + '% ' + (long ? 'cheaper' : 'richer') + ' than the other exchanges (catch-up likely)'); } else if (d.hlD * sgn >= 0.25){ badc++; say.push('Hyperliquid is already ' + Math.abs(d.hlD).toFixed(2) + '% ' + (long ? 'richer' : 'cheaper') + ' than the others (you would be chasing)'); } }
+        if (isNum(d.cbD)){ if (d.cbD * sgn >= 0.05){ good++; say.push('Coinbase (US spot) trades at a ' + (long ? 'premium' : 'discount') + ' of ' + Math.abs(d.cbD).toFixed(2) + '%'); } else if (d.cbD * sgn <= -0.1){ badc++; say.push('Coinbase (US spot) shows ' + (long ? 'weak' : 'strong') + ' demand (' + cpPc(d.cbD, 2) + ')'); } }
+        st = badc ? 'bad' : good ? 'ok' : 'ok'; if (!say.length) say.push('all exchanges agree on price within ' + (isNum(d.spread) ? d.spread.toFixed(2) : '0.1') + '%'); }
+      mk('xdiv', st, isNum(d.spread) ? 'gap ' + d.spread.toFixed(2) + '%' : '—', (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + say.join('; ') + '.', lines); } }
+  /* 7 spot vs perp */
+  { const d = R.svp; if (!d) na('svp', E.svp || 'no data'); else if (!isNum(d.ratio)) mk('svp', 'na', 'no spot market', 'Not available: this coin has no Binance or Bybit spot market, so spot volume cannot be compared.', ['Perpetual 24h volume: ' + cpUsd(d.perp) + ' (' + d.src + ')']);
+    else { const r = d.ratio; let st; if (long) st = r >= 0.35 ? 'ok' : r >= 0.15 ? 'ok' : 'warn'; else st = r < 0.15 ? 'ok' : r >= 0.35 ? 'warn' : 'warn';
+      const say = r >= 0.35 ? 'spot-led: real buying and selling is large compared with leverage (' + r.toFixed(2) + ')' : r >= 0.15 ? 'a normal mix of spot and leverage (' + r.toFixed(2) + ')' : 'mostly leverage: spot is only ' + r.toFixed(2) + 'x of perp volume';
+      const verdictTxt = long ? (r >= 0.35 ? 'Supports your LONG: ' : r >= 0.15 ? 'Supports your LONG a little: ' : 'Neutral: ') : (r < 0.15 ? 'Supports your SHORT: ' : 'Neutral: ');
+      mk('svp', st, 'spot/perp ' + r.toFixed(2), verdictTxt + say + (long && r < 0.15 ? ', so a rally here can snap back fast' : '') + '.', ['Spot 24h volume: ' + cpUsd(d.spot), 'Perpetual 24h volume: ' + cpUsd(d.perp) + ' (' + d.src + ')', 'Ratio spot ÷ perp = ' + r.toFixed(3)]); } }
+  /* 8 stablecoins */
+  { const d = R.stable; if (!d) na('stable', E.stable || 'no data'); else {
+      const v = d.chg7 * sgn, st = v >= 0.5 ? 'ok' : v <= -0.3 ? 'bad' : 'warn', lines = ['Total stablecoin supply: ' + cpUsd(d.circ) + ', 7 day change ' + cpPc(d.chg7, 2)];
+      if (isNum(d.dex1)) lines.push('Decentralised exchange volume: 1 day ' + cpPc(d.dex1, 1) + (isNum(d.dex7) ? ', 7 day ' + cpPc(d.dex7, 1) : ''));
+      lines.push('Exchange reserves are a paid dataset everywhere, so they are not used. If you added an Alchemy key, on-chain exchange flows appear in the On-chain panel.');
+      mk('stable', st, 'supply 7d ' + cpPc(d.chg7, 2), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + 'stablecoin supply changed ' + cpPc(d.chg7, 2) + ' in 7 days (' + (d.chg7 >= 0.5 ? 'new money is entering' : d.chg7 <= -0.3 ? 'money is leaving' : 'little change') + '). This is a market-wide background reading.', lines); } }
+  /* 9 unlock */
+  { const d = R.unlock; if (!d) na('unlock', E.unlock || 'no data'); else {
+      let st = 'ok', say = [], lines = [];
+      if (isNum(d.fdv)) lines.push('Fully-diluted value ÷ market cap: ' + d.fdv.toFixed(2) + 'x'); if (isNum(d.sup)) lines.push('Share of total supply already circulating: ' + d.sup.toFixed(0) + '%'); if (isNum(d.mcap)) lines.push('Market cap: ' + cpUsd(d.mcap));
+      if (d.unl){ const days = (d.unl.t - Date.now()) / 864e5; lines.push('Next unlock on your calendar: ' + new Date(d.unl.t).toLocaleDateString() + (isNum(d.unl.pct) ? ', ' + d.unl.pct + '% of supply' : '') + (isNum(d.unl.usd) ? ', about ' + cpUsd(d.unl.usd) : '')); if (days <= 14 && (!isNum(d.unl.pct) || d.unl.pct >= 1)){ st = long ? 'bad' : 'ok'; say.push('a token unlock is due in ' + Math.max(0, Math.round(days)) + ' days' + (isNum(d.unl.pct) ? ' (' + d.unl.pct + '% of supply)' : '')); } } else if (!d.haveSrc) lines.push('No unlock calendar connected. Add one in Airdrops and unlocks to see exact dates.');
+      if (isNum(d.fdv)){ if (d.fdv >= 3){ if (st !== 'bad') st = long ? 'bad' : 'ok'; say.push('heavy supply overhang (' + d.fdv.toFixed(1) + 'x)'); } else if (d.fdv >= 1.5){ if (st === 'ok' && long) st = 'warn'; say.push('some supply overhang (' + d.fdv.toFixed(1) + 'x)'); } else say.push('little supply overhang (' + d.fdv.toFixed(1) + 'x)'); }
+      if (!say.length) say.push('no unlock data points to a problem');
+      mk('unlock', st, isNum(d.fdv) ? 'FDV/MC ' + d.fdv.toFixed(1) + 'x' : '—', (st === 'ok' ? (long ? 'Supports your LONG: ' : 'Supports your SHORT: ') : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + say.join('; ') + '.', lines); } }
+  /* 10 correlation */
+  { const d = R.corr; if (!d) na('corr', E.corr || 'no data'); else if (d.self) mk('corr', 'ok', 'this is ' + d.self, 'Neutral: this coin is the benchmark itself, so its own chart is the signal.', []);
+    else { const b = d.btc, lines = ['BTC: correlation ' + b.corr.toFixed(2) + ', beta ' + b.beta.toFixed(2) + '; BTC moved ' + cpPc(d.btc4h, 2) + ' in the last 4 hours'];
+      if (d.eth) lines.push('ETH: correlation ' + d.eth.corr.toFixed(2) + ', beta ' + d.eth.beta.toFixed(2));
+      if (isNum(d.coin4h)) lines.push('This coin moved ' + cpPc(d.coin4h, 2) + ' in the last 4 hours; alpha (beyond what BTC explains) ' + cpPc(d.alpha, 2));
+      let st = 'ok', say = [];
+      const headwind = isNum(d.btc4h) && d.btc4h * sgn < -0.8 && b.corr > 0.5;
+      if (headwind){ st = b.beta >= 1.3 ? 'bad' : 'warn'; say.push('BTC is moving against you (' + cpPc(d.btc4h, 1) + ' in 4h) and this coin follows it' + (b.beta >= 1.3 ? ' with ' + b.beta.toFixed(1) + 'x the move' : '')); }
+      if (isNum(d.alpha)){ if (d.alpha * sgn <= -0.8){ st = 'bad'; say.push('it is ' + (long ? 'weaker' : 'stronger') + ' than BTC explains (alpha ' + cpPc(d.alpha, 1) + ')'); } else if (d.alpha * sgn >= 0.3 && st === 'ok') say.push('it is ' + (long ? 'stronger' : 'weaker') + ' than BTC explains (alpha ' + cpPc(d.alpha, 1) + ')'); }
+      if (b.corr < 0.4) say.push('it moves on its own flow (correlation ' + b.corr.toFixed(2) + '), so the signal is independent of BTC'); else if (!headwind) say.push('correlation with BTC is ' + b.corr.toFixed(2) + ', beta ' + b.beta.toFixed(1));
+      mk('corr', st, 'corr ' + b.corr.toFixed(2) + ', beta ' + b.beta.toFixed(1), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + say.join('; ') + '.', lines); } }
+  /* 11 ATR */
+  { const d = R.atr; if (!d) na('atr', E.atr || 'no data'); else {
+      const u = d.used, st = u >= 110 ? 'bad' : u >= 70 ? 'warn' : 'ok', lines = ['Daily ATR (14 days): ' + d.atrP.toFixed(2) + '% of price (' + fmtPx(d.atr) + ')', 'Today so far: high-to-low ' + d.rngP.toFixed(2) + '% = ' + u.toFixed(0) + '% of a normal day, after ' + d.hrs.toFixed(1) + ' hours of the UTC day', 'Room left in a normal day: about ' + d.left.toFixed(2) + '%'];
+      if (isNum(d.h1P)) lines.push('1 hour ATR: ' + d.h1P.toFixed(2) + '% of price');
+      let extra = ''; if (d.plan){ lines.push('Scanner plan first target: ' + d.plan.d1.toFixed(2) + '% away (second target ' + d.plan.d2.toFixed(2) + '%), which is ' + (d.plan.d1 / d.atrP * 100).toFixed(0) + '% of a daily ATR'); if (d.plan.d1 / d.atrP > 0.6) extra = ' The first target is more than 60% of a normal day, which is ambitious for a same-day scalp.'; }
+      mk('atr', extra && st === 'ok' ? 'warn' : st, 'day used ' + u.toFixed(0) + '%', (st === 'ok' && !extra ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + 'today has used ' + u.toFixed(0) + '% of a normal day\'s range' + (u < 70 ? ', so there is room to run' : u < 110 ? ', so most of the move may be done: take profit early' : ', so more than a normal day has already happened and a new entry is late') + '.' + extra, lines); } }
+  /* 12 session */
+  { const d = R.sess; if (!d) na('sess', 'no data'); else {
+      const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'your time'; } catch(e){ return 'your time'; } })();
+      const loc = (hh) => { const dt = new Date(); dt.setUTCHours(Math.floor(hh), Math.round((hh % 1) * 60), 0, 0); return dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); };
+      const st = d.kz ? 'ok' : (d.we || d.ses.length === 0) ? 'bad' : 'warn';
+      const lines = ['Now: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ' in ' + tz + ' (' + String(Math.floor(d.h)).padStart(2, '0') + ':' + String(Math.floor((d.h % 1) * 60)).padStart(2, '0') + ' UTC)', 'Open sessions: ' + (d.ses.length ? d.ses.join(', ') : 'none (thin hours)'),
+        'Kill zones in your time: Asia open ' + loc(0) + ' to ' + loc(3) + ', London open ' + loc(7) + ' to ' + loc(10) + ', New York open ' + loc(12) + ' to ' + loc(15) + ', London close ' + loc(15) + ' to ' + loc(17), d.next ? 'Next kill zone: ' + d.next.nm + ' in about ' + (d.next.dh < 1 ? Math.round(d.next.dh * 60) + ' minutes' : d.next.dh.toFixed(1) + ' hours') : ''];
+      if (d.we) lines.push('It is the weekend: volume is lower and moves are less reliable.');
+      mk('sess', st, d.kz || (d.ses.join('+') || 'thin hours'), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': it is the ' + d.kz + ' kill zone, when big desks are active.' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' + (d.we ? 'weekend' : 'thin late hours') + ', the market is slow and fake moves are common.' : 'Neutral: ' + d.ses.join(' and ') + ' is open but this is not a kill zone, so only trade strong setups.'), lines); } }
+  /* 13 options */
+  { const d = R.opts; if (!d) na('opts', E.opts || 'no data'); else if (d.none) mk('opts', 'na', 'no options market', 'Not available: ' + (d.loaded ? 'this coin has no liquid options market on Deribit (mainly BTC, ETH and SOL do), so it is left out of the score.' : 'the options data did not load (' + (d.err || 'open the Options view once to load it') + ').'), []);
+    else { const lines = []; if (isNum(d.pcr)) lines.push('Put/call ratio by open interest: ' + d.pcr.toFixed(2)); if (isNum(d.pcrV)) lines.push('Put/call ratio by volume: ' + d.pcrV.toFixed(2)); if (isNum(d.skew)) lines.push('Skew (put IV minus call IV): ' + cpPc(d.skew, 1).replace('%', ' points')); if (isNum(d.iv)) lines.push('30 day implied volatility: ' + d.iv.toFixed(0) + '%'); if (isNum(d.term)) lines.push('Term structure: ' + cpPc(d.term, 1).replace('%', ' points')); for (const w of (d.why || [])) lines.push('Deribit read: ' + w);
+      let sc = 0; if (isNum(d.pcr)){ if (d.pcr < 0.6) sc++; else if (d.pcr > 1.0) sc--; } if (isNum(d.skew)){ if (d.skew >= 3) sc--; else if (d.skew <= -2) sc++; }
+      const mine = sc * sgn, st = mine > 0 ? 'ok' : mine < 0 ? 'bad' : 'warn';
+      mk('opts', st, (isNum(d.pcr) ? 'P/C ' + d.pcr.toFixed(2) : '') + (isNum(d.skew) ? ', skew ' + cpPc(d.skew, 1).replace('%', '') : ''), (st === 'ok' ? 'Supports your ' + dir.toUpperCase() + ': ' : st === 'bad' ? 'Against your ' + dir.toUpperCase() + ': ' : 'Neutral: ') + 'options traders are ' + (sc > 0 ? 'positioned bullish' : sc < 0 ? 'positioned bearish' : 'mixed') + (isNum(d.pcr) ? ' (put/call ' + d.pcr.toFixed(2) + ')' : '') + '.', lines); } }
+  return out;
+}
+function cpOverall(R, dir){
+  const items = cpEval(R, dir), W = {ok:1, warn:0.4, bad:0};
+  let s = 0, w = 0, ok = 0, warn = 0, bad = 0, n = 0;
+  for (const id of CP_ORDER){ const it = items[id]; if (!it || it.st === 'na') continue; const wt = CP_CORE.has(id) ? 2 : 1; s += W[it.st] * wt; w += wt; n++; if (it.st === 'ok') ok++; else if (it.st === 'warn') warn++; else bad++; }
+  const score = w ? Math.round(s / w * 100) : null, D = dir.toUpperCase();
+  let tone = 'warn', label, text, short;
+  if (n < 5){ label = 'NOT ENOUGH DATA'; text = 'Only ' + n + ' of the 13 checks returned data, which is too few to judge. Press Refresh, or check the Settings test button for blocked exchanges.'; tone = 'dim'; short = '? ' + n + '/13'; }
+  else if (score >= 72 && bad <= 1){ label = 'CONFIRMED'; text = 'Most of the market data backs this ' + D + '. You can take the setup you planned. Keep your stop-loss as planned.'; tone = 'up'; short = '✔ ' + ok + '/' + n; }
+  else if (score >= 58){ label = 'MOSTLY CONFIRMED'; text = 'More signs support this ' + D + ' than oppose it, but not everything agrees. Fine to trade with a normal or slightly smaller size, and respect your stop.'; tone = 'up'; short = '✔ ' + ok + '/' + n; }
+  else if (score >= 42){ label = 'MIXED'; text = 'About half the signs support this ' + D + ' and half do not. Wait for a better moment or use a small size.'; tone = 'warn'; short = '~ ' + ok + '/' + n; }
+  else { label = 'NOT CONFIRMED'; text = 'Most of the market data is against this ' + D + '. A beginner should skip it or wait until the red items turn green.'; tone = 'dn'; short = '✖ ' + ok + '/' + n; }
+  return {score, label, text, tone, short, ok, warn, bad, n, items};
+}
+function cpDirDefault(name){
+  const c = state.coins.get(name); if (c && c.m){ const v = c.m.verdict; if (v === 4 || v === 5) return 'long'; if (v === 2 || v === 3) return 'short'; try { const pl = planFor(c); if (pl) return pl.dir; } catch(e){} }
+  return 'long';
+}
+const cpDir = name => CP.dir[name] || cpDirDefault(name);
+/* cached result nudges the verdict and the signal gate (only when fresh, within 10 minutes) */
+function cpBias(c){ const R = CP.cache.get(c.name); if (!R || Date.now() - R.at > 600000) return null; const L = cpOverall(R, 'long'), S = cpOverall(R, 'short'); if (!isNum(L.score) || !isNum(S.score) || L.n < 6) return null; return {long:L.score, short:S.score, n:L.n}; }
+
+/* ---------- the confirmation window and the Confirm column / buttons used by every scanner ---------- */
+const CP_ICON = {ok:'✔', warn:'!', bad:'✖', na:'–'};
+function cpChip(name, small){
+  const R = CP.cache.get(name), busy = CP.jobs.has(name);
+  if (!R) return `<button class="cpb${small ? ' sm' : ''}" type="button" data-cp="${esc(name)}" title="Open the Confirmation window: 13 extra institutional checks with plain reasons">${busy ? '… checking' : '✔ 13 checks'}</button>`;
+  const o = cpOverall(R, cpDir(name)), age = Math.round((Date.now() - R.at) / 60000);
+  return `<button class="cpb cp-${o.tone}${small ? ' sm' : ''}" type="button" data-cp="${esc(name)}" title="${esc(o.label + ' for a ' + cpDir(name).toUpperCase() + ': ' + o.ok + ' of ' + o.n + ' checks support it. Checked ' + (age < 1 ? 'just now' : age + ' min ago') + '. Click for the reasons.')}">${esc(o.short)}</button>`;
+}
+function cpDlgEnsure(){
+  if ($('cpDlg')) return $('cpDlg');
+  const d = document.createElement('dialog'); d.id = 'cpDlg'; d.style.width = 'min(980px,calc(100vw - 12px))';
+  d.innerHTML = '<div class="dlg-h"><h3 id="cpT">Confirmation</h3><span class="row" style="gap:6px;align-items:center"><button class="btn sm" id="cpRe" type="button" title="Fetch all 13 checks again">↻ Refresh</button><button class="btn sm" id="cpExp" type="button">Collapse all</button><button class="btn sm" id="cpX" type="button">Close</button></span></div><div class="dlg-b" id="cpB"></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click', e => {
+    if (e.target.closest('#cpX')){ d.close(); return; }
+    if (e.target.closest('#cpRe')){ cpOpen(CP.open, true); return; }
+    if (e.target.closest('#cpExp')){ CP.ex = !CP.ex; cpDraw(); return; }
+    const t = e.target.closest('[data-cpdir]'); if (t){ CP.dir[CP.open] = t.dataset.cpdir; cpDraw(); requestRender(); return; }
+    const ch = e.target.closest('[data-cpchart]'); if (ch){ d.close(); openChart(ch.dataset.cpchart); }
+  });
+  d.addEventListener('close', () => { CP.open = ''; });
+  return d;
+}
+function cpOpen(name, force){
+  if (!name) return; const d = cpDlgEnsure(); CP.open = name;
+  if (!d.open) d.showModal();
+  const hit = CP.cache.get(name);
+  if (!hit || force || Date.now() - hit.at >= CP_TTL){
+    if (!hit || force) { $('cpT').textContent = 'Confirmation: ' + name; $('cpB').innerHTML = '<p class="hint" style="padding:14px">Collecting the 13 checks for ' + esc(name) + ' from Hyperliquid, Binance, Bybit, Coinbase, DefiLlama and Deribit. This takes about 5 to 15 seconds…</p>'; }
+    cpLoad(name, true).then(() => { if (CP.open === name) cpDraw(); requestRender(); }).catch(e => { if (CP.open === name) $('cpB').innerHTML = '<p class="hint" style="padding:14px">Could not collect the data: ' + esc(errTxt(e)) + '</p>'; });
+  }
+  if (hit && !force) cpDraw();
+}
+function cpDraw(){
+  const name = CP.open, R = CP.cache.get(name), b = $('cpB'); if (!name || !R || !b) return;
+  const dir = cpDir(name), o = cpOverall(R, dir), D = dir.toUpperCase(), age = Math.round((Date.now() - R.at) / 1000);
+  $('cpT').textContent = 'Confirmation: ' + name;
+  $('cpExp').textContent = CP.ex ? 'Collapse all' : 'Expand all';
+  const bar = isNum(o.score) ? `<div class="cpbar"><i style="width:${o.score}%"></i></div>` : '';
+  const head = `<div class="cpv cpv-${o.tone}"><div class="cpv1"><b>${esc(o.label)}</b><span>${isNum(o.score) ? 'Confirmation score ' + o.score + ' / 100' : ''}</span></div>${bar}<p>${esc(o.text)}</p>
+    <div class="cpcnt"><span class="up">✔ ${o.ok} support</span><span class="warn">! ${o.warn} neutral</span><span class="dn">✖ ${o.bad} against</span><span class="dim">– ${13 - o.n} not available</span></div></div>`;
+  const tog = `<div class="row" style="gap:6px;align-items:center;margin:8px 0"><span class="hint">Check this coin for a</span><button class="btn sm${dir === 'long' ? ' primary' : ''}" type="button" data-cpdir="long">LONG</button><button class="btn sm${dir === 'short' ? ' primary' : ''}" type="button" data-cpdir="short">SHORT</button>
+    <span class="hint">· data from ${age < 5 ? 'just now' : age < 90 ? age + ' seconds ago' : Math.round(age / 60) + ' minutes ago'} · <a href="#" data-cpchart="${esc(name)}" style="color:var(--accent)">open chart</a></span></div>`;
+  const cards = CP_ORDER.map((id, i) => {
+    const it = o.items[id], info = CP_INFO[id]; if (!it) return '';
+    const lines = it.lines.filter(Boolean);
+    return `<details class="cpc cp-${it.st}"${CP.ex ? ' open' : ''}><summary><i class="cpi">${CP_ICON[it.st]}</i><span class="cpn1"><b>${i + 1}. ${esc(info.t)}</b><small>${esc(it.say)}</small></span><span class="cpval">${esc(it.v || '')}</span></summary>
+      <div class="cpbody">${lines.length ? `<h5>What we found</h5><ul>${lines.map(l => '<li>' + esc(l) + '</li>').join('')}</ul>` : ''}<h5>Why it matters</h5><p>${esc(info.why)}</p><h5>How we measured it</h5><p>${esc(info.how)}</p><h5>How to read it</h5><p>${esc(info.read)}</p>${R.err && R.err[id] ? `<p class="hint">Data problem: ${esc(R.err[id])}</p>` : ''}</div></details>`;
+  }).join('');
+  const sources = '<p class="hint">Sources: Hyperliquid, Binance, Bybit, Coinbase, Deribit, DefiLlama and CoinGecko, all free public data. Liquidation zones and the unlock overhang are estimates, not paid heatmaps. This is a second opinion on the scanner\'s signal, not a promise: always keep your stop-loss.</p>';
+  b.innerHTML = head + tog + cards + sources;
+}
+/* the Confirm column / buttons are added to every scanner table or card that shows a coin name */
+function cpDecorate(){
+  const sel = ['#viewMovers a[data-chart]', '#viewWatch a[data-chart]', '#viewSdesk a[data-chart]', '#viewSdesk button[data-chart]', '#viewMemes a[data-chart]', '#viewOrderflow a[data-chart]', '#viewOptions a[data-chart]', '#viewSignals a[data-chart]', '#viewWhales a[data-chart]', '#viewFlows a[data-chart]', '#viewNews a[data-chart]', '#viewMap a[data-chart]', '#viewLookup [data-lkchart]'];
+  document.querySelectorAll(sel.join(',')).forEach(a => {
+    const nm = a.dataset.chart || a.dataset.lkchart; if (!nm) return; const nx = a.nextElementSibling;
+    if (nx && nx.classList && nx.classList.contains('cpb')){ if (nx.dataset.cp !== nm) nx.dataset.cp = nm; return; }
+    a.insertAdjacentHTML('afterend', cpChip(nm, true).replace('<button ', '<button data-cpd="1" '));
+  });
+  document.querySelectorAll('.cpb[data-cpd]').forEach(btn => { const nm = btn.dataset.cp, R = CP.cache.get(nm); if (!R && !CP.jobs.has(nm)) return; const want = cpChip(nm, true).replace('<button ', '<button data-cpd="1" '); if (btn.outerHTML !== want){ const t = document.createElement('template'); t.innerHTML = want; btn.replaceWith(t.content.firstChild); } });
+}
+let cpDecT = null;
+function cpDecSoon(){ if (cpDecT) return; cpDecT = setTimeout(() => { cpDecT = null; try { cpDecorate(); } catch(e){} }, 350); }
+/* background checks for the best coins of the table in view, so the Confirm column fills itself (one coin at a time, gentle on the exchanges) */
+function cpAuto(names){
+  if (state.cpAuto === false || document.hidden) return;
+  for (const n of names.slice(0, 5)){ const R = CP.cache.get(n); if ((!R || Date.now() - R.at > 180000) && !CP.jobs.has(n) && !CP.q.includes(n)) CP.q.push(n); }
+  if (CP.qRun || !CP.q.length) return; CP.qRun = true;
+  (async () => { try { while (CP.q.length){ const n = CP.q.shift(); try { await cpLoad(n); } catch(e){} requestRender(); await sleep(1500); } } finally { CP.qRun = false; } })();
+}
+function cpInit(){
+  if (cpInit.done) return; cpInit.done = true; cpDlgEnsure();
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-cp]'); if (!b) return; e.preventDefault(); e.stopPropagation(); cpOpen(b.dataset.cp); }, true);
+  try { new MutationObserver(muts => { for (const m of muts) for (const n of m.addedNodes){ if (!(n.nodeType === 1 && n.classList && n.classList.contains('cpb'))){ try { cpDecorate(); } catch(e){} return; } } }).observe(document.body, {childList:true, subtree:true}); } catch(e){}
+  cpDecSoon();
+}
+
+function cpColumn(){ return {id:'cpConf', label:'Confirm (13 checks)', val:c => { const R = CP.cache.get(c.name); return R ? cpOverall(R, cpDir(c.name)).score : null; }, cell:c => [cpChip(c.name), 'cpc1']}; }
+cpInit();
+
 function renderInst(){ renderInstK('perp'); }
 function renderInstSpot(){ renderInstK('spot'); }
 function renderInstK(kind){
@@ -6713,7 +7201,7 @@ function renderInstK(kind){
       <button class="btn sm" id="${I('Re')}" type="button" title="Reload prices and candles for all coins now">↻ Refresh</button></div>
       <div class="row" style="align-items:center;gap:6px;margin:6px 0"><label class="hint">Scan chosen coins <input id="${I('ScanIn')}" type="text" placeholder="e.g. BTC, SOL, HYPE" style="width:200px"></label><button class="btn primary sm" id="${I('ScanBtn')}" type="button">Scan</button><span class="hint">Opens a window with all institutional data for each coin. Use the arrows to move between them.</span></div>
       <details class="v4gd"><summary>How to read this (threshold guide for beginners)</summary><div class="v4sw"><table class="v4t"><thead><tr><th>Number</th><th>Quiet / weak</th><th>Notable</th><th>What it means</th></tr></thead><tbody>${INS_GUIDE.map(g => '<tr>' + g.map((x, i) => '<td style="white-space:normal' + (i ? '' : ';font-weight:600') + '">' + esc(x) + '</td>').join('') + '</tr>').join('')}</tbody></table></div></details>
-      <p class="hint" id="${I('Note')}"></p><div class="v4sw"><table class="v4t"><thead><tr><th>Coin</th><th>Institutions</th><th>Score</th><th title="Accumulation (ACC) or distribution (DIST) on each timeframe. Capital letters = strong.">15m</th><th>1h</th><th>4h</th><th>D</th><th title="4h accumulation or distribution with the 15m and/or 1h ready: flow and volume lined up in the same direction">15m / 1h ready + 4h</th><th title="${spot ? 'BUY READY appears' : 'FINAL LONG / FINAL SHORT appears'} when institutions, the take-off score, net money flow and volume all agree">${spot ? 'Buy call' : 'Take-off call'}</th><th title="Institutional score out of 100, built from all the institutional data for the coin">Inst. score</th><th title="Press to see every confirmation for this coin">Confirm</th><th>15m vol / flow</th><th>1h vol / flow</th><th>4h vol / flow</th><th>Net flow 1h</th><th>Institutional candles</th><th>Inst. volume</th><th>Big / small flow</th>${spot ? '<th title="Market cap, spot volume and turnover">Spot data</th>' : ''}<th>Listed on</th><th>Watch</th></tr></thead><tbody id="${I('Body')}"></tbody></table></div></div>`;
+      <p class="hint" id="${I('Note')}"></p><div class="v4sw"><table class="v4t"><thead><tr><th>Coin</th><th>Institutions</th><th>Score</th><th title="Accumulation (ACC) or distribution (DIST) on each timeframe. Capital letters = strong.">15m</th><th>1h</th><th>4h</th><th>D</th><th title="4h accumulation or distribution with the 15m and/or 1h ready: flow and volume lined up in the same direction">15m / 1h ready + 4h</th><th title="${spot ? 'BUY READY appears' : 'FINAL LONG / FINAL SHORT appears'} when institutions, the take-off score, net money flow and volume all agree">${spot ? 'Buy call' : 'Take-off call'}</th><th title="Institutional score out of 100, built from all the institutional data for the coin">Inst. score</th><th title="Press to see every confirmation for this coin">Confirm</th><th>15m vol / flow</th><th>1h vol / flow</th><th>4h vol / flow</th><th>Net flow 1h</th><th>Institutional candles</th><th>Inst. volume</th><th>Big / small flow</th>${spot ? '<th title="Market cap, spot volume and turnover">Spot data</th>' : ''}<th>Listed on</th><th title="13 extra institutional checks with plain reasons">Extra checks (13)</th><th>Watch</th></tr></thead><tbody id="${I('Body')}"></tbody></table></div></div>`;
     el.addEventListener('change', e => { const id = e.target.id, t = gi(); if (id === I('F')) t.f = e.target.value; else if (id === I('Act')) t.act = e.target.checked; else if (id === I('Rdy')) t.rdy = e.target.checked; else if (id === I('Fin')) t.fin = e.target.checked; else if (id === I('N')) t.n = +e.target.value; else return; saveState(); renderInstK(kind); });
     el.addEventListener('input', e => { if (e.target.id === I('Q')){ gi().q = e.target.value; saveState(); renderInstK(kind); } });
     el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === I('ScanIn')){ e.preventDefault(); instScanGo(kind); } });
@@ -6747,7 +7235,7 @@ function renderInstK(kind){
     const call = f.final ? (spot ? (f.final === 'long' ? '<b>BUY READY</b>' : '<b>AVOID / SELL</b>') : `<b>FINAL ${f.final.toUpperCase()}</b>`) : f.building ? `Building ${spot ? (f.dir > 0 ? 'buy' : 'avoid') : (f.dir > 0 ? 'long' : 'short')}` : '—';
     const callK = f.final ? (f.final === 'long' ? 'up' : 'dn') : f.building ? 'warn' : 'dim';
     const spotCell = spot ? `<td class="dim" style="white-space:normal;min-width:150px;text-align:left">${isNum(m.mcap) ? 'Mcap ' + esc(fmtUsd(m.mcap)) : ''}${isNum(m.spotVol) ? '<br>Spot ' + esc(fmtUsd(m.spotVol)) : ''}${isNum(m.volMcap) ? '<br>Turnover ' + m.volMcap.toFixed(1) + '%' : ''}${!isNum(m.mcap) && !isNum(m.spotVol) ? '—' : ''}</td>` : '';
-    return `<tr data-chart="${esc(r.coin)}" style="cursor:pointer"><td><b>${esc(r.coin)}</b></td><td class="${r.state >= 4 ? 'up' : r.state <= 2 ? 'dn' : 'dim'}" style="font-weight:600"><span title="${esc(r.why)}">${esc(INS_LAB[r.state])}</span>${r.active ? '' : ' <span class="dim" title="Big players are not unusually active right now">(quiet)</span>'}</td><td class="${cl(r.score)}">${r.score > 0 ? '+' : ''}${r.score}</td>${INS_TFS.map(([tf]) => tfCell(r.tf[tf])).join('')}<td class="${su[1]}" style="white-space:normal;min-width:120px">${su[0]}</td><td class="${callK}" style="white-space:normal;min-width:96px"><span title="${esc(f.text)}">${call}</span></td><td class="${SC.score === null ? 'dim' : SC.score >= 70 ? (CF.dir > 0 ? 'up' : 'dn') : SC.score >= 45 ? 'warn' : 'dim'}" style="font-weight:600">${SC.score === null ? '—' : SC.score}</td><td><button class="btn sm insb${CF.dir && CF.total && CF.ok / CF.total >= 0.7 ? ' on' : ''}" type="button" data-insc="${esc(r.coin)}" title="Show every confirmation for ${esc(r.coin)}">${CF.dir ? '✔ ' + CF.ok + '/' + CF.total : '✔ —'}</button></td>${instVolFlowCell(m, '15m')}${instVolFlowCell(m, '1h')}${instVolFlowCell(m, '4h')}<td class="${r.flow.k}">${esc(r.flow.t)}</td><td style="white-space:normal;min-width:190px;text-align:left">${['15m', '1h'].map(tf => { const a = instCandleTxt(m, tf, true); return `<div class="${a[1] || 'dim'}" title="${esc(a[2])}"><b>${tf}</b> ${esc(a[0])}</div>`; }).join('')}</td><td>${isNum(r.share) ? r.share.toFixed(0) + '%' : '—'}${isNum(r.vx) ? ' · ' + r.vx.toFixed(1) + 'x' : ''}</td><td class="${cl(r.fl)}">${pc(r.fl)} / <span class="${cl(r.rf)}">${pc(r.rf)}</span></td>${spotCell}<td class="dim" style="white-space:normal;min-width:120px;text-align:left"><span title="${esc(r.lst.full.join(', ') || 'none of the checked exchanges')}${r.lst.unchecked.length ? ' (not checked: ' + esc(r.lst.unchecked.join(', ')) + ')' : ''}">${esc(r.lst.on.join(' · ') || '—')}</span></td><td style="white-space:nowrap"><button class="btn sm insb${w ? ' on' : ''}" type="button" data-insw="${esc(r.coin)}" title="${w ? 'Remove from watchlist' : 'Add to watchlist'}">${w ? '★' : '☆'}</button> <button class="btn sm insb${al ? ' on' : ''}" type="button" data-insa="${esc(r.coin)}" title="${al ? 'Turn institutional alerts off' : 'Alert me: accumulation, distribution, final call'}">🔔</button></td></tr>`; }).join('') || `<tr><td colspan="${spot ? 21 : 20}" class="dim" style="text-align:center;padding:14px">${loaded ? 'No coin shows an institutional footprint right now. Untick "Only active institutions" to see weaker reads.' : 'Nothing to show yet.'}</td></tr>`;
+    return `<tr data-chart="${esc(r.coin)}" style="cursor:pointer"><td><b>${esc(r.coin)}</b></td><td class="${r.state >= 4 ? 'up' : r.state <= 2 ? 'dn' : 'dim'}" style="font-weight:600"><span title="${esc(r.why)}">${esc(INS_LAB[r.state])}</span>${r.active ? '' : ' <span class="dim" title="Big players are not unusually active right now">(quiet)</span>'}</td><td class="${cl(r.score)}">${r.score > 0 ? '+' : ''}${r.score}</td>${INS_TFS.map(([tf]) => tfCell(r.tf[tf])).join('')}<td class="${su[1]}" style="white-space:normal;min-width:120px">${su[0]}</td><td class="${callK}" style="white-space:normal;min-width:96px"><span title="${esc(f.text)}">${call}</span></td><td class="${SC.score === null ? 'dim' : SC.score >= 70 ? (CF.dir > 0 ? 'up' : 'dn') : SC.score >= 45 ? 'warn' : 'dim'}" style="font-weight:600">${SC.score === null ? '—' : SC.score}</td><td><button class="btn sm insb${CF.dir && CF.total && CF.ok / CF.total >= 0.7 ? ' on' : ''}" type="button" data-insc="${esc(r.coin)}" title="Show every confirmation for ${esc(r.coin)}">${CF.dir ? '✔ ' + CF.ok + '/' + CF.total : '✔ —'}</button></td>${instVolFlowCell(m, '15m')}${instVolFlowCell(m, '1h')}${instVolFlowCell(m, '4h')}<td class="${r.flow.k}">${esc(r.flow.t)}</td><td style="white-space:normal;min-width:190px;text-align:left">${['15m', '1h'].map(tf => { const a = instCandleTxt(m, tf, true); return `<div class="${a[1] || 'dim'}" title="${esc(a[2])}"><b>${tf}</b> ${esc(a[0])}</div>`; }).join('')}</td><td>${isNum(r.share) ? r.share.toFixed(0) + '%' : '—'}${isNum(r.vx) ? ' · ' + r.vx.toFixed(1) + 'x' : ''}</td><td class="${cl(r.fl)}">${pc(r.fl)} / <span class="${cl(r.rf)}">${pc(r.rf)}</span></td>${spotCell}<td class="dim" style="white-space:normal;min-width:120px;text-align:left"><span title="${esc(r.lst.full.join(', ') || 'none of the checked exchanges')}${r.lst.unchecked.length ? ' (not checked: ' + esc(r.lst.unchecked.join(', ')) + ')' : ''}">${esc(r.lst.on.join(' · ') || '—')}</span></td><td>${cpChip(r.coin)}</td><td style="white-space:nowrap"><button class="btn sm insb${w ? ' on' : ''}" type="button" data-insw="${esc(r.coin)}" title="${w ? 'Remove from watchlist' : 'Add to watchlist'}">${w ? '★' : '☆'}</button> <button class="btn sm insb${al ? ' on' : ''}" type="button" data-insa="${esc(r.coin)}" title="${al ? 'Turn institutional alerts off' : 'Alert me: accumulation, distribution, final call'}">🔔</button></td></tr>`; }).join('') || `<tr><td colspan="${spot ? 22 : 21}" class="dim" style="text-align:center;padding:14px">${loaded ? 'No coin shows an institutional footprint right now. Untick "Only active institutions" to see weaker reads.' : 'Nothing to show yet.'}</td></tr>`;
 }
 
 const SKIPS = {n:0, why:{}};
@@ -6755,6 +7243,7 @@ function sigGate(c, dir, m, now, mk){
   const long = dir === 'long', bo = [m.bo && m.bo['1h'], m.bo && m.bo['15m']], BU = [1, 3, 5, 8], BE = [2, 4, 6, 9];
   const ic = [m.ic && m.ic['1h'], m.ic && m.ic['15m']], en = [m.icEntry && m.icEntry['1h'], m.icEntry && m.icEntry['15m']];
   if (isNum(m.walScore) && m.walN >= 5 && (long ? m.walScore <= -WAL_T : m.walScore >= WAL_T)) return 'the tracked wallets are against it';
+  { const cb = cpBias(c); if (cb && cb.n >= 8 && (long ? cb.long : cb.short) < 35) return 'the 13 extra institutional checks are against it'; }
   { const pr = m.pressure && m.pressure['1h']; if (isNum(pr) && (long ? pr <= -PR_T.note : pr >= PR_T.note)) return (long ? 'selling' : 'buying') + ' pressure is against it'; }
   if (mk){
     if (mk.size === 'skip') return 'market verdict says skip trading';
@@ -7905,7 +8394,7 @@ const PERP_GROUPS = [
     ['Price and change', ['px','read'].concat(TFS.map(t => 'chg_' + t), ['chgUsd','relStr','rangePos','distHi','distLo','vwapDay','sweep','tfAgree'])],
     ['Volume and activity', ['vol','volD','volDUsd','rvol','rvolBest','trades','tradesX','vlt','vltX','atr']],
     ['Regime and trend', ['regime','trend']],
-    ['Verdict and smart money', ['verdict','dataRead','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','instFlow','pattern','liqMap','ob','fvg','ote','instVol','volState','retail']],
+    ['Verdict and smart money', ['cpConf','verdict','dataRead','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','instFlow','pattern','liqMap','ob','fvg','ote','instVol','volState','retail']],
     ['Take-off and build-up', ['takeoff','buildup','takeWhy']],
     ['Execution quality', ['depthX','slipPct','tpAtr','slAtr','rr1']],
     ['Sessions and macro', ['session','asiaSweep','kzSweep','eventRisk','eventMin','rotation','domChg']],
