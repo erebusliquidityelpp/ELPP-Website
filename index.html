@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.6</title>
+<title>ELPP CRYPTO SCANNER PRO V4.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -697,7 +697,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.6</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.7</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5389,7 +5389,7 @@ const DK_MIN = 10;
 function dkPerpRows(side){
   if (state.mode !== 'perp') return [];
   const ok = side === 'long' ? [4, 5] : [2, 3], sg = side === 'long' ? 1 : -1;
-  const pool = [...state.coins.values()].filter(c => c.ctx && c.m && isNum(c.m.verdictScore) && isNum(c.m.verdict) && c.loaded), abs = c => Math.abs(c.m.verdictScore || 0);
+  const pool = [...state.coins.values()].filter(c => c.ctx && c.m && isNum(c.m.verdictScore) && isNum(c.m.verdict) && c.loaded), abs = c => Math.abs(c.m.verdictScore || 0) + (sgAlign(c, side).adj || 0);
   const real = pool.filter(c => ok.includes(c.m.verdict)).sort((x, y) => abs(y) - abs(x));
   const used = new Set(real), lean = pool.filter(c => !used.has(c) && c.m.verdict !== 0 && Math.sign(c.m.verdictScore) === sg).sort((x, y) => abs(y) - abs(x));
   let rows = real.concat(lean); if (rows.length < DK_MIN){ const have = new Set(rows); rows = rows.concat(pool.filter(c => !have.has(c) && Math.sign(c.m.verdictScore) === sg).sort((x, y) => abs(y) - abs(x))); }
@@ -5401,6 +5401,55 @@ function dkInst(c){
   let cols; try { cols = cwCols(); } catch(e){ return ''; }
   const rows = DK_INST.map(([id, lab]) => { const col = cols.get(id); if (!col) return ''; let r; try { r = col.cell(c); } catch(e){ return ''; } if (!r || r[0] === '—' || r[0] === '' || r[0] == null) return ''; return `<div class="cwr"><span>${esc(lab)}</span><span class="${r[1] || ''}">${r[0]}</span></div>`; }).join('');
   return rows ? `<div class="dkh"><span>Institutional data</span></div><div class="dkinst">${rows}</div>` : '';
+}
+/* ===== V4.7: the institutional read and the 13 extra checks inside the Signal desk and the Signals engine ===== */
+const SGI = new Map();
+function sgInst(c){
+  const hit = SGI.get(c.name); if (hit && Date.now() - hit.at < 15000) return hit.v;
+  let v = null;
+  try {
+    const rd = instRow(c, 'perp'), cf = rd.conf || {};
+    v = {rd, dir:cf.dir || (rd.state >= 4 ? 1 : rd.state <= 2 ? -1 : 0), score:rd.sc ? rd.sc.score : null, label:INS_LAB[rd.state] || 'No clear side', active:!!rd.active, fin:rd.fin, setup:rd.setup, ok:cf.ok || 0, total:cf.total || 0};
+  } catch(e){ v = null; }
+  SGI.set(c.name, {at:Date.now(), v}); return v;
+}
+function sgAlign(c, side){
+  const v = sgInst(c), want = side === 'long' ? 1 : -1;
+  if (!v || !v.dir) return {state:'unclear', score:v ? v.score : null, adj:0, text:'the institutional read shows no clear side yet'};
+  const sc = isNum(v.score) ? v.score : 0, fin = v.fin && v.fin.final ? 2 : 0;
+  if (v.dir === want) return {state:'with', score:sc, adj:(sc >= 60 ? 8 : sc >= 40 ? 4 : 1) + fin, text:'institutions AGREE (the 4h shows ' + (v.dir > 0 ? 'accumulation' : 'distribution') + ', institutional score ' + sc + '/100)'};
+  return {state:'against', score:sc, adj:sc >= 50 ? -8 : sc >= 30 ? -4 : -1, text:'institutions are AGAINST it (the 4h shows ' + (v.dir > 0 ? 'accumulation' : 'distribution') + ', institutional score ' + sc + '/100)'};
+}
+function sgTag(c, side){ const a = sgAlign(c, side); return isNum(a.score) && a.state !== 'unclear' ? ' · inst ' + a.score + (a.state === 'with' ? ' ✔' : ' ✖') : ''; }
+function sgCpLine(c, dir){
+  const R = CP.cache.get(c.name);
+  if (!R) return CP.jobs.has(c.name) ? 'checking the 13 extra checks now…' : 'not checked yet (press the button)';
+  const o = cpOverall(R, dir); return o.label + ': ' + o.ok + ' of ' + o.n + ' checks support it' + (o.bad ? ', ' + o.bad + ' against' : '');
+}
+function sgDeskBlock(c, dir){
+  const v = sgInst(c); if (!v) return '';
+  const m = c.m, rd = v.rd, S = v.setup, d = dir || 'long', al = sgAlign(c, d), R = CP.cache.get(c.name), o = R ? cpOverall(R, d) : null;
+  const row = (l, h, k) => `<div class="cwr"><span>${esc(l)}</span><span class="${k || ''}">${h}</span></div>`;
+  const tfRows = ['15m', '1h', '4h'].map(tf => { const t = rd.tf && rd.tf[tf], vd = stVol((m.volD || {})[tf]), fl = stFlow((m.flowPct || {})[tf]), pr = pressLab((m.pressure || {})[tf]), rd0 = t && t.dir ? (t.dir > 0 ? 'accumulating' : 'distributing') + (Math.abs(t.lvl) >= 2 ? ' (strong)' : '') : 'no side';
+    return row(tf, `${esc(rd0)} · volume <b class="${vd[1]}">${esc(vd[0])}</b> ${esc(spc((m.volD || {})[tf]))} · net flow <b class="${fl[1]}">${esc(fl[0])}</b> ${esc(spc((m.flowPct || {})[tf]))} · pressure <b class="${pr[1]}">${esc(pr[0])}</b>`, t && t.dir ? (t.dir > 0 ? 'up' : 'dn') : 'dim'); }).join('');
+  const parts = (rd.sc && rd.sc.parts) || [], got = parts.filter(p => p[1] > 0).map(p => p[0]), miss = parts.filter(p => p[1] === 0).map(p => p[0]);
+  const take = S && S.dir ? '4h ' + (S.dir > 0 ? 'accumulating' : 'distributing') + '; ' + (S.state === 'both' ? 'READY on 15m and 1h' : S.state === 'wait' ? '15m and 1h not ready yet' : 'ready on ' + S.state + ' only') : '4h shows no accumulation or distribution';
+  const sw = swpCell(m), wl = walCell(m), lst = rd.lst && rd.lst.on && rd.lst.on.length ? rd.lst.on.join(', ') : '';
+  const cpBest = o ? Object.values(o.items).filter(x => x.st === 'bad').slice(0, 2).map(x => x.say.replace(/^Against your [A-Z]+: /, '')) : [];
+  return `<div class="dkh"><span>Institutional read</span><em>${isNum(v.score) ? 'score ' + v.score + '/100 · ' : ''}${esc(v.label)}</em></div>
+    <div class="dkinst" style="grid-template-columns:1fr">${row('Do institutions agree with this ' + d.toUpperCase() + '?', esc(al.text), al.state === 'with' ? 'up' : al.state === 'against' ? 'dn' : 'dim')}
+    ${row('Take-off set-up', esc(take), S && S.state === 'both' ? (S.dir > 0 ? 'up' : 'dn') : 'warn')}
+    ${v.fin ? row('Final call', esc(v.fin.text), v.fin.final ? (v.fin.final === 'long' ? 'up' : 'dn') : 'dim') : ''}
+    ${tfRows}
+    ${row('Sweep + reclaim + 2nd test', sw[0], sw[1])}${row('Tracked wallets (about 100)', wl[0], wl[1])}
+    ${v.total ? row('Radar checklist', esc(v.ok + ' of ' + v.total + ' confirmations match (full list: Institutional Radar, ✔ Confirm)'), v.ok >= v.total * 0.6 ? 'up' : 'warn') : ''}
+    ${got.length || miss.length ? row('Institutional score', esc((got.length ? 'earned: ' + got.slice(0, 4).join(', ') : '') + (miss.length ? (got.length ? ' · ' : '') + 'missing: ' + miss.slice(0, 4).join(', ') : '')), 'dim') : ''}
+    ${lst ? row('Listed on', esc(lst), 'dim') : ''}
+    ${row('13 extra checks (reasons in the window)', cpChip(c.name, true) + ' ' + esc(sgCpLine(c, d)) + (cpBest.length ? '<br><span class="dn">' + esc(cpBest.join('; ')) + '</span>' : ''), o ? (o.tone === 'dim' ? 'dim' : o.tone) : 'dim')}</div>`;
+}
+function sgSigInfo(c, dir){
+  const a = sgAlign(c, dir), R = CP.cache.get(c.name), o = R ? cpOverall(R, dir) : null;
+  return {inst:isNum(a.score) ? {score:a.score, st:a.state} : null, cp:o && isNum(o.score) ? {score:o.score, ok:o.ok, n:o.n, label:o.label} : null, adj:a.adj};
 }
 function dkOptRows(){
   return Object.keys(OPT.by || {}).map(u => OPT.by[u]).filter(o => o && o.an).sort((a, b) => b.tot - a.tot).slice(0, 6);
@@ -5435,6 +5484,7 @@ function dkPerpCard(c){
     <div class="dkh"><span>Why</span></div><ul class="dkl">${(why.length ? why : ['No single factor dominates right now.']).slice(0, 4).map(w => `<li>${esc(w)}</li>`).join('')}</ul>
     ${against.length ? `<div class="dkh"><span>Against it</span></div><ul class="dkl dkl2">${against.slice(0, 3).map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
     ${plan}
+    ${sgDeskBlock(c, dir)}
     ${dkInst(c)}
     ${cross.length ? `<div class="dkh"><span>Cross-market read</span></div><div class="dkchips">${cross.map(([k, v]) => `<span><em>${esc(k)}</em> · ${esc(v)}</span>`).join('')}</div>` : ''}
     ${cautions.length ? `<div class="dkcau"><b>Caution.</b> ${esc(cautions.join('; ').replace(/\.+$/,''))}.</div>` : ''}
@@ -5476,15 +5526,15 @@ function renderSdesk(){
   }
   const side = d.tab, perp = side !== 'opt', L = dkPerpRows('long'), S = dkPerpRows('short'), orow = dkOptRows(), prow = side === 'long' ? L : side === 'short' ? S : [];
   const mk = typeof MK !== 'undefined' ? MK.last : null;
-  const sig = [side, d.sel[side], state.mode, snapshot.size, OPT.at, OPT.busy, (state.acct || {}).bal, (state.acct || {}).risk, mk && mk.state, L.map(c => c.name + (c.m.verdictScore || 0)).join(','), S.map(c => c.name + (c.m.verdictScore || 0)).join(','), orow.map(o => o.u + o.an.score).join(',')].join('|');
+  const sig = [side, d.sel[side], state.mode, snapshot.size, OPT.at, OPT.busy, (state.acct || {}).bal, (state.acct || {}).risk, mk && mk.state, (CP.cache.get(d.sel[side]) || {at:0}).at, L.map(c => c.name + (c.m.verdictScore || 0)).join(','), S.map(c => c.name + (c.m.verdictScore || 0)).join(','), orow.map(o => o.u + o.an.score).join(',')].join('|');
   if (sig === dkSig) return; dkSig = sig;
   $('dkTabs').innerHTML = `<button type="button" class="btn scope dkt-long${side === 'long' ? ' on' : ''}" data-dktab="long">Long signals <small>${L.length}</small></button><button type="button" class="btn scope dkt-short${side === 'short' ? ' on' : ''}" data-dktab="short">Short signals <small>${S.length}</small></button><button type="button" class="btn scope${side === 'opt' ? ' on' : ''}" data-dktab="opt">Options</button><span class="dkbadge">Live data</span>`;
   let items = [], card = '', msg = '';
   const mkLine = mk ? `<div class="dkmk dkmk-${mk.tone}"><b>Market today: ${esc(mk.state)}.</b> ${esc(mk.sizeText)}${perp && ((side === 'long' && (mk.state === 'Weak' || mk.state === 'Bad')) || (side === 'short' && (mk.state === 'Strong' || mk.state === 'Good'))) ? ' This list goes against the market direction, so wait for extra confirmation.' : ''}</div>` : '';
   if (perp){
     if (state.mode !== 'perp') msg = `<div class="banner">The Signal desk reads the Perp scalp verdicts. You are in ${esc(MODES[state.mode] || state.mode)} mode. <button class="btn" type="button" id="dkMode">Switch to Perp scalp</button></div>`;
-    items = prow.map(c => ({id:c.name, sym:c.name, sub:'Perp' + (isNum(c.m.regime) && METRICS.regime.cat[c.m.regime] ? ' · ' + METRICS.regime.cat[c.m.regime] : '') + (isNum(c.m.whBias) && c.m.whN >= 2 ? ' · whales ' + (c.m.whBias >= 0 ? 'long ' : 'short ') + Math.abs(c.m.whBias).toFixed(0) + '%' : ''), verdict:dkVerdict(c.m), dir:side, score:Math.abs(c.m.verdictScore || 0), chg:c.m.pch && c.m.pch['24h']}));
-    const sel = items.find(i => i.id === d.sel[side]) || items[0]; if (sel){ d.sel[side] = sel.id; card = dkPerpCard(state.coins.get(sel.id)); }
+    items = prow.map(c => ({id:c.name, sym:c.name, sub:'Perp' + (isNum(c.m.regime) && METRICS.regime.cat[c.m.regime] ? ' · ' + METRICS.regime.cat[c.m.regime] : '') + (isNum(c.m.whBias) && c.m.whN >= 2 ? ' · whales ' + (c.m.whBias >= 0 ? 'long ' : 'short ') + Math.abs(c.m.whBias).toFixed(0) + '%' : '') + sgTag(c, side), verdict:dkVerdict(c.m), dir:side, score:Math.abs(c.m.verdictScore || 0), chg:c.m.pch && c.m.pch['24h']}));
+    const sel = items.find(i => i.id === d.sel[side]) || items[0]; if (sel){ d.sel[side] = sel.id; card = dkPerpCard(state.coins.get(sel.id)); try { cpAuto([sel.id].concat(items.slice(0, 3).map(i => i.id))); } catch(e){} }
     if (!items.length && !msg) msg = `<p class="hint">No coin has a ${side} verdict right now. That is normal when the market leans the other way or is quiet; the scanner only lists coins it would actually take. Check the Market verdict at the top of the page.</p>`;
   } else {
     items = orow.map(o => { const a = o.an, dir = a.bias === 1 ? 'long' : a.bias === 2 ? 'short' : 'flat'; return {id:o.u, sym:o.u, sub:a.bias === 3 ? 'Mixed positioning' : (a.bias === 1 ? 'Calls favoured' : 'Puts favoured'), verdict:a.bias === 3 ? 'WATCH' : (Math.abs(a.score) >= 5 ? 'READY' : 'GO'), dir, score:Math.min(100, Math.round(Math.abs(a.score) * 12)), chg:null}; });
@@ -5887,7 +5937,7 @@ function verdictWatch(r){
   AL.log.unshift({t:now, txt:'Market verdict: ' + prev.split('|')[0] + ' → ' + r.state + ' (' + r.grade + ' · ' + r.score + ')'}); AL.log.length = Math.min(AL.log.length, 30);
 }
 function fireAlert(c, dir, why, test){
-  const AC = state.alerts || {}, pl = planFor(c), txt = `${c.name} ${dir.toUpperCase()} · score ${c.m && isNum(c.m.verdictScore) ? c.m.verdictScore : '?'}${pl ? ` · entry ${fmtPx(pl.entry)} · stop ${fmtPx(pl.sl)} · TP1 ${fmtPx(pl.tp1)} · TP2 ${fmtPx(pl.tp2)}` : ''}${why ? ' · ' + why : ''}`;
+  const AC = state.alerts || {}, pl = planFor(c), txt = `${c.name} ${dir.toUpperCase()} · score ${c.m && isNum(c.m.verdictScore) ? c.m.verdictScore : '?'}${pl ? ` · entry ${fmtPx(pl.entry)} · stop ${fmtPx(pl.sl)} · TP1 ${fmtPx(pl.tp1)} · TP2 ${fmtPx(pl.tp2)}` : ''}${(() => { try { const si = sgSigInfo(c, dir); return (si.inst ? ' · institutions ' + si.inst.score + '/100 ' + (si.inst.st === 'with' ? 'agree' : si.inst.st === 'against' ? 'AGAINST' : 'unclear') : '') + (si.cp ? ' · 13 checks ' + si.cp.ok + '/' + si.cp.n + ' ' + si.cp.label.toLowerCase() : ''); } catch(e){ return ''; } })()}${why ? ' · ' + why : ''}`;
   if (AC.sound) beep();
   if (AC.notify || test) elppNotify('ELPP: ' + c.name + ' ' + dir.toUpperCase(), txt, 'elpp-' + c.name);
   if (AC.tgToken && AC.tgChat){ fetch('https://api.telegram.org/bot' + encodeURIComponent(AC.tgToken) + '/sendMessage', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id:AC.tgChat, text:'ELPP alert\n' + txt})}).catch(() => {}); }
@@ -7243,6 +7293,7 @@ function sigGate(c, dir, m, now, mk){
   const long = dir === 'long', bo = [m.bo && m.bo['1h'], m.bo && m.bo['15m']], BU = [1, 3, 5, 8], BE = [2, 4, 6, 9];
   const ic = [m.ic && m.ic['1h'], m.ic && m.ic['15m']], en = [m.icEntry && m.icEntry['1h'], m.icEntry && m.icEntry['15m']];
   if (isNum(m.walScore) && m.walN >= 5 && (long ? m.walScore <= -WAL_T : m.walScore >= WAL_T)) return 'the tracked wallets are against it';
+  { const al = sgAlign(c, dir); if (al.state === 'against' && al.score >= 50) return 'the institutional read is against it'; }
   { const cb = cpBias(c); if (cb && cb.n >= 8 && (long ? cb.long : cb.short) < 35) return 'the 13 extra institutional checks are against it'; }
   { const pr = m.pressure && m.pressure['1h']; if (isNum(pr) && (long ? pr <= -PR_T.note : pr >= PR_T.note)) return (long ? 'selling' : 'buying') + ' pressure is against it'; }
   if (mk){
@@ -7283,11 +7334,12 @@ function sigTick(){
       if (SIG.list.some(x => x.name === c.name && (x.status === 'open' || x.status === 'tp1'))) continue;
       const last = [...SIG.list].reverse().find(x => x.name === c.name); if (last && now - last.t < 2 * 36e5) continue;
       const pl = planFor(c); if (!pl || pl.dir !== dir) continue;
+      if (strict){ const R0 = CP.cache.get(c.name), fresh = R0 && now - R0.at < 600000; if (!fresh){ CP.tried = CP.tried || {}; if (!CP.jobs.has(c.name) && !(CP.tried[c.name] && now - CP.tried[c.name] < 120000)){ CP.tried[c.name] = now; cpLoad(c.name).then(() => setTimeout(sigTick, 300)).catch(() => {}); } if (CP.jobs.has(c.name) || (CP.tried[c.name] && now - CP.tried[c.name] < 25000)) continue; } }
       if (strict){ const why = sigGate(c, dir, m, now, mk); if (why){ SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; } src = 'Confirmed: ' + src; }
-      { const sp = swpPick(m), want = dir === 'long' ? 1 : -1, tg = []; if (sp && sp[1].dir === want) tg.push('sweep+reclaim ' + sp[0] + (sp[1].retest ? ' + 2nd test held' : ', 2nd test pending')); if (isNum(m.walScore) && m.walN >= 3) tg.push('wallets ' + (m.walScore > 0 ? '+' : '') + m.walScore); const pr1 = m.pressure && m.pressure['1h']; if (isNum(pr1)) tg.push('pressure ' + (pr1 > 0 ? '+' : '') + Math.round(pr1) + '%'); if (tg.length) src += ' [' + tg.join(' · ') + ']'; }
-      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now});
+      { const sp = swpPick(m), want = dir === 'long' ? 1 : -1, tg = []; if (sp && sp[1].dir === want) tg.push('sweep+reclaim ' + sp[0] + (sp[1].retest ? ' + 2nd test held' : ', 2nd test pending')); if (isNum(m.walScore) && m.walN >= 3) tg.push('wallets ' + (m.walScore > 0 ? '+' : '') + m.walScore); const pr1 = m.pressure && m.pressure['1h']; if (isNum(pr1)) tg.push('pressure ' + (pr1 > 0 ? '+' : '') + Math.round(pr1) + '%'); { const si = sgSigInfo(c, dir); if (si.inst) tg.push('institutions ' + si.inst.score + (si.inst.st === 'with' ? ' agree' : si.inst.st === 'against' ? ' against' : '')); if (si.cp) tg.push('13 checks ' + si.cp.ok + '/' + si.cp.n); } if (tg.length) src += ' [' + tg.join(' · ') + ']'; }
+      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now, inst:sgSigInfo(c, dir).inst, cp:sgSigInfo(c, dir).cp, iadj:sgAlign(c, dir).adj || 0});
     }
-    cands.sort((x, y) => Math.abs(y.score || 0) - Math.abs(x.score || 0));
+    cands.sort((x, y) => (Math.abs(y.score || 0) + (y.iadj || 0)) - (Math.abs(x.score || 0) + (x.iadj || 0)));
     const used = {long:0, short:0}; if (strict) for (const x of SIG.list) if (now - x.t < 36e5 && /^Confirmed/.test(x.src || '')) used[x.dir]++;
     for (const x of cands){ if (strict && used[x.dir] >= 3){ SKIPS.n++; SKIPS.why['capped at 3 per side per hour'] = (SKIPS.why['capped at 3 per side per hour'] || 0) + 1; continue; } used[x.dir]++; SIG.list.push(x); ch = true; }
   }
@@ -7301,7 +7353,7 @@ function renderSignals(){
     const AC = state.alerts || {}, MC = state.mac || {}, PC = state.pf || {};
     el.innerHTML = `<div class="nsec"><h3>Signal log: did the signals work?</h3>
       <p class="hint">With strict filters on, a trade is only written when the market allows it and the set-up is confirmed (see the box below). Otherwise, every time the scanner shows a strong verdict (or an A-grade set-up with a lean) it writes the entry, stop and two targets here, then watches the 5-minute candles to see what happened first. Stop is checked before targets inside the same candle (the cautious reading). Win rate = targets hit / (targets hit + stopped out). R is profit in units of the stop distance. A signal that is still open after 24h is closed at the current price. The log lives in this browser; the page must be open for new signals to be recorded.</p>
-      <div class="row"><label class="hint"><input type="checkbox" id="sgStrict"> Strict filters (recommended): only log a trade when the market verdict allows it, a sweep breakout and an institutional candle confirm it, price has not already run, and at most 3 per side per hour</label></div><div id="sgSkip" class="hint"></div><div id="sgBatch" class="hint"></div><div id="sgStats"></div><div class="row"><button class="btn" id="sgCsv" type="button">Download CSV</button><button class="btn" id="sgClear" type="button">Clear log</button></div><div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th>Opened</th><th style="text-align:left">Coin</th><th>Side</th><th style="text-align:left">Source</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th style="text-align:left">Result</th><th>R</th></tr></thead><tbody id="sgBody"></tbody></table></div></div>
+      <div class="row"><label class="hint"><input type="checkbox" id="sgStrict"> Strict filters (recommended): only log a trade when the market verdict allows it, a sweep breakout and an institutional candle confirm it, price has not already run, the institutional read and the 13 extra checks are not against it, and at most 3 per side per hour</label></div><div id="sgSkip" class="hint"></div><div id="sgBatch" class="hint"></div><div id="sgStats"></div><div class="row"><button class="btn" id="sgCsv" type="button">Download CSV</button><button class="btn" id="sgClear" type="button">Clear log</button></div><div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th>Opened</th><th style="text-align:left">Coin</th><th>Side</th><th style="text-align:left">Source</th><th title="Institutional score at the moment the signal was written (agree = institutions on the same side)">Institutions</th><th title="The 13 extra institutional checks. Click for the reasons.">13 checks</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th style="text-align:left">Result</th><th>R</th></tr></thead><tbody id="sgBody"></tbody></table></div></div>
     <div class="nsec"><h3>Alerts</h3>
       <p class="hint">Fires when all of these are true: the verdict is Strong, the 1h sweep breakout is confirmed, an institutional candle backs it, and the score is at least the number below. Each coin alerts at most once every 2 hours. The page must stay open.</p>
       <div class="row"><label class="hint"><input type="checkbox" id="alOn"> Alerts on</label><label class="hint"><input type="checkbox" id="alSound"> Sound</label><label class="hint"><input type="checkbox" id="alNotify"> Notification</label><button class="btn sm" id="alEnable" type="button">Allow notifications</button><label class="hint">Minimum score <input type="text" id="alMin" style="width:56px"></label></div>
@@ -7340,7 +7392,7 @@ function renderSignals(){
       else if (id === 'pfAddr'){ state.pf = {addr:e.target.value.trim()}; saveState(); } else if (id === 'mySize'){ state.mySize = e.target.value.trim(); saveState(); requestRender(); } else if (id === 'hlpAddrs'){ state.hlpAddrs = e.target.value; saveState(); loadHlp(); } else if (id === 'cmcKey'){ state.cmc = {key:e.target.value.trim()}; saveState(); } else if (id === 'czKey'){ state.cz = {key:e.target.value.trim()}; saveState(); CZ.mk = null; CZ.cycleAt = 0; CZ.until = 0; } });
     el.addEventListener('click', e => {
       if (e.target.closest('#sgClear')){ if (confirm('Clear the whole signal log?')){ SIG.list = []; sigSave(); renderSignals(); } return; }
-      if (e.target.closest('#sgCsv')){ const rows = [['opened','coin','side','source','entry','stop','tp1','tp2','status','R']].concat(SIG.list.map(x => [new Date(x.t).toISOString(), x.name, x.dir, x.src, x.entry, x.sl, x.tp1, x.tp2, x.status, x.r === undefined ? '' : x.r.toFixed(2)])); const b = new Blob([rows.map(r => r.join(',')).join('\n')], {type:'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'elpp_signals.csv'; a.click(); return; }
+      if (e.target.closest('#sgCsv')){ const rows = [['opened','coin','side','source','inst_score','inst_state','checks13_score','entry','stop','tp1','tp2','status','R']].concat(SIG.list.map(x => [new Date(x.t).toISOString(), x.name, x.dir, '"' + String(x.src).replace(/"/g, '') + '"', x.inst ? x.inst.score : '', x.inst ? x.inst.st : '', x.cp ? x.cp.score : '', x.entry, x.sl, x.tp1, x.tp2, x.status, x.r === undefined ? '' : x.r.toFixed(2)])); const b = new Blob([rows.map(r => r.join(',')).join('\n')], {type:'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'elpp_signals.csv'; a.click(); return; }
       if (e.target.closest('#alEnable')){ notifyAsk().then(r => toast(r === 'unsupported' ? 'This browser has no notifications' : 'Notifications: ' + r)); return; }
       if (e.target.closest('#alTest')){ const c = state.coins.get('BTC') || [...state.coins.values()][0]; if (c) fireAlert(c, 'long', 'this is a test', true); else toast('No coin data yet'); return; }
       if (e.target.closest('#macReload')){ state.mac = Object.assign({}, state.mac, {url:$('macUrl').value.trim(), manual:$('macManual').value}); saveState(); loadMacro(); return; }
@@ -7359,7 +7411,7 @@ function renderSignals(){
     const rs = [...B.values()].map(a => a.reduce((p, q) => p + q, 0) / a.length), w = rs.filter(r => r > 0).length;
     $('sgBatch').innerHTML = rs.length ? `Signals logged within 30 minutes on the same side are one market bet, not many. Finished batches: <b>${rs.length}</b>, winners <b>${w}</b> (${(w / rs.length * 100).toFixed(0)}%), average <b>${(rs.reduce((p, q) => p + q, 0) / rs.length).toFixed(2)}R</b> per batch.` : ''; }
   $('sgStats').innerHTML = SIG.list.length ? `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Group</th><th>Signals</th><th>Open</th><th>TP1 only</th><th>TP2</th><th>Stopped</th><th>Expired</th><th>Win rate</th><th>Avg R</th><th>Total R</th></tr></thead><tbody>${group('All signals', SIG.list)}${by('src').map(([k, l]) => group('Source: ' + k, l)).join('')}${by('preset').map(([k, l]) => group('Rule set: ' + k, l)).join('')}${group('Long', SIG.list.filter(x => x.dir === 'long'))}${group('Short', SIG.list.filter(x => x.dir === 'short'))}</tbody></table></div>` : '<p class="hint">No signals recorded yet. Keep the page open in Perp scalp mode; strong signals appear here automatically.</p>';
-  $('sgBody').innerHTML = SIG.list.slice(-100).reverse().map(x => `<tr><td>${new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</td><td style="text-align:left"><a href="#" data-chart="${esc(x.name)}" style="color:var(--accent)">${esc(x.name)}</a></td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td style="text-align:left">${esc(x.src)}</td><td>${esc(P(x.entry))}</td><td>${esc(P(x.sl))}</td><td>${esc(P(x.tp1))}</td><td>${esc(P(x.tp2))}</td><td style="text-align:left" class="${x.status === 'stop' ? 'dn' : x.status === 'tp2' || x.status === 'tp1done' ? 'up' : ''}">${SIG_LAB[x.status] || x.status}</td><td>${x.r === undefined ? '—' : sg(x.r, 2)}</td></tr>`).join('') || '<tr><td colspan="10" class="hint">Nothing yet.</td></tr>';
+  $('sgBody').innerHTML = SIG.list.slice(-100).reverse().map(x => `<tr><td>${new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</td><td style="text-align:left"><a href="#" data-chart="${esc(x.name)}" style="color:var(--accent)">${esc(x.name)}</a></td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td style="text-align:left">${esc(x.src)}</td><td class="${x.inst ? (x.inst.st === 'with' ? 'up' : x.inst.st === 'against' ? 'dn' : 'dim') : 'dim'}">${x.inst ? esc(x.inst.score + '/100 ' + (x.inst.st === 'with' ? 'agree' : x.inst.st === 'against' ? 'against' : 'unclear')) : '—'}</td><td>${cpChip(x.name, true)}</td><td>${esc(P(x.entry))}</td><td>${esc(P(x.sl))}</td><td>${esc(P(x.tp1))}</td><td>${esc(P(x.tp2))}</td><td style="text-align:left" class="${x.status === 'stop' ? 'dn' : x.status === 'tp2' || x.status === 'tp1done' ? 'up' : ''}">${SIG_LAB[x.status] || x.status}</td><td>${x.r === undefined ? '—' : sg(x.r, 2)}</td></tr>`).join('') || '<tr><td colspan="12" class="hint">Nothing yet.</td></tr>';
   $('alLog').innerHTML = AL.log.length ? '<b>Recent alerts</b><br>' + AL.log.map(a => esc(new Date(a.t).toLocaleTimeString() + ' · ' + a.txt)).join('<br>') : '';
   const n = macNext();
   $('macStat').innerHTML = (MAC.err ? `<span class="warn">${esc(MAC.err)}</span> ` : '') + (n ? `Next: <b>${esc(n.ev.name)}</b> ${n.min >= 0 ? 'in ' + Math.round(n.min) + ' min' : Math.round(-n.min) + ' min ago'} (${n.min >= -15 && n.min <= 30 ? '<span class="dn">blackout</span>' : n.min <= 60 ? '<span class="warn">warning</span>' : 'clear'}).` : 'No upcoming events loaded.');
