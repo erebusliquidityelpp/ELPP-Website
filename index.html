@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.8</title>
+<title>ELPP CRYPTO SCANNER PRO V4.9</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0A0E14">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -718,7 +722,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.8</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.9</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -735,35 +739,40 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
   <nav class="side" id="side" aria-label="Sections">
     <button class="nv back" id="navBack" type="button" title="Back to the previous page" disabled>← Back</button>
     <button class="nv" type="button" data-view="overview" style="font-weight:700">Overview: market summary</button>
-    <details class="ng" data-g="scanner" open><summary>Scanner</summary>
+    <details class="ng" data-g="scanner" open><summary>Scanners</summary>
     <button class="nv" type="button" data-mode="perp">Perp scalp</button>
     <button class="nv" type="button" data-mode="spot">Spot</button>
     <button class="nv" type="button" data-mode="swing">Swing</button>
     <button class="nv" type="button" data-mode="position">Positional</button>
     <button class="nv" type="button" data-mode="hype">Hype &amp; News</button>
+    <button class="nv" type="button" data-view="screener">Screener (Hyperliquid + Binance)</button>
+    <button class="nv" type="button" data-view="inst">Perpetual Institutional Radar</button>
+    <button class="nv" type="button" data-view="instspot">Spot Institutional Radar</button>
     </details>
-  <details class="ng" data-g="intelligence" open><summary>Intelligence</summary>
+  <details class="ng" data-g="trade" open><summary>Trade desk</summary>
+    <button class="nv" type="button" data-view="sdesk">Signal desk</button>
+    <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
+    <button class="nv" type="button" data-view="watch">★ Watchlist &amp; alerts</button>
+    </details>
+  <details class="ng" data-g="market" open><summary>Market data</summary>
+    <button class="nv" type="button" data-view="map">Market map (heatmap)</button>
+    <button class="nv" type="button" data-view="movers">Movers: toppers &amp; losers</button>
+    <button class="nv" type="button" data-view="flows">Money flow</button>
+    <button class="nv" type="button" data-view="orderflow">Order flow &amp; your feeds</button>
+    <button class="nv" type="button" data-view="options">Options (Deribit)</button>
+    <button class="nv" type="button" data-view="whales">Whale positions</button>
+    <button class="nv" type="button" data-view="memes">Meme holders</button>
+    <button class="nv" type="button" data-view="drops">Airdrops &amp; unlocks</button>
+    </details>
+  <details class="ng" data-g="research" open><summary>Research</summary>
     <button class="nv" type="button" data-view="lookup">Coin lookup: type a symbol</button>
     <button class="nv" type="button" data-view="news">News &amp; big names</button>
-    <button class="nv" type="button" data-view="sdesk">Signal desk</button>
-    <button class="nv" type="button" data-view="map">Market map (heatmap)</button>
-    <button class="nv" type="button" data-view="memes">Meme holders</button>
-    <button class="nv" type="button" data-view="movers">Movers: toppers &amp; losers</button>
-    <button class="nv" type="button" data-view="options">Options (Deribit)</button>
-    <button class="nv" type="button" data-view="orderflow">Order flow &amp; your feeds</button>
-    <button class="nv" type="button" data-view="screener">Screener (Hyperliquid + Binance)</button>
-    <button class="nv" type="button" data-view="inst">Perpetual Institutional Radar (accumulation / distribution)</button>
-    <button class="nv" type="button" data-view="instspot">Spot Institutional Radar (accumulation / distribution)</button>
-    <button class="nv" type="button" data-view="watch">★ Watchlist &amp; alerts</button>
-    <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
-    <button class="nv" type="button" data-view="whales">Whale positions</button>
-    <button class="nv" type="button" data-view="flows">Money flow</button>
-    <button class="nv" type="button" data-view="drops">Airdrops &amp; unlocks</button>
     </details>
   <details class="ng" data-g="tools" open><summary>Tools</summary>
     <button class="nv" type="button" data-nav="filters">Filters panel</button>
     <button class="nv" type="button" data-nav="cols">Columns</button>
     <button class="nv" type="button" data-nav="guide">Threshold guide</button>
+    <button class="nv" type="button" id="btnInstall" hidden>⬇ Install as app</button>
     </details>
   </nav>
   <aside class="panel" id="panel" aria-label="Filters">
@@ -8115,6 +8124,15 @@ function renderOverview(){
   }
   const html = ovHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
+
+/* ===== V4.9: install as an app (Chrome / Edge on Windows, Android) ===== */
+(function(){
+  let dp = null; const bt = () => document.getElementById('btnInstall');
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; const b = bt(); if (b) b.hidden = false; });
+  window.addEventListener('appinstalled', () => { dp = null; const b = bt(); if (b) b.hidden = true; });
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#btnInstall'); if (!b || !dp) return; dp.prompt(); dp.userChoice.finally(() => { dp = null; b.hidden = true; }); });
+  if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+})();
 function renderFlowsView(){
   const el = $('viewFlows'), st = X.stable;
   if (!st){ el.innerHTML = `<div class="nsec empty">${X.stableErr ? 'Stablecoin data could not load (' + esc(X.stableErr) + ').' : 'Loading stablecoin data…'}</div>`; return; }
