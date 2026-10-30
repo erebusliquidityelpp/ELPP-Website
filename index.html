@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.10</title>
-<link rel="manifest" href="manifest.webmanifest">
+<title>ELPP CRYPTO SCANNER PRO V4.11</title>
+<link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="eagle-favicon.png">
+<link rel="apple-touch-icon" href="eagle-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -725,7 +725,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.10</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.11</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5946,7 +5946,7 @@ function elppNotify(title, body, tag){
   const plain = () => { try { new Notification(title, {body:body, tag:tag}); } catch(e){} };
   try {
     if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
-      navigator.serviceWorker.getRegistration().then(reg => { if (reg && reg.showNotification) reg.showNotification(title, {body:body, tag:tag, icon:'icon-192.png', badge:'icon-192.png', vibrate:[120, 60, 120]}); else plain(); }).catch(plain);
+      navigator.serviceWorker.getRegistration().then(reg => { if (reg && reg.showNotification) reg.showNotification(title, {body:body, tag:tag, icon:'eagle-192.png', badge:'eagle-192.png', vibrate:[120, 60, 120]}); else plain(); }).catch(plain);
     } else plain();
     return true;
   } catch(e){ return false; }
