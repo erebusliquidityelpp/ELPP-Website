@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.7</title>
+<title>ELPP CRYPTO SCANNER PRO V4.8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -692,12 +692,33 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 .cpv{border:1px solid var(--line2);border-left-width:5px;border-radius:12px;padding:12px 14px;margin-bottom:8px}.cpv-up{border-color:var(--up)}.cpv-dn{border-color:var(--down)}.cpv-warn{border-color:var(--warn)}.cpv1{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.cpv1 b{font-size:19px}.cpv1 span{color:var(--muted);font-size:12px}.cpv p{margin:6px 0;line-height:1.5}.cpbar{height:8px;border-radius:6px;background:var(--line2);overflow:hidden;margin:8px 0}.cpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--down),var(--warn),var(--up))}.cpcnt{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:600}
 .cpc{border:1px solid var(--line2);border-left-width:4px;border-radius:10px;margin:6px 0;background:var(--surface)}.cpc.cp-ok{border-left-color:var(--up)}.cpc.cp-warn{border-left-color:var(--warn)}.cpc.cp-bad{border-left-color:var(--down)}.cpc.cp-na{border-left-color:var(--muted);opacity:.8}.cpc summary{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer;list-style:none}.cpc summary::-webkit-details-marker{display:none}.cpi{font-style:normal;font-weight:700;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:12px;color:#fff;background:var(--muted)}.cp-ok .cpi{background:var(--up)}.cp-warn .cpi{background:var(--warn)}.cp-bad .cpi{background:var(--down)}.cpn1{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.cpn1 small{color:var(--muted);font-size:12px;line-height:1.45;white-space:normal}.cpval{font-family:var(--mono,monospace);font-size:11px;color:var(--muted);text-align:right;max-width:32%;flex:none}.cpbody{padding:2px 14px 12px 44px;font-size:12.5px;line-height:1.6}.cpbody h5{margin:10px 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent)}.cpbody p{margin:0}.cpbody ul{margin:0;padding-left:16px}.cpc1{white-space:nowrap}
 @media (max-width:640px){.cpval{display:none}.cpbody{padding-left:14px}.cpv1 b{font-size:16px}}
+
+/* ===== V4.8 Overview ===== */
+#viewOverview{display:flex;flex-direction:column;gap:12px;min-width:0;max-width:100%}
+.ovm{border:1px solid var(--line2);border-left-width:5px;border-radius:12px;padding:12px 14px;background:var(--surface)}.ovm.ov-up{border-color:var(--up)}.ovm.ov-dn{border-color:var(--down)}.ovm.ov-warn{border-color:var(--warn)}.ovm.ov-na{border-color:var(--line2)}
+.ovm h2{font-size:19px;margin:2px 0 6px;letter-spacing:.01em}.ovm.ov-up h2{color:var(--up)}.ovm.ov-dn h2{color:var(--down)}.ovm.ov-warn h2{color:var(--warn)}
+.ovm p{margin:6px 0 0;font-size:13px;line-height:1.5}
+.ovbar{position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,var(--down),var(--warn),var(--up));margin:8px 0 2px}.ovbar i{position:absolute;top:-4px;width:4px;height:16px;margin-left:-2px;border-radius:2px;background:var(--fg);box-shadow:0 0 0 2px var(--surface)}
+.ovscale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ovwhy{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px}.ovwhy .up{color:var(--up)}.ovwhy .dn{color:var(--down)}
+.ovstory{margin:4px 0 0;padding-left:18px;font-size:13px;line-height:1.55}.ovstory li{margin:4px 0}.ovstory .up{color:var(--up)}.ovstory .dn{color:var(--down)}
+.ovk{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.ovk>div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2);min-width:0}
+.ovk small{display:block;color:var(--muted);font-size:11px}.ovk b{display:block;font-size:17px;font-family:var(--mono);margin:2px 0}.ovk em{font-style:normal;font-size:11.5px}.ovk .up{color:var(--up)}.ovk .dn{color:var(--down)}.ovk .warn{color:var(--warn)}.ovk .dim{color:var(--muted)}
+.ovv{display:inline-block;padding:1px 9px;border-radius:999px;border:1px solid currentColor;font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap}.ovv.ov-up{color:var(--up)}.ovv.ov-dn{color:var(--down)}.ovv.ov-warn{color:var(--warn)}.ovv.ov-na{color:var(--muted)}
+.ovduo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:6px}.ovduo>div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2)}.ovduo small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.ovduo em{display:block;font-style:normal;font-size:11.5px;color:var(--muted);margin-top:4px}
+.ovwrap{overflow-x:auto}.ovt{width:100%;min-width:0;border-collapse:collapse}
+.ovt th,.ovt td{text-align:left!important;font-family:var(--sans)!important;white-space:normal!important;vertical-align:top;padding:9px 10px;line-height:1.45;font-variant-numeric:normal}
+.ovt th{position:static;cursor:default}.ovt td small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.ovt td:nth-child(1){width:20%}.ovt td:nth-child(2){width:27%}.ovt td:nth-child(3){width:26%}.ovt td:nth-child(4){width:27%}.ovt td .btn{margin-top:6px}
+.ovd{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:6px 12px}.ovd summary{cursor:pointer;font-weight:600;font-size:13px;padding:4px 0}
+.ovgl{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin:6px 0}.ovgl>div{font-size:12.5px;line-height:1.45}.ovgl b{display:block}.ovgl span{color:var(--muted)}
+.ovsrc{margin:6px 0}
+@media (max-width:760px){.ovt thead{display:none}.ovt,.ovt tbody{display:block;width:100%}.ovt tr{display:block;border:1px solid var(--line);border-radius:8px;margin:0 0 8px;padding:6px 10px;background:var(--surface2)}.ovt td{display:block;width:auto!important;border:0;padding:4px 0}.ovt td::before{content:attr(data-l);display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px}.ovm h2{font-size:17px}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.7</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.8</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -713,6 +734,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <main class="wrap" id="wrap">
   <nav class="side" id="side" aria-label="Sections">
     <button class="nv back" id="navBack" type="button" title="Back to the previous page" disabled>← Back</button>
+    <button class="nv" type="button" data-view="overview" style="font-weight:700">Overview: market summary</button>
     <details class="ng" data-g="scanner" open><summary>Scanner</summary>
     <button class="nv" type="button" data-mode="perp">Perp scalp</button>
     <button class="nv" type="button" data-mode="spot">Spot</button>
@@ -917,6 +939,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewScreener" class="vcol" hidden></div>
     <div id="viewInst" class="vcol" hidden></div>
     <div id="viewInstSpot" class="vcol" hidden></div>
+    <div id="viewOverview" class="vcol" hidden></div>
   </section>
 </main>
 <div id="panelBd" aria-hidden="true"></div>
@@ -1790,7 +1813,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -4678,7 +4701,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -7453,7 +7476,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -7761,14 +7784,14 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['signals','Signals'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['signals','Signals'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   $('scopes').hidden = state.view !== 'table';
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -7787,6 +7810,310 @@ function renderNewsView(){
   h += `<div class="nsec"><h3>Big names and what the news says about them</h3><div class="mvgrid">` + MOVERS.map(mv => { const hits = X.moverHits.get(mv.name) || []; return `<div class="mv"><b>${esc(mv.name)}${mv.handle ? ` · <a href="https://x.com/${esc(mv.handle)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">@${esc(mv.handle)}</a>` : ''}</b>` + (hits.length ? hits.map(it => `<div><a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--fg)">${esc(it.title.slice(0, 110))}</a> <small class="hint">${esc(ago(it.t))}</small></div>`).join('') : '<span class="hint">Nothing in the latest headlines.</span>') + '</div>'; }).join('') + `</div><p class="hint">Live posts from X need a paid X API, so they are not read here. This box finds these names inside the news headlines and links to their profile so you can open the account yourself.</p></div>`;
   h += `<div class="nsec"><h3>Latest headlines (${items.length})</h3>` + (items.length ? items.slice(0, 60).map(it => `<div class="nitem"><span><a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(it.title)}</a><br>${it.coins.map(c => `<span class="tagp">${esc(c)}</span>`).join('')}${tagPills(it)}</span><small>${esc(it.source)}<br>${esc(ago(it.t))}</small></div>`).join('') : '<p class="hint">No headlines of this type right now.</p>') + '</div>';
   if (el._h !== h){ el.innerHTML = h; el._h = h; }
+}
+/* ===== V4.8: Overview. The whole crypto market in plain words, with one table for what institutions are doing and one for what retail is doing ===== */
+const OV = {ex:null, exAt:0, busy:false, cache:null, cacheAt:0, open:new Set()};
+const ovT = v => !isNum(v) ? '—' : v >= 1e12 ? '$' + (v / 1e12).toFixed(2) + 'T' : fmtUsd(v);
+const ovSg = (v, d) => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(d === undefined ? 1 : d) + '%' : '—';
+const ovNum = v => (v === null || v === undefined || v === '') ? null : (isFinite(+v) ? +v : null);
+async function ovLoadExtra(force){
+  if (OV.busy) return; if (!force && OV.exAt && Date.now() - OV.exAt < 300000) return;
+  OV.busy = true; const ex = {top:{}, all:{}, cb:{}, errs:[]};
+  try {
+    try { if (!FX.fng) loadFng(); } catch(e){}
+    try { if (!X.stable && !X.stableAt) loadStable(); } catch(e){}
+    try { if (!OPT.at && !OPT.busy) loadOptions(); } catch(e){}
+    const B = 'https://fapi.binance.com/futures/data/';
+    for (const s of ['BTC', 'ETH', 'SOL']){
+      for (const kind of ['top', 'all']){
+        try {
+          const j = await vget('binance', B + (kind === 'top' ? 'topLongShortPositionRatio' : 'globalLongShortAccountRatio') + '?symbol=' + s + 'USDT&period=1h&limit=5');
+          if (!j || !j.length) throw new Error('empty answer');
+          const r = +j[j.length - 1].longShortRatio, r0 = +j[0].longShortRatio;
+          if (isFinite(r)) ex[kind][s] = {l:r / (1 + r) * 100, l0:isFinite(r0) ? r0 / (1 + r0) * 100 : null};
+        } catch(e){ ex.errs.push('Binance ' + kind + ' ' + s + ': ' + errTxt(e)); }
+      }
+    }
+    for (const s of ['BTC', 'ETH']){
+      try {
+        const a = await evget('coinbase', 'https://api.exchange.coinbase.com/products/' + s + '-USD/ticker'), b = await vget('binance', 'https://api.binance.com/api/v3/ticker/price?symbol=' + s + 'USDT');
+        const cb = +a.price, sp = +b.price; if (cb > 0 && sp > 0) ex.cb[s] = (cb / sp - 1) * 100;
+      } catch(e){ ex.errs.push('Coinbase ' + s + ': ' + errTxt(e)); }
+    }
+  } finally { OV.ex = ex; OV.exAt = Date.now(); OV.busy = false; OV.cacheAt = 0; if (state.view === 'overview'){ try { renderOverview(); } catch(e){} } }
+}
+function ovCalc(){
+  if (OV.cache && Date.now() - OV.cacheAt < 15000) return OV.cache;
+  const o = {}, now = Date.now();
+  const all = [...state.coins.values()].filter(c => c.loaded && c.m && c.m.chg);
+  o.n = all.length;
+  const WA = (f, wf) => { let a = 0, w = 0; for (const c of all){ const v = f(c), x = wf(c); if (isNum(v) && isNum(x) && x > 0){ a += v * x; w += x; } } return w ? a / w : null; };
+  const byVol = c => c.m.vol24;
+  const br = tf => { let up = 0, n = 0; for (const c of all){ const v = c.m.chg[tf]; if (isNum(v)){ n++; if (v > 0) up++; } } return n >= 5 ? up / n * 100 : null; };
+  o.b1 = br('1h'); o.b4 = br('4h'); o.bd = br('1d');
+  o.f4 = WA(c => c.m.flowPct && c.m.flowPct['4h'], byVol);
+  o.oi1 = WA(c => c.m.oiChg && c.m.oiChg['1h'], c => c.m.oiUsd);
+  o.px1 = WA(c => c.m.chg['1h'], byVol);
+  o.fund = WA(c => c.m.funding, byVol);
+  let cl = 0, cs = 0, nf = 0; for (const c of all){ if (isNum(c.m.funding)){ nf++; if (c.m.funding > CROWD_LONG) cl++; else if (c.m.funding < CROWD_SHORT) cs++; } }
+  o.cl = cl; o.cs = cs; o.nf = nf;
+  const bc = state.coins.get('BTC'); o.btcTrend = bc && bc.m && bc.m.trend ? bc.m.trend['4h'] : null;
+  /* CoinGecko: value of the whole market, breadth, big movers, memes */
+  const rows = (X.cgRows || []).filter(r => r && +r.market_cap > 0);
+  const g24 = r => { const v = ovNum(r.price_change_percentage_24h_in_currency); return v !== null ? v : ovNum(r.price_change_percentage_24h); };
+  const g7 = r => ovNum(r.price_change_percentage_7d_in_currency);
+  o.cg = rows.length >= 20;
+  if (o.cg){
+    let cap = 0, prev = 0, up = 0, n = 0, pump = 0, dump = 0, up7 = 0, n7 = 0, mS = 0, mN = 0; const mv = [], alts = [];
+    for (const r of rows){
+      const mc = +r.market_cap, c24 = g24(r), sym = String(r.symbol || '').toUpperCase(); cap += mc; prev += c24 === null ? mc : mc / (1 + c24 / 100);
+      if (SKIP_SYM.has(sym)) continue;
+      if (c24 !== null){ n++; if (c24 > 0) up++; if (c24 >= 10) pump++; if (c24 <= -10) dump++; if (sym !== 'BTC' && alts.length < 100) alts.push(c24); if (+r.total_volume >= 2e7) mv.push({s:sym, c:c24, v:+r.total_volume}); if (SECTORS[sym] === 'Meme'){ mS += c24; mN++; } }
+      const c7 = g7(r); if (c7 !== null){ n7++; if (c7 > 0) up7++; }
+    }
+    o.cap = cap; o.capChg = prev > 0 ? (cap / prev - 1) * 100 : null; o.cgN = n; o.cgUp = up; o.pump = pump; o.dump = dump; o.cgBreadth = n ? up / n * 100 : null; o.up7 = n7 ? up7 / n7 * 100 : null;
+    o.memeAvg = mN ? mS / mN : null; o.memeN = mN;
+    alts.sort((a, b) => a - b); o.altMed = alts.length >= 10 ? alts[Math.floor(alts.length / 2)] : null;
+    mv.sort((a, b) => b.c - a.c); o.gain = mv.slice(0, 4); o.lose = mv.slice(-4).reverse();
+    const row = s => rows.find(r => String(r.symbol || '').toUpperCase() === s);
+    const pr = r => r ? {px:+r.current_price, c24:g24(r), c7:g7(r), cap:+r.market_cap} : null;
+    o.btc = pr(row('BTC')); o.eth = pr(row('ETH'));
+    o.domBtc = o.btc && cap > 0 ? o.btc.cap / cap * 100 : null; o.domEth = o.eth && cap > 0 ? o.eth.cap / cap * 100 : null; o.domSrc = 'the top ' + rows.length + ' coins on CoinGecko';
+    const g = CMC.glob; if (g && isFinite(g.btc)){ o.domBtc = g.btc; o.domEth = isFinite(g.eth) ? g.eth : o.domEth; o.domChg = isFinite(g.btcChg) ? g.btcChg : null; o.domSrc = 'CoinMarketCap'; }
+  }
+  o.trend = []; for (const [k, rank] of X.trend) { if (o.trend.length >= 7) break; const r = X.cg.get(k); o.trend.push({s:k, c:r ? g24(r) : null}); }
+  o.fng = FX.fng;
+  const st = X.stable; if (st && st.usdt && st.usdc){ const n0 = st.usdt.now + st.usdc.now, d7 = st.usdt.d7 + st.usdc.d7, d1 = st.usdt.d1 + st.usdc.d1; o.st = {now:n0, p7:d7 > 0 ? (n0 / d7 - 1) * 100 : null, p1:d1 > 0 ? (n0 / d1 - 1) * 100 : null, d7:n0 - d7}; }
+  const ob = OPT.by && OPT.by.BTC; o.opt = ob ? {pcr:ob.pcr, skew:ob.skew, bias:ob.an ? ob.an.bias : 3, score:ob.an ? ob.an.score : 0, dvol:OPT.dvol && OPT.dvol.BTC} : null;
+  /* whales and small wallets on Hyperliquid */
+  if (W.agg && W.agg.size){
+    let iL = 0, iS = 0, iN = 0, rL = 0, rS = 0, rN = 0, flow = 0, nfl = 0; const per = [];
+    for (const a of W.agg.values()){
+      iL += a.iL; iS += a.iS; iN += a.iN; per.push(a);
+      for (const t of ['Crab', 'Fish', 'Shrimp']){ const x = a.tiers[t]; if (x){ rL += x.L; rS += x.S; rN += x.n; } }
+      if (isNum(a.flow)){ flow += a.flow; nfl++; }
+    }
+    const top = (f) => per.map(a => ({c:a.coin, net:f(a)})).filter(x => x.net > 0).sort((a, b) => b.net - a.net).slice(0, 3);
+    o.wh = {iL, iS, iN, rL, rS, rN, flow:nfl ? flow : null, wallets:W.wallets.size, topL:top(a => a.iL - a.iS), topS:top(a => a.iS - a.iL)};
+  }
+  /* our own institutional radar across the biggest coins */
+  const big = all.filter(c => c.ctx).sort((a, b) => (b.m.vol24 || 0) - (a.m.vol24 || 0)).slice(0, 40);
+  let acc = 0, dis = 0, non = 0; const A = [], D = [];
+  for (const c of big){ let v = null; try { v = sgInst(c); } catch(e){} if (!v) continue; const s = isNum(v.score) ? v.score : 0;
+    if (v.dir > 0){ acc++; A.push({c:c.name, s}); } else if (v.dir < 0){ dis++; D.push({c:c.name, s}); } else non++; }
+  A.sort((a, b) => b.s - a.s); D.sort((a, b) => b.s - a.s);
+  o.rad = {acc, dis, non, n:acc + dis + non, A:A.slice(0, 4), D:D.slice(0, 4)};
+  /* liquidations */
+  if (LQ.up || LQ.n){ let L = 0, S = 0; for (const arr of LQ.coins.values()) for (const x of arr){ if (now - x.t <= 3.6e6){ if (x.long) L += x.usd; else S += x.usd; } } o.liq = {L, S, up:LQ.up, mins:LQ.t0 ? Math.min(60, (now - LQ.t0) / 6e4) : 0}; }
+  /* Binance everyday-trader ratio across the top coins we already poll */
+  let ls = 0, lsN = 0; for (const [k, v] of X.ls) if (v && isNum(v.r) && v.r > 0){ ls += v.r / (1 + v.r) * 100; lsN++; } o.ls = lsN >= 5 ? {avg:ls / lsN, n:lsN} : null;
+  o.ex = OV.ex;
+  /* overall mood of the market, from -6 to +6 */
+  const why = []; let sc = 0; const add = (p, t) => { sc += p; why.push([p, t]); };
+  if (isNum(o.b4)){ if (o.b4 >= 60) add(1, o.b4.toFixed(0) + '% of coins are rising on the 4-hour chart'); else if (o.b4 <= 40) add(-1, 'only ' + o.b4.toFixed(0) + '% of coins are rising on the 4-hour chart'); }
+  if (isNum(o.bd)){ if (o.bd >= 60) add(1, o.bd.toFixed(0) + '% of coins are up on the day'); else if (o.bd <= 40) add(-1, 'only ' + o.bd.toFixed(0) + '% of coins are up on the day'); }
+  if (o.btcTrend === 1) add(1, 'Bitcoin\'s 4-hour trend is up'); else if (o.btcTrend === -1) add(-1, 'Bitcoin\'s 4-hour trend is down');
+  if (isNum(o.f4)){ if (o.f4 >= 5) add(1, 'more buying than selling volume over 4 hours'); else if (o.f4 <= -5) add(-1, 'more selling than buying volume over 4 hours'); }
+  if (isNum(o.capChg)){ if (o.capChg >= 1.5) add(1, 'the total market value is up ' + o.capChg.toFixed(1) + '% in 24h'); else if (o.capChg <= -1.5) add(-1, 'the total market value is down ' + Math.abs(o.capChg).toFixed(1) + '% in 24h'); }
+  if (o.st && isNum(o.st.p7)){ if (o.st.p7 >= 0.5) add(1, 'new stablecoin money is entering (buying power growing)'); else if (o.st.p7 <= -0.3) add(-1, 'stablecoin money is leaving'); }
+  o.mood = {sc, why, n:why.length};
+  o.cache = true; OV.cache = o; OV.cacheAt = now; return o;
+}
+/* each row: tone is the side of the money: up = buying, dn = selling, warn = split or careful, na = no data yet */
+function ovInstRows(o){
+  const R = [];
+  const wh = o.wh;
+  if (wh && wh.iN > 0){
+    const tot = wh.iL + wh.iS, lp = tot > 0 ? wh.iL / tot * 100 : 50, tone = lp >= 58 ? 'up' : lp <= 42 ? 'dn' : 'warn';
+    const names = a => a.length ? a.map(x => x.c + ' ' + fmtUsd(x.net)).join(', ') : 'none';
+    R.push({n:'Biggest wallets on Hyperliquid', sub:'whales, orcas and sharks (accounts over $1M)', now:`${fmtUsd(wh.iL)} long vs ${fmtUsd(wh.iS)} short (${lp.toFixed(0)}% long)` + (isNum(wh.flow) ? ` · last 5 to 30 min: ${wh.flow >= 0 ? 'net added long ' : 'net added short '}${fmtUsd(Math.abs(wh.flow))}` : ''),
+      tone, say:tone === 'up' ? 'Mostly BUYING: the big wallets are positioned for a rise.' : tone === 'dn' ? 'Mostly SELLING: the big wallets are positioned for a fall.' : 'SPLIT: the big wallets do not agree.',
+      why:'Wallets this big move prices, and their positions are public. Where their money sits shows what the big players expect.', more:'Most long: ' + names(wh.topL) + '. Most short: ' + names(wh.topS) + '.', go:'whales', goL:'Whale positions'});
+  } else R.push({n:'Biggest wallets on Hyperliquid', sub:'whales, orcas and sharks (accounts over $1M)', now:'Wallet list is still loading…', tone:'na', say:'No data yet', why:'Wallets this big move prices, and their positions are public.', go:'whales', goL:'Whale positions'});
+  const rd = o.rad;
+  if (rd && rd.n >= 8){
+    const tone = rd.acc >= rd.dis * 1.5 && rd.acc >= 3 ? 'up' : rd.dis >= rd.acc * 1.5 && rd.dis >= 3 ? 'dn' : 'warn';
+    R.push({n:'Our institutional radar', sub:'the 40 biggest coins, read on the 4-hour chart', now:`${rd.acc} accumulating · ${rd.dis} distributing · ${rd.non} no clear side`,
+      tone, say:tone === 'up' ? 'Mostly BUYING: more coins show big players quietly buying.' : tone === 'dn' ? 'Mostly SELLING: more coins show big players quietly selling.' : 'SPLIT: no clear trend of big money across coins.',
+      why:'Big players cannot buy everything at once, so they build positions slowly. We spot that in volume, order flow and pressure.', more:(rd.A.length ? 'Strongest buying: ' + rd.A.map(x => x.c + ' (' + x.s + ')').join(', ') + '. ' : '') + (rd.D.length ? 'Strongest selling: ' + rd.D.map(x => x.c + ' (' + x.s + ')').join(', ') + '.' : ''), go:'inst', goL:'Perp institutional radar'});
+  } else R.push({n:'Our institutional radar', sub:'the 40 biggest coins, read on the 4-hour chart', now:'Still collecting candles…', tone:'na', say:'No data yet', why:'Big players build positions slowly. We spot that in volume, order flow and pressure.', go:'inst', goL:'Perp institutional radar'});
+  const ex = o.ex, tp = ex ? Object.entries(ex.top) : [];
+  if (tp.length){
+    const avg = tp.reduce((a, [k, v]) => a + v.l, 0) / tp.length, prev = tp.filter(([k, v]) => isNum(v.l0)), d = prev.length ? avg - prev.reduce((a, [k, v]) => a + v.l0, 0) / prev.length : null;
+    const tone = avg >= 55 ? 'up' : avg <= 45 ? 'dn' : 'warn';
+    R.push({n:'Top traders on Binance', sub:'the accounts with the biggest positions', now:tp.map(([k, v]) => `${k} ${v.l.toFixed(0)}% long`).join(' · ') + (isNum(d) && Math.abs(d) >= 1 ? ` · ${d > 0 ? 'more' : 'less'} long than 4h ago` : ''),
+      tone, say:tone === 'up' ? 'Mostly BUYING: the biggest accounts hold more longs than shorts.' : tone === 'dn' ? 'Mostly SELLING: the biggest accounts hold more shorts than longs.' : 'SPLIT: the biggest accounts are about even.',
+      why:'This ratio counts position size, so large accounts weigh more than small ones. It is a better guide to big money than the everyday long/short ratio.', go:'orderflow', goL:'Order flow'});
+  } else R.push({n:'Top traders on Binance', sub:'the accounts with the biggest positions', now:OV.busy ? 'Loading…' : 'Could not load (Binance may be blocked on your network)', tone:'na', say:'No data yet', why:'This ratio counts position size, so large accounts weigh more than small ones.', go:'orderflow', goL:'Order flow'});
+  if (isNum(o.oi1) && isNum(o.px1)){
+    const oi = o.oi1, px = o.px1; let tone = 'warn', say = 'QUIET: not much new money is moving in the last hour.';
+    if (oi > 0.15 && px > 0.05){ tone = 'up'; say = 'BUYING: new buyers are opening positions, so the rise has real money behind it.'; }
+    else if (oi > 0.15 && px < -0.05){ tone = 'dn'; say = 'SELLING: new sellers are opening shorts, so the fall has real money behind it.'; }
+    else if (oi < -0.15 && px > 0.05) say = 'CAREFUL: price is rising only because shorts are closing. That is weaker and can fade.';
+    else if (oi < -0.15 && px < -0.05) say = 'CAREFUL: price is falling because longs are closing (stops and profit-taking). That is weaker and can bounce.';
+    R.push({n:'New money in futures', sub:'open interest together with price, last hour', now:`Open interest ${ovSg(oi, 2)} · price ${ovSg(px, 2)} (volume-weighted, all coins)`, tone, say,
+      why:'Open interest is the total of open bets. Rising together with price means fresh money is behind the move. Rising while price falls means fresh money is betting on a fall.', go:'perp', goL:'Perp scalp scanner'});
+  }
+  if (o.st && isNum(o.st.p7)){
+    const p = o.st.p7, tone = p >= 0.5 ? 'up' : p <= -0.3 ? 'dn' : 'warn';
+    R.push({n:'Dollar stablecoins (USDT + USDC)', sub:'fresh buying power entering or leaving crypto', now:`Supply ${ovT(o.st.now)} · 7 days ${ovSg(p, 2)} (${fmtUsd(o.st.d7, true)}) · 1 day ${ovSg(o.st.p1, 2)}`,
+      tone, say:tone === 'up' ? 'BUYING power is growing: new dollars are entering crypto.' : tone === 'dn' ? 'Money is LEAVING: buying power is shrinking.' : 'FLAT: no clear sign of new money.',
+      why:'Stablecoins are the cash that gets spent on coins. More of them being created means more potential buying. Fewer means money is leaving.', go:'flows', goL:'Money flow'});
+  } else R.push({n:'Dollar stablecoins (USDT + USDC)', sub:'fresh buying power entering or leaving crypto', now:X.stableErr ? 'Could not load (' + X.stableErr + ')' : 'Loading…', tone:'na', say:'No data yet', why:'Stablecoins are the cash that gets spent on coins.', go:'flows', goL:'Money flow'});
+  const cb = ex && ex.cb && Object.keys(ex.cb).length ? ex.cb : null;
+  if (cb){
+    const v = (cb.BTC !== undefined ? cb.BTC : cb.ETH), tone = v >= 0.05 ? 'up' : v <= -0.05 ? 'dn' : 'warn';
+    R.push({n:'Coinbase premium (US big money)', sub:'Coinbase price compared with Binance', now:Object.entries(cb).map(([k, x]) => k + ' ' + ovSg(x, 3)).join(' · '),
+      tone, say:tone === 'up' ? 'BUYING: US buyers are paying more on Coinbase than elsewhere.' : tone === 'dn' ? 'SELLING: US sellers are accepting less on Coinbase than elsewhere.' : 'NEUTRAL: Coinbase trades at the same price as other exchanges.',
+      why:'Coinbase is where many US funds and ETF-linked buyers trade. When its price is above other exchanges, US demand is strong. It is a small, noisy signal, so use it only as a hint.', go:'orderflow', goL:'Order flow'});
+  } else R.push({n:'Coinbase premium (US big money)', sub:'Coinbase price compared with Binance', now:OV.busy ? 'Loading…' : 'Could not load', tone:'na', say:'No data yet', why:'Coinbase is where many US funds trade.', go:'orderflow', goL:'Order flow'});
+  const op = o.opt;
+  if (op){
+    const tone = op.bias === 1 ? 'up' : op.bias === 2 ? 'dn' : 'warn', dv = op.dvol;
+    R.push({n:'Bitcoin options (Deribit)', sub:'where professionals place their bets and hedges', now:`Put/call ${isNum(op.pcr) ? op.pcr.toFixed(2) : '—'}` + (isNum(op.skew) ? ` · skew ${op.skew > 0 ? '+' : ''}${op.skew.toFixed(1)}` : '') + (dv ? ` · volatility index ${dv.now.toFixed(0)} (${ovSg(dv.chg, 0)} in 24h)` : ''),
+      tone, say:tone === 'up' ? 'BUYING: options traders lean bullish (more calls than puts).' : tone === 'dn' ? 'SELLING: options traders lean bearish or are hedging (more puts).' : 'SPLIT: options traders have no strong lean.',
+      why:'Options are mostly used by professionals and funds. Puts are bets on a fall or insurance, calls are bets on a rise. The volatility index shows how much movement they expect.', go:'options', goL:'Options'});
+  } else R.push({n:'Bitcoin options (Deribit)', sub:'where professionals place their bets and hedges', now:OPT.busy ? 'Loading…' : (OPT.err ? 'Could not load' : 'Not loaded yet'), tone:'na', say:'No data yet', why:'Options are mostly used by professionals and funds.', go:'options', goL:'Options'});
+  return R;
+}
+function ovRetailRows(o){
+  const R = [];
+  const f = o.fng;
+  if (f && isNum(f.v)){
+    const v = f.v, tone = v >= 56 ? 'up' : v <= 44 ? 'dn' : 'warn';
+    const say = v <= 24 ? 'Extreme FEAR: the crowd is panicking, selling or hiding. This zone is often near a bottom, but fear can last.' : v <= 44 ? 'FEAR: the crowd is nervous and mostly selling or waiting.' : v <= 55 ? 'NEUTRAL: the crowd has no strong feeling.' : v <= 74 ? 'GREED: the crowd is confident and buying.' : 'Extreme GREED: the crowd is euphoric and chasing prices. This zone is often near a top.';
+    R.push({n:'Fear & Greed index', sub:'the mood of everyday traders', now:`${v} out of 100 · ${f.cls}`, tone, say, why:'Everyday traders buy when they feel safe and sell when scared, usually too late. Extremes are often wrong, so many professionals do the opposite of the crowd there.', go:'', goL:''});
+  } else R.push({n:'Fear & Greed index', sub:'the mood of everyday traders', now:'Loading…', tone:'na', say:'No data yet', why:'Everyday traders buy when they feel safe and sell when scared.', go:'', goL:''});
+  const ex = o.ex, al = ex ? Object.entries(ex.all) : [];
+  if (al.length){
+    const avg = al.reduce((a, [k, v]) => a + v.l, 0) / al.length, tone = avg >= 55 ? 'up' : avg <= 45 ? 'dn' : 'warn';
+    R.push({n:'Everyday traders long vs short', sub:'Binance, number of accounts (not size)', now:al.map(([k, v]) => `${k} ${v.l.toFixed(0)}% long`).join(' · ') + (o.ls ? ` · top-coin average ${o.ls.avg.toFixed(0)}% long` : ''),
+      tone, say:avg >= 65 ? 'Crowded LONG: almost everyone is betting on a rise. Crowds like this are often wrong and get flushed out.' : avg <= 35 ? 'Crowded SHORT: almost everyone is betting on a fall. This can end with a sharp squeeze up.' : tone === 'up' ? 'Mostly BUYING: more accounts are long than short.' : tone === 'dn' ? 'Mostly SELLING: more accounts are short than long.' : 'SPLIT: the crowd is about even.',
+      why:'This counts accounts, so it mostly shows what small traders do. Compare it with the top-trader row in the institutions table: when the two disagree, big money is usually the better guide.', go:'orderflow', goL:'Order flow'});
+  } else if (o.ls){
+    const avg = o.ls.avg, tone = avg >= 55 ? 'up' : avg <= 45 ? 'dn' : 'warn';
+    R.push({n:'Everyday traders long vs short', sub:'Binance, number of accounts (not size)', now:`top-coin average ${avg.toFixed(0)}% long (${o.ls.n} coins)`, tone, say:tone === 'up' ? 'Mostly BUYING: more accounts are long than short.' : tone === 'dn' ? 'Mostly SELLING: more accounts are short than long.' : 'SPLIT: the crowd is about even.', why:'This counts accounts, so it mostly shows what small traders do.', go:'orderflow', goL:'Order flow'});
+  } else R.push({n:'Everyday traders long vs short', sub:'Binance, number of accounts (not size)', now:OV.busy ? 'Loading…' : 'Could not load (Binance may be blocked on your network)', tone:'na', say:'No data yet', why:'This counts accounts, so it mostly shows what small traders do.', go:'orderflow', goL:'Order flow'});
+  if (o.nf >= 10){
+    const tone = o.cl >= o.cs * 2 && o.cl / o.nf >= 0.12 ? 'up' : o.cs >= o.cl * 2 && o.cs / o.nf >= 0.12 ? 'dn' : 'warn';
+    R.push({n:'Borrowed-money betting (funding)', sub:'what the leveraged crowd pays to hold its side', now:`${o.cl} coins crowded long · ${o.cs} crowded short · out of ${o.nf}` + (isNum(o.fund) ? ` · average ${o.fund.toFixed(4)}% per hour` : ''),
+      tone, say:tone === 'up' ? 'Crowd is BUYING with borrowed money. If price stalls, they get flushed out fast.' : tone === 'dn' ? 'Crowd is SELLING short with borrowed money. A sharp bounce can squeeze them.' : 'BALANCED: no side is badly overcrowded.',
+      why:'On perpetual futures the crowded side pays a fee (funding). A very high fee means too many people are on the same side, which is a risk for them.', go:'perp', goL:'Perp scalp scanner'});
+  } else R.push({n:'Borrowed-money betting (funding)', sub:'what the leveraged crowd pays to hold its side', now:'Loading…', tone:'na', say:'No data yet', why:'On perpetual futures the crowded side pays a fee (funding).', go:'perp', goL:'Perp scalp scanner'});
+  if (o.cg && o.cgN >= 50){
+    const tone = o.pump >= o.dump * 2 && o.pump >= 5 ? 'up' : o.dump >= o.pump * 2 && o.dump >= 5 ? 'dn' : 'warn';
+    R.push({n:'Chasing pumps (FOMO)', sub:'how many coins jumped or crashed more than 10% today', now:`${o.pump} coins up 10%+ · ${o.dump} coins down 10%+ (of ${o.cgN})` + (o.trend.length ? ' · trending: ' + o.trend.slice(0, 5).map(t => t.s + (isNum(t.c) ? ' ' + ovSg(t.c, 0) : '')).join(', ') : ''),
+      tone, say:tone === 'up' ? 'Crowd is BUYING: many coins are pumping and people chase them (FOMO).' : tone === 'dn' ? 'Crowd is SELLING: many coins are crashing and people panic.' : 'CALM: few extreme moves today.',
+      why:'Everyday traders pile into whatever is already rising, and flee whatever is falling. Many pumping coins at once is a sign of excitement, and these often reverse.', go:'movers', goL:'Movers'});
+  }
+  if (o.cg && o.memeN >= 3){
+    const m = o.memeAvg, tone = m >= 3 ? 'up' : m <= -3 ? 'dn' : 'warn';
+    R.push({n:'Meme coins', sub:'the risk-appetite barometer', now:`${o.memeN} meme coins, average ${ovSg(m, 1)} in 24h`, tone,
+      say:tone === 'up' ? 'Crowd is BUYING risk: meme coins are rising, a sign of high risk appetite.' : tone === 'dn' ? 'Crowd is SELLING risk: meme coins are falling, a sign of fear.' : 'NEUTRAL: meme coins are flat, so the crowd is not gambling much.',
+      why:'Meme coins have no business behind them, so they mostly move on crowd excitement. They are the first to rise when everyday traders feel brave and the first to fall when they get scared.', go:'memes', goL:'Meme holders'});
+  }
+  const wh = o.wh;
+  if (wh && wh.rN >= 10){
+    const tot = wh.rL + wh.rS, lp = tot > 0 ? wh.rL / tot * 100 : 50, tone = lp >= 55 ? 'up' : lp <= 45 ? 'dn' : 'warn';
+    R.push({n:'Small wallets on Hyperliquid', sub:'crabs, fish and shrimp (accounts under $50k)', now:`${fmtUsd(wh.rL)} long vs ${fmtUsd(wh.rS)} short (${lp.toFixed(0)}% long) · ${wh.rN} positions sampled`, tone,
+      say:tone === 'up' ? 'Mostly BUYING: small wallets are long.' : tone === 'dn' ? 'Mostly SELLING: small wallets are short.' : 'SPLIT: small wallets are about even.',
+      why:'Small accounts are the best view of how everyday traders are positioned. Compare with the big wallets above.', go:'whales', goL:'Whale positions'});
+  } else R.push({n:'Small wallets on Hyperliquid', sub:'crabs, fish and shrimp (accounts under $50k)', now:wh ? `Only ${wh.rN} small positions sampled so far, not enough to read` : 'Wallet list is still loading…', tone:'na', say:'Not enough data yet', why:'Small accounts are the best view of how everyday traders are positioned.', go:'whales', goL:'Whale positions'});
+  const lq = o.liq;
+  if (lq && lq.L + lq.S > 0){
+    const tone = lq.L > lq.S * 1.5 && lq.L >= 1e6 ? 'dn' : lq.S > lq.L * 1.5 && lq.S >= 1e6 ? 'up' : 'warn';
+    R.push({n:'Forced closes (liquidations)', sub:'traders wiped out by the market, last ' + Math.max(1, Math.round(lq.mins)) + ' min', now:`Longs liquidated ${fmtUsd(lq.L)} · shorts liquidated ${fmtUsd(lq.S)}`, tone,
+      say:tone === 'dn' ? 'SELLING by force: leveraged longs are being wiped out.' : tone === 'up' ? 'BUYING by force: leveraged shorts are being squeezed.' : 'BALANCED: no side is being wiped out much.',
+      why:'When a trader borrows too much and the price goes against them, the exchange closes the trade for them. Waves of forced closes push price further and mostly hit small leveraged traders.', go:'', goL:''});
+  } else R.push({n:'Forced closes (liquidations)', sub:'traders wiped out by the market', now:LQ.up ? 'Listening… nothing big yet' : 'Not connected (Binance may be blocked on your network)', tone:'na', say:'No data yet', why:'When a trader borrows too much and the price goes against them, the exchange closes the trade for them.', go:'', goL:''});
+  return R;
+}
+function ovSide(rows){
+  const k = rows.filter(r => r.tone !== 'na'), up = k.filter(r => r.tone === 'up').length, dn = k.filter(r => r.tone === 'dn').length;
+  let tone = 'warn', label = 'Split: no clear side';
+  if (k.length < 3) return {tone:'na', label:'Still collecting data', up, dn, n:k.length, tot:rows.length};
+  if (up >= dn + 2){ tone = 'up'; label = 'Mostly BUYING'; } else if (dn >= up + 2){ tone = 'dn'; label = 'Mostly SELLING'; } else if (up > dn){ tone = 'up'; label = 'Leaning to buying'; } else if (dn > up){ tone = 'dn'; label = 'Leaning to selling'; }
+  return {tone, label, up, dn, n:k.length, tot:rows.length};
+}
+function ovTable(rows){
+  return `<div class="ovwrap"><table class="ovt"><thead><tr><th>What we look at</th><th>What it shows now</th><th>Simple verdict</th><th>Why it matters</th></tr></thead><tbody>` + rows.map(r =>
+    `<tr><td data-l="What we look at"><b>${esc(r.n)}</b><small>${esc(r.sub || '')}</small></td><td data-l="What it shows now">${esc(r.now)}${r.more ? `<small>${esc(r.more)}</small>` : ''}</td><td data-l="Simple verdict"><span class="ovv ov-${r.tone}">${r.tone === 'up' ? 'BUYING' : r.tone === 'dn' ? 'SELLING' : r.tone === 'warn' ? 'SPLIT / CAREFUL' : 'NO DATA'}</span><small>${esc(r.say)}</small></td><td data-l="Why it matters">${esc(r.why)}${r.go ? `<br><button type="button" class="btn sm" data-ovgo="${esc(r.go)}">Open ${esc(r.goL)}</button>` : ''}</td></tr>`).join('') + `</tbody></table></div>`;
+}
+function ovStory(o){
+  const S = [];
+  if (o.cg && isNum(o.cap)) S.push(`The whole crypto market is worth about <b>${ovT(o.cap)}</b> and is <b class="${o.capChg >= 0 ? 'up' : 'dn'}">${o.capChg >= 0 ? 'up' : 'down'} ${Math.abs(o.capChg).toFixed(1)}%</b> in the last 24 hours. ${o.cgUp} of the ${o.cgN} biggest coins are green today.`);
+  if (o.btc) S.push(`<b>Bitcoin</b> costs $${fmtPx(o.btc.px)} (${ovSg(o.btc.c24)} today, ${ovSg(o.btc.c7)} this week).` + (o.eth ? ` <b>Ethereum</b> costs $${fmtPx(o.eth.px)} (${ovSg(o.eth.c24)} today).` : '') + (isNum(o.domBtc) ? ` Bitcoin is ${o.domBtc.toFixed(1)}% of the whole market.` : ''));
+  if (o.cg && isNum(o.altMed) && o.btc && isNum(o.btc.c24)){ const d = o.altMed - o.btc.c24; S.push(d >= 1 ? 'Other coins (altcoins) are doing <b>better</b> than Bitcoin today. When that lasts, money is moving from safe coins to riskier ones (an "alt season" mood).' : d <= -1 ? 'Other coins (altcoins) are doing <b>worse</b> than Bitcoin today. Traders are hiding in Bitcoin, the safest coin, and leaving smaller coins.' : 'Bitcoin and the other coins are moving about the same today.'); }
+  if (o.fng) S.push(`Everyday traders feel <b>${esc(String(o.fng.cls).toLowerCase())}</b> (Fear & Greed ${o.fng.v} out of 100).`);
+  if (o.st && isNum(o.st.p7)) S.push(o.st.p7 >= 0.5 ? `New dollar-stablecoins are being created (${ovSg(o.st.p7, 2)} this week). That is fresh cash that can buy coins.` : o.st.p7 <= -0.3 ? `Dollar-stablecoins are shrinking (${ovSg(o.st.p7, 2)} this week). Cash is leaving crypto.` : 'The amount of dollar-stablecoins is flat this week, so there is no big wave of new cash.');
+  if (o.nf >= 10) S.push(o.cl >= o.cs * 2 && o.cl / o.nf >= 0.12 ? `Many traders are <b>betting on a rise with borrowed money</b> (${o.cl} coins have crowded longs). That makes sudden drops more violent.` : o.cs >= o.cl * 2 && o.cs / o.nf >= 0.12 ? `Many traders are <b>betting on a fall with borrowed money</b> (${o.cs} coins have crowded shorts). That makes sudden jumps more violent.` : 'Borrowed-money bets are fairly balanced, so there is no big squeeze waiting to happen.');
+  if (o.opt && o.opt.dvol) S.push(`The options market expects ${o.opt.dvol.chg >= 5 ? '<b>bigger swings</b> ahead (volatility is rising)' : o.opt.dvol.chg <= -5 ? '<b>calmer trading</b> ahead (volatility is falling)' : 'about the same amount of movement as before'} for Bitcoin.`);
+  if (o.gain && o.gain.length) S.push(`Biggest gainers today: ${o.gain.slice(0, 3).map(x => `<b>${esc(x.s)}</b> ${ovSg(x.c, 0)}`).join(', ')}. Biggest losers: ${o.lose.slice(0, 3).map(x => `<b>${esc(x.s)}</b> ${ovSg(x.c, 0)}`).join(', ')}.`);
+  return S;
+}
+function ovHtml(){
+  const o = ovCalc(), mood = o.mood, sc = mood.sc;
+  const ml = mood.n < 2 ? ['na', 'Still collecting data', 'The scanner is still loading prices. Give it a minute.'] : sc >= 3 ? ['up', 'BUYERS ARE IN CONTROL', 'Most signs point up. Rising markets are easier to trade from the long side, but do not chase big green candles.'] : sc >= 1 ? ['up', 'SLIGHTLY BULLISH', 'A few more signs point up than down. Be selective and let price come to your level.'] : sc <= -3 ? ['dn', 'SELLERS ARE IN CONTROL', 'Most signs point down. Falling markets are dangerous for new buyers. Patience is also a position.'] : sc <= -1 ? ['dn', 'SLIGHTLY BEARISH', 'A few more signs point down than up. Be careful with new longs.'] : ['warn', 'UNDECIDED / SIDEWAYS', 'Signs point both ways. This is the kind of market that tricks beginners, so trade small or wait.'];
+  const pos = Math.max(0, Math.min(100, (sc + 6) / 12 * 100));
+  const inst = ovInstRows(o), ret = ovRetailRows(o), I = ovSide(inst), Rt = ovSide(ret);
+  const nm = {up:'buying', dn:'selling', warn:'split', na:'unclear'};
+  let cmp = ['warn', 'Not enough data yet to compare', 'Wait for both tables to fill in.'];
+  if (I.tone !== 'na' && Rt.tone !== 'na'){
+    const iu = I.tone === 'up', id = I.tone === 'dn', ru = Rt.tone === 'up', rd = Rt.tone === 'dn';
+    if (iu && rd) cmp = ['up', 'Institutions BUYING while retail is SELLING', 'This is the classic bottoming pattern: big money quietly buys while the crowd is scared. It is often a good area to look for longs, but wait for the Confirm checks and keep your stop-loss.'];
+    else if (id && ru) cmp = ['dn', 'Institutions SELLING while retail is BUYING', 'This is the classic topping pattern: big money sells to a crowd that keeps buying. Be careful with new longs and do not chase.'];
+    else if (iu && ru) cmp = ['up', 'Institutions and retail are BOTH buying', 'The trend is strong, but late buyers get trapped when everyone is already in. Prefer pullbacks over chasing green candles.'];
+    else if (id && rd) cmp = ['dn', 'Institutions and retail are BOTH selling', 'A broad sell-off. Panic can go further than expected, so wait for selling to slow and a clear reclaim before buying.'];
+    else if (iu) cmp = ['up', 'Institutions lean buying, retail is split', 'Big money is a little ahead of the crowd. A mild positive.'];
+    else if (id) cmp = ['dn', 'Institutions lean selling, retail is split', 'Big money is a little ahead of the crowd. A mild negative.'];
+    else if (ru) cmp = ['warn', 'Retail is buying, institutions are split', 'The crowd is more excited than big money. Be cautious: rallies led by the crowd alone fade easily.'];
+    else if (rd) cmp = ['warn', 'Retail is selling, institutions are split', 'The crowd is more scared than big money. Panic may be overdone, but wait for proof.'];
+    else cmp = ['warn', 'Nobody has a clear side', 'Both groups are split. The market is waiting for a reason to move.'];
+  }
+  const tile = (lab, val, cls, sub) => `<div><small>${esc(lab)}</small><b${cls ? ` class="${cls}"` : ''}>${val}</b><em class="${cls || 'dim'}">${esc(sub || '')}</em></div>`;
+  const tc = v => !isNum(v) ? '' : v > 0 ? 'up' : v < 0 ? 'dn' : '';
+  const tiles = [
+    tile('Total crypto value', o.cg ? ovT(o.cap) : '—', tc(o.capChg), o.cg ? ovSg(o.capChg) + ' in 24h' : 'loading'),
+    tile('Bitcoin', o.btc ? '$' + fmtPx(o.btc.px) : '—', tc(o.btc && o.btc.c24), o.btc ? ovSg(o.btc.c24) + ' today · ' + ovSg(o.btc.c7) + ' week' : 'loading'),
+    tile('Ethereum', o.eth ? '$' + fmtPx(o.eth.px) : '—', tc(o.eth && o.eth.c24), o.eth ? ovSg(o.eth.c24) + ' today · ' + ovSg(o.eth.c7) + ' week' : 'loading'),
+    tile('Bitcoin share of market', isNum(o.domBtc) ? o.domBtc.toFixed(1) + '%' : '—', '', isNum(o.domChg) ? ovSg(o.domChg, 2).replace('%', ' pt') + ' in 24h' : 'share of all crypto value'),
+    tile('Fear & Greed', o.fng ? String(o.fng.v) : '—', o.fng ? (o.fng.v >= 56 ? 'up' : o.fng.v <= 44 ? 'dn' : 'warn') : '', o.fng ? o.fng.cls : 'loading'),
+    tile('Coins rising today', isNum(o.cgBreadth) ? o.cgBreadth.toFixed(0) + '%' : '—', isNum(o.cgBreadth) ? (o.cgBreadth >= 60 ? 'up' : o.cgBreadth <= 40 ? 'dn' : 'warn') : '', o.cg ? o.cgUp + ' of ' + o.cgN + ' coins' : 'loading'),
+    tile('New stablecoin cash', o.st ? ovSg(o.st.p7, 2) : '—', o.st ? (o.st.p7 >= 0.5 ? 'up' : o.st.p7 <= -0.3 ? 'dn' : 'warn') : '', o.st ? 'USDT + USDC, 7 days' : 'loading'),
+    tile('Buy vs sell volume', isNum(o.f4) ? ovSg(o.f4, 1) : '—', tc(isNum(o.f4) && Math.abs(o.f4) >= 5 ? o.f4 : 0), isNum(o.f4) ? 'net, last 4 hours' : 'loading')
+  ].join('');
+  const story = ovStory(o);
+  const det = (id, title, body) => `<details class="ovd" data-ovd="${id}"${OV.open.has(id) ? ' open' : ''}><summary>${title}</summary>${body}</details>`;
+  const gl = [['Open interest', 'The total amount of money currently bet on futures. Rising means more people are entering.'], ['Funding rate', 'A small fee that the crowded side of the futures market pays the other side every hour. A high fee means too many people are betting the same way.'], ['Long / short', 'A long is a bet that the price will rise. A short is a bet that it will fall.'], ['Liquidation', 'When a trader borrows too much and the price moves against them, the exchange closes the trade by force.'], ['Accumulation / distribution', 'Accumulation is big players quietly buying. Distribution is big players quietly selling to others.'], ['Whale, orca, shark', 'Trader accounts holding over $10M, $5M and $1M. Crab, fish and shrimp hold less than $50k, so they stand for everyday traders.'], ['Stablecoin', 'A coin that always costs one dollar (like USDT or USDC). It is the cash of crypto. More of it means more buying power.'], ['Put / call ratio', 'In options, a call is a bet on a rise and a put is a bet on a fall (or insurance). More puts than calls means fear or hedging.'], ['Altcoin', 'Any coin that is not Bitcoin.'], ['Coinbase premium', 'How much more (or less) Bitcoin costs on Coinbase compared with Binance. A premium suggests American buyers are active.']];
+  const src = [['CoinGecko (prices, market value)', o.cg], ['Hyperliquid (coins, funding, open interest)', o.n >= 5], ['Fear & Greed (alternative.me)', !!o.fng], ['Stablecoin supply (DefiLlama)', !!o.st], ['Whale wallets (Hyperliquid)', !!o.wh], ['Binance top traders and everyday traders', !!(o.ex && (Object.keys(o.ex.top).length || Object.keys(o.ex.all).length))], ['Coinbase premium', !!(o.ex && Object.keys(o.ex.cb).length)], ['Bitcoin options (Deribit)', !!o.opt], ['Liquidation stream (Binance)', !!o.liq]];
+  const bad = o.ex && o.ex.errs.length ? `<p class="hint">Some extra data failed: ${esc(o.ex.errs.slice(0, 3).join(' · '))}. If Binance is blocked on your network, those rows stay empty and the rest still works.</p>` : '';
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Market overview: what is going on in crypto right now</h3><button class="btn sm" type="button" id="ovRefresh">${OV.busy ? 'Loading…' : '↻ Refresh extra data'}</button></div>
+    <p class="hint" style="margin:6px 0 0">New to crypto? Read this page from top to bottom. It is the weather report for the market, built from the same free data as the rest of the scanner. It updates by itself. It is not a buy or sell signal: for that, use the Signal desk and the Confirm button.</p></div>
+  <div class="ovm ov-${ml[0]}"><div class="ovmh"><span class="hint">Overall market mood</span><h2>${esc(ml[1])}</h2></div><div class="ovbar"><i style="left:${pos.toFixed(0)}%"></i></div><div class="ovscale"><span>sellers</span><span>undecided</span><span>buyers</span></div><p>${esc(ml[2])}</p>
+    ${mood.why.length ? `<ul class="ovwhy">${mood.why.map(([p, t]) => `<li class="${p > 0 ? 'up' : 'dn'}">${p > 0 ? '▲' : '▼'} ${esc(t)}</li>`).join('')}</ul>` : ''}</div>
+  <div class="nsec"><h3>The market in plain words</h3>${story.length ? `<ul class="ovstory">${story.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="hint">Loading prices…</p>'}</div>
+  <div class="nsec"><h3>Key numbers</h3><div class="ovk">${tiles}</div></div>
+  <div class="ovm ov-${cmp[0]}"><div class="ovmh"><span class="hint">Institutions versus retail</span><h2>${esc(cmp[1])}</h2></div>
+    <div class="ovduo"><div><small>Institutions (big money)</small><span class="ovv ov-${I.tone}">${esc(I.label)}</span><em>${I.up} buying · ${I.dn} selling · ${I.n - I.up - I.dn} split, of ${I.n} readings</em></div><div><small>Retail (everyday traders)</small><span class="ovv ov-${Rt.tone}">${esc(Rt.label)}</span><em>${Rt.up} buying · ${Rt.dn} selling · ${Rt.n - Rt.up - Rt.dn} split, of ${Rt.n} readings</em></div></div><p>${esc(cmp[2])}</p></div>
+  <div class="nsec"><h3>What institutions are doing</h3><p class="hint">Institutions means funds, whales and professional traders: the big money. Nobody can see their private accounts, so each row is the best free clue we have. Green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(inst)}</div>
+  <div class="nsec"><h3>What retail is doing</h3><p class="hint">Retail means everyday traders with small accounts. They tend to buy after prices rise and sell after they fall, so extremes in this table are often a warning sign for the crowd. Same colours: green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(ret)}</div>
+  <div class="nsec"><h3>What a beginner should do with this</h3><ul class="ovstory"><li><b>Use it as the weather, not the plan.</b> A good market makes good trades easier, a bad one makes them harder. It never replaces a stop-loss.</li><li><b>When institutions and retail disagree, follow the institutions, but wait for confirmation.</b> Open the Signal desk, pick a coin, and press Confirm to see the 13 checks.</li><li><b>When everyone agrees, be careful.</b> If both groups are buying, do not chase green candles. If both are selling, do not catch falling knives.</li><li><b>Keep size small when the mood is undecided.</b> Sideways markets trick beginners the most.</li></ul>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><button type="button" class="btn sm" data-ovgo="sdesk">Open Signal desk</button><button type="button" class="btn sm" data-ovgo="movers">Open Movers</button><button type="button" class="btn sm" data-ovgo="news">Open News</button><button type="button" class="btn sm" data-ovgo="map">Open Market map</button></div></div>
+  ${det('gl', 'Words explained', `<div class="ovgl">${gl.map(([k, v]) => `<div><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join('')}</div>`)}
+  ${det('src', 'What data is behind this page', `<div class="ovsrc">${src.map(([k, ok]) => `<span class="tagp ${ok ? 'good' : 'bad'}">${esc(k)} ${ok ? '✓' : '…'}</span>`).join('')}</div>${bad}<p class="hint">Whales' and funds' private accounts cannot be seen, so every "institutions" row is a clue, not a fact. Liquidation numbers only count while this page is open. Options exist only for Bitcoin and Ethereum here. Everything is free public data and can be a few minutes old.</p>`)}`;
+}
+function renderOverview(){
+  const el = $('viewOverview'); if (!el) return;
+  if (!el._built){
+    el._built = true;
+    el.addEventListener('click', e => {
+      if (e.target.closest('#ovRefresh')){ OV.cacheAt = 0; ovLoadExtra(true); renderOverview(); return; }
+      const g = e.target.closest('[data-ovgo]'); if (g){ const b = document.querySelector('#side .nv[data-view="' + g.dataset.ovgo + '"],#side .nv[data-mode="' + g.dataset.ovgo + '"]'); if (b) b.click(); }
+    });
+    el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
+    ovLoadExtra();
+  }
+  const html = ovHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
 function renderFlowsView(){
   const el = $('viewFlows'), st = X.stable;
