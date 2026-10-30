@@ -1,0 +1,1 @@
+{"name":"elpp-journal-relay","version":"1.0.0","private":true,"description":"Reads your own exchange trade history for the ELPP scanner journal","main":"elpp_journal_relay.js","scripts":{"start":"node elpp_journal_relay.js"},"engines":{"node":">=18"}}
