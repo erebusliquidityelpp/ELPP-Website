@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.27</title>
+<title>ELPP CRYPTO SCANNER PRO V4.28</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.27</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.28</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -2572,12 +2572,11 @@ function renderDropsView(){
   if (!el._built){
     el._built = true;
     el.innerHTML = `<div class="nsec"><h3>Airdrops &amp; token unlocks</h3>
-      <p class="hint">These five sites do not offer a free address that a web page can read, and I could not test any of them from where I work. So each one has a blank for the API address (and key, if the site gives you one). Find it on the site's developer / API page, paste it here, press Fetch. Put <code>{key}</code> in the address if the key goes in the link, or fill the header name (for example <code>X-API-KEY</code>) if it goes in a header. Everything stays in this browser. The scanner finds the list inside the answer and reads name, symbol, date, value and % automatically, then matches it to coins: you get <b>Airdrops</b> and <b>Next token unlock</b> columns, rule filters, and unlocks lower the verdict.</p>
+      <p class="hint">These five sites do not offer a free address that a web page can read, and I could not test any of them from where I work. So each one has a blank for the API address (and key, if the site gives you one). Find it on the site's developer / API page, paste it in the API keys menu, then press Fetch here. Put <code>{key}</code> in the address if the key goes in the link, or fill the header name (for example <code>X-API-KEY</code>) if it goes in a header. Everything stays in this browser. The scanner finds the list inside the answer and reads name, symbol, date, value and % automatically, then matches it to coins: you get <b>Airdrops</b> and <b>Next token unlock</b> columns, rule filters, and unlocks lower the verdict.</p>
       ${DROP_SRC.map(([id, name, link, kind]) => `<div class="xcard" data-id="${id}" style="max-width:none"><div class="xh"><b>${esc(name)}</b><span class="tagp">${kind === 'unl' ? 'Token unlocks' : kind === 'hyp' ? 'Hyperliquid on-chain' : 'Airdrops'}</span><a href="${link}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">Open site</a><span class="hint" id="dst_${id}"></span></div>
-        <div class="row" style="margin-top:6px"><input type="text" data-f="url" placeholder="API address (use {key} where the key goes)" style="flex:1;min-width:240px"><input type="text" data-f="hdr" placeholder="Key header, e.g. X-API-KEY" style="width:180px"><input type="password" data-f="key" placeholder="API key" autocomplete="off" style="width:180px"><button class="btn sm" type="button" data-fetch="${id}">Fetch</button></div><div id="dl_${id}"></div></div>`).join('')}</div>`;
-    for (const [id] of DROP_SRC){ const c = (state.drops || {})[id] || {}, card = el.querySelector(`[data-id="${id}"]`); for (const f of ['url','hdr','key']) card.querySelector(`[data-f="${f}"]`).value = c[f] || ''; }
+        <div class="row" style="margin-top:6px"><span class="hint">API address and key are set in the <b>API keys</b> menu.</span><button class="btn sm" type="button" data-goapi="1">Open API keys</button><button class="btn sm" type="button" data-fetch="${id}">Fetch</button></div><div id="dl_${id}"></div></div>`).join('')}</div>`;
     el.addEventListener('change', e => { const f = e.target.dataset.f; if (!f) return; const id = e.target.closest('[data-id]').dataset.id; state.drops = state.drops || {}; state.drops[id] = Object.assign({}, state.drops[id], {[f]:e.target.value.trim()}); saveState(); });
-    el.addEventListener('click', e => { const b = e.target.closest('[data-fetch]'); if (!b) return; const id = b.dataset.fetch, card = b.closest('[data-id]'); state.drops = state.drops || {}; state.drops[id] = {url:card.querySelector('[data-f="url"]').value.trim(), hdr:card.querySelector('[data-f="hdr"]').value.trim(), key:card.querySelector('[data-f="key"]').value.trim()}; saveState(); fetchDrop(id); });
+    el.addEventListener('click', e => { if (e.target.closest('[data-goapi]')){ const nb = document.querySelector('.nv[data-view="api"]'); if (nb) nb.click(); return; } const b = e.target.closest('[data-fetch]'); if (!b) return; fetchDrop(b.dataset.fetch); });
   }
   for (const [id, , , kind] of DROP_SRC){
     const items = X.drops[id] || [], err = X.dropsErr[id], st = $('dst_' + id), dl = $('dl_' + id); if (!st || !dl) continue;
@@ -6061,22 +6060,21 @@ function renderOrderflowView(){
       <p class="hint" id="ofStat"></p>
       <p class="hint"><b>Delta</b> = money spent buying at the ask (aggressive buyers) minus money spent selling at the bid. <b>Big prints</b> = single trades above a size threshold. <b>Absorbed</b> = lots of one-sided trading but price does not move: the other side is soaking it up. Collected live from Hyperliquid while this page is open (the top 60 coins by volume). Open any coin for its footprint ladder and CVD.</p>
       <div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Delta 5m</th><th>Delta 5m %</th><th>Delta 15m</th><th>Delta 15m %</th><th>Big prints 15m</th><th style="text-align:left">Reading 15m</th><th style="text-align:left">Verdict</th></tr></thead><tbody id="ofBody"></tbody></table></div></div>
-    <div class="nsec"><h3>MEXC through your relay</h3><p class="hint">If the red "MEXC … blocked or offline" message shows even though MEXC opens in your browser, MEXC is refusing to answer a web page. Run <code>elpp_feed_relay.js</code> (same file as below) and paste its address here, for example https://YOUR-RELAY. The scanner then asks the relay for MEXC data instead. Leave blank to try MEXC directly.</p><div class="row"><input type="text" id="mxRelay" placeholder="https://YOUR-RELAY" style="flex:1;min-width:240px"><button class="btn" id="mxRelayGo" type="button">Save and reload MEXC</button></div></div>
+    <div class="nsec"><h3>MEXC through your relay</h3><p class="hint">If the red "MEXC … blocked or offline" message shows even though MEXC opens in your browser, MEXC is refusing to answer a web page. Run <code>elpp_feed_relay.js</code> (same file as below) and put its address in the API keys menu, for example https://YOUR-RELAY. The scanner then asks the relay for MEXC data instead. Leave blank to try MEXC directly.</p><div class="row"><span class="hint">The relay address is set in the <b>API keys</b> menu (row "Relay address").</span><button class="btn" data-goapi="1" type="button">Open API keys</button><button class="btn" id="mxRelayGo" type="button">Reload MEXC</button></div></div>
     <div class="nsec"><h3>Your own feeds: ATAS, Bookmap, LuxAlgo</h3>
-      <p class="hint"><b>Can an API key be used?</b> No. ATAS and Bookmap are desktop programs and LuxAlgo is a TradingView indicator. None of them offers a web API that a key unlocks. What does work: they push their numbers to a small relay you run (the file <code>elpp_feed_relay.js</code>), and this page reads the relay. Put the relay's address below.</p>
+      <p class="hint"><b>Can an API key be used?</b> No. ATAS and Bookmap are desktop programs and LuxAlgo is a TradingView indicator. None of them offers a web API that a key unlocks. What does work: they push their numbers to a small relay you run (the file <code>elpp_feed_relay.js</code>), and this page reads the relay. Put the relay's address in the API keys menu.</p>
       ${EXF_SRC.filter(s => s[3] !== 'paid').map(([id, name, how]) => `<div class="xcard" data-id="${id}" style="max-width:none"><div class="xh"><b>${esc(name)}</b></div><p class="hint">${esc(how)}</p>
-        <div class="row"><input type="text" data-f="url" placeholder="Feed address, e.g. https://YOUR-RELAY/feed/${id}" style="flex:1;min-width:240px"><input type="text" data-f="hdr" placeholder="Key header (optional)" style="width:170px"><input type="password" data-f="key" placeholder="Key (optional)" style="width:170px"><button class="btn" data-fetch="${id}" type="button">Fetch</button></div>
+        <div class="row"><span class="hint">Feed address and key are set in the <b>API keys</b> menu.</span><button class="btn" data-goapi="1" type="button">Open API keys</button><button class="btn" data-fetch="${id}" type="button">Fetch</button></div>
         <p class="hint" data-st></p></div>`).join('')}
       <p class="hint">Expected shape: a list of rows with a <code>symbol</code> (BTC, BTCUSDT, BINANCE:BTCUSDT.P all work) and any numbers or text, or an object keyed by symbol. Every field shows in the coin window and in the "Your feeds" column.</p></div>
     <div class="nsec"><h3>Paid data slots (leave blank until you have a key)</h3>
-      <p class="hint">These need a paid subscription, so they are empty. Fill in the address, key and header name from your provider, press Fetch, and type the name of one number from the answer in "Field to filter on". That number then becomes a column and a filter ("Your Coinglass field", "Your exchange netflow field", and so on) and every field shows in the coin window.</p>
+      <p class="hint">These need a paid subscription, so they are empty. Fill in the address, key, header name and "Field to filter on" (one number from the answer) in the API keys menu, then press Fetch here. That number then becomes a column and a filter ("Your Coinglass field", "Your exchange netflow field", and so on) and every field shows in the coin window.</p>
       ${EXF_SRC.filter(s => s[3] === 'paid').map(([id, name, how]) => `<div class="xcard" data-id="${id}" style="max-width:none"><div class="xh"><b>${esc(name)}</b></div><p class="hint">${esc(how)}</p>
-        <div class="row"><input type="text" data-f="url" placeholder="Endpoint address (you can use {key} where the key goes)" style="flex:1;min-width:240px"><input type="text" data-f="hdr" placeholder="Key header name" style="width:150px"><input type="password" data-f="key" placeholder="Key" style="width:150px"><input type="text" data-f="field" placeholder="Field to filter on" style="width:150px"><button class="btn" data-fetch="${id}" type="button">Fetch</button></div>
+        <div class="row"><span class="hint">Endpoint address, key, header name and the field to filter on are set in the <b>API keys</b> menu.</span><button class="btn" data-goapi="1" type="button">Open API keys</button><button class="btn" data-fetch="${id}" type="button">Fetch</button></div>
         <p class="hint" data-st></p></div>`).join('')}</div>`;
-    $('mxRelay').value = state.mxRelay || '';
     for (const [id] of EXF_SRC){ const c = (state.extf || {})[id] || {}, card = el.querySelector(`[data-id="${id}"]`); for (const f of ['url','hdr','key','field']){ const inp = card.querySelector(`[data-f="${f}"]`); if (inp) inp.value = c[f] || ''; } }
     el.addEventListener('change', e => { const f = e.target.dataset.f; if (!f) return; const id = e.target.closest('[data-id]').dataset.id; state.extf = state.extf || {}; state.extf[id] = Object.assign({}, state.extf[id], {[f]:e.target.value.trim()}); saveState(); });
-    el.addEventListener('click', e => { if (e.target.closest('#mxRelayGo')){ state.mxRelay = $('mxRelay').value.trim(); saveState(); loadMexc(); loadMarkets(); loadCmc(); toast('MEXC and market data reloading'); return; } const b = e.target.closest('[data-fetch]'); if (b){ const id = b.dataset.fetch, card = b.closest('[data-id]'); state.extf = state.extf || {}; state.extf[id] = {url:card.querySelector('[data-f="url"]').value.trim(), hdr:card.querySelector('[data-f="hdr"]').value.trim(), key:card.querySelector('[data-f="key"]').value.trim(), field:(card.querySelector('[data-f="field"]') || {value:''}).value.trim()}; saveState(); fetchExf(id); return; }
+    el.addEventListener('click', e => { if (e.target.closest('[data-goapi]')){ const nb = document.querySelector('.nv[data-view="api"]'); if (nb) nb.click(); return; } if (e.target.closest('#mxRelayGo')){ loadMexc(); loadMarkets(); loadCmc(); toast('MEXC and market data reloading'); return; } const b = e.target.closest('[data-fetch]'); if (b){ const id = b.dataset.fetch, card = b.closest('[data-id]'); fetchExf(id); return; }
       const a = e.target.closest('[data-chart]'); if (a){ e.preventDefault(); openChart(a.dataset.chart); } });
   }
   $('ofStat').innerHTML = (OF.up ? '<span class="up">Live connection on</span>' : '<span class="warn">Live connection off' + (OF.err ? ' (' + esc(OF.err) + ')' : '') + '</span>') + ` · ${OF.coins.size} coins tracked · ${OF.n.toLocaleString()} trades seen since you opened this page. 15m numbers need about 9 minutes of data.`;
@@ -8239,6 +8237,28 @@ function ovRetailRows(o){
   } else R.push({n:'Forced closes (liquidations)', sub:'traders wiped out by the market', now:LQ.up ? 'Listening… nothing big yet' : 'Not connected (Binance may be blocked on your network)', tone:'na', say:'No data yet', why:'When a trader borrows too much and the price goes against them, the exchange closes the trade for them.', go:'', goL:''});
   return R;
 }
+/* ===== V4.28: market-wide breadth readings for "Institutions versus retail" ===== */
+function ovBreadth(){
+  const I = {up:0, dn:0, sp:0, n:0}, R = {up:0, dn:0, sp:0, n:0}; let coins = 0;
+  const put = (T, v) => { T.n++; if (v > 0) T.up++; else if (v < 0) T.dn++; else T.sp++; };
+  const th = (v, hi, lo) => v >= hi ? 1 : v <= lo ? -1 : 0, ok = isNum;
+  for (const c of snapshot.values()){
+    const m = c && c.m; if (!m || !ok(m.px) || /^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)) continue; const i0 = I.n + R.n;
+    for (const tf of ['15m', '1h', '4h']){ const f = (m.flowPct || {})[tf]; if (ok(f)) put(I, th(f, 5, -5)); const ic = (m.ic || {})[tf]; if (ic) put(I, ic === 1 || ic === 3 ? 1 : ic === 2 || ic === 4 ? -1 : 0); }
+    for (const tf of ['15m', '1h']){ const p = (m.pressure || {})[tf]; if (ok(p)) put(I, th(p, 10, -10)); }
+    { const o = (m.ofPct || {})['15m']; if (ok(o)) put(I, th(o, 10, -10)); }
+    if (ok(m.whBias) && m.whN >= 2) put(I, th(m.whBias, 40, -40)); if (ok(m.walScore) && m.walN >= 5) put(I, th(m.walScore, 30, -30));
+    if (ok(m.takerPct)) put(I, th(m.takerPct, 8, -8)); if (m.cbState !== null && m.cbState !== undefined) put(I, m.cbState === 1 ? 1 : m.cbState === 2 ? -1 : 0);
+    if (ok(m.topSmart)) put(I, th(m.topSmart, 0.55, 0.45)); if (m.optBias) put(I, m.optBias === 1 ? 1 : -1);
+    if (ok(m.lsRatio)) put(R, m.lsRatio > 1.2 ? 1 : m.lsRatio < 0.83 ? -1 : 0); if (ok(m.topCrowd)) put(R, th(m.topCrowd, 0.55, 0.45));
+    if (ok(m.funding)) put(R, th(m.funding, 0.003, -0.003));
+    { const o = m.oiPx && (m.oiPx['1h'] || m.oiPx['15m']); if (o) put(R, o === 1 ? 1 : o === 2 ? -1 : 0); }
+    if (ok(m.fundZ)) put(R, th(m.fundZ, 1.5, -1.5)); if (m.lsState) put(R, m.lsState === 1 ? 1 : -1);
+    if (ok(m.wikiX)) put(R, m.wikiX >= 2.5 ? 1 : 0); if (ok(m.trendRank)) put(R, m.trendRank <= 10 ? 1 : 0);
+    if (I.n + R.n > i0) coins++;
+  }
+  return {i:I, r:R, coins};
+}
 function ovSide(rows){
   const k = rows.filter(r => r.tone !== 'na'), up = k.filter(r => r.tone === 'up').length, dn = k.filter(r => r.tone === 'dn').length;
   let tone = 'warn', label = 'Split: no clear side';
@@ -8267,6 +8287,7 @@ function ovHtml(){
   const ml = mood.n < 2 ? ['na', 'Still collecting data', 'The scanner is still loading prices. Give it a minute.'] : sc >= 3 ? ['up', 'BUYERS ARE IN CONTROL', 'Most signs point up. Rising markets are easier to trade from the long side, but do not chase big green candles.'] : sc >= 1 ? ['up', 'SLIGHTLY BULLISH', 'A few more signs point up than down. Be selective and let price come to your level.'] : sc <= -3 ? ['dn', 'SELLERS ARE IN CONTROL', 'Most signs point down. Falling markets are dangerous for new buyers. Patience is also a position.'] : sc <= -1 ? ['dn', 'SLIGHTLY BEARISH', 'A few more signs point down than up. Be careful with new longs.'] : ['warn', 'UNDECIDED / SIDEWAYS', 'Signs point both ways. This is the kind of market that tricks beginners, so trade small or wait.'];
   const pos = Math.max(0, Math.min(100, (sc + 6) / 12 * 100));
   const inst = ovInstRows(o), ret = ovRetailRows(o), I = ovSide(inst), Rt = ovSide(ret);
+  { const Bd = ovBreadth(), comb = (S, b) => { const up = S.up + b.up, dn = S.dn + b.dn, n = S.n + b.n; if (b.n >= 300){ const dd = up + dn, d = dd ? (up - dn) / dd * 100 : 0; S.tone = d >= 8 ? 'up' : d <= -8 ? 'dn' : 'warn'; S.label = d >= 25 ? 'Mostly BUYING' : d <= -25 ? 'Mostly SELLING' : d >= 8 ? 'Leaning to buying' : d <= -8 ? 'Leaning to selling' : 'Split: no clear side'; } S.up = up; S.dn = dn; S.n = n; S.coins = b.n >= 300 ? Bd.coins : 0; return S; }; comb(I, Bd.i); comb(Rt, Bd.r); }
   const nm = {up:'buying', dn:'selling', warn:'split', na:'unclear'};
   let cmp = ['warn', 'Not enough data yet to compare', 'Wait for both tables to fill in.'];
   if (I.tone !== 'na' && Rt.tone !== 'na'){
@@ -8305,7 +8326,7 @@ function ovHtml(){
   <div class="nsec"><h3>The market in plain words</h3>${story.length ? `<ul class="ovstory">${story.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="hint">Loading prices…</p>'}</div>
   <div class="nsec"><h3>Key numbers</h3><div class="ovk">${tiles}</div></div>
   <div class="ovm ov-${cmp[0]}"><div class="ovmh"><span class="hint">Institutions versus retail</span><h2>${esc(cmp[1])}</h2></div>
-    <div class="ovduo"><div><small>Institutions (big money)</small><span class="ovv ov-${I.tone}">${esc(I.label)}</span><em>${I.up} buying · ${I.dn} selling · ${I.n - I.up - I.dn} split, of ${I.n} readings</em></div><div><small>Retail (everyday traders)</small><span class="ovv ov-${Rt.tone}">${esc(Rt.label)}</span><em>${Rt.up} buying · ${Rt.dn} selling · ${Rt.n - Rt.up - Rt.dn} split, of ${Rt.n} readings</em></div></div><p>${esc(cmp[2])}</p></div>
+    <div class="ovduo"><div><small>Institutions (big money)</small><span class="ovv ov-${I.tone}">${esc(I.label)}</span><em>${I.up} buying · ${I.dn} selling · ${I.n - I.up - I.dn} split, of ${I.n.toLocaleString()} readings${I.coins ? ' across ' + I.coins + ' coins' : ''}</em></div><div><small>Retail (everyday traders)</small><span class="ovv ov-${Rt.tone}">${esc(Rt.label)}</span><em>${Rt.up} buying · ${Rt.dn} selling · ${Rt.n - Rt.up - Rt.dn} split, of ${Rt.n.toLocaleString()} readings${Rt.coins ? ' across ' + Rt.coins + ' coins' : ''}</em></div></div><p>${esc(cmp[2])}</p></div>
   <div class="nsec"><h3>What institutions are doing</h3><p class="hint">Institutions means funds, whales and professional traders: the big money. Nobody can see their private accounts, so each row is the best free clue we have. Green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(inst)}</div>
   <div class="nsec"><h3>What retail is doing</h3><p class="hint">Retail means everyday traders with small accounts. They tend to buy after prices rise and sell after they fall, so extremes in this table are often a warning sign for the crowd. Same colours: green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(ret)}</div>
   ${ovOutside()}
