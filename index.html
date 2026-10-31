@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.25</title>
+<title>ELPP CRYPTO SCANNER PRO V4.26</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.25</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.26</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -3167,7 +3167,7 @@ function lqConnect(){
 }
 function lqAdd(o){
   const b = String(o.s || '').replace(/(USDT|USDC)$/, '').replace(/^10{3,}/, ''), usd = (+o.ap || +o.p || 0) * (+o.z || +o.q || 0); if (!b || !(usd > 0)) return;
-  const arr = LQ.coins.get(b) || []; const now = Date.now(); arr.push({t:now, usd, long:o.S === 'SELL'}); while (arr.length && now - arr[0].t > 4.2e6) arr.shift(); LQ.coins.set(b, arr); LQ.n++; if (!LQ.t0) LQ.t0 = now;
+  const arr = LQ.coins.get(b) || []; const now = Date.now(); arr.push({t:now, usd, long:o.S === 'SELL', ex:'Binance', p:+o.ap || +o.p || 0}); while (arr.length && now - arr[0].t > 4.2e6) arr.shift(); LQ.coins.set(b, arr); LQ.n++; if (!LQ.t0) LQ.t0 = now;
 }
 function liqFill(c){
   const m = c.m; m.liqL5 = null; m.liqS5 = null; m.liqX = null; m.liqFlush = 0; if (!LQ.up && !LQ.n) return;
@@ -3255,14 +3255,14 @@ function dqFill(c, now){
 /* liquidations from three exchanges at once: if one stream is blocked the others keep it alive */
 LQ.s = {bn:false, ok:false, by:false}; LQ.okErr = ''; LQ.byErr = '';
 function lqUp(){ LQ.up = !!(LQ.s.bn || LQ.s.ok || LQ.s.by); }
-function lqPush(b, usd, long){ if (!b || !(usd > 0)) return; const arr = LQ.coins.get(b) || [], now = Date.now(); arr.push({t:now, usd, long}); while (arr.length && now - arr[0].t > 4.2e6) arr.shift(); LQ.coins.set(b, arr); LQ.n++; if (!LQ.t0) LQ.t0 = now; }
+function lqPush(b, usd, long, ex, p){ if (!b || !(usd > 0)) return; const arr = LQ.coins.get(b) || [], now = Date.now(); arr.push({t:now, usd, long, ex:ex || '', p:p || 0}); while (arr.length && now - arr[0].t > 4.2e6) arr.shift(); LQ.coins.set(b, arr); LQ.n++; if (!LQ.t0) LQ.t0 = now; }
 async function lqOkx(){
   if (LQ.okWs && LQ.okWs.readyState <= 1) return;
   try { if (!LQ.okCt){ const j = await ext('https://www.okx.com/api/v5/public/instruments?instType=SWAP', null, 15000); LQ.okCt = new Map((j.data || []).filter(x => /-USDT-SWAP$/.test(x.instId)).map(x => [x.instId, +x.ctVal])); } } catch(e){ LQ.okErr = errTxt(e); setTimeout(lqOkx, 60000); return; }
   let ws; try { ws = new WebSocket('wss://ws.okx.com:8443/ws/v5/public'); } catch(e){ LQ.okErr = errTxt(e); setTimeout(lqOkx, 60000); return; }
   LQ.okWs = ws; LQ.okRetry = LQ.okRetry || 0;
   ws.onopen = () => { LQ.s.ok = true; LQ.okErr = ''; LQ.okRetry = 0; lqUp(); try { ws.send(JSON.stringify({op:'subscribe', args:[{channel:'liquidation-orders', instType:'SWAP'}]})); } catch(e){} };
-  ws.onmessage = ev => { try { const j = JSON.parse(ev.data); for (const d of (j.data || [])){ const ct = LQ.okCt && LQ.okCt.get(d.instId); if (!(ct > 0)) continue; const b = d.instId.replace('-USDT-SWAP', '').replace(/^10{3,}/, ''); for (const x of (d.details || [])) lqPush(b, +x.sz * ct * (+x.bkPx), x.posSide === 'long' || (x.posSide === 'net' && x.side === 'sell')); } } catch(e){} };
+  ws.onmessage = ev => { try { const j = JSON.parse(ev.data); for (const d of (j.data || [])){ const ct = LQ.okCt && LQ.okCt.get(d.instId); if (!(ct > 0)) continue; const b = d.instId.replace('-USDT-SWAP', '').replace(/^10{3,}/, ''); for (const x of (d.details || [])) lqPush(b, +x.sz * ct * (+x.bkPx), x.posSide === 'long' || (x.posSide === 'net' && x.side === 'sell'), 'OKX', +x.bkPx); } } catch(e){} };
   ws.onerror = () => { LQ.okErr = 'the OKX liquidation stream failed (OKX may be blocked on your network)'; };
   ws.onclose = () => { LQ.s.ok = false; lqUp(); setTimeout(lqOkx, Math.min(60000, 3000 * ++LQ.okRetry)); };
 }
@@ -3273,7 +3273,7 @@ function lqBybit(){
   let ws; try { ws = new WebSocket('wss://stream.bybit.com/v5/public/linear'); } catch(e){ LQ.byErr = errTxt(e); setTimeout(lqBybit, 60000); return; }
   LQ.byWs = ws; LQ.byRetry = LQ.byRetry || 0; let pi = null;
   ws.onopen = () => { LQ.s.by = true; LQ.byErr = ''; LQ.byRetry = 0; lqUp(); try { for (let i = 0; i < names.length; i += 10) ws.send(JSON.stringify({op:'subscribe', args:names.slice(i, i + 10).map(n => 'allLiquidation.' + n)})); } catch(e){} pi = setInterval(() => { try { ws.send('{"op":"ping"}'); } catch(e){} }, 20000); };
-  ws.onmessage = ev => { try { const j = JSON.parse(ev.data); if (!j.topic || j.topic.indexOf('allLiquidation') !== 0) return; for (const d of (Array.isArray(j.data) ? j.data : [j.data])){ if (!d) continue; lqPush(String(d.s || '').replace(/USDT$/, '').replace(/^10{3,}/, ''), (+d.v) * (+d.p), d.S === 'Buy'); } } catch(e){} };
+  ws.onmessage = ev => { try { const j = JSON.parse(ev.data); if (!j.topic || j.topic.indexOf('allLiquidation') !== 0) return; for (const d of (Array.isArray(j.data) ? j.data : [j.data])){ if (!d) continue; lqPush(String(d.s || '').replace(/USDT$/, '').replace(/^10{3,}/, ''), (+d.v) * (+d.p), d.S === 'Buy', 'Bybit', +d.p); } } catch(e){} };
   ws.onerror = () => { LQ.byErr = 'the Bybit liquidation stream failed (Bybit may be blocked on your network)'; };
   ws.onclose = () => { if (pi) clearInterval(pi); LQ.s.by = false; lqUp(); setTimeout(lqBybit, Math.min(60000, 3000 * ++LQ.byRetry)); };
 }
@@ -8847,9 +8847,9 @@ async function eiRun(k, fn, every, force){
 function eiLoadAll(force){
   if (eiCfg().off) return;
   eiRun('cot', eiCotLoad, 6 * 36e5, force); eiRun('term', eiTermLoad, 3e5, force); eiRun('etf', eiEtfLoad, 18e5, force); eiRun('poly', eiPolyLoad, 3e5, force);
-  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('dvol', eiDvolLoad, 6e5, force);
+  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('oiex', eiOiLoad, 90000, force); eiRun('dvol', eiDvolLoad, 6e5, force);
 }
-function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); }
+function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); setInterval(eiOiBnTick, 3000); setInterval(eiBkTick, 5000); }
 /* 1. CFTC Commitments of Traders: what asset managers, leveraged funds and dealers hold in CME bitcoin and ether futures */
 async function eiCotLoad(){
   const base = 'https://publicreporting.cftc.gov/resource/gpe5-46if.json', tok = String(eiCfg().cftc || '').trim(), hdr = tok ? {'X-App-Token':tok} : null;
@@ -8997,6 +8997,7 @@ function eiFill(c, now){
   { const t = EI.top.get(k); if (t && Date.now() - t.at < 3 * 36e5){ m.topSmart = t.smart; m.topCrowd = t.crowd; if (isNum(t.smart) && isNum(t.crowd)) m.topDiv = t.smart >= 0.55 && t.crowd <= 0.48 ? 1 : t.smart <= 0.45 && t.crowd >= 0.52 ? 2 : 0; } }
   { const r = X.trend && X.trend.get(k); if (r) m.trendRank = r; }
   if ((k === 'BTC' || k === 'ETH') && EI.d.bfx && EI.d.bfx[k]) m.bfxChg = EI.d.bfx[k].chg;
+  eiBookFill(c, m, k);
   eiImpact(c, m, k);
 }
 /* V4.23: every coin gets a signed, labelled list of what each institutional source adds (+ = long bias) */
@@ -9019,6 +9020,9 @@ function eiImpact(c, m, k){
   { const D = (k === 'ETH' && EI.d.dvolE) ? EI.d.dvolE : EI.d.dvol; if (D && isNum(D.ratio) && D.ratio >= 1.25) P('Options fear', -1, 'the Deribit options fear gauge (DVOL) is ' + ((D.ratio - 1) * 100).toFixed(0) + '% above its normal: the options market is paying up for protection'); }
   { const g = OC.g; if (g && isNum(g.stChg7)){ if (g.stChg7 >= 1) P('Stablecoins', 1, 'stablecoin supply grew ' + g.stChg7.toFixed(1) + '% in 7 days: fresh buying power is entering'); else if (g.stChg7 <= -0.5) P('Stablecoins', -1, 'stablecoin supply shrank ' + Math.abs(g.stChg7).toFixed(1) + '% in 7 days: cash is leaving crypto'); } }
   if (isNum(m.trendRank) && m.trendRank <= 3) P('Retail attention', -1, 'it is in the top 3 trending coins on CoinGecko: the crowd is already looking');
+  { const ch = (m.chg || {})['1h']; if (isNum(m.oiAggChg) && isNum(ch) && m.oiAggN >= 3){ if (m.oiAggChg >= 3 && ch > 0.3) P('All-exchange open interest', 1, 'open interest across ' + m.oiAggN + ' exchanges is up ' + m.oiAggChg.toFixed(1) + '% in about an hour while price rises: new longs are real, not just one venue'); else if (m.oiAggChg >= 3 && ch < -0.3) P('All-exchange open interest', -1, 'open interest across ' + m.oiAggN + ' exchanges is up ' + m.oiAggChg.toFixed(1) + '% in about an hour while price falls: new shorts are piling in'); } }
+  if (isNum(m.bkObi) && m.bkAgg && m.bkAgg.n >= 3 && Math.abs(m.bkObi) >= 0.25) P('Order book across exchanges', m.bkObi > 0 ? 1 : -1, 'within 0.5% of price the combined book on ' + m.bkAgg.n + ' exchanges holds ' + fmtUsd(m.bkAgg.b05) + ' of bids against ' + fmtUsd(m.bkAgg.a05) + ' of asks (' + (m.bkObi > 0 ? 'buyers' : 'sellers') + ' are stacked deeper)');
+  if (m.lhmMag) P('Liquidation heatmap', m.lhmMag, m.lhmMag > 0 ? 'the estimated liquidation cluster above price is the bigger and closer one: price tends to be pulled up to hunt it' : 'the estimated liquidation cluster below price is the bigger and closer one: price tends to be pulled down to hunt it');
   let net = 0; const out = []; for (const x of L){ if (Math.abs(net + x[1]) > 8) continue; net += x[1]; out.push(x); }
   m.eiImp = out; m.eiNet = out.length ? net : null;
 }
@@ -9303,6 +9307,85 @@ function pt30(c, rd){
   return {rows:out, net, verdict, fails, hard, have};
 }
 
+/* ===== V4.26: all-exchange open interest, order-book depth and liquidation heatmap ===== */
+Object.assign(EI, {oiEx:{}, oiSrc:{}, oiBn:new Map(), oiH:new Map(), bk:new Map(), bkBusy:false, oiBnBusy:false, bkSrc:{}});
+const EI_OI_SRC = [
+  ['Bybit', async () => { const j = await ext('https://api.bybit.com/v5/market/tickers?category=linear', null, 15000), m = new Map(); for (const t of ((j.result || {}).list || [])){ if (!/USDT$/.test(t.symbol)) continue; const u = +t.openInterestValue; if (u > 0){ const b = rdUnit(t.symbol, 'USDT')[0]; m.set(b, (m.get(b) || 0) + u); } } return m; }],
+  ['OKX', async () => { const j = await ext('https://www.okx.com/api/v5/public/open-interest?instType=SWAP', null, 15000), m = new Map(); for (const t of (j.data || [])){ if (!/-USDT-SWAP$/.test(t.instId)) continue; const u = +t.oiUsd; if (u > 0) m.set(t.instId.replace('-USDT-SWAP', '').replace(/^10{3,}/, ''), u); } return m; }],
+  ['Bitget', async () => { const j = await ext('https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES', null, 15000), m = new Map(); for (const t of (j.data || [])){ if (!/USDT$/.test(t.symbol)) continue; const u = (+t.holdingAmount) * (+t.markPrice || +t.lastPr); if (u > 0){ const b = rdUnit(t.symbol, 'USDT')[0]; m.set(b, (m.get(b) || 0) + u); } } return m; }],
+  ['Gate', async () => { const j = await ext('https://api.gateio.ws/api/v4/futures/usdt/contracts', null, 20000), m = new Map(); for (const t of (Array.isArray(j) ? j : [])){ if (!/_USDT$/.test(t.name)) continue; const u = (+t.position_size) * (+t.quanto_multiplier) * (+t.mark_price); if (u > 0) m.set(t.name.replace('_USDT', '').replace(/^10{3,}/, ''), u); } return m; }]
+];
+async function eiOiLoad(){
+  const rs = await Promise.allSettled(EI_OI_SRC.map(s => s[1]())); let any = 0;
+  rs.forEach((r, i) => { const nm = EI_OI_SRC[i][0]; if (r.status === 'fulfilled' && r.value.size){ EI.oiEx[nm] = {m:r.value, at:Date.now()}; EI.oiSrc[nm] = {ok:true, at:Date.now(), err:''}; any++; } else EI.oiSrc[nm] = {ok:false, at:Date.now(), err:r.status === 'rejected' ? errTxt(r.reason) : 'empty answer'}; });
+  if (!any) throw new Error('no exchange answered the open-interest request');
+}
+async function eiOiBnTick(){
+  if (EI.oiBnBusy || document.hidden || eiCfg().off) return;
+  const list = [...state.coins.values()].filter(c => c.ctx && c.m && isNum(c.m.px) && !String(c.name).includes(':')).sort((a, b) => ((b.m && b.m.vol24) || 0) - ((a.m && a.m.vol24) || 0)).slice(0, 40); if (!list.length) return;
+  list.sort((a, b) => ((EI.oiBn.get(normSym(a.name)) || {at:0}).at) - ((EI.oiBn.get(normSym(b.name)) || {at:0}).at)); const c = list[0], k = normSym(c.name);
+  if (Date.now() - (EI.oiBn.get(k) || {at:0}).at < 150000) return; EI.oiBnBusy = true;
+  try { const sym = (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; const j = await ext('https://fapi.binance.com/fapi/v1/openInterest?symbol=' + sym, null, 12000); const q = +j.openInterest; if (q > 0){ EI.oiBn.set(k, {usd:q * c.m.px, at:Date.now()}); EI.oiSrc.Binance = {ok:true, at:Date.now(), err:''}; } else EI.oiBn.set(k, {usd:null, at:Date.now() - 100000}); }
+  catch(e){ EI.oiSrc.Binance = {ok:false, at:Date.now(), err:errTxt(e)}; EI.oiBn.set(k, {usd:null, at:Date.now() - 100000}); }
+  finally { EI.oiBnBusy = false; }
+}
+/* order-book depth on five exchanges */
+function bkCalc(bids, asks){
+  if (!bids.length || !asks.length) return null; const bb = Math.max(...bids.map(x => x[0])), ba = Math.min(...asks.map(x => x[0])), mid = (bb + ba) / 2; if (!(mid > 0)) return null;
+  const S = (a, f) => a.filter(f).reduce((s, x) => s + x[0] * x[1], 0), big = a => a.reduce((o, x) => (x[0] * x[1] > o.u ? {p:x[0], u:x[0] * x[1]} : o), {p:0, u:0});
+  return {mid, b05:S(bids, x => x[0] >= mid * 0.995), a05:S(asks, x => x[0] <= mid * 1.005), b1:S(bids, x => x[0] >= mid * 0.99), a1:S(asks, x => x[0] <= mid * 1.01), wb:big(bids.filter(x => x[0] >= mid * 0.98)), wa:big(asks.filter(x => x[0] <= mid * 1.02))};
+}
+async function eiBkTick(){
+  if (EI.bkBusy || document.hidden || eiCfg().off) return;
+  const list = [...state.coins.values()].filter(c => c.ctx && c.m && isNum(c.m.px) && !String(c.name).includes(':')).sort((a, b) => ((b.m && b.m.vol24) || 0) - ((a.m && a.m.vol24) || 0)).slice(0, 30); if (!list.length) return;
+  list.sort((a, b) => ((EI.bk.get(normSym(a.name)) || {at:0}).at) - ((EI.bk.get(normSym(b.name)) || {at:0}).at)); const c = list[0], k = normSym(c.name);
+  if (Date.now() - (EI.bk.get(k) || {at:0}).at < 420000) return; EI.bkBusy = true;
+  try {
+    const sym = (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT', mu = /^k[A-Z0-9]{2,}$/.test(c.name) ? 1 : 1, ex = {}, nums = a => (a || []).map(x => [+x[0], +x[1]]).filter(x => x[0] > 0 && x[1] > 0);
+    const jobs = [
+      ['Binance', async () => { const j = await ext('https://fapi.binance.com/fapi/v1/depth?symbol=' + sym + '&limit=500', null, 12000); return bkCalc(nums(j.bids), nums(j.asks)); }],
+      ['Bybit', async () => { const j = await ext('https://api.bybit.com/v5/market/orderbook?category=linear&symbol=' + sym + '&limit=200', null, 12000), r = j.result || {}; return bkCalc(nums(r.b), nums(r.a)); }],
+      ['OKX', async () => { if (!LQ.okCt) return null; const id = k + '-USDT-SWAP', ct = LQ.okCt.get(id); if (!(ct > 0)) return null; const j = await ext('https://www.okx.com/api/v5/market/books?instId=' + id + '&sz=400', null, 12000), d = (j.data || [])[0]; if (!d) return null; return bkCalc(nums(d.bids).map(x => [x[0], x[1] * ct]), nums(d.asks).map(x => [x[0], x[1] * ct])); }],
+      ['Bitget', async () => { const j = await ext('https://api.bitget.com/api/v2/mix/market/merge-depth?productType=USDT-FUTURES&symbol=' + sym + '&limit=100', null, 12000), d = j.data || {}; return bkCalc(nums(d.bids), nums(d.asks)); }]
+    ];
+    const rs = await Promise.allSettled(jobs.map(x => x[1]()));
+    rs.forEach((r, i) => { const nm = jobs[i][0]; if (r.status === 'fulfilled' && r.value){ ex[nm] = r.value; EI.bkSrc[nm] = {ok:true, at:Date.now(), err:''}; } else if (r.status === 'rejected') EI.bkSrc[nm] = {ok:false, at:Date.now(), err:errTxt(r.reason)}; });
+    if (c.l2 && c.l2.bk && c.l2.ak && Date.now() - c.l2.at < 600000){ const h = bkCalc(c.l2.bk.map(x => [x[0], x[1] / x[0]]), c.l2.ak.map(x => [x[0], x[1] / x[0]])); if (h) ex.Hyperliquid = h; }
+    EI.bk.set(k, {ex, at:Object.keys(ex).length ? Date.now() : Date.now() - 300000});
+  } finally { EI.bkBusy = false; }
+}
+/* estimated resting liquidation levels (heatmap) from where volume traded and what leverage would be wiped since */
+function lhmBuild(c, m, oiUsd){
+  const cd = c.candles; if (!cd || cd.length < 150 || !isNum(m.px)) return null; if (c._lhm && Date.now() - c._lhm.at < 60000 && c._lhm.n === cd.length) return c._lhm.v;
+  const n = cd.length, sufMin = new Array(n + 1), sufMax = new Array(n + 1); sufMin[n] = Infinity; sufMax[n] = -Infinity;
+  for (let i = n - 1; i >= 0; i--){ sufMin[i] = Math.min(sufMin[i + 1], cd[i].l); sufMax[i] = Math.max(sufMax[i + 1], cd[i].h); }
+  const T = [[10, 0.35], [25, 0.3], [50, 0.2], [100, 0.15]], px = m.px, bw = px * 0.0025, B = new Map(); let tot = 0;
+  for (let i = 0; i < n - 1; i++){ const k = cd[i], e = (k.h + k.l + k.c) / 3, w = (k.v || 0) * e; if (!(w > 0)) continue;
+    for (const [lev, tw] of T){ const lL = e * (1 - 1 / lev + 0.005), sL = e * (1 + 1 / lev - 0.005);
+      if (sufMin[i + 1] > lL && lL < px && lL > px * 0.9){ const b = Math.round(lL / bw), o = B.get(b) || {p:0, l:0, s:0}; o.p = b * bw; o.l += w * tw; B.set(b, o); tot += w * tw; }
+      if (sufMax[i + 1] < sL && sL > px && sL < px * 1.1){ const b = Math.round(sL / bw), o = B.get(b) || {p:0, l:0, s:0}; o.p = b * bw; o.s += w * tw; B.set(b, o); tot += w * tw; } } }
+  if (!(tot > 0)) return null; const scale = isNum(oiUsd) && oiUsd > 0 ? oiUsd / tot : null, all = [...B.values()].map(o => ({p:o.p, raw:o.l + o.s, side:o.l ? 'long' : 'short', d:(o.p - px) / px * 100}));
+  const pick = a => a.sort((x, y) => y.raw - x.raw).slice(0, 3).map(x => ({p:x.p, d:x.d, usd:scale ? x.raw * scale : null, side:x.side})), mx = Math.max(...all.map(x => x.raw));
+  const above = pick(all.filter(x => x.p > px && x.d <= 6)), below = pick(all.filter(x => x.p < px && x.d >= -6));
+  const sumA = all.filter(x => x.p > px).reduce((s, x) => s + x.raw, 0), sumB = all.filter(x => x.p < px).reduce((s, x) => s + x.raw, 0);
+  const v = {above, below, rel:x => x.usd && scale ? x.usd / (mx * scale) * 100 : null, shortUsd:scale ? sumA * scale : null, longUsd:scale ? sumB * scale : null, mx:mx * (scale || 1)};
+  c._lhm = {at:Date.now(), n, v}; return v;
+}
+function eiBookFill(c, m, k){
+  m.oiAgg = null; m.oiAggN = 0; m.oiAggMix = null; m.oiAggChg = null; m.bkAgg = null; m.bkObi = null; m.lhm = null; m.lhmMag = 0; m.liqEx = null; const now = Date.now(), v = {};
+  if (isNum(m.oiUsd) && m.oiUsd > 0) v.Hyperliquid = m.oiUsd;
+  for (const nm in EI.oiEx){ const o = EI.oiEx[nm]; if (now - o.at > 600000) continue; const u = o.m.get(k); if (u > 0) v[nm] = u; }
+  { const b = EI.oiBn.get(k); if (b && b.usd > 0 && now - b.at < 900000) v.Binance = b.usd; }
+  const names = Object.keys(v);
+  if (names.length >= 2){ const tot = names.reduce((s, x) => s + v[x], 0); m.oiAgg = tot; m.oiAggN = names.length; m.oiAggMix = names.map(x => [x, v[x] / tot * 100]).sort((a, b) => b[1] - a[1]);
+    let h = EI.oiH.get(k); if (!h){ h = []; EI.oiH.set(k, h); } if (!h.length || now - h[h.length - 1].t >= 120000){ h.push({t:now, v}); while (h.length > 90) h.shift(); }
+    const old = h.filter(x => now - x.t >= 50 * 60000).pop(); if (old){ const com = names.filter(x => old.v[x] > 0); if (com.length >= 2){ const a = com.reduce((s, x) => s + v[x], 0), b = com.reduce((s, x) => s + old.v[x], 0); if (b > 0) m.oiAggChg = (a / b - 1) * 100; } } }
+  const bk = EI.bk.get(k); if (bk && now - bk.at < 1500000){ const ex = bk.ex, nm = Object.keys(ex); if (nm.length){ const S = f => nm.reduce((s, x) => s + ex[x][f], 0), b05 = S('b05'), a05 = S('a05'); m.bkAgg = {ex, n:nm.length, b05, a05, b1:S('b1'), a1:S('a1')}; if (b05 + a05 > 0) m.bkObi = (b05 - a05) / (b05 + a05); } }
+  { const arr = LQ.coins.get(k) || []; const ex = {}; let any = false; for (const x of arr){ if (now - x.t > 3.6e6 || !x.ex) continue; const o = ex[x.ex] || (ex[x.ex] = {l:0, s:0}); if (x.long) o.l += x.usd; else o.s += x.usd; any = true; } if (any) m.liqEx = ex; }
+  try { m.lhm = lhmBuild(c, m, m.oiAgg || m.oiUsd); } catch(e){ m.lhm = null; }
+  if (m.lhm && isNum(m.px)){ const a = m.lhm.above[0], b = m.lhm.below[0]; if (a && b && Math.abs(a.d) <= 3 && Math.abs(b.d) <= 3){ const ra = a.usd || 0, rb = b.usd || 0; if (ra > 1.5 * rb && ra > 0) m.lhmMag = Math.abs(a.d) <= Math.abs(b.d) * 1.5 ? 1 : 0; else if (rb > 1.5 * ra && rb > 0) m.lhmMag = Math.abs(b.d) <= Math.abs(a.d) * 1.5 ? -1 : 0; } else if (a && Math.abs(a.d) <= 2 && !b) m.lhmMag = 1; else if (b && Math.abs(b.d) <= 2 && !a) m.lhmMag = -1; }
+}
+
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
 var X9 = {cb:new Map(), cbAt:0, cbBusy:false, cbProd:null, cbErr:null, seas:new Map(), seasQ:[], seasBusy:false, seasErr:null, want:new Set(), started:false};
 function x9Mult(name){ return /^k[A-Z0-9]{2,}$/.test(name) ? 1000 : 1; }
@@ -9412,6 +9495,17 @@ function ptRows(c, rd){
     if (e) row('Institutions', name + ' spot ETF flows', fmtUsd(e.d1, true) + ' last day · ' + fmtUsd(e.d5, true) + ' over 5 days', e.state === 1 ? (long ? 'up' : 'dn') : e.state === 2 ? (long ? 'dn' : 'up') : 'warn', 'Real money into or out of US spot ETFs. Several inflow days back a long; an outflow streak is a headwind.');
     if (o) row('Institutions', 'CME futures: asset managers net change', (o.cur >= 0 ? '+' : '') + o.cur.toFixed(0) + ' ' + name + ' this week (z ' + o.z.toFixed(1) + ')', o.state === 1 ? (long ? 'up' : 'dn') : o.state === 2 ? (long ? 'dn' : 'up') : 'warn', 'What regulated asset managers did in CME futures, weekly. Adding length is bullish; cutting is bearish.');
     if (t) row('Positioning', 'Futures curve (annualised basis)', t.ann.toFixed(1) + '% · ' + EI_TERM_LAB[t.state], t.state === 1 ? 'warn' : t.state === 4 ? 'dn' : 'up', 'Above 20% a year means leveraged longs are crowded; below zero means stress.'); }
+  { const px = m.px, mixTxt = a => (a || []).slice(0, 5).map(x => x[0] + ' ' + x[1].toFixed(0) + '%').join(' · ');
+    if (n(m.oiAgg)) row('All-exchange data', 'Open interest across ' + m.oiAggN + ' exchanges', fmtUsd(m.oiAgg) + (n(m.oiAggChg) ? ' · ' + sgn(m.oiAggChg, 1, '%') + ' (about 1h)' : ''), n(m.oiAggChg) && m.oiAggChg >= 3 ? 'warn' : 'na', 'Open interest is the money in open leveraged positions. ' + mixTxt(m.oiAggMix) + '. Rising across many exchanges together is real new positioning; rising on one venue alone can be noise.');
+    else row('All-exchange data', 'Open interest across exchanges', 'No data yet', 'na', 'Needs at least two exchanges to answer (Bybit, OKX, Bitget, Gate, Binance and Hyperliquid are tried).');
+    if (m.bkAgg){ const A = m.bkAgg, ex = Object.keys(A.ex).map(x => x + ' ' + fmtUsd(A.ex[x].b05) + ' / ' + fmtUsd(A.ex[x].a05)).join(' · '); row('All-exchange data', 'Order book depth within 0.5% (bids / asks), ' + A.n + ' exchanges', fmtUsd(A.b05) + ' / ' + fmtUsd(A.a05) + (n(m.bkObi) ? ' · ' + sgn(m.bkObi * 100, 0, '%') + ' imbalance' : ''), n(m.bkObi) && dir ? (m.bkObi * dir >= 0.2 ? 'up' : m.bkObi * dir <= -0.2 ? 'dn' : 'warn') : 'warn', 'Combined resting orders on all exchanges that answered. ' + ex + '. Within 1%: ' + fmtUsd(A.b1) + ' bids / ' + fmtUsd(A.a1) + ' asks.');
+      const wb = Object.keys(A.ex).map(x => [x, A.ex[x].wb]).filter(x => x[1].u > 0).sort((p, q) => q[1].u - p[1].u)[0], wa = Object.keys(A.ex).map(x => [x, A.ex[x].wa]).filter(x => x[1].u > 0).sort((p, q) => q[1].u - p[1].u)[0];
+      if (wb || wa) row('All-exchange data', 'Biggest resting walls (within 2%)', (wb ? 'bid ' + fmtUsd(wb[1].u) + ' at ' + fmtPx(wb[1].p) + ' (' + wb[0] + ')' : '—') + ' · ' + (wa ? 'ask ' + fmtUsd(wa[1].u) + ' at ' + fmtPx(wa[1].p) + ' (' + wa[0] + ')' : '—'), 'warn', 'Big single orders act as support or resistance until they are pulled or eaten. They can also be fake, so watch whether they stay as price nears.'); }
+    else row('All-exchange data', 'Order book depth across exchanges', 'No data yet', 'na', 'The book is read for one coin about every 7 minutes, top 30 coins first.');
+    if (m.lhm){ const H = m.lhm, f = a => a.length ? a.map(x => fmtPx(x.p) + ' (' + sgn(x.d, 1, '%') + (n(x.usd) ? ', about ' + fmtUsd(x.usd) : '') + ')').join(' · ') : 'none within 6%'; const mix = m.oiAggMix ? ' Estimated size is split by open-interest share: ' + mixTxt(m.oiAggMix) + '.' : '';
+      row('All-exchange data', 'Liquidation heatmap: shorts to be wiped above price', f(H.above), m.lhmMag > 0 ? 'up' : 'warn', 'Where leveraged short positions opened in the last 2 days would be liquidated if price reaches them (10x to 100x), after removing levels price has already crossed. This is an estimate from volume, not an exchange feed.' + mix);
+      row('All-exchange data', 'Liquidation heatmap: longs to be wiped below price', f(H.below), m.lhmMag < 0 ? 'dn' : 'warn', 'Same method for leveraged longs. The bigger and nearer side tends to attract price (stop-hunt magnet).' + (n(H.longUsd) && n(H.shortUsd) ? ' Total estimated: ' + fmtUsd(H.longUsd) + ' of longs below vs ' + fmtUsd(H.shortUsd) + ' of shorts above.' : '')); }
+    if (m.liqEx){ const t = Object.keys(m.liqEx).map(x => x + ' longs ' + fmtUsd(m.liqEx[x].l) + ' / shorts ' + fmtUsd(m.liqEx[x].s)).join(' · '); row('All-exchange data', 'Real liquidations by exchange (last hour)', t, 'warn', 'Positions actually force-closed, from the Binance, OKX and Bybit streams. Longs liquidated means forced selling; shorts liquidated means forced buying.'); } }
   { let P = null; try { P = pt30(c, rd); } catch(e){ P = null; }
     if (P){ const tone = {ok:'up', watch:'warn', bad:'dn', na:'na'}, word = {ok:'Pass', watch:'Watch', bad:'Fail', na:'No data'};
       row('30 pre-trade checks', 'Overall verdict', P.verdict + ' · ' + (P.net > 0 ? '+' : '') + P.net + ' pts', P.verdict === 'Go' ? 'up' : P.verdict === 'Avoid' || P.verdict === 'Wait' ? 'dn' : 'warn', P.have + ' of 30 checks had data. ' + P.fails.length + ' failed' + (P.hard.length ? ' (a must-fix one failed: ' + P.hard.map(x => x.label.toLowerCase()).join(', ') + ')' : '') + '. Go needs a score of +5 or more with at most one fail; Avoid is -4 or worse or four fails; any must-fix fail (data, news, big event, stablecoin peg, stale data) says Wait.');
