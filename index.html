@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.21</title>
+<title>ELPP CRYPTO SCANNER PRO V4.22</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.21</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.22</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -777,6 +777,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
   <details class="ng" data-g="trade" open><summary>Trade desk</summary>
     <button class="nv" type="button" data-view="prep">Pre-trade preparation</button>
     <button class="nv" type="button" data-view="ei">Institutional data+</button>
+    <button class="nv" type="button" data-view="api">API keys</button>
     <button class="nv" type="button" data-view="sdesk">Signal desk</button>
     <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
     <button class="nv" type="button" data-view="journal">Trading journal</button>
@@ -982,6 +983,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewJournal" class="vcol" hidden></div>
     <div id="viewPrep" class="vcol" hidden></div>
     <div id="viewEI" class="vcol" hidden></div>
+    <div id="viewApi" class="vcol" hidden></div>
   </section>
 </main>
 <div id="panelBd" aria-hidden="true"></div>
@@ -1855,7 +1857,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -4894,7 +4896,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -7684,7 +7686,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -7992,14 +7994,14 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   $('scopes').hidden = state.view !== 'table';
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -9062,6 +9064,96 @@ function renderEI(){
   }
   const ae = document.activeElement; if (ae && el.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
   eiLoadAll(false); const html = eiHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
+}
+
+/* ===== V4.22: one window for every API key ===== */
+var APK = {edit:false, filter:'all'};
+function apiStr(v){ return v === undefined || v === null ? '' : String(v); }
+function apiSvc(){
+  const A = () => state.alerts || {}, hc = () => holdCfg().api, jr = () => (typeof JR !== 'undefined' && JR.cfg) || {};
+  const sub = (o, k) => ({get:() => apiStr((state[o] || {})[k]), set:v => { state[o] = Object.assign({}, state[o], {[k]:v}); }});
+  const ei = k => ({get:() => apiStr(eiCfg()[k]), set:v => { eiCfg()[k] = v; }});
+  const st = k => ({get:() => apiStr(state[k]), set:v => { state[k] = v; }});
+  const F = (k, label, ph, acc, secret) => Object.assign({k, label, ph:ph || '', secret:secret !== false}, acc);
+  const L = [
+    {g:'Market data', id:'cg', name:'CoinGecko', tier:'free', what:'Faster loading of prices, sectors and trends (the free demo key lifts the rate limit).', where:'coingecko.com/en/api (Demo plan, free)', f:[F('cg', 'Demo key', 'CG-…', st('cgKey'))], after:() => { loadCg(); loadTrend(); }},
+    {g:'Market data', id:'cmc', name:'CoinMarketCap', tier:'free', what:'Market cap, rank and supply cross-check. Needs a relay address (below) because CoinMarketCap blocks browsers.', where:'coinmarketcap.com/api (Basic plan, free)', f:[F('cmc', 'API key', '', sub('cmc', 'key'))], after:() => { CMC.err = ''; loadCmc(); }},
+    {g:'Market data', id:'cz', name:'Coinalyze', tier:'free', what:'Aggregated open interest, funding and liquidations across many exchanges.', where:'coinalyze.net (free account, API key in settings)', f:[F('cz', 'API key', '', sub('cz', 'key'))], after:() => { CZ.mk = null; CZ.cycleAt = 0; CZ.until = 0; CZ.err = ''; czTick(); }},
+    {g:'Market data', id:'relay', name:'Relay address (yours)', tier:'free', what:'Your own small relay. Lets the page reach sites that block browsers (MEXC, CoinMarketCap, some institutional feeds). Also the X relay.', where:'Your Railway or Cloudflare relay. See the relay guide.', f:[F('mx', 'Relay address', 'https://my-relay.up.railway.app', st('mxRelay'), false)], after:() => { loadMexc(); loadMarkets(); loadCmc(); }},
+    {g:'On-chain', id:'alch', name:'Alchemy', tier:'free', what:'Ethereum and Base wallet and holder lookups.', where:'alchemy.com (free)', f:[F('alch', 'API key', '', sub('alch', 'key'))], after:() => 'oc'},
+    {g:'On-chain', id:'hel', name:'Helius', tier:'free', what:'Solana wallet and holder lookups.', where:'helius.dev (free)', f:[F('hel', 'API key', '', sub('hel', 'key'))], after:() => 'oc'},
+    {g:'On-chain', id:'hold', name:'Holder data API (any provider)', tier:'paid', what:'Top-holder share for meme coins from a provider you choose (Birdeye, Solscan, Moralis and similar).', where:'Your provider. Paste the address, header name and key.', f:[F('hu', 'Endpoint address', 'https://…{mint}…', {get:() => apiStr(hc().url), set:v => { hc().url = v; }}, false), F('hh', 'Header name', 'X-API-KEY', {get:() => apiStr(hc().hdr), set:v => { hc().hdr = v; }}, false), F('hk', 'Key', '', {get:() => apiStr(hc().key), set:v => { hc().key = v; }})], after:() => { holdSave(); }},
+    {g:'Institutional (free sources)', id:'soso', name:'SoSoValue', tier:'free', what:'US spot ETF flows (otherwise the public Farside page is tried).', where:'sosovalue.com (API, free)', f:[F('so', 'API key', 'x-soso-api-key', ei('soso'))], after:() => 'ei'},
+    {g:'Institutional (free sources)', id:'cftc', name:'CFTC Socrata token', tier:'free', what:'Raises the request limit on CME futures positioning (COT).', where:'publicreporting.cftc.gov (free app token)', f:[F('cf', 'App token', '', ei('cftc'))], after:() => 'ei'},
+    {g:'Institutional (free sources)', id:'fred', name:'FRED (St. Louis Fed)', tier:'free', what:'SOFR and IORB rates (backup source) and macro series.', where:'fred.stlouisfed.org (free key)', f:[F('fr', 'API key', '', ei('fred'))], after:() => 'ei'},
+    {g:'Institutional (free sources)', id:'gh', name:'GitHub', tier:'free', what:'Developer activity without hitting the 60 requests an hour limit.', where:'github.com/settings/tokens (read-only, no scopes)', f:[F('gh', 'Token', 'ghp_…', ei('gh'))], after:() => 'ei'},
+    {g:'Social and alerts', id:'x', name:'X (Twitter)', tier:'paid', what:'Live posts from the big names and news accounts.', where:'developer.x.com (Bearer token). The relay address is the Relay row above, or fill the box here.', f:[F('xt', 'Bearer token', '', st('xToken')), F('xp', 'X relay (optional)', 'https://…', st('xProxy'), false)], after:() => { X.xAt = {}; X.feedFailAt = 0; if (xTok()) xFeedAll(); }},
+    {g:'Social and alerts', id:'tg', name:'Telegram alerts', tier:'free', what:'Sends signal alerts to your phone through your own bot.', where:'Telegram: talk to @BotFather for the token, @userinfobot for your chat id', f:[F('tt', 'Bot token', '123456:ABC…', {get:() => apiStr(A().tgToken), set:v => { state.alerts = Object.assign({}, state.alerts, {tgToken:v}); }}), F('tc', 'Chat id', '', {get:() => apiStr(A().tgChat), set:v => { state.alerts = Object.assign({}, state.alerts, {tgChat:v}); }}, false)]},
+    {g:'Trading accounts', id:'opt', name:'Deribit (read-only)', tier:'free', what:'Shows your own open option positions. Use a read-only key only.', where:'deribit.com: Account, API (scope account:read)', f:[F('oi', 'Client ID', '', sub('opt', 'id'), false), F('os', 'Client secret', '', sub('opt', 'secret'))], after:() => { optLoadPositions().then(() => { try { renderOptions(); } catch(e){} }); }},
+    {g:'Trading accounts', id:'jr', name:'Journal relay', tier:'free', what:'Pulls your fills into the Journal (relay address, access token, optional dYdX address).', where:'Your own journal relay', f:[F('jr', 'Relay address', 'https://…', {get:() => apiStr(jr().relay), set:v => { JR.cfg = Object.assign({}, JR.cfg, {relay:v}); }}, false), F('jt', 'Access token', '', {get:() => apiStr(jr().token), set:v => { JR.cfg = Object.assign({}, JR.cfg, {token:v}); }}), F('jd', 'dYdX address', '', {get:() => apiStr(jr().dydx), set:v => { JR.cfg = Object.assign({}, JR.cfg, {dydx:v}); }}, false)], after:() => { LS.set('elpp_jr_cfg', JR.cfg); JR.st = {}; jrSync(true); }}
+  ];
+  const paid = {atas:'', bookmap:'', luxalgo:'', coinglass:'paid', netflow:'paid', social:'paid', revenue:'paid', primexbt:'paid'};
+  for (const [id, label] of EXF_SRC){
+    const acc = k => ({get:() => apiStr(((state.extf || {})[id] || {})[k]), set:v => { state.extf = state.extf || {}; state.extf[id] = Object.assign({}, state.extf[id], {[k]:v}); }});
+    L.push({g:'Paid and special feeds', id:'x_' + id, name:label.replace(/ \(.*$/, ''), tier:'paid', what:'Extra feed. Paste the endpoint address, the header name your provider asks for and your key. Full notes are in Settings.', where:'Your provider', f:[F('u', 'Endpoint address', 'https://…', acc('url'), false), F('h', 'Header name', 'X-API-KEY', acc('hdr'), false), F('k', 'Key', '', acc('key')), F('fd', 'Field to filter on (optional)', '', acc('field'), false)], after:() => { if (((state.extf || {})[id] || {}).url) fetchExf(id); }});
+  }
+  for (const [id, label] of DROP_SRC){
+    const acc = k => ({get:() => apiStr(((state.drops || {})[id] || {})[k]), set:v => { state.drops = state.drops || {}; state.drops[id] = Object.assign({}, state.drops[id], {[k]:v}); }});
+    L.push({g:'Airdrop and unlock sources', id:'d_' + id, name:label, tier:'free', what:'Only needed if the site gives you an API address and key. Leave blank to use the public page.', where:'The site itself', f:[F('u', 'API address', 'https://… (use {key} if needed)', acc('url'), false), F('h', 'Header name', 'X-API-KEY', acc('hdr'), false), F('k', 'Key', '', acc('key'))], after:() => { if (((state.drops || {})[id] || {}).url) fetchDrop(id); }});
+  }
+  return L;
+}
+function apiHtml(){
+  const L = apiSvc(), filt = APK.filter;
+  const done = L.filter(s => s.f.some(f => f.get())).length;
+  let h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">API keys (every key in one window)</h3><div class="row" style="gap:6px"><select id="apiFilt"><option value="all"${filt === 'all' ? ' selected' : ''}>All services</option><option value="free"${filt === 'free' ? ' selected' : ''}>Free only</option><option value="paid"${filt === 'paid' ? ' selected' : ''}>Paid / special</option><option value="empty"${filt === 'empty' ? ' selected' : ''}>Not filled yet</option></select><button class="btn" type="button" id="apiSave">Save all and load</button></div></div>
+    <p class="hint">Type or paste each key once here. This is the same storage the other pages use, so a key entered here appears there too. Keys are saved only in this browser on this device (never on GitHub, never sent anywhere except to the service it belongs to). <b>${done}</b> of ${L.length} services have something filled in. Nothing here is required: the scanner works without any key and every part that lacks one says so plainly.</p><div class="apistat hint" id="apiMsg"></div></div>`;
+  let cur = '';
+  for (const s of L){
+    const has = s.f.some(f => f.get());
+    if (filt === 'free' && s.tier !== 'free') continue; if (filt === 'paid' && s.tier === 'free') continue; if (filt === 'empty' && has) continue;
+    if (s.g !== cur){ if (cur) h += '</div>'; cur = s.g; h += `<div class="nsec"><h3>${esc(s.g)}</h3>`; }
+    h += `<div class="apirow" data-svc="${esc(s.id)}" style="border-top:1px solid var(--line,#2a3140);padding:8px 0"><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><b>${esc(s.name)}</b><span class="hint">${s.tier === 'free' ? 'free' : 'paid or special'}</span><span class="${has ? 'up' : 'dim'}">${has ? '● filled in' : '○ empty'}</span></div><div class="hint">${esc(s.what)} <i>Get it: ${esc(s.where)}</i></div><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${s.f.map(f => `<label class="hint" style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px">${esc(f.label)}<input type="${f.secret ? 'password' : 'text'}" data-fk="${esc(f.k)}" value="${esc(f.get())}" placeholder="${esc(f.ph)}" autocomplete="off" style="width:100%"></label>`).join('')}</div></div>`;
+  }
+  if (cur) h += '</div>';
+  return h;
+}
+function apiSync(){
+  const set = (id, v) => { const e = $(id); if (e && document.activeElement !== e) e.value = v; };
+  const A = state.alerts || {}, o = state.opt || {};
+  set('cgKey', state.cgKey || ''); set('xToken', state.xToken || ''); set('xProxy', state.xProxy || ''); set('mxRelay', state.mxRelay || '');
+  set('optId', o.id || ''); set('optSecret', o.secret || ''); set('alTok', A.tgToken || ''); set('alChat', A.tgChat || '');
+  set('czKey', (state.cz || {}).key || ''); set('cmcKey', (state.cmc || {}).key || ''); set('alchKey', (state.alch || {}).key || ''); set('helKey', (state.hel || {}).key || '');
+}
+function apiSave(el){
+  const L = apiSvc(), changed = [];
+  for (const s of L){
+    const row = el.querySelector('[data-svc="' + s.id + '"]'); if (!row) continue;
+    let ch = false;
+    for (const f of s.f){ const i = row.querySelector('[data-fk="' + f.k + '"]'); if (!i) continue; const v = i.value.trim(); if (v !== f.get()){ f.set(v); ch = true; } }
+    if (ch) changed.push(s);
+  }
+  if (!changed.length){ toast('Nothing changed'); return 0; }
+  saveState(); apiSync();
+  const run = new Set();
+  for (const s of changed){ try { const r = s.after ? s.after() : null; if (r) run.add(r); } catch(e){} }
+  try { if (run.has('ei')) eiLoadAll(true); if (run.has('oc')){ OC.coin.clear(); OC.err = {}; OC.test = null; ocTestKeys().then(() => ocGlobal()); } } catch(e){}
+  try { holdSave(); } catch(e){}
+  return changed.length;
+}
+function renderApi(){
+  const el = $('viewApi'); if (!el) return;
+  if (!el._built){
+    el._built = true;
+    el.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.fk) APK.edit = true; });
+    el.addEventListener('change', e => { if (e.target.id === 'apiFilt'){ APK.filter = e.target.value; APK.edit = false; el._h = ''; renderApi(); } });
+    el.addEventListener('click', e => {
+      if (e.target.closest('#apiSave')){ const n = apiSave(el); APK.edit = false; const hh = apiHtml(); el.innerHTML = hh; el._h = hh; const m = $('apiMsg'); if (m && n) m.textContent = 'Saved ' + n + ' service' + (n > 1 ? 's' : '') + ' and started loading their data. Check each page for its own status line.'; if (n) toast('Saved ' + n + ' service' + (n > 1 ? 's' : '')); }
+    });
+  }
+  if (APK.edit) return;
+  const ae = document.activeElement; if (ae && el.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
+  const html = apiHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
 
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
