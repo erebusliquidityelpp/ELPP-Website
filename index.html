@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.23</title>
+<title>ELPP CRYPTO SCANNER PRO V4.24</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.23</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.24</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -3934,6 +3934,7 @@ function verdictFill(c){
     const pl = m.pools || [], up = pl.filter(q => q.side === 1).sort((a, b) => a.d - b.d)[0], dn = pl.filter(q => q.side === 2).sort((a, b) => b.d - a.d)[0];
     why += 'Nearest liquidity: ' + (up ? `above +${up.d.toFixed(2)}% (${up.name})` : 'none above') + ', ' + (dn ? `below ${dn.d.toFixed(2)}% (${dn.name})` : 'none below') + '.';
   }
+  try { const p = psyRead(c); m.psy = p; if (p) why += ' Psychology: ' + p.tag + ' - ' + p.label; } catch(e){ m.psy = null; }
   m.verdictWhy = why.trim();
 }
 /* ---------- free extras: mood, funding, venues, HLP, protocol, DEX, cross-market, history ---------- */
@@ -4784,6 +4785,7 @@ function allColumnsCg(){
   const num = (id, label, fn, fmt, cls) => cols.push({id, label, val:fn, cell:c => { const v = fn(c); return [fmt(v), cls ? cls(v) : (isNum(v) ? '' : 'dim')]; }});
   const sgn = v => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(1) + '%' : '—', ud = v => isNum(v) ? (v >= 0 ? 'up' : 'dn') : 'dim';
   cols.push({id:'phase', label:'Market phase', val:c => c.m.phase, cell:c => { const v = c.m.phase; return [isNum(v) ? METRICS.phase.cat[v] : '—', !isNum(v) ? 'dim' : (v === 2 || v === 5) ? 'up' : v === 4 ? 'dn' : v === 0 || v === 1 || v === 3 ? 'warn' : 'dim']; }});
+  cols.push({id:'psy', label:'Psychology', val:c => c.m.psy ? c.m.psy.tag : '', cell:c => { const p = c.m.psy; return [p ? p.tag : '—', p ? p.tone : 'dim']; }});
   cols.push({id:'cgTrend', label:'Trend 30d', val:c => (c.m.cgTrend || {})['30d'], cell:c => { const v = (c.m.cgTrend || {})['30d']; return [!isNum(v) ? '—' : v > 0 ? '▲ Up' : v < 0 ? '▼ Down' : '◆ Sideways', !isNum(v) ? 'dim' : v > 0 ? 'up' : v < 0 ? 'dn' : 'dim']; }});
   for (const tf of ['1h','24h','7d','30d','200d','1y']) num('pch_' + tf, 'Δ ' + tf, c => (c.m.pch || {})[tf], sgn, ud);
   num('mcap','Market cap', c => c.m.mcap, v => isNum(v) ? fmtUsd(v) : '—');
@@ -8845,9 +8847,9 @@ async function eiRun(k, fn, every, force){
 function eiLoadAll(force){
   if (eiCfg().off) return;
   eiRun('cot', eiCotLoad, 6 * 36e5, force); eiRun('term', eiTermLoad, 3e5, force); eiRun('etf', eiEtfLoad, 18e5, force); eiRun('poly', eiPolyLoad, 3e5, force);
-  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force);
+  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('dvol', eiDvolLoad, 6e5, force);
 }
-function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); }
+function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); }
 /* 1. CFTC Commitments of Traders: what asset managers, leveraged funds and dealers hold in CME bitcoin and ether futures */
 async function eiCotLoad(){
   const base = 'https://publicreporting.cftc.gov/resource/gpe5-46if.json', tok = String(eiCfg().cftc || '').trim(), hdr = tok ? {'X-App-Token':tok} : null;
@@ -8991,6 +8993,10 @@ function eiFill(c, now){
     const o = eiCotView(k); if (o) m.cotState = o.state;
     const f = eiTermView(k); if (f){ m.termBasis = f.ann; m.termState = f.state; }
   }
+  m.topSmart = null; m.topCrowd = null; m.topDiv = null; m.trendRank = null; m.bfxChg = null;
+  { const t = EI.top.get(k); if (t && Date.now() - t.at < 3 * 36e5){ m.topSmart = t.smart; m.topCrowd = t.crowd; if (isNum(t.smart) && isNum(t.crowd)) m.topDiv = t.smart >= 0.55 && t.crowd <= 0.48 ? 1 : t.smart <= 0.45 && t.crowd >= 0.52 ? 2 : 0; } }
+  { const r = X.trend && X.trend.get(k); if (r) m.trendRank = r; }
+  if ((k === 'BTC' || k === 'ETH') && EI.d.bfx && EI.d.bfx[k]) m.bfxChg = EI.d.bfx[k].chg;
   eiImpact(c, m, k);
 }
 /* V4.23: every coin gets a signed, labelled list of what each institutional source adds (+ = long bias) */
@@ -9008,6 +9014,11 @@ function eiImpact(c, m, k){
   { const F = EI.d.fund; if (F && isNum(F.spread) && F.spread >= 5) P('Dollar funding', -2, 'US overnight funding is stressed (SOFR is ' + F.spread.toFixed(0) + ' bp above the Fed rate on reserves): risk assets tend to suffer'); }
   { const p = EI.d.poly && EI.d.poly.rows.find(r => r.cat === 'Fed and rates' && /cut/i.test(r.q)); if (p && isNum(p.yes)){ if (p.yes >= 70) P('Fed odds', 1, 'prediction markets give ' + p.yes.toFixed(0) + '% to a Fed cut (easier money helps risk assets)'); else if (p.yes <= 15) P('Fed odds', -1, 'prediction markets give only ' + p.yes.toFixed(0) + '% to a Fed cut (no help from the Fed)'); } }
   if (k === 'BTC'){ const M = EI.d.mem; if (M && isNum(M.hrRatio) && M.hrRatio <= -5) P('Bitcoin network', -1, 'hashrate is ' + Math.abs(M.hrRatio).toFixed(0) + '% under its 90-day normal: miners under stress may sell'); }
+  if (m.topDiv === 1) P('Smart vs crowd', 2, 'the biggest Binance traders are ' + Math.round(m.topSmart * 100) + '% long while ordinary accounts are only ' + Math.round(m.topCrowd * 100) + '% long: smart money disagrees with the crowd (bullish)'); else if (m.topDiv === 2) P('Smart vs crowd', -2, 'the biggest Binance traders are only ' + Math.round(m.topSmart * 100) + '% long while ordinary accounts are ' + Math.round(m.topCrowd * 100) + '% long: smart money disagrees with the crowd (bearish)');
+  if (isNum(m.bfxChg)){ if (m.bfxChg >= 3) P('Margin book', 1, 'Bitfinex margin traders added longs (long share up ' + m.bfxChg.toFixed(1) + ' points in about a day)'); else if (m.bfxChg <= -3) P('Margin book', -1, 'Bitfinex margin traders cut longs (long share down ' + Math.abs(m.bfxChg).toFixed(1) + ' points in about a day)'); }
+  { const D = EI.d.dvol; if (D && isNum(D.ratio) && D.ratio >= 1.25) P('Options fear', -1, 'the Deribit options fear gauge (DVOL) is ' + ((D.ratio - 1) * 100).toFixed(0) + '% above its normal: the options market is paying up for protection'); }
+  { const g = OC.g; if (g && isNum(g.stChg7)){ if (g.stChg7 >= 1) P('Stablecoins', 1, 'stablecoin supply grew ' + g.stChg7.toFixed(1) + '% in 7 days: fresh buying power is entering'); else if (g.stChg7 <= -0.5) P('Stablecoins', -1, 'stablecoin supply shrank ' + Math.abs(g.stChg7).toFixed(1) + '% in 7 days: cash is leaving crypto'); } }
+  if (isNum(m.trendRank) && m.trendRank <= 3) P('Retail attention', -1, 'it is in the top 3 trending coins on CoinGecko: the crowd is already looking');
   let net = 0; const out = []; for (const x of L){ if (Math.abs(net + x[1]) > 8) continue; net += x[1]; out.push(x); }
   m.eiImp = out; m.eiNet = out.length ? net : null;
 }
@@ -9173,6 +9184,75 @@ function renderApi(){
   const html = apiHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
 
+/* ===== V4.24: smart-money vs crowd, Bitfinex margin, Deribit DVOL, and the psychology read ===== */
+Object.assign(EI, {top:new Map(), topBusy:false, topFail:0});
+async function eiTopTick(){
+  if (EI.topBusy || document.hidden || eiCfg().off) return;
+  const list = [...state.coins.values()].filter(c => c.ctx && !String(c.name).includes(':')).sort((a, b) => ((b.m && b.m.vol24) || 0) - ((a.m && a.m.vol24) || 0)).slice(0, 30); if (!list.length) return;
+  list.sort((a, b) => ((EI.top.get(normSym(a.name)) || {at:0}).at) - ((EI.top.get(normSym(b.name)) || {at:0}).at)); const c = list[0], k = normSym(c.name);
+  if (Date.now() - (EI.top.get(k) || {at:0}).at < 600000) return; EI.topBusy = true;
+  try {
+    const sym = (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT', B = 'https://fapi.binance.com/futures/data/'; let smart = null, crowd = null, src = '';
+    try {
+      const a = await ext(B + 'topLongShortPositionRatio?symbol=' + sym + '&period=1h&limit=1', null, 12000), b = await ext(B + 'globalLongShortAccountRatio?symbol=' + sym + '&period=1h&limit=1', null, 12000);
+      if (Array.isArray(a) && a.length && isNum(+a[0].longAccount)) smart = +a[0].longAccount; if (Array.isArray(b) && b.length && isNum(+b[0].longAccount)) crowd = +b[0].longAccount; if (smart !== null || crowd !== null) src = 'Binance';
+    } catch(e){}
+    if (crowd === null){ try { const j = await ext('https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=' + sym + '&period=1h&limit=1', null, 12000), r = j && j.result && j.result.list && j.result.list[0]; if (r && isNum(+r.buyRatio)){ crowd = +r.buyRatio; src = src ? src + '/Bybit' : 'Bybit'; } } catch(e){} }
+    if (smart !== null || crowd !== null){ EI.top.set(k, {smart, crowd, src, at:Date.now()}); EI.topFail = 0; } else { EI.top.set(k, {smart:null, crowd:null, src:'', at:Date.now() - 480000}); EI.topFail++; }
+  } finally { EI.topBusy = false; }
+}
+/* Bitfinex margin longs vs shorts: a big, professional margin book (BTC and ETH only) */
+async function eiBfxLoad(){
+  const out = {};
+  for (const [sym, t] of [['BTC', 'tBTCUSD'], ['ETH', 'tETHUSD']]){
+    const get = async side => { const j = await ext('https://api-pub.bitfinex.com/v2/stats1/pos.size:1m:' + t + ':' + side + '/hist?limit=1500', null, 15000); if (!Array.isArray(j) || j.length < 60) throw new Error('no Bitfinex margin rows'); return j.map(x => +x[1]); };
+    const L = await get('long'), S = await get('short'), n = Math.min(L.length, S.length), sh = i => L[i] / ((L[i] || 0) + (S[i] || 0) || 1), av = (a, b) => { let s = 0, c = 0; for (let i = a; i < b; i++){ const v = sh(i); if (isFinite(v)){ s += v; c++; } } return c ? s / c : null; };
+    const now = av(0, 10), ago = av(Math.max(0, n - 40), n); if (now === null || ago === null) throw new Error('bad Bitfinex margin numbers');
+    out[sym] = {share:now * 100, chg:(now - ago) * 100, hours:Math.round(n / 60)};
+  }
+  EI.d.bfx = out;
+}
+/* Deribit DVOL: the options market's fear gauge for BTC */
+async function eiDvolLoad(){
+  const end = Date.now(), j = await ext('https://www.deribit.com/api/v2/public/get_volatility_index_data?currency=BTC&resolution=3600&start_timestamp=' + (end - 8 * 864e5) + '&end_timestamp=' + end, null, 15000);
+  const d = j && j.result && j.result.data; if (!Array.isArray(d) || d.length < 48) throw new Error('no DVOL rows');
+  const cl = d.map(x => +x[4]).filter(isFinite), cur = cl[cl.length - 1], ref = cl.slice(0, cl.length - 24).reduce((a, b) => a + b, 0) / Math.max(1, cl.length - 24);
+  EI.d.dvol = {cur, ref, ratio:cur / ref};
+}
+/* psychology read: institutions, market mood, retail crowd */
+function psyRead(c){
+  const m = c.m; if (!m) return null; const I = [], M = [], R = [], imp = m.eiImp || [], has = s => imp.find(x => x[0] === s);
+  let is = 0; const ip = (v, t) => { is += v; I.push(t); };
+  if (isNum(m.whBias) && m.whN >= 2 && Math.abs(m.whBias) >= 40) ip(m.whBias > 0 ? 1 : -1, m.whBias > 0 ? 'big wallets are mostly long' : 'big wallets are mostly short');
+  if (isNum(m.walScore) && m.walN >= 5 && Math.abs(m.walScore) >= 30) ip(m.walScore > 0 ? 1 : -1, 'tracked wallets lean ' + (m.walScore > 0 ? 'long' : 'short'));
+  { const ic = m.ic && m.ic['1h']; if (ic === 1 || ic === 3) ip(1, 'institutional buying candles'); else if (ic === 2 || ic === 4) ip(-1, 'institutional selling candles'); }
+  if (m.optBias === 1) ip(1, 'options traders are bullish'); else if (m.optBias === 2) ip(-1, 'options traders are bearish');
+  if (m.cbState === 1) ip(1, 'US buyers (Coinbase) paying up'); else if (m.cbState === 2) ip(-1, 'US buyers (Coinbase) discounting');
+  for (const s of ['ETF flow', 'CME positioning', 'Smart vs crowd', 'Margin book']){ const x = has(s); if (x) ip(x[1] > 0 ? 1 : -1, x[2].replace(/^the market backdrop: /, '')); }
+  const inst = is >= 2 ? 1 : is <= -2 ? -1 : 0;
+  let ms = 0; for (const s of ['Futures curve', 'Dollar funding', 'Fed odds', 'Options fear', 'Stablecoins']){ const x = has(s); if (x){ ms += x[1]; M.push(x[2]); } }
+  const fv = m.fngVal, mood = !isNum(fv) ? 'unknown' : fv <= 25 ? 'extreme fear' : fv <= 45 ? 'fear' : fv >= 75 ? 'extreme greed' : fv >= 60 ? 'greed' : 'neutral';
+  if (isNum(fv)) M.unshift('market mood is ' + mood + ' (' + fv + ')');
+  const mkt = ms >= 1 ? 1 : ms <= -1 ? -1 : 0;
+  let rs = 0, hot = 0; const rp = t => R.push(t);
+  if (m.lsState === 1){ rs++; hot++; rp('ordinary accounts are crowded long'); } else if (m.lsState === 2){ rs--; rp('ordinary accounts are crowded short'); }
+  if (m.topDiv === undefined || m.topDiv === null){} else if (isNum(m.topCrowd) && m.topCrowd >= 0.6){ rs++; hot++; rp(Math.round(m.topCrowd * 100) + '% of ordinary accounts are long'); } else if (isNum(m.topCrowd) && m.topCrowd <= 0.4){ rs--; rp(Math.round(m.topCrowd * 100) + '% of ordinary accounts are long (crowd is short)'); }
+  if (isNum(m.wikiX) && m.wikiX >= 2.5){ hot++; rp('Wikipedia lookups are ' + m.wikiX.toFixed(1) + 'x normal'); }
+  if (isNum(m.trendRank) && m.trendRank <= 5){ hot++; rp('top ' + m.trendRank + ' trending on CoinGecko'); }
+  if (m.oiPx && (m.oiPx['15m'] === 5 || m.oiPx['1h'] === 5)){ hot++; rp('open interest jumping with flat price (crowd piling in)'); }
+  const fear = m.lsState === 2 || (isNum(fv) && fv <= 30 && !hot), euph = hot >= 2 || (hot >= 1 && isNum(fv) && fv >= 65);
+  const retail = euph ? 'euphoric' : fear ? 'fearful' : 'quiet';
+  let label, tag, tone;
+  if (inst === 1 && retail === 'fearful'){ tag = 'Accumulation'; tone = 'up'; label = 'Smart money is buying while the crowd is scared: accumulation. The best set-up for a long.'; }
+  else if (inst === -1 && retail === 'euphoric'){ tag = 'Distribution'; tone = 'dn'; label = 'Institutions are selling into retail excitement: distribution. Dangerous for longs, favours shorts.'; }
+  else if (inst === 1 && retail === 'euphoric'){ tag = 'Late trend'; tone = 'warn'; label = 'Institutions and the crowd are both bullish: the trend can run, but late entries get squeezed. Smaller size, tighter stop.'; }
+  else if (inst === -1 && retail === 'fearful'){ tag = 'Panic'; tone = 'warn'; label = 'Institutions are selling and the crowd is scared: a down-trend, but a sharp bounce or squeeze can come. Do not chase shorts late.'; }
+  else if (retail === 'euphoric'){ tag = 'FOMO'; tone = 'dn'; label = 'The crowd is excited but institutions are not confirming: FOMO risk. Avoid chasing.'; }
+  else if (retail === 'fearful' && mkt >= 0){ tag = 'Fear'; tone = 'warn'; label = 'The crowd is fearful and institutions are not selling: contrarian long set-ups are possible, but wait for confirmation.'; }
+  else { tag = 'Mixed'; tone = 'warn'; label = 'No clear tug of war: institutions are mixed and the crowd is quiet. Let price and the checklist decide.'; }
+  return {inst, mkt, retail, instWhy:I, mktWhy:M, retWhy:R, label, tag, tone, mood};
+}
+
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
 var X9 = {cb:new Map(), cbAt:0, cbBusy:false, cbProd:null, cbErr:null, seas:new Map(), seasQ:[], seasBusy:false, seasErr:null, want:new Set(), started:false};
 function x9Mult(name){ return /^k[A-Z0-9]{2,}$/.test(name) ? 1000 : 1; }
@@ -9282,6 +9362,11 @@ function ptRows(c, rd){
     if (e) row('Institutions', name + ' spot ETF flows', fmtUsd(e.d1, true) + ' last day · ' + fmtUsd(e.d5, true) + ' over 5 days', e.state === 1 ? (long ? 'up' : 'dn') : e.state === 2 ? (long ? 'dn' : 'up') : 'warn', 'Real money into or out of US spot ETFs. Several inflow days back a long; an outflow streak is a headwind.');
     if (o) row('Institutions', 'CME futures: asset managers net change', (o.cur >= 0 ? '+' : '') + o.cur.toFixed(0) + ' ' + name + ' this week (z ' + o.z.toFixed(1) + ')', o.state === 1 ? (long ? 'up' : 'dn') : o.state === 2 ? (long ? 'dn' : 'up') : 'warn', 'What regulated asset managers did in CME futures, weekly. Adding length is bullish; cutting is bearish.');
     if (t) row('Positioning', 'Futures curve (annualised basis)', t.ann.toFixed(1) + '% · ' + EI_TERM_LAB[t.state], t.state === 1 ? 'warn' : t.state === 4 ? 'dn' : 'up', 'Above 20% a year means leveraged longs are crowded; below zero means stress.'); }
+  { const p = psyRead(c); if (p){ const tn = v => dir ? (v * dir > 0 ? 'up' : v * dir < 0 ? 'dn' : 'warn') : 'warn', sd = v => v > 0 ? 'bullish' : v < 0 ? 'bearish' : 'mixed';
+    row('Psychology', 'Overall read', p.tag, p.tone, p.label);
+    row('Psychology', 'Institutions', sd(p.inst), tn(p.inst), p.instWhy.length ? p.instWhy.join('; ') : 'No clear institutional footprint on this coin yet.');
+    row('Psychology', 'Market mood and backdrop', p.mood + ' · ' + sd(p.mkt), tn(p.mkt), p.mktWhy.length ? p.mktWhy.join('; ') : 'No market-wide push either way.');
+    row('Psychology', 'Retail crowd', p.retail, p.retail === 'euphoric' ? 'dn' : p.retail === 'fearful' ? 'warn' : 'na', p.retWhy.length ? p.retWhy.join('; ') : 'No sign of a crowd on this coin.'); } }
   if (m.eiImp && m.eiImp.length){ for (const x of m.eiImp) row('Institutional data+', x[0] + ' (' + (x[1] > 0 ? '+' : '') + x[1] + ' pts)', x[1] > 0 ? 'leans long' : 'leans short', dir ? (x[1] * dir > 0 ? 'up' : 'dn') : 'warn', x[2] + '. This is already counted in the verdict.'); row('Institutional data+', 'Net from these sources', (m.eiNet > 0 ? '+' : '') + m.eiNet + ' pts', dir ? (m.eiNet * dir > 0 ? 'up' : m.eiNet * dir < 0 ? 'dn' : 'warn') : 'warn', 'The free institutional sources combined, capped at 8 points either way.'); }
   if (n(m.wikiX)) row('Context', 'Retail attention (Wikipedia)', m.wikiX.toFixed(1) + 'x normal', m.wikiX >= 2.5 ? 'dn' : m.wikiX >= 1.5 ? 'warn' : 'up', 'A sudden jump in ordinary people looking the coin up means the crowd arrives late. Treat it as a contrarian warning, not a buy signal.');
   if (n(m.devChg)) row('Fundamentals', 'Developer activity (commits, 4 weeks vs previous)', (m.devChg > 0 ? '+' : '') + m.devChg.toFixed(0) + '%', m.devChg <= -40 ? 'dn' : m.devChg >= 0 ? 'up' : 'warn', 'A living project keeps shipping. Falling development is a weak, slow warning.');
