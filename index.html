@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.35</title>
+<title>ELPP CRYPTO SCANNER PRO V4.36</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.35</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.36</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -8892,7 +8892,10 @@ function eiLoadAll(force){
   eiRun('cot', eiCotLoad, 6 * 36e5, force); eiRun('term', eiTermLoad, 3e5, force); eiRun('etf', eiEtfLoad, 18e5, force); eiRun('poly', eiPolyLoad, 3e5, force);
   eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('oiex', eiOiLoad, 90000, force); eiRun('pf', eiPfLoad, 300000, force); eiRun('chain', eiChainLoad, 36e5, force); eiRun('dvol', eiDvolLoad, 6e5, force);
 }
-function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); setInterval(eiOiBnTick, 3000); setInterval(eiBkTick, 5000); setInterval(eiOhTick, 4000); }
+const BOOT_AT = Date.now();
+/* the extra institutional loaders wait until the core candles are in (25 coins) or 90 seconds have passed, so they never slow the first market verdict */
+function eiGate(){ if (Date.now() - BOOT_AT > 90000) return true; let n = 0; for (const c of state.coins.values()){ if (c.candles && c.candles.length > 20 && ++n >= 25) return true; } return false; }
+function eiStart(){ const G = f => () => { if (eiGate()) f(); }; setTimeout(() => eiLoadAll(false), 45000); setInterval(() => { if (eiGate()) eiLoadAll(false); }, 60000); setInterval(G(eiTakerTick), 3000); setInterval(G(eiTopTick), 4000); setInterval(G(eiOiBnTick), 3000); setInterval(G(eiBkTick), 5000); setInterval(G(eiOhTick), 4000); }
 /* 1. CFTC Commitments of Traders: what asset managers, leveraged funds and dealers hold in CME bitcoin and ether futures */
 async function eiCotLoad(){
   const base = 'https://publicreporting.cftc.gov/resource/gpe5-46if.json', tok = String(eiCfg().cftc || '').trim(), hdr = tok ? {'X-App-Token':tok} : null;
@@ -9511,13 +9514,14 @@ function moveStats(list){
 
 /* ===== V4.30: request manager, response recorder, data health, more free data ===== */
 var HQ = new Map(), HB = new Map(), INF = new Map(), REC = new Map();
-function recAdd(url, status, txt){ try { const u = new URL(url); if (u.search && /key|token|secret|sig/i.test(u.search)) return; const k = u.host + u.pathname; REC.set(k, {at:Date.now(), status, len:txt.length, sample:txt.slice(0, 2500), q:u.search.slice(0, 120)}); if (REC.size > 260) REC.delete(REC.keys().next().value); } catch(e){} }
+function recDue(url){ try { const u = new URL(url), o = REC.get(u.host + u.pathname); return !o || Date.now() - o.at > 600000; } catch(e){ return false; } }
+function recAdd(url, status, txt){ try { const u = new URL(url); { const o = REC.get(u.host + u.pathname); if (o && Date.now() - o.at < 600000) return; } if (u.search && /key|token|secret|sig/i.test(u.search)) return; const k = u.host + u.pathname; REC.set(k, {at:Date.now(), status, len:txt.length, sample:txt.slice(0, 2500), q:u.search.slice(0, 120)}); if (REC.size > 260) REC.delete(REC.keys().next().value); } catch(e){} }
 async function extRaw(url, headers, ms){
   let host = ''; try { host = new URL(url).host; } catch(e){}
   const pause = HB.get(host); if (pause && pause > Date.now()) throw new Error('rate limit reached (429), will retry');
   const dedupe = !headers; if (dedupe && INF.has(url)) return (await INF.get(url)).clone();
-  const h = HQ.get(host) || {n:0, q:[]}; HQ.set(host, h); if (h.n >= 8) await new Promise(res => h.q.push(res)); h.n++;
-  const p = (async () => { try { const r = await extRaw0(url, headers, ms); if (!headers && !/alchemy|helius|telegram|anthropic/i.test(url)) r.clone().text().then(t => recAdd(url, r.status, t)).catch(() => {}); return r; } catch(e){ if (/429/.test((e && e.message) || '')) HB.set(host, Date.now() + 30000); throw e; } finally { h.n--; const nx = h.q.shift(); if (nx) nx(); } })();
+  const h = HQ.get(host) || {n:0, q:[]}; HQ.set(host, h); if (h.n >= 16) await new Promise(res => h.q.push(res)); h.n++;
+  const p = (async () => { try { const r = await extRaw0(url, headers, ms); if (!headers && !/alchemy|helius|telegram|anthropic/i.test(url) && recDue(url)) r.clone().text().then(t => recAdd(url, r.status, t)).catch(() => {}); return r; } catch(e){ if (/429/.test((e && e.message) || '')) HB.set(host, Date.now() + 12000); throw e; } finally { h.n--; const nx = h.q.shift(); if (nx) nx(); } })();
   if (dedupe){ INF.set(url, p); p.then(() => setTimeout(() => INF.delete(url), 1500), () => INF.delete(url)); }
   const r = await p; return dedupe ? r.clone() : r;
 }
