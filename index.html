@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.45</title>
+<title>ELPP CRYPTO SCANNER PRO V4.46</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -747,7 +747,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.45</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.46</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1922,7 +1922,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto']) o[k] = state[k];
+    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','stopMode']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -7606,7 +7606,7 @@ function sigGate(c, dir, m, now, mk){
 }
 function sigTick(){
   if (!SIG.loaded) sigLoad(); const now = Date.now(); let ch = false;
-  for (const s of SIG.list) if (s.status === 'open' || s.status === 'tp1') if (sigResolve(s, now)) ch = true;
+  for (const s of SIG.list){ if (s.status === 'open' || s.status === 'tp1'){ if (sigResolve(s, now)) ch = true; } try { if (stExtra(s, now)) ch = true; } catch(e){} }
   if (state.mode === 'perp'){
     const AC = state.alerts || {}, strict = state.sigStrict !== false, cands = [];
     const all = [...state.coins.values()].filter(c => c.m && isNum(c.m.vol24)); let mk = null; try { mk = mkCalc(all); } catch(e){}
@@ -7621,6 +7621,7 @@ function sigTick(){
       if (SIG.list.some(x => x.name === c.name && (x.status === 'open' || x.status === 'tp1'))) continue;
       const last = [...SIG.list].reverse().find(x => x.name === c.name); if (last && now - last.t < 2 * 36e5) continue;
       const pl = planFor(c); if (!pl || pl.dir !== dir) continue;
+      if (pl.late){ const why = 'entry too late: the sweep wick is more than 3 ATR away'; SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; }
       let P30 = null; try { P30 = pt30(c, instRow(c, 'perp')); P30 = {v:P30.verdict, net:P30.net}; } catch(e){}
       const RG = regimeNow(), AP = aPlusCheck(c, dir, P30), skipWhy = [];
       if (state.regGate !== false){ if (RG.tag === 'Panic') skipWhy.push('Bitcoin is in a panic move'); else { const rs = SIG.list.filter(x => x.reg === RG.tag && x.status !== 'open' && x.status !== 'tp1' && isNum(x.r)); if (rs.length >= 10 && rs.reduce((a, x) => a + x.r, 0) / rs.length <= -0.15) skipWhy.push('your record in a ' + RG.tag.toLowerCase() + ' market is negative'); } }
@@ -7631,7 +7632,7 @@ function sigTick(){
       if (strict){ const R0 = CP.cache.get(c.name), fresh = R0 && now - R0.at < 600000; if (!fresh){ CP.tried = CP.tried || {}; if (!CP.jobs.has(c.name) && !(CP.tried[c.name] && now - CP.tried[c.name] < 120000)){ CP.tried[c.name] = now; cpLoad(c.name).then(() => setTimeout(sigTick, 300)).catch(() => {}); } if (CP.jobs.has(c.name) || (CP.tried[c.name] && now - CP.tried[c.name] < 25000)) continue; } }
       if (strict){ const why = sigGate(c, dir, m, now, mk); if (why){ SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; } src = 'Confirmed: ' + src; }
       { const sp = swpPick(m), want = dir === 'long' ? 1 : -1, tg = []; if (sp && sp[1].dir === want) tg.push('sweep+reclaim ' + sp[0] + (sp[1].retest ? ' + 2nd test held' : ', 2nd test pending')); if (isNum(m.walScore) && m.walN >= 3) tg.push('wallets ' + (m.walScore > 0 ? '+' : '') + m.walScore); const pr1 = m.pressure && m.pressure['1h']; if (isNum(pr1)) tg.push('pressure ' + (pr1 > 0 ? '+' : '') + Math.round(pr1) + '%'); { const si = sgSigInfo(c, dir); if (si.inst) tg.push('institutions ' + si.inst.score + (si.inst.st === 'with' ? ' agree' : si.inst.st === 'against' ? ' against' : '')); if (si.cp) tg.push('13 checks ' + si.cp.ok + '/' + si.cp.n); } if (tg.length) src += ' [' + tg.join(' · ') + ']'; }
-      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now, inst:sgSigInfo(c, dir).inst, cp:sgSigInfo(c, dir).cp, iadj:sgAlign(c, dir).adj || 0, imp:(m.eiImp || []).map(x => [x[0], x[1]]), psy:m.psy ? m.psy.tag : null, p30:P30, reg:RG.tag, aplus:AP.ok});
+      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now, inst:sgSigInfo(c, dir).inst, cp:sgSigInfo(c, dir).cp, iadj:sgAlign(c, dir).adj || 0, imp:(m.eiImp || []).map(x => [x[0], x[1]]), psy:m.psy ? m.psy.tag : null, p30:P30, reg:RG.tag, aplus:AP.ok, alts:(() => { try { return stAlts(c, dir, pl); } catch(e){ return null; } })(), smode:state.stopMode || 'sweep'});
     }
     cands.sort((x, y) => (Math.abs(y.score || 0) + (y.iadj || 0)) - (Math.abs(x.score || 0) + (x.iadj || 0)));
     const used = {long:0, short:0}; if (strict) for (const x of SIG.list) if (now - x.t < 36e5 && /^Confirmed/.test(x.src || '')) used[x.dir]++;
@@ -7656,7 +7657,7 @@ function renderSignals(){
       <div class="row" style="margin-top:6px"><input type="password" id="alTok" placeholder="Telegram bot token (optional)" style="min-width:260px"><input type="text" id="alChat" placeholder="Telegram chat id" style="width:170px"><button class="btn" id="alTest" type="button">Send test alert</button></div>
       <div class="row" style="margin-top:6px;gap:8px;flex-wrap:wrap;align-items:center"><label class="hint">Send alerts for <select id="alGrade"><option value="any">every signal</option><option value="go">only Go (30-check verdict)</option><option value="aplus">only A+</option></select></label><label class="hint">Quiet hours (your time) <input type="time" id="alQ1" style="width:110px"> to <input type="time" id="alQ2" style="width:110px"></label></div>
       <p class="hint">Telegram: create a bot with @BotFather, send it a message, then use the token and your chat id here. They are stored only in this browser.</p><div id="alLog" class="hint"></div></div>
-    ${RG_HTML}${brHtml()}${bwHtml()}<div class="nsec"><h3>Macro calendar</h3>
+    ${RG_HTML}${stHtml()}${brHtml()}${bwHtml()}<div class="nsec"><h3>Macro calendar</h3>
       <p class="hint">High-impact USD events (FOMC, CPI, jobs). 30 minutes before to 15 minutes after, coins are forced to Avoid; the hour before shows a warning. Sources: a free calendar feed, the built-in FOMC dates (check them on federalreserve.gov), and your own list.</p>
       <div class="row"><input type="text" id="macUrl" placeholder="Calendar feed address (blank = off)" style="flex:1;min-width:260px"><button class="btn" id="macReload" type="button">Reload</button></div>
       <textarea id="macManual" rows="3" style="width:100%;margin-top:6px" placeholder="Your own events, one per line, in UTC:&#10;2026-11-12 13:30 US CPI&#10;2026-11-06 13:30 Non-farm payrolls"></textarea>
@@ -7682,7 +7683,7 @@ function renderSignals(){
     $('alGrade').value = (state.alerts || {}).grade || 'any'; $('alQ1').value = (state.alerts || {}).q1 || ''; $('alQ2').value = (state.alerts || {}).q2 || ''; $('sgStrict').checked = state.sigStrict !== false; $('sgAplus').checked = !!state.aplus; $('sgReg').checked = state.regGate !== false; $('sgCap').value = state.capSide || 4; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
     $('macUrl').value = MC.url === undefined ? MAC_URL : MC.url; $('macManual').value = MC.manual || ''; $('pfAddr').value = PC.addr || ''; $('mySize').value = state.mySize || 10000; $('hlpAddrs').value = state.hlpAddrs === undefined ? HLP_DEFAULT : state.hlpAddrs; $('czKey').value = (state.cz || {}).key || ''; $('cmcKey').value = (state.cmc || {}).key || ''; $('alchKey').value = (state.alch || {}).key || ''; $('helKey').value = (state.hel || {}).key || ''; $('ocLabels').value = state.ocl || ''; $('pxOn').checked = state.pubProxy !== false; $('pxMain').checked = state.pxMain === true; ocStatShow();
     { const C = rgCfg(); $('rgOn').checked = !!C.on; $('rgLoss').value = C.maxLoss; $('rgTrades').value = C.maxTrades; $('rgLosses').value = C.losses; $('rgCool').value = C.coolH; $('rgJr').checked = C.jr !== false; rgRender();
-      el.addEventListener('change', e => { if (e.target.id === 'brOn' || e.target.id === 'brTime'){ const B = brCfg(); B.on = $('brOn').checked; B.time = $('brTime').value || '08:00'; B.last = ''; saveState(); if (B.on) { try { notifyAsk(); } catch(x){} } return; } if (e.target.id === 'bwOn'){ state.bw = {on:e.target.checked}; saveState(); BWM.at = 0; try { requestRender(); } catch(x){} toast('Backtest-weighted scoring ' + (e.target.checked ? 'on' : 'off')); return; } if (!/^rg/.test(e.target.id)) return; const C2 = rgCfg(); C2.on = $('rgOn').checked; C2.maxLoss = Math.max(0.5, +$('rgLoss').value || 3); C2.maxTrades = Math.max(1, Math.floor(+$('rgTrades').value || 6)); C2.losses = Math.max(1, Math.floor(+$('rgLosses').value || 2)); C2.coolH = Math.max(0.5, +$('rgCool').value || 2); C2.jr = $('rgJr').checked; state.rg = C2; RG_M.at = 0; saveState(); rgRender(); requestRender(); toast('Daily risk guard ' + (C2.on ? 'on' : 'off')); }); }
+      el.addEventListener('change', e => { if (e.target.id === 'stMode') return; if (e.target.id === 'brOn' || e.target.id === 'brTime'){ const B = brCfg(); B.on = $('brOn').checked; B.time = $('brTime').value || '08:00'; B.last = ''; saveState(); if (B.on) { try { notifyAsk(); } catch(x){} } return; } if (e.target.id === 'bwOn'){ state.bw = {on:e.target.checked}; saveState(); BWM.at = 0; try { requestRender(); } catch(x){} toast('Backtest-weighted scoring ' + (e.target.checked ? 'on' : 'off')); return; } if (!/^rg/.test(e.target.id)) return; const C2 = rgCfg(); C2.on = $('rgOn').checked; C2.maxLoss = Math.max(0.5, +$('rgLoss').value || 3); C2.maxTrades = Math.max(1, Math.floor(+$('rgTrades').value || 6)); C2.losses = Math.max(1, Math.floor(+$('rgLosses').value || 2)); C2.coolH = Math.max(0.5, +$('rgCool').value || 2); C2.jr = $('rgJr').checked; state.rg = C2; RG_M.at = 0; saveState(); rgRender(); requestRender(); toast('Daily risk guard ' + (C2.on ? 'on' : 'off')); }); }
     { let shut = []; try { shut = JSON.parse(localStorage.getItem('elpp_fold_sig') || '[]'); } catch(e){}
       const save = () => { try { localStorage.setItem('elpp_fold_sig', JSON.stringify([...el.querySelectorAll('.nsec.fold.shut > h3')].map(h => h.textContent.trim()))); } catch(e){} };
       for (const h of el.querySelectorAll('.nsec > h3')){ const sec = h.parentNode; sec.classList.add('fold'); h.title = 'Click to open or close'; if (shut.includes(h.textContent.trim())) sec.classList.add('shut'); }
@@ -8878,6 +8879,7 @@ function jrHtml(){
   ${jrCharts(L, S)}
   <div class="nsec"><h3>What your journal is telling you</h3><ul class="ovstory">${coach.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : '<div class="nsec"><p class="hint">No closed trades in this view yet. Connect an exchange above to pull them in, or log one by hand below.</p></div>'}
   ${papHtml()}
+  ${stopDiagHtml()}
   ${jrForm()}
   ${S ? `<div class="nsec"><h3>All trades</h3><div class="ovwrap"><table class="ovt jrt"><thead><tr><th>Closed</th><th>Coin</th><th>Entry → exit</th><th>Result</th><th>Setup and feeling</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>${L.length > 200 ? '<p class="hint">Showing the latest 200. The statistics use all trades in the view.</p>' : ''}</div>
   ${det('jr1', 'Where you make and lose money', `<div class="ovgl2"><div><b>By coin</b>${jrTable(jrGroup(L, t => t.coin).slice(0, 12), 'Coin')}</div><div><b>By side</b>${jrTable(jrGroup(L, t => t.side), 'Side')}</div><div><b>By setup</b>${jrTable(jrGroup(L, t => t.setup || null), 'Setup')}</div><div><b>By feeling</b>${jrTable(jrGroup(L, t => t.emo || null), 'Feeling')}</div><div><b>By weekday</b>${jrTable(jrGroup(L, t => wd[new Date(t.open || t.close).getDay()]), 'Day')}</div><div><b>By session</b>${jrTable(jrGroup(L, ses), 'Session')}</div></div>`)}` : ''}
@@ -10071,8 +10073,9 @@ function prBuild(){
     live:{description:'Every confirmed Strong signal the scanner logged, tracked automatically to its target, stop or 24h expiry. R = multiples of the amount risked. Costs of 0.07% per trade are deducted.', closedSignals:A.n, openSignals:V.open, firstSignal:V.first ? new Date(V.first).toISOString() : null, lastClosed:V.last ? new Date(V.last).toISOString() : null,
       winPct:f(A.win, 1), winPctRange95:[f(A.ci[0], 1), f(A.ci[1], 1)], averageR:f(A.avg, 3), totalR:f(A.sum, 2), profitFactor:f(A.pf, 2), tStat:f(A.t, 2), maxDrawdownR:f(A.dd, 2), longestLosingStreak:V.bl, sampleIsEnough:A.n >= 30, summary:prLiveText(A),
       equityCurveR:(() => { let c = 0; return V.L.map(x => +(c += x.r).toFixed(2)); })(), byMonth:V.months.map(m => ({month:m.month, trades:m.trades, winPct:f(m.winPct, 1), averageR:f(m.avgR, 3), totalR:f(m.totalR, 2)})),
-      recent:V.L.slice(-50).reverse().map(x => ({coin:x.c, side:x.d > 0 ? 'long' : 'short', opened:new Date(x.t0).toISOString(), closed:new Date(x.t).toISOString(), resultR:f(x.r, 2), outcome:x.out === 'stop' ? 'stopped out' : x.out === 'expired' ? 'expired (24h)' : x.out === 'tp2' ? 'target 2 hit' : 'target 1 hit'}))},
+      recent:V.L.slice(-50).reverse().map(x => ({coin:x.c, side:x.d > 0 ? 'long' : 'short', opened:new Date(x.t0).toISOString(), closed:new Date(x.t).toISOString(), resultR:f(x.r, 2), mae:f(x.mae, 2), mfe:f(x.mfe, 2), outcome:x.out === 'stop' ? 'stopped out' : x.out === 'expired' ? 'expired (24h)' : x.out === 'tp2' ? 'target 2 hit' : 'target 1 hit'}))},
     backtest:bt ? {description:'Each idea the scanner uses was replayed on past data on its own, with realistic costs. The last third of the period is held back as a separate test. Every rule is listed, including those with no edge.', ranAt:new Date(bt.at).toISOString(), days:bt.days, coins:bt.coins, sources:bt.sources, settings:bt.settings, buyHoldAvgPct:bt.buyHoldAvgPct, rules:bt.rules} : null,
+    diagnosis:(() => { try { return stDiag(); } catch(e){ return null; } })(),
     notes:['Past results do not guarantee future results.', 'Backtests ignore slippage on large orders, exchange outages and survivorship of coins; they are an estimate, not a promise.', 'Small samples (under 30 trades) are shown for transparency only and should not be marketed as proof.']};
 }
 function prHtml(){
@@ -10088,9 +10091,9 @@ function prHtml(){
     h += `<div class="row" style="gap:10px;flex-wrap:wrap">${tile('Closed signals', A.n, V.open + ' still open', '')}${tile('Win rate', f(A.win, 'p'), '95% range ' + (isNum(A.ci[0]) ? A.ci[0].toFixed(0) + '-' + A.ci[1].toFixed(0) + '%' : '—'), A.win >= 40 ? 'up' : 'warn')}${tile('Average per trade', f(A.avg), 'after costs', cl(A.avg))}${tile('Total', f(A.sum), 'profit factor ' + (isNum(A.pf) ? A.pf.toFixed(2) : '—'), cl(A.sum))}${tile('Worst drop', A.dd.toFixed(1) + 'R', 'longest losing run ' + V.bl, A.dd > 8 ? 'warn' : '')}${tile('Luck check', isNum(A.t) ? A.t.toFixed(1) : '—', A.t >= 2 ? 'probably real' : 'not yet proven', A.t >= 2 ? 'up' : 'warn')}</div>
     <div class="row" style="gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:10px"><div style="flex:2 1 300px;min-width:0;overflow:auto">${btSvg(A.curve, V.P.eq0)}<p class="hint">Account growth if every signal had been taken at 1% risk (start 1000, dashed line).</p></div>
     <div style="flex:1 1 240px;min-width:0;overflow:auto"><b class="hint">By month</b><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Month</th><th>Trades</th><th>Win</th><th>Total</th></tr></thead><tbody>${V.months.map(m => `<tr><td style="text-align:left">${esc(m.month)}</td><td>${m.trades}</td><td>${f(m.winPct, 'p')}</td><td class="${cl(m.totalR)}">${f(m.totalR)}</td></tr>`).join('')}</tbody></table></div></div>
-    <details class="ovd" data-ovd="pr-last" style="margin-top:8px"${OV.open.has('pr-last') ? ' open' : ''}><summary>Last 15 signals</summary><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Closed</th><th style="text-align:left">Coin</th><th>Side</th><th>Result</th><th style="text-align:left">Outcome</th></tr></thead><tbody>${V.L.slice(-15).reverse().map(x => `<tr><td style="text-align:left">${esc(new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}))}</td><td style="text-align:left">${esc(x.c)}</td><td>${x.d > 0 ? 'Long' : 'Short'}</td><td class="${cl(x.r)}">${f(x.r)}</td><td style="text-align:left">${x.out === 'stop' ? 'Stopped out' : x.out === 'expired' ? 'Expired (24h)' : x.out === 'tp2' ? 'Target 2' : 'Target 1'}</td></tr>`).join('')}</tbody></table></details>`;
+    <details class="ovd" data-ovd="pr-last" style="margin-top:8px"${OV.open.has('pr-last') ? ' open' : ''}><summary>Last 15 signals</summary><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Closed</th><th style="text-align:left">Coin</th><th>Side</th><th>Result</th><th>MAE</th><th>MFE</th><th style="text-align:left">Outcome</th></tr></thead><tbody>${V.L.slice(-15).reverse().map(x => `<tr><td style="text-align:left">${esc(new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}))}</td><td style="text-align:left">${esc(x.c)}</td><td>${x.d > 0 ? 'Long' : 'Short'}</td><td class="${cl(x.r)}">${f(x.r)}</td><td>${isNum(x.mae) ? x.mae.toFixed(2) + 'R' : '—'}</td><td>${isNum(x.mfe) ? x.mfe.toFixed(2) + 'R' : '—'}</td><td style="text-align:left">${x.out === 'stop' ? 'Stopped out' : x.out === 'expired' ? 'Expired (24h)' : x.out === 'tp2' ? 'Target 2' : 'Target 1'}</td></tr>`).join('')}</tbody></table></details>`;
   }
-  h += '</div><div class="nsec"><h3>Historical test of every idea (backtest)</h3>';
+  h += '</div>' + stopDiagHtml() + '<div class="nsec"><h3>Historical test of every idea (backtest)</h3>';
   if (!bt) h += '<p class="hint">Waiting for the first automatic backtest.</p>';
   else {
     const ok = bt.rules.filter(r => /^Edge/.test(r.verdict)).length, base = bt.rules.find(r => r.id === 'R0');
@@ -10125,6 +10128,69 @@ function cdWhen(t){ try { const dt = new Date(t), pk = dt.toLocaleString('en-GB'
 function cdHtml(t, big){ return `<span data-cd="${t}"${big ? ' style="font-size:15px;font-weight:700"' : ''}>${esc(cdFmt(t - Date.now()))}</span><br><span class="dim">${esc(cdWhen(t))}</span>`; }
 function cdTick(){ const n = Date.now(); for (const e of document.querySelectorAll('[data-cd]')){ const t = +e.dataset.cd, txt = cdFmt(t - n); if (e.textContent !== txt) e.textContent = txt; } }
 setInterval(() => { try { cdTick(); } catch(e){} }, 1000);
+/* ===== V4.46: stop placement beyond the sweep wick, stop-hunt tracking, MAE/MFE diagnosis, alternative-stop comparison ===== */
+let PLAN_MODE = null;
+function stSweepStop(c, long, px, a){
+  const m = c.m || {}, p = swpPick(m), want = long ? 1 : -1; if (!p || p[1].dir !== want || !c.candles || c.candles.length < 30) return null;
+  const tfm = p[0] === '15m' ? 15 : 60, bars = Math.min(c.candles.length, Math.ceil(((p[1].age || 0) + 4) * tfm / 5) + 1), seg = c.candles.slice(-bars);
+  const ext = long ? Math.min(...seg.map(x => x.l)) : Math.max(...seg.map(x => x.h)); if (!isFinite(ext)) return null;
+  const a15 = isNum(m.atr && m.atr['15m']) ? m.atr['15m'] / 100 * px : a / 2, buf = Math.max(0.35 * a15, px * 0.0008), sl = long ? ext - buf : ext + buf;
+  if (long ? sl >= px : sl <= px) return null;
+  return {sl, ext, why:'beyond the sweep wick at ' + fmtPx(ext) + ' plus a buffer'};
+}
+function stAlts(c, dir, pl){
+  const o = {}, long = dir === 'long', px = pl.entry, a = pl.a, now = Date.now();
+  const mk = sl => { const risk = Math.abs(px - sl); if (!(risk > 0) || !isFinite(sl)) return null; return {t:now, name:c.name, dir, entry:px, sl, tp1:pl.tp1, tp2:pl.tp2, rr1:Math.abs(pl.tp1 - px) / risk, rr2:Math.abs(pl.tp2 - px) / risk, status:'open', chk:now}; };
+  let p1 = null, p2 = null; try { PLAN_MODE = 'pool'; p1 = planFor(c); PLAN_MODE = 'sweep'; p2 = planFor(c); } catch(e){} PLAN_MODE = null;
+  if (p1 && p1.dir === dir) o.pool = mk(p1.sl); if (p2 && p2.dir === dir && /sweep wick/.test(p2.slWhy || '')) o.sweep = mk(p2.sl);
+  o.atr1 = mk(long ? px - a : px + a); o.atr2 = mk(long ? px - 2 * a : px + 2 * a); return o;
+}
+function stExtra(s, now){
+  let ch = false;
+  if (s.alts) for (const k in s.alts){ const A = s.alts[k]; if (A && (A.status === 'open' || A.status === 'tp1')){ A.t = s.t; if (sigResolve(A, now)) ch = true; } }
+  if (s.status === 'stop' && s.rev == null && s.tEnd){ const c = state.coins.get(s.name); if (c && c.candles){ const long = s.dir === 'long', from = Math.ceil(s.tEnd / 300000) * 300000;
+      for (const x of c.candles){ if (x.t < from) continue; if (x.t > s.tEnd + 6 * 36e5) break; if (long ? x.h >= s.tp1 : x.l <= s.tp1){ s.rev = true; ch = true; break; } }
+      if (s.rev == null && now - s.tEnd >= 6 * 36e5 && c.candles.length && c.candles[0].t <= from){ s.rev = false; ch = true; } } }
+  return ch;
+}
+function stDiag(){
+  const C = SIG.list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.r)); const n = C.length; if (!n) return null;
+  const by = k => C.filter(x => x.status === k).length, st = C.filter(x => x.status === 'stop'), ex = C.filter(x => x.status === 'expired'), win = C.filter(x => x.r > 0), rv = st.filter(x => x.rev != null), hunt = rv.filter(x => x.rev).length;
+  const srt = a => a.slice().sort((x, y) => x - y), med = a => { const b = srt(a); return b.length ? b[Math.floor((b.length - 1) / 2)] : null; }, q = (a, p) => { const b = srt(a); return b.length ? b[Math.min(b.length - 1, Math.floor(p * b.length))] : null; };
+  const wm = win.filter(x => isNum(x.mae)).map(x => x.mae), sm = st.filter(x => isNum(x.mfe)).map(x => x.mfe), em = ex.filter(x => isNum(x.mfe)).map(x => x.mfe), alt = {};
+  for (const k of ['pool', 'sweep', 'atr1', 'atr2']){ const A = C.map(x => x.alts && x.alts[k]).filter(a => a && a.status !== 'open' && a.status !== 'tp1' && isNum(a.r)); if (A.length) alt[k] = {n:A.length, win:A.filter(a => a.r > 0).length / A.length * 100, stop:A.filter(a => a.status === 'stop').length / A.length * 100, avg:A.reduce((s, a) => s + a.r, 0) / A.length}; }
+  return {n, tp2:by('tp2'), tp1:by('tp1done'), stop:st.length, exp:ex.length, expAvg:ex.length ? ex.reduce((s, x) => s + x.r, 0) / ex.length : null, expMfe:med(em), hunt, huntN:rv.length, stopMfe:med(sm), stopMfeBig:sm.filter(v => v >= 1).length, stopMfeN:sm.length, winMaeMed:med(wm), winMae90:q(wm, 0.9), winN:wm.length, alt};
+}
+function stDiagText(D){
+  const t = [], pc = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+  if (D.n < 10){ t.push('Only ' + D.n + ' closed signals so far. Keep collecting: the diagnosis needs at least 10, and 30 to be reliable.'); return t; }
+  if (D.huntN >= 5 && D.hunt / D.huntN >= 0.4) t.push(`<b>Stops are being hunted.</b> ${D.hunt} of ${D.huntN} stopped trades (${pc(D.hunt, D.huntN)}) reached TP1 within 6 hours after the stop was hit: the idea was right, the stop was in the wrong place. Use "Stop beyond the sweep wick" (Signals page) and compare the stop methods below.`);
+  else if (D.huntN >= 5) t.push(`Only ${D.hunt} of ${D.huntN} stopped trades (${pc(D.hunt, D.huntN)}) went on to hit TP1 afterwards, so most stops were real invalidations, not hunts.`);
+  else if (D.stop >= 3) t.push('Stop-hunt check is still filling in: each stopped trade is watched for 6 hours after the stop to see if TP1 was reached anyway.');
+  if (D.stopMfeN >= 5 && D.stopMfeBig / D.stopMfeN >= 0.3) t.push(`<b>${D.stopMfeBig} of ${D.stopMfeN} stopped trades were more than 1R in profit first</b> and then reversed to the stop. A rule "move the stop to entry after +1R" would have saved them.`);
+  if (D.exp / D.n >= 0.5) t.push(`<b>${pc(D.exp, D.n)} of signals neither hit a target nor the stop in 24 hours</b> (average ${D.expAvg >= 0 ? '+' : ''}${(D.expAvg || 0).toFixed(2)}R). The stop is not the problem here: the targets are too far for a day, or the signal fires with no momentum behind it. Take partial profit at TP1 and use the 24-hour time exit.`);
+  if (D.winN >= 5){ if (D.winMae90 >= 0.7) t.push(`Winners often dip first: 9 in 10 dipped up to ${D.winMae90.toFixed(2)}R (typical ${D.winMaeMed.toFixed(2)}R) against you before working. A stop tighter than that would have cut most winners.`); else t.push(`Winners barely dip: 9 in 10 never went further than ${D.winMae90.toFixed(2)}R against you (typical ${D.winMaeMed.toFixed(2)}R). A stop closer than the current one would keep most winners and lose less on losers.`); }
+  const ks = Object.keys(D.alt).filter(k => D.alt[k].n >= 8); if (ks.length >= 2){ ks.sort((a, b) => D.alt[b].avg - D.alt[a].avg); const nm = {pool:'beyond the nearest liquidity pool (old)', sweep:'beyond the sweep wick (new)', atr1:'1 x hourly ATR', atr2:'2 x hourly ATR'}; t.push(`On the same signals, the best stop so far is <b>${nm[ks[0]]}</b> (${D.alt[ks[0]].avg >= 0 ? '+' : ''}${D.alt[ks[0]].avg.toFixed(2)}R per trade) and the worst is ${nm[ks[ks.length - 1]]} (${D.alt[ks[ks.length - 1]].avg >= 0 ? '+' : ''}${D.alt[ks[ks.length - 1]].avg.toFixed(2)}R).`); }
+  if (!t.length) t.push('Nothing stands out yet. Stops, targets and timing look balanced.');
+  return t;
+}
+function stopDiagHtml(){
+  const D = stDiag(), f = v => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(2) + 'R' : '—', pc = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+  let h = `<div class="nsec"><h3>Why trades fail: stop, MAE and MFE diagnosis</h3><p class="hint"><b>MAE</b> (max adverse excursion) = how far a trade went against you before it ended. <b>MFE</b> (max favourable excursion) = how far it went your way. Both are in R, where 1R = the distance to your stop. Together they show whether the stop is in the wrong place, the target is too far, or the signal is simply wrong.</p>`;
+  if (!D){ return h + '<p class="hint">No closed signals yet.</p></div>'; }
+  const tile = (lab, val, sub) => `<div style="flex:1;min-width:140px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:17px;font-weight:700">${val}</div><small class="hint">${esc(sub || '')}</small></div>`;
+  h += `<div class="row" style="gap:10px;flex-wrap:wrap;align-items:stretch">${tile('Hit a target', pc(D.tp1 + D.tp2, D.n), D.tp2 + ' at TP2, ' + D.tp1 + ' at TP1')}${tile('Stopped out', pc(D.stop, D.n), D.stop + ' trades')}${tile('Expired (24h)', pc(D.exp, D.n), 'average ' + f(D.expAvg))}${tile('Stop-hunted', D.huntN ? pc(D.hunt, D.huntN) : '—', D.huntN ? D.hunt + ' of ' + D.huntN + ' reached TP1 within 6h after the stop' : 'needs stopped trades')}${tile('Winners: typical dip (MAE)', D.winN ? D.winMaeMed.toFixed(2) + 'R' : '—', D.winN ? 'against you; 9 in 10 under ' + D.winMae90.toFixed(2) + 'R' : '')}${tile('Stopped trades: best point (MFE)', D.stopMfeN ? f(D.stopMfe) : '—', D.stopMfeN ? D.stopMfeBig + ' of ' + D.stopMfeN + ' went over +1R first' : '')}</div>`;
+  h += '<ul class="ovstory">' + stDiagText(D).map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  const nm = {pool:'Beyond the nearest liquidity pool (old method)', sweep:'Beyond the sweep wick + buffer (new)', atr1:'1 x hourly ATR', atr2:'2 x hourly ATR'}, ks = Object.keys(D.alt);
+  if (ks.length) h += `<p class="hint" style="margin-top:8px"><b>Same signals, different stops.</b> Each new signal is also tracked with the other stop methods, using the same targets, so you can see which stop would have done best.</p><div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Stop method</th><th>Signals</th><th>Stopped out</th><th>Win</th><th>Avg R</th></tr></thead><tbody>${ks.map(k => `<tr><td style="text-align:left">${esc(nm[k])}</td><td>${D.alt[k].n}</td><td>${D.alt[k].stop.toFixed(0)}%</td><td>${D.alt[k].win.toFixed(0)}%</td><td class="${D.alt[k].avg > 0.05 ? 'up' : D.alt[k].avg < -0.05 ? 'dn' : 'dim'}">${f(D.alt[k].avg)}</td></tr>`).join('')}</tbody></table></div>`;
+  else h += '<p class="hint">The stop-method comparison fills in as new signals close (it starts with signals created from this version on).</p>';
+  return h + '</div>';
+}
+function stHtml(){
+  const m = state.stopMode || 'sweep'; return `<div class="nsec"><h3>Stop placement</h3><p class="hint">Where the scanner puts the stop-loss on new signals. <b>Beyond the sweep wick</b> (default): the stop goes just past the lowest point (longs) or highest point (shorts) of the liquidity sweep that triggered the trade, plus a small buffer. If price comes back through the wick, the sweep idea is wrong and you want out. A signal is skipped when that wick is more than 3 hourly ATR away, because the entry is then too late. <b>Beyond the nearest liquidity pool</b> (old): 0.5 ATR past the closest pool, which is exactly where price is attracted to.</p><label class="hint">Method <select id="stMode"><option value="sweep"${m === 'sweep' ? ' selected' : ''}>Beyond the sweep wick (recommended)</option><option value="pool"${m === 'pool' ? ' selected' : ''}>Beyond the nearest liquidity pool (old)</option></select></label></div>`;
+}
+document.addEventListener('change', e => { if (e.target && e.target.id === 'stMode'){ state.stopMode = e.target.value; saveState(); toast('Stop placement: ' + (e.target.value === 'sweep' ? 'beyond the sweep wick' : 'beyond the nearest pool') + ' (new signals only)'); } });
+
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
 var X9 = {cb:new Map(), cbAt:0, cbBusy:false, cbProd:null, cbErr:null, seas:new Map(), seasQ:[], seasBusy:false, seasErr:null, want:new Set(), started:false};
 function x9Mult(name){ return /^k[A-Z0-9]{2,}$/.test(name) ? 1000 : 1; }
@@ -11043,15 +11109,18 @@ function planFor(c){
   const atrp = m.atr && (m.atr['1h'] || m.atr['15m']), a = isNum(atrp) && atrp > 0 ? atrp / 100 * px : px * 0.01, long = dir === 'long';
   const pools = (m.pools || []).slice(), below = pools.filter(q => q.p < px).sort((x, y) => y.p - x.p), above = pools.filter(q => q.p > px).sort((x, y) => x.p - y.p);
   const sp = (long ? below : above).find(q => Math.abs(q.p - px) >= 0.4 * a && Math.abs(q.p - px) <= 3.5 * a);
-  let sl = sp ? (long ? sp.p - 0.5 * a : sp.p + 0.5 * a) : (long ? px - 1.5 * a : px + 1.5 * a), risk = Math.abs(px - sl), widened = false;
-  if (risk < 1.5 * a){ risk = 1.5 * a; sl = long ? px - risk : px + risk; widened = true; }
+  const SM = PLAN_MODE || state.stopMode || 'sweep'; let swR = null, late = false; if (SM === 'sweep'){ try { swR = stSweepStop(c, long, px, a); } catch(e){} }
+  let sl, risk, widened = false;
+  if (swR){ sl = swR.sl; risk = Math.abs(px - sl); if (risk < 0.75 * a){ risk = 0.75 * a; sl = long ? px - risk : px + risk; } if (risk > 3 * a) late = true; }
+  else { sl = sp ? (long ? sp.p - 0.5 * a : sp.p + 0.5 * a) : (long ? px - 1.5 * a : px + 1.5 * a); risk = Math.abs(px - sl);
+    if (risk < 1.5 * a){ risk = 1.5 * a; sl = long ? px - risk : px + risk; widened = true; } }
   const tg1 = (long ? above : below).filter(q => Math.abs(q.p - px) >= 1.5 * risk), tg2 = (long ? above : below).filter(q => Math.abs(q.p - px) >= 2.5 * risk);
   const tp1 = tg1[0] ? tg1[0].p : (long ? px + 2 * risk : px - 2 * risk);
   let tp2 = tg2.find(q => Math.abs(q.p - px) > Math.abs(tp1 - px) * 1.15); tp2 = tp2 ? tp2.p : (long ? px + 3.5 * risk : px - 3.5 * risk);
   if (Math.abs(tp2 - px) <= Math.abs(tp1 - px)) tp2 = long ? px + 1.7 * Math.abs(tp1 - px) : px - 1.7 * Math.abs(tp1 - px);
   const tgA = tg1[0], tgB = tg2.find(q => Math.abs(q.p - px) > Math.abs(tp1 - px) * 1.15);
   const slPct = risk / px, maxLev = isNum(m.maxLev) ? m.maxLev : 20;
-  return {a, dir, lean, entry:px, sl, tp1, tp2, rr1:Math.abs(tp1 - px) / risk, rr2:Math.abs(tp2 - px) / risk, slPct, lev:Math.max(1, Math.min(maxLev, Math.floor(1 / (3 * slPct)))), slWhy:(sp && !widened) ? 'beyond ' + sp.name + ' with room for a wick' : '1.5 x the hourly ATR (minimum)', t1Why:tgA ? tgA.name : '2R', t2Why:tgB ? tgB.name : '3.5R'};
+  return {a, dir, lean, entry:px, sl, tp1, tp2, rr1:Math.abs(tp1 - px) / risk, rr2:Math.abs(tp2 - px) / risk, slPct, lev:Math.max(1, Math.min(maxLev, Math.floor(1 / (3 * slPct)))), late, slWhy:swR ? swR.why : (sp && !widened) ? 'beyond ' + sp.name + ' with room for a wick' : '1.5 x the hourly ATR (minimum)', t1Why:tgA ? tgA.name : '2R', t2Why:tgB ? tgB.name : '3.5R'};
 }
 function cwPlanCalc(){
   const c = chartCoin; if (!c) return; const pl = planFor(snapshot.get(c.name) || c), out = $('cwPlanOut'); if (!out) return;
