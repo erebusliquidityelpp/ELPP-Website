@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.32</title>
+<title>ELPP CRYPTO SCANNER PRO V4.33</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -170,6 +170,7 @@ button,select,input{font:inherit;color:inherit}
 .gtab tbody th{position:static;font:600 12px var(--sans);text-transform:none;letter-spacing:0;color:var(--fg);min-width:240px;background:var(--surface);cursor:default}
 .gtab tbody th small{display:block;font-weight:400;color:var(--muted);margin-top:2px}
 .nsec{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px}
+.nsec.fold>h3{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px}.nsec.fold>h3::before{content:'\25BE';font-size:13px;color:var(--gold,#c9a227);width:14px;flex:none}.nsec.fold.shut>h3::before{content:'\25B8'}.nsec.fold.shut>*:not(h3){display:none!important}.nsec.fold.shut>h3{margin-bottom:0}
 .nsec h3{font-size:14px;margin-bottom:6px}
 .nitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
 .nitem a{color:var(--fg);text-decoration:none} .nitem a:hover{color:var(--accent);text-decoration:underline}
@@ -745,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.32</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.33</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -7631,6 +7632,10 @@ function renderSignals(){
       <p class="hint">Used by the Execution filters (book depth, slippage). Depth and slippage come from the first 20 levels of the Hyperliquid order book, so a very large size on a liquid coin can read "more than the book" even when real liquidity is deeper.</p></div>`;
     $('alGrade').value = (state.alerts || {}).grade || 'any'; $('alQ1').value = (state.alerts || {}).q1 || ''; $('alQ2').value = (state.alerts || {}).q2 || ''; $('sgStrict').checked = state.sigStrict !== false; $('sgAplus').checked = !!state.aplus; $('sgReg').checked = state.regGate !== false; $('sgCap').value = state.capSide || 4; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
     $('macUrl').value = MC.url === undefined ? MAC_URL : MC.url; $('macManual').value = MC.manual || ''; $('pfAddr').value = PC.addr || ''; $('mySize').value = state.mySize || 10000; $('hlpAddrs').value = state.hlpAddrs === undefined ? HLP_DEFAULT : state.hlpAddrs; $('czKey').value = (state.cz || {}).key || ''; $('cmcKey').value = (state.cmc || {}).key || ''; $('alchKey').value = (state.alch || {}).key || ''; $('helKey').value = (state.hel || {}).key || ''; $('ocLabels').value = state.ocl || ''; $('pxOn').checked = state.pubProxy !== false; $('pxMain').checked = state.pxMain === true; ocStatShow();
+    { let shut = []; try { shut = JSON.parse(localStorage.getItem('elpp_fold_sig') || '[]'); } catch(e){}
+      const save = () => { try { localStorage.setItem('elpp_fold_sig', JSON.stringify([...el.querySelectorAll('.nsec.fold.shut > h3')].map(h => h.textContent.trim()))); } catch(e){} };
+      for (const h of el.querySelectorAll('.nsec > h3')){ const sec = h.parentNode; sec.classList.add('fold'); h.title = 'Click to open or close'; if (shut.includes(h.textContent.trim())) sec.classList.add('shut'); }
+      el.addEventListener('click', e => { const h = e.target.closest('.nsec.fold > h3'); if (!h || !el.contains(h)) return; h.parentNode.classList.toggle('shut'); save(); }, true); }
     const setA = (k, v) => { state.alerts = Object.assign({}, state.alerts, {[k]:v}); saveState(); };
     el.addEventListener('change', e => { const id = e.target.id;
       if (id === 'sgAplus'){ state.aplus = e.target.checked; saveState(); toast('A+ only ' + (e.target.checked ? 'on' : 'off')); } else if (id === 'sgReg'){ state.regGate = e.target.checked; saveState(); } else if (id === 'sgCap'){ state.capSide = Math.max(1, Math.min(20, +e.target.value || 4)); saveState(); } else if (id === 'alGrade') setA('grade', e.target.value); else if (id === 'alQ1') setA('q1', e.target.value); else if (id === 'alQ2') setA('q2', e.target.value); else if (id === 'perfTune'){ eiCfg().tune = e.target.checked; saveState(); PERF.at = 0; toast('Auto-tune ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'sgStrict'){ state.sigStrict = e.target.checked; saveState(); toast('Strict signal filters ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'alOn') setA('on', e.target.checked); else if (id === 'alSound'){ setA('sound', e.target.checked); if (e.target.checked) beep(); } else if (id === 'alNotify') setA('notify', e.target.checked); else if (id === 'alVerdict') setA('verdict', e.target.checked); else if (id === 'alKeep'){ const kb = NB(); if (kb){ try { kb.keepAlive(e.target.checked); } catch(x){} toast('Background running ' + (e.target.checked ? 'on' : 'off')); } } else if (id === 'alMin') setA('minScore', e.target.value.trim()); else if (id === 'alTok') setA('tgToken', e.target.value.trim()); else if (id === 'alChat') setA('tgChat', e.target.value.trim());
