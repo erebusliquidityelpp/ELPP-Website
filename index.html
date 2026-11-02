@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.28</title>
+<title>ELPP CRYPTO SCANNER PRO V4.29</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.28</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.29</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1912,7 +1912,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei']) o[k] = state[k];
+    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -3839,6 +3839,7 @@ function verdictFill(c){
       if (m.lsState === 1) add(-3, 'retail accounts are crowded long (reversal fuel down)'); else if (m.lsState === 2) add(3, 'retail accounts are crowded short (squeeze fuel up)');
       if (m.fngState === 1) add(2, 'the whole market is in extreme fear (contrarian long)'); else if (m.fngState === 2) add(-2, 'the whole market is in extreme greed (contrarian short)');
       if (m.eiImp) for (const x of m.eiImp) add(x[1], x[2]);
+      { const RG = regimeNow(); if (RG.tag === 'Panic') flags.push('Bitcoin is in a panic move: signals are unreliable right now'); }
       if (m.cbState === 1) add(2, 'Coinbase (US spot) trades above Hyperliquid by ' + m.cbPrem.toFixed(2) + '%: US buyers are paying up'); else if (m.cbState === 2) add(-2, 'Coinbase (US spot) trades below Hyperliquid by ' + Math.abs(m.cbPrem).toFixed(2) + '%: US sellers are pressing');
       if (m.seasState === 1) add(1, 'this hour of the day has leaned up for this coin over the last 45 days (' + m.seasHit.toFixed(0) + '% of days up)'); else if (m.seasState === 2) add(-1, 'this hour of the day has leaned down for this coin over the last 45 days (' + (100 - m.seasHit).toFixed(0) + '% of days down)');
       if (isNum(m.dqScore) && m.dqScore < 45) flags.push('data quality is low for this coin (' + m.dqWhy + '): trust the signal less');
@@ -6093,6 +6094,7 @@ function sigResolve(s, now){
   const first = Math.ceil(s.t / 300000) * 300000; let ch = false;
   for (const x of c.candles){
     if (x.t < first || s.status === 'tp2' || s.status === 'stop') continue; const closed = x.T < now; if (closed && x.t <= (s.chk || 0)) continue;
+    { const fav = (long ? x.h - s.entry : s.entry - x.l) / risk, adv = (long ? s.entry - x.l : x.h - s.entry) / risk; if (isFinite(fav)) s.mfe = Math.max(s.mfe || 0, fav); if (isFinite(adv)) s.mae = Math.max(s.mae || 0, Math.min(adv, 1.0001)); }
     const hSL = long ? x.l <= s.sl : x.h >= s.sl, h1 = long ? x.h >= s.tp1 : x.l <= s.tp1, h2 = long ? x.h >= s.tp2 : x.l <= s.tp2, back = long ? x.l <= s.entry : x.h >= s.entry;
     if (s.status === 'open'){ if (hSL){ sigFin(s, 'stop', -1, s.sl, now); ch = true; } else if (h2){ sigFin(s, 'tp2', s.rr2, s.tp2, now); ch = true; } else if (h1){ s.status = 'tp1'; s.c1 = x.t; ch = true; } }
     else if (s.status === 'tp1'){ if (h2){ sigFin(s, 'tp2', s.rr2, s.tp2, now); ch = true; } else if (x.t > s.c1 && back){ sigFin(s, 'tp1done', s.rr1, s.tp1, now); ch = true; } }
@@ -6154,6 +6156,9 @@ function verdictWatch(r){
 }
 function fireAlert(c, dir, why, test){
   const AC = state.alerts || {}, pl = planFor(c), txt = `${c.name} ${dir.toUpperCase()} · score ${c.m && isNum(c.m.verdictScore) ? c.m.verdictScore : '?'}${pl ? ` · entry ${fmtPx(pl.entry)} · stop ${fmtPx(pl.sl)} · TP1 ${fmtPx(pl.tp1)} · TP2 ${fmtPx(pl.tp2)}` : ''}${(() => { try { const si = sgSigInfo(c, dir); return (si.inst ? ' · institutions ' + si.inst.score + '/100 ' + (si.inst.st === 'with' ? 'agree' : si.inst.st === 'against' ? 'AGAINST' : 'unclear') : '') + (si.cp ? ' · 13 checks ' + si.cp.ok + '/' + si.cp.n + ' ' + si.cp.label.toLowerCase() : ''); } catch(e){ return ''; } })()}${why ? ' · ' + why : ''}`;
+  if (!test){ let mute = ''; const q1 = AC.q1, q2 = AC.q2; if (q1 && q2){ const d = new Date(), mm = d.getHours() * 60 + d.getMinutes(), a = (+q1.slice(0, 2)) * 60 + (+q1.slice(3, 5)), b = (+q2.slice(0, 2)) * 60 + (+q2.slice(3, 5)); if (a !== b && (a < b ? (mm >= a && mm < b) : (mm >= a || mm < b))) mute = 'quiet hours'; }
+    if (!mute && (AC.grade === 'go' || AC.grade === 'aplus')){ try { const P = pt30(c, instRow(c, 'perp')); if (AC.grade === 'go' && P.verdict !== 'Go') mute = 'the 30-check verdict is ' + P.verdict; else if (AC.grade === 'aplus' && !aPlusCheck(c, dir, {v:P.verdict, net:P.net}).ok) mute = 'not A+'; } catch(e){} }
+    if (mute){ AL.log.unshift({t:Date.now(), txt:'(muted: ' + mute + ') ' + txt}); AL.log.length = Math.min(AL.log.length, 30); renderSignals(); return; } }
   if (AC.sound) beep();
   if (AC.notify || test) elppNotify('ELPP: ' + c.name + ' ' + dir.toUpperCase(), txt, 'elpp-' + c.name);
   if (AC.tgToken && AC.tgChat){ fetch('https://api.telegram.org/bot' + encodeURIComponent(AC.tgToken) + '/sendMessage', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id:AC.tgChat, text:'ELPP alert\n' + txt})}).catch(() => {}); }
@@ -7565,10 +7570,16 @@ function sigTick(){
       if (SIG.list.some(x => x.name === c.name && (x.status === 'open' || x.status === 'tp1'))) continue;
       const last = [...SIG.list].reverse().find(x => x.name === c.name); if (last && now - last.t < 2 * 36e5) continue;
       const pl = planFor(c); if (!pl || pl.dir !== dir) continue;
+      let P30 = null; try { P30 = pt30(c, instRow(c, 'perp')); P30 = {v:P30.verdict, net:P30.net}; } catch(e){}
+      const RG = regimeNow(), AP = aPlusCheck(c, dir, P30), skipWhy = [];
+      if (state.regGate !== false){ if (RG.tag === 'Panic') skipWhy.push('Bitcoin is in a panic move'); else { const rs = SIG.list.filter(x => x.reg === RG.tag && x.status !== 'open' && x.status !== 'tp1' && isNum(x.r)); if (rs.length >= 10 && rs.reduce((a, x) => a + x.r, 0) / rs.length <= -0.15) skipWhy.push('your record in a ' + RG.tag.toLowerCase() + ' market is negative'); } }
+      if (state.aplus && !AP.ok) skipWhy.push('not A+ (' + AP.n + ' of 5 groups agree)');
+      { const cap = +state.capSide || 4, openSide = SIG.list.filter(x => (x.status === 'open' || x.status === 'tp1') && x.dir === dir).length + cands.filter(x => x.dir === dir).length; if (openSide >= cap) skipWhy.push('portfolio cap: ' + openSide + ' ' + dir + 's already open'); }
+      if (skipWhy.length){ const why = 'held back: ' + skipWhy[0]; SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; }
       if (strict){ const R0 = CP.cache.get(c.name), fresh = R0 && now - R0.at < 600000; if (!fresh){ CP.tried = CP.tried || {}; if (!CP.jobs.has(c.name) && !(CP.tried[c.name] && now - CP.tried[c.name] < 120000)){ CP.tried[c.name] = now; cpLoad(c.name).then(() => setTimeout(sigTick, 300)).catch(() => {}); } if (CP.jobs.has(c.name) || (CP.tried[c.name] && now - CP.tried[c.name] < 25000)) continue; } }
       if (strict){ const why = sigGate(c, dir, m, now, mk); if (why){ SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; } src = 'Confirmed: ' + src; }
       { const sp = swpPick(m), want = dir === 'long' ? 1 : -1, tg = []; if (sp && sp[1].dir === want) tg.push('sweep+reclaim ' + sp[0] + (sp[1].retest ? ' + 2nd test held' : ', 2nd test pending')); if (isNum(m.walScore) && m.walN >= 3) tg.push('wallets ' + (m.walScore > 0 ? '+' : '') + m.walScore); const pr1 = m.pressure && m.pressure['1h']; if (isNum(pr1)) tg.push('pressure ' + (pr1 > 0 ? '+' : '') + Math.round(pr1) + '%'); { const si = sgSigInfo(c, dir); if (si.inst) tg.push('institutions ' + si.inst.score + (si.inst.st === 'with' ? ' agree' : si.inst.st === 'against' ? ' against' : '')); if (si.cp) tg.push('13 checks ' + si.cp.ok + '/' + si.cp.n); } if (tg.length) src += ' [' + tg.join(' · ') + ']'; }
-      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now, inst:sgSigInfo(c, dir).inst, cp:sgSigInfo(c, dir).cp, iadj:sgAlign(c, dir).adj || 0, imp:(m.eiImp || []).map(x => [x[0], x[1]]), psy:m.psy ? m.psy.tag : null, p30:(() => { try { const q = pt30(c, instRow(c, 'perp')); return {v:q.verdict, net:q.net}; } catch(e){ return null; } })()});
+      cands.push({id:now + '-' + c.name, t:now, name:c.name, dir, src, preset:state.preset || state.scope, entry:pl.entry, sl:pl.sl, tp1:pl.tp1, tp2:pl.tp2, rr1:pl.rr1, rr2:pl.rr2, score:m.verdictScore, status:'open', chk:now, inst:sgSigInfo(c, dir).inst, cp:sgSigInfo(c, dir).cp, iadj:sgAlign(c, dir).adj || 0, imp:(m.eiImp || []).map(x => [x[0], x[1]]), psy:m.psy ? m.psy.tag : null, p30:P30, reg:RG.tag, aplus:AP.ok});
     }
     cands.sort((x, y) => (Math.abs(y.score || 0) + (y.iadj || 0)) - (Math.abs(x.score || 0) + (x.iadj || 0)));
     const used = {long:0, short:0}; if (strict) for (const x of SIG.list) if (now - x.t < 36e5 && /^Confirmed/.test(x.src || '')) used[x.dir]++;
@@ -7584,12 +7595,14 @@ function renderSignals(){
     const AC = state.alerts || {}, MC = state.mac || {}, PC = state.pf || {};
     el.innerHTML = `<div class="nsec"><h3>Signal log: did the signals work?</h3>
       <p class="hint">With strict filters on, a trade is only written when the market allows it and the set-up is confirmed (see the box below). Otherwise, every time the scanner shows a strong verdict (or an A-grade set-up with a lean) it writes the entry, stop and two targets here, then watches the 5-minute candles to see what happened first. Stop is checked before targets inside the same candle (the cautious reading). Win rate = targets hit / (targets hit + stopped out). R is profit in units of the stop distance. A signal that is still open after 24h is closed at the current price. The log lives in this browser; the page must be open for new signals to be recorded.</p>
+      <div class="row" style="gap:10px;flex-wrap:wrap;align-items:center"><label class="hint"><input type="checkbox" id="sgAplus"> A+ only (5 of 5 groups must agree)</label><label class="hint"><input type="checkbox" id="sgReg"> Skip panic markets and regimes where my record is negative</label><label class="hint">Max open per side <input type="number" id="sgCap" min="1" max="20" style="width:60px"></label></div>
       <div class="row"><label class="hint"><input type="checkbox" id="sgStrict"> Strict filters (recommended): only log a trade when the market verdict allows it, a sweep breakout and an institutional candle confirm it, price has not already run, the institutional read and the 13 extra checks are not against it, and at most 3 per side per hour</label></div><div id="sgSkip" class="hint"></div><div id="sgBatch" class="hint"></div><div id="sgStats"></div><div id="sgPerf"></div><div class="row"><button class="btn" id="sgCsv" type="button">Download CSV</button><button class="btn" id="sgClear" type="button">Clear log</button></div><div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th>Opened</th><th style="text-align:left">Coin</th><th>Side</th><th style="text-align:left">Source</th><th title="Institutional score at the moment the signal was written (agree = institutions on the same side)">Institutions</th><th title="The 13 extra institutional checks. Click for the reasons.">13 checks</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th style="text-align:left">Result</th><th>R</th></tr></thead><tbody id="sgBody"></tbody></table></div></div>
     <div class="nsec"><h3>Alerts</h3>
       <p class="hint">Fires when all of these are true: the verdict is Strong, the 1h sweep breakout is confirmed, an institutional candle backs it, and the score is at least the number below. Each coin alerts at most once every 2 hours. The page must stay open.</p>
       <div class="row"><label class="hint"><input type="checkbox" id="alOn"> Alerts on</label><label class="hint"><input type="checkbox" id="alSound"> Sound</label><label class="hint"><input type="checkbox" id="alNotify"> Notification</label><button class="btn sm" id="alEnable" type="button">Allow notifications</button><label class="hint">Minimum score <input type="text" id="alMin" style="width:56px"></label></div>
       <div class="row"><label class="hint"><input type="checkbox" id="alVerdict"> Also alert when the market verdict changes</label><label class="hint" id="alKeepWrap" hidden><input type="checkbox" id="alKeep"> Keep running in the background (phone app)</label></div>
       <div class="row" style="margin-top:6px"><input type="password" id="alTok" placeholder="Telegram bot token (optional)" style="min-width:260px"><input type="text" id="alChat" placeholder="Telegram chat id" style="width:170px"><button class="btn" id="alTest" type="button">Send test alert</button></div>
+      <div class="row" style="margin-top:6px;gap:8px;flex-wrap:wrap;align-items:center"><label class="hint">Send alerts for <select id="alGrade"><option value="any">every signal</option><option value="go">only Go (30-check verdict)</option><option value="aplus">only A+</option></select></label><label class="hint">Quiet hours (your time) <input type="time" id="alQ1" style="width:110px"> to <input type="time" id="alQ2" style="width:110px"></label></div>
       <p class="hint">Telegram: create a bot with @BotFather, send it a message, then use the token and your chat id here. They are stored only in this browser.</p><div id="alLog" class="hint"></div></div>
     <div class="nsec"><h3>Macro calendar</h3>
       <p class="hint">High-impact USD events (FOMC, CPI, jobs). 30 minutes before to 15 minutes after, coins are forced to Avoid; the hour before shows a warning. Sources: a free calendar feed, the built-in FOMC dates (check them on federalreserve.gov), and your own list.</p>
@@ -7614,11 +7627,11 @@ function renderSignals(){
       <p class="hint"><label class="tg"><input type="checkbox" id="pxOn"> Use free public proxies for blocked low-volume data (extra exchanges, DEX, DefiLlama). Never used for your keys.</label><br><label class="tg"><input type="checkbox" id="pxMain"> Also use them for the main exchange scan (many calls: can get your IP rate-limited, leave off unless needed).</label></p></div>
     <div class="nsec"><h3>My execution settings</h3><div class="row"><label class="hint">My typical position size, $ <input type="text" id="mySize" style="width:110px"></label></div>
       <p class="hint">Used by the Execution filters (book depth, slippage). Depth and slippage come from the first 20 levels of the Hyperliquid order book, so a very large size on a liquid coin can read "more than the book" even when real liquidity is deeper.</p></div>`;
-    $('sgStrict').checked = state.sigStrict !== false; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
+    $('alGrade').value = (state.alerts || {}).grade || 'any'; $('alQ1').value = (state.alerts || {}).q1 || ''; $('alQ2').value = (state.alerts || {}).q2 || ''; $('sgStrict').checked = state.sigStrict !== false; $('sgAplus').checked = !!state.aplus; $('sgReg').checked = state.regGate !== false; $('sgCap').value = state.capSide || 4; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
     $('macUrl').value = MC.url === undefined ? MAC_URL : MC.url; $('macManual').value = MC.manual || ''; $('pfAddr').value = PC.addr || ''; $('mySize').value = state.mySize || 10000; $('hlpAddrs').value = state.hlpAddrs === undefined ? HLP_DEFAULT : state.hlpAddrs; $('czKey').value = (state.cz || {}).key || ''; $('cmcKey').value = (state.cmc || {}).key || ''; $('alchKey').value = (state.alch || {}).key || ''; $('helKey').value = (state.hel || {}).key || ''; $('ocLabels').value = state.ocl || ''; $('pxOn').checked = state.pubProxy !== false; $('pxMain').checked = state.pxMain === true; ocStatShow();
     const setA = (k, v) => { state.alerts = Object.assign({}, state.alerts, {[k]:v}); saveState(); };
     el.addEventListener('change', e => { const id = e.target.id;
-      if (id === 'perfTune'){ eiCfg().tune = e.target.checked; saveState(); PERF.at = 0; toast('Auto-tune ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'sgStrict'){ state.sigStrict = e.target.checked; saveState(); toast('Strict signal filters ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'alOn') setA('on', e.target.checked); else if (id === 'alSound'){ setA('sound', e.target.checked); if (e.target.checked) beep(); } else if (id === 'alNotify') setA('notify', e.target.checked); else if (id === 'alVerdict') setA('verdict', e.target.checked); else if (id === 'alKeep'){ const kb = NB(); if (kb){ try { kb.keepAlive(e.target.checked); } catch(x){} toast('Background running ' + (e.target.checked ? 'on' : 'off')); } } else if (id === 'alMin') setA('minScore', e.target.value.trim()); else if (id === 'alTok') setA('tgToken', e.target.value.trim()); else if (id === 'alChat') setA('tgChat', e.target.value.trim());
+      if (id === 'sgAplus'){ state.aplus = e.target.checked; saveState(); toast('A+ only ' + (e.target.checked ? 'on' : 'off')); } else if (id === 'sgReg'){ state.regGate = e.target.checked; saveState(); } else if (id === 'sgCap'){ state.capSide = Math.max(1, Math.min(20, +e.target.value || 4)); saveState(); } else if (id === 'alGrade') setA('grade', e.target.value); else if (id === 'alQ1') setA('q1', e.target.value); else if (id === 'alQ2') setA('q2', e.target.value); else if (id === 'perfTune'){ eiCfg().tune = e.target.checked; saveState(); PERF.at = 0; toast('Auto-tune ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'sgStrict'){ state.sigStrict = e.target.checked; saveState(); toast('Strict signal filters ' + (e.target.checked ? 'on' : 'off')); renderSignals(); } else if (id === 'alOn') setA('on', e.target.checked); else if (id === 'alSound'){ setA('sound', e.target.checked); if (e.target.checked) beep(); } else if (id === 'alNotify') setA('notify', e.target.checked); else if (id === 'alVerdict') setA('verdict', e.target.checked); else if (id === 'alKeep'){ const kb = NB(); if (kb){ try { kb.keepAlive(e.target.checked); } catch(x){} toast('Background running ' + (e.target.checked ? 'on' : 'off')); } } else if (id === 'alMin') setA('minScore', e.target.value.trim()); else if (id === 'alTok') setA('tgToken', e.target.value.trim()); else if (id === 'alChat') setA('tgChat', e.target.value.trim());
       else if (id === 'macUrl'){ state.mac = Object.assign({}, state.mac, {url:e.target.value.trim()}); saveState(); } else if (id === 'macManual'){ state.mac = Object.assign({}, state.mac, {manual:e.target.value}); saveState(); loadMacro(); }
       else if (id === 'pfAddr'){ state.pf = {addr:e.target.value.trim()}; saveState(); } else if (id === 'mySize'){ state.mySize = e.target.value.trim(); saveState(); requestRender(); } else if (id === 'hlpAddrs'){ state.hlpAddrs = e.target.value; saveState(); loadHlp(); } else if (id === 'cmcKey'){ state.cmc = {key:e.target.value.trim()}; saveState(); } else if (id === 'czKey'){ state.cz = {key:e.target.value.trim()}; saveState(); CZ.mk = null; CZ.cycleAt = 0; CZ.until = 0; } });
     el.addEventListener('click', e => {
@@ -9421,7 +9434,7 @@ function perfBuild(force){
     if (a.n >= 10){ const edge = a.avgR - (isNum(base.avgR) ? base.avgR : 0); if (edge >= 0.15){ v = 'Working'; mult = 1.25; } else if (edge <= -0.15){ v = 'Hurting'; mult = 0.5; } else v = 'Neutral'; }
     return {nm, a, b, v, mult}; }).sort((x, y) => y.a.n - x.a.n);
   const grp = (key, f) => { const m = new Map(); for (const x of closed){ const k = f(x); if (!k) continue; (m.get(k) || m.set(k, []).get(k)).push(x); } return [...m.entries()].map(([k, l]) => ({k, s:st(l)})).sort((x, y) => y.s.n - x.s.n); };
-  const V = {all, base, rows, psy:grp('psy', x => x.psy), p30:grp('p30', x => x.p30 && x.p30.v), mult:new Map(rows.map(r => [r.nm, r.mult]))};
+  const V = {all, base, rows, psy:grp('psy', x => x.psy), p30:grp('p30', x => x.p30 && x.p30.v), reg:grp('reg', x => x.reg), ap:grp('ap', x => x.aplus === undefined ? null : x.aplus ? 'A+' : 'Other'), mult:new Map(rows.map(r => [r.nm, r.mult]))};
   PERF.v = V; PERF.at = Date.now(); return V;
 }
 function perfHtml(){
@@ -9432,9 +9445,44 @@ function perfHtml(){
   const tr = V.rows.map(r => `<tr><td style="text-align:left">${esc(r.nm)}</td><td>${esc(f(r.a))}</td><td>${esc(f(r.b))}</td><td class="${r.v === 'Working' ? 'up' : r.v === 'Hurting' ? 'dn' : 'dim'}">${r.v}${r.v === 'Working' || r.v === 'Hurting' ? ' (x' + r.mult + ')' : ''}</td></tr>`).join('');
   h += `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Source</th><th>When it agreed with the trade</th><th>When it disagreed</th><th>Verdict</th></tr></thead><tbody>${tr || '<tr><td colspan="4" class="dim">No source data yet</td></tr>'}</tbody></table></div>`;
   const g = (t, a) => a.length ? `<p class="hint"><b>${t}:</b> ` + a.map(x => esc(x.k) + ' ' + esc(f(x.s))).join(' · ') + '</p>' : '';
-  h += g('By psychology read', V.psy) + g('By 30-check verdict', V.p30);
+  h += g('By psychology read', V.psy) + g('By 30-check verdict', V.p30) + g('By Bitcoin market regime', V.reg) + g('A+ signals vs the rest', V.ap);
+  { const M = moveStats(SIG.list); if (M) h += `<p class="hint"><b>How your trades move (${M.n} closed):</b> on average price ran ${M.mfe.toFixed(2)}R in your favour at best${isNum(M.maeWin) ? ', and winners dipped ' + M.maeWin.toFixed(2) + 'R against you first' : ''}.${M.stops ? ' Of ' + M.stops + ' stopped trades, ' + M.hunt + ' (' + M.huntPct.toFixed(0) + '%) had already reached 0.8R in profit before being stopped.' : ''} ${M.huntPct !== null && M.huntPct >= 35 ? 'That is a lot: consider taking part profit earlier or moving the stop to break-even sooner.' : M.maeWin !== null && M.maeWin >= 0.8 ? 'Winners nearly hit your stop before working: entries are early, wait for confirmation or use a wider stop with a smaller size.' : ''}</p>`; }
   h += `<label class="hint"><input type="checkbox" id="perfTune"${C.tune ? ' checked' : ''}> Auto-tune: scale each source's points by its record (Working x1.25, Hurting x0.5). Off by default; turn on only after 30 or more closed signals.</label></div>`;
   return h;
+}
+
+/* ===== V4.29: market regime, A+ mode, portfolio caps, trade-movement stats ===== */
+var REG = {at:0, v:null};
+function regimeNow(){
+  if (REG.v && Date.now() - REG.at < 60000) return REG.v;
+  let out = {tag:'Unknown', tone:'na', why:'Bitcoin candles are not loaded yet.', er:null};
+  try {
+    const b = snapshot.get('BTC') || state.coins.get('BTC'), cd = b && b.candles; if (cd && cd.length > 400){
+      const H = new Map(); for (const k of cd){ const h = Math.floor(k.t / 36e5); const o = H.get(h); if (!o) H.set(h, {o:k.o, h:k.h, l:k.l, c:k.c}); else { o.h = Math.max(o.h, k.h); o.l = Math.min(o.l, k.l); o.c = k.c; } }
+      const hs = [...H.entries()].sort((a, c) => a[0] - c[0]).map(x => x[1]); if (hs.length >= 30){
+        const last = hs.slice(-25), net = Math.abs(last[last.length - 1].c - last[0].c); let path = 0; for (let i = 1; i < last.length; i++) path += Math.abs(last[i].c - last[i - 1].c);
+        const er = path > 0 ? net / path : 0, rg = hs.slice(-25, -1).map(x => (x.h - x.l) / x.c).sort((a, c) => a - c), med = rg[rg.length >> 1] || 0, cur = hs[hs.length - 1], now1 = (cur.h - cur.l) / cur.c, ch1 = (cur.c - cur.o) / cur.o * 100, dirUp = last[last.length - 1].c >= last[0].c;
+        if (Math.abs(ch1) >= 2.5 || (med > 0 && now1 >= 3.5 * med && now1 >= 0.012)) out = {tag:'Panic', tone:'dn', why:'Bitcoin moved ' + ch1.toFixed(1) + '% this hour and its range is ' + (med > 0 ? (now1 / med).toFixed(1) + 'x' : 'far above') + ' normal. Signals are unreliable in a panic.', er};
+        else if (er >= 0.35) out = {tag:dirUp ? 'Trending up' : 'Trending down', tone:dirUp ? 'up' : 'dn', why:'Bitcoin moved in one direction over the last day (efficiency ' + er.toFixed(2) + '). Trend-following set-ups work best; fading the move works worst.', er};
+        else out = {tag:'Ranging', tone:'warn', why:'Bitcoin has chopped sideways over the last day (efficiency ' + er.toFixed(2) + '). Sweep-and-reclaim and range-edge set-ups work; breakouts fail more often.', er};
+      } } } catch(e){}
+  REG.v = out; REG.at = Date.now(); return out;
+}
+function aPlusCheck(c, dir, P30){
+  const m = c.m, d = dir === 'long' ? 1 : -1, g = [], n = isNum;
+  const f1 = (m.flowPct || {})['1h'], f15 = (m.flowPct || {})['15m'];
+  g.push(['Money flow', n(f1) && f1 * d >= 5 && (!n(f15) || f15 * d >= 0)]);
+  const fy = n(m.funding) ? m.funding * 24 * 365 : null; g.push(['Positioning not crowded against you', !((fy !== null && fy * d > 60) || (m.lsState === (d > 0 ? 1 : 2)))]);
+  let ps = null; try { ps = psyRead(c); } catch(e){} g.push(['Institutions agree', !!(ps && ps.inst === d)]);
+  { const sp = (typeof swpPick === 'function') ? swpPick(m) : null, bo = m.bo && m.bo['1h'], ic = m.ic && m.ic['1h']; const BU = [1, 3, 5, 8], BE = [2, 4, 6, 9]; g.push(['Price structure', !!((sp && sp[1].dir === d) || bo === (d > 0 ? 2 : 4) || (d > 0 ? BU : BE).includes(ic))]); }
+  g.push(['30-check verdict is Go', !!(P30 && P30.v === 'Go')]);
+  const ok = g.filter(x => x[1]).length; return {ok:ok >= 5, n:ok, g};
+}
+function moveStats(list){
+  const L = list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.mfe) && isNum(x.mae)); if (L.length < 5) return null;
+  const av = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null, st = L.filter(x => x.status === 'stop'), wn = L.filter(x => x.r > 0);
+  const hunt = st.filter(x => x.mfe >= 0.8).length;
+  return {n:L.length, mfe:av(L.map(x => x.mfe)), maeWin:av(wn.map(x => x.mae)), mfeStop:av(st.map(x => x.mfe)), stops:st.length, hunt, huntPct:st.length ? hunt / st.length * 100 : null};
 }
 
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
@@ -9563,6 +9611,7 @@ function ptRows(c, rd){
       for (const x of P.rows) row('30 pre-trade checks', x.i + '. ' + x.label, word[x.v] + (x.v === 'na' ? '' : ' · ' + (x.pts > 0 ? '+' : '') + x.pts + ' pts'), tone[x.v], x.why); } }
   { const p = psyRead(c); if (p){ const tn = v => dir ? (v * dir > 0 ? 'up' : v * dir < 0 ? 'dn' : 'warn') : 'warn', sd = v => v > 0 ? 'bullish' : v < 0 ? 'bearish' : 'mixed';
     row('Psychology', 'Overall read', p.tag, p.tone, p.label);
+    { const RG = regimeNow(); row('Psychology', 'Market regime (Bitcoin, last day)', RG.tag, RG.tone, RG.why); }
     row('Psychology', 'Institutions', sd(p.inst), tn(p.inst), p.instWhy.length ? p.instWhy.join('; ') : 'No clear institutional footprint on this coin yet.');
     row('Psychology', 'Market mood and backdrop', p.mood + ' · ' + sd(p.mkt), tn(p.mkt), p.mktWhy.length ? p.mktWhy.join('; ') : 'No market-wide push either way.');
     row('Psychology', 'Retail crowd', p.retail, p.retail === 'euphoric' ? 'dn' : p.retail === 'fearful' ? 'warn' : 'na', p.retWhy.length ? p.retWhy.join('; ') : 'No sign of a crowd on this coin.'); } }
