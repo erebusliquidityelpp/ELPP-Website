@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.43</title>
+<title>ELPP CRYPTO SCANNER PRO V4.44</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.43</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.44</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9855,7 +9855,7 @@ function dgHtml(){
   else { const G = dgBreak(c.m), mx = Math.max(10, ...Object.values(G).map(g => Math.max(g.up, -g.dn)));
     h += `<div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><label class="hint">Coin <select id="dgCoin">${L.slice(0, 80).map(x => `<option value="${esc(x.name)}"${x.name === c.name ? ' selected' : ''}>${esc(x.name)} (${sg(Math.round(x.m.verdictScore))})</option>`).join('')}</select></label><b>${esc(VERDICT_LAB[c.m.verdict] || '')}</b><span class="hint">score <b class="${c.m.verdictScore > 0 ? 'up' : c.m.verdictScore < 0 ? 'dn' : ''}">${sg(Math.round(c.m.verdictScore))}</b> (Strong at +/-${c.m.vThr ? c.m.vThr[1] : 35}, Lean at +/-${c.m.vThr ? c.m.vThr[0] : 15})</span><button class="btn sm" type="button" data-chart="${esc(c.name)}">Open chart</button></div>
       <div style="margin-top:8px">${DG_GROUPS.map(([k, nm]) => { const g = G[k], w = v => Math.round(Math.abs(v) / mx * 100); return `<div style="display:grid;grid-template-columns:minmax(150px,230px) 1fr 70px;gap:8px;align-items:center;margin:3px 0"><span class="hint">${esc(nm)}</span><span style="display:flex;height:12px;background:var(--surface2,#151a22);border-radius:6px;overflow:hidden"><span style="width:50%;display:flex;justify-content:flex-end"><i style="width:${w(g.dn)}%;background:#ff6b6b"></i></span><span style="width:50%"><i style="display:block;height:100%;width:${w(g.up)}%;background:#2ecc8f"></i></span></span><b class="${g.up + g.dn > 0 ? 'up' : g.up + g.dn < 0 ? 'dn' : 'dim'}">${sg(Math.round(g.up + g.dn))}</b></div>`; }).join('')}</div>
-      <details class="ovd" style="margin-top:8px"><summary>Every reason behind this score</summary>${DG_GROUPS.map(([k, nm]) => { const g = G[k]; if (!g.items.length) return ''; return `<p class="hint"><b>${esc(nm)}</b></p>` + g.items.sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).map(x => `<div class="cwr"><span>${esc(x[1])}</span><span class="${x[0] > 0 ? 'up' : 'dn'}">${sg(x[0])}</span></div>`).join(''); }).join('')}${c.m.vFlags && c.m.vFlags.length ? `<p class="hint"><b>Cautions (not scored)</b></p>` + c.m.vFlags.map(x => `<div class="cwr"><span>${esc(x)}</span><span class="warn">!</span></div>`).join('') : ''}</details>`; }
+      <details class="ovd" data-ovd="dg-why" style="margin-top:8px"${OV.open.has('dg-why') ? ' open' : ''}><summary>Every reason behind this score</summary>${DG_GROUPS.map(([k, nm]) => { const g = G[k]; if (!g.items.length) return ''; return `<p class="hint"><b>${esc(nm)}</b></p>` + g.items.sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).map(x => `<div class="cwr"><span>${esc(x[1])}</span><span class="${x[0] > 0 ? 'up' : 'dn'}">${sg(x[0])}</span></div>`).join(''); }).join('')}${c.m.vFlags && c.m.vFlags.length ? `<p class="hint"><b>Cautions (not scored)</b></p>` + c.m.vFlags.map(x => `<div class="cwr"><span>${esc(x)}</span><span class="warn">!</span></div>`).join('') : ''}</details>`; }
   h += '</div>';
   /* market-wide */
   const tot = {}; let n = 0; for (const g of DG_GROUPS) tot[g[0]] = 0; for (const x of L){ n++; for (const p of x.m.vAll) tot[dgOf(p[1], p[2])] += Math.abs(p[0]); } const sum = Object.values(tot).reduce((a, b) => a + b, 0) || 1;
@@ -9875,7 +9875,7 @@ function dgHtml(){
 const DG = {coin:null};
 function renderDecide(){
   const el = $('viewDecide'); if (!el) return;
-  if (!el._built){ el._built = true; el.addEventListener('change', e => { if (e.target.id === 'dgCoin'){ DG.coin = e.target.value; el._h = ''; renderDecide(); } }); el.addEventListener('click', e => { const a = e.target.closest('[data-chart]'); if (a) openChart(a.dataset.chart); }); }
+  if (!el._built){ el._built = true; el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true); el.addEventListener('change', e => { if (e.target.id === 'dgCoin'){ DG.coin = e.target.value; el._h = ''; renderDecide(); } }); el.addEventListener('click', e => { const a = e.target.closest('[data-chart]'); if (a) openChart(a.dataset.chart); }); }
   const ae = document.activeElement; if (ae && el.contains(ae) && ae.tagName === 'SELECT') return;
   const html = dgHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
@@ -10087,7 +10087,7 @@ function prHtml(){
     h += `<div class="row" style="gap:10px;flex-wrap:wrap">${tile('Closed signals', A.n, V.open + ' still open', '')}${tile('Win rate', f(A.win, 'p'), '95% range ' + (isNum(A.ci[0]) ? A.ci[0].toFixed(0) + '-' + A.ci[1].toFixed(0) + '%' : '—'), A.win >= 40 ? 'up' : 'warn')}${tile('Average per trade', f(A.avg), 'after costs', cl(A.avg))}${tile('Total', f(A.sum), 'profit factor ' + (isNum(A.pf) ? A.pf.toFixed(2) : '—'), cl(A.sum))}${tile('Worst drop', A.dd.toFixed(1) + 'R', 'longest losing run ' + V.bl, A.dd > 8 ? 'warn' : '')}${tile('Luck check', isNum(A.t) ? A.t.toFixed(1) : '—', A.t >= 2 ? 'probably real' : 'not yet proven', A.t >= 2 ? 'up' : 'warn')}</div>
     <div class="row" style="gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:10px"><div style="flex:2;min-width:300px">${btSvg(A.curve, V.P.eq0)}<p class="hint">Account growth if every signal had been taken at 1% risk (start 1000, dashed line).</p></div>
     <div style="flex:1;min-width:240px"><b class="hint">By month</b><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Month</th><th>Trades</th><th>Win</th><th>Total</th></tr></thead><tbody>${V.months.map(m => `<tr><td style="text-align:left">${esc(m.month)}</td><td>${m.trades}</td><td>${f(m.winPct, 'p')}</td><td class="${cl(m.totalR)}">${f(m.totalR)}</td></tr>`).join('')}</tbody></table></div></div>
-    <details class="ovd" style="margin-top:8px"><summary>Last 15 signals</summary><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Closed</th><th style="text-align:left">Coin</th><th>Side</th><th>Result</th><th style="text-align:left">Outcome</th></tr></thead><tbody>${V.L.slice(-15).reverse().map(x => `<tr><td style="text-align:left">${esc(new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}))}</td><td style="text-align:left">${esc(x.c)}</td><td>${x.d > 0 ? 'Long' : 'Short'}</td><td class="${cl(x.r)}">${f(x.r)}</td><td style="text-align:left">${x.out === 'stop' ? 'Stopped out' : x.out === 'expired' ? 'Expired (24h)' : x.out === 'tp2' ? 'Target 2' : 'Target 1'}</td></tr>`).join('')}</tbody></table></details>`;
+    <details class="ovd" data-ovd="pr-last" style="margin-top:8px"${OV.open.has('pr-last') ? ' open' : ''}><summary>Last 15 signals</summary><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Closed</th><th style="text-align:left">Coin</th><th>Side</th><th>Result</th><th style="text-align:left">Outcome</th></tr></thead><tbody>${V.L.slice(-15).reverse().map(x => `<tr><td style="text-align:left">${esc(new Date(x.t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}))}</td><td style="text-align:left">${esc(x.c)}</td><td>${x.d > 0 ? 'Long' : 'Short'}</td><td class="${cl(x.r)}">${f(x.r)}</td><td style="text-align:left">${x.out === 'stop' ? 'Stopped out' : x.out === 'expired' ? 'Expired (24h)' : x.out === 'tp2' ? 'Target 2' : 'Target 1'}</td></tr>`).join('')}</tbody></table></details>`;
   }
   h += '</div><div class="nsec"><h3>Historical test of every idea (backtest)</h3>';
   if (!bt) h += '<p class="hint">Waiting for the first automatic backtest.</p>';
@@ -10097,11 +10097,11 @@ function prHtml(){
     <div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Idea</th><th>Trades</th><th>Win</th><th>Avg R</th><th>Profit factor</th><th>Test-period avg</th><th style="text-align:left">Verdict</th></tr></thead><tbody>${bt.rules.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td>${r.trades}</td><td>${f(r.winPct, 'p')}</td><td class="${cl(r.avgR)}">${f(r.avgR)}</td><td>${isNum(r.profitFactor) ? r.profitFactor.toFixed(2) : '—'}</td><td class="${cl(r.testPeriodAvgR)}">${f(r.testPeriodAvgR)} <small class="dim">(${r.testPeriodTrades})</small></td><td style="text-align:left" class="${/^Edge/.test(r.verdict) ? 'up' : /No edge|failed/.test(r.verdict) ? 'dn' : 'dim'}">${esc(r.verdict)}</td></tr>`).join('')}</tbody></table></div>`;
   }
   h += `</div><div class="nsec"><h3>How to use this on your website</h3><ul class="ovstory"><li><b>Download website data (JSON)</b> gives one clean file with the live record, the equity curve, monthly results, the last 50 signals and the whole backtest table. Your site reads it and draws it in your own design.</li><li>The file lists <b>everything</b>, winners and losers, and marks whether the sample is big enough (<code>sampleIsEnough</code>). Show those same figures, with the sample size next to them: that is what makes a record believable, and it keeps you clear of misleading-claims rules.</li><li>The server runner can save this file for you every few minutes as <code>data/proof.json</code>, so the site always has fresh numbers without anyone opening the app.</li><li>Put "past results do not guarantee future results" beside the numbers. It is included in the file as <code>notes</code>.</li></ul>
-    <details class="ovd"><summary>Preview of the data</summary><pre style="max-height:320px;overflow:auto;font-size:11px;white-space:pre-wrap">${esc(JSON.stringify(prBuild(), null, 1).slice(0, 6000))}…</pre></details></div>`;
+    <details class="ovd" data-ovd="pr-prev"${OV.open.has('pr-prev') ? ' open' : ''}><summary>Preview of the data</summary><pre style="max-height:320px;overflow:auto;font-size:11px;white-space:pre-wrap">${esc(JSON.stringify(Object.assign(prBuild(), {generatedAt:'(set when you download)'}), null, 1).slice(0, 6000))}…</pre></details></div>`;
   return h;
 }
 function renderProof(){
-  const el = $('viewProof'); if (!el) return; if (el._busy) return;
+  const el = $('viewProof'); if (!el) return; if (!el._built){ el._built = true; el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true); }
   const html = prHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
 }
 function prAuto(){
