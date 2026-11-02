@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.47</title>
+<title>ELPP CRYPTO SCANNER PRO V4.48</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -747,7 +747,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.47</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.48</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10243,6 +10243,63 @@ function adHtml(ctl){
 }
 document.addEventListener('change', e => { const t = e.target; if (!t || !t.id) return; if (t.id === 'adOn'){ adCfg().on = t.checked; saveState(); toast('Self-adjusting ' + (t.checked ? 'on' : 'off')); } else if (t.id === 'stCap'){ state.dayCap = Math.min(15, Math.max(1, Math.floor(+t.value || 15))); t.value = state.dayCap; saveState(); } else if (t.id === 'stQ'){ state.qMin = Math.min(95, Math.max(30, Math.floor(+t.value || 60))); t.value = state.qMin; saveState(); } });
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#adReset')){ if (confirm('Reset the stop rules to the defaults? The learning log is kept.')){ const A = adCfg(); Object.assign(A, {buf:1, be:false, retest:false, counter:false, capT:false, at:SIG.list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.r)).length}); A.log.unshift({t:Date.now(), what:'Rules reset to defaults by you', why:'Manual reset.'}); saveState(); toast('Rules reset'); try { requestRender(); renderSignals(); } catch(x){} } } });
+
+/* ===== V4.48: Download CSV / Copy for AI on every page and data window ===== */
+function csvCell(v){ v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function csvTxt(el){ const t = el.innerText != null ? el.innerText : el.textContent; return String(t || '').replace(/[▲▼↑↓⇅]/g, '').replace(/\s*\n\s*/g, ' · ').replace(/\s+/g, ' ').trim(); }
+function csvBuild(root, title){
+  const rows = [], add = r => rows.push(r.map(csvCell).join(',')), now = new Date();
+  add(['ELPP Crypto Scanner Pro export']); add(['Page', title]); add(['Exported (UTC)', now.toISOString()]); add(['Exported (Pakistan time)', now.toLocaleString('en-GB', {timeZone:'Asia/Karachi', hour12:false}) + ' PKT']); add(['Version', (document.querySelector('.v4b') || {}).textContent || '']); add(['Mode / venue', (state.mode || '') + ' / ' + (state.venue || state.vsel || 'auto')]); add([]);
+  const SKIP = /^(SCRIPT|STYLE|svg|SVG|BUTTON|INPUT|SELECT|TEXTAREA|IFRAME|PRE|CANVAS|NAV)$/, BLOCK = /^(DIV|P|UL|OL|LI|TABLE|DETAILS|SECTION|H1|H2|H3|H4|H5|SUMMARY|DL)$/;
+  let tables = 0;
+  const hid = el => el.hidden || (el.style && el.style.display === 'none');
+  const heading = t => { const p = t.previousElementSibling; if (p && (/^(H[1-6]|B|STRONG|SUMMARY)$/.test(p.tagName) || p.classList.contains('hint')) && csvTxt(p).length < 90) return csvTxt(p); const d = t.closest('details'); if (d && d.querySelector('summary')) return csvTxt(d.querySelector('summary')); return ''; };
+  const table = t => {
+    const hd = heading(t); if (hd) add(['# ' + hd]); tables++;
+    for (const tr of t.querySelectorAll('tr')){ if (tr.hidden) continue; const cells = [...tr.children].filter(c => /^(TD|TH)$/.test(c.tagName)).map(csvTxt); if (cells.some(x => x !== '')) add(cells); }
+    add([]);
+  };
+  const walk = el => {
+    if (!el || el.nodeType !== 1 || SKIP.test(el.tagName) || hid(el)) return;
+    if (el.tagName === 'TABLE'){ table(el); return; }
+    if (/^(H[1-6]|SUMMARY)$/.test(el.tagName)){ const t = csvTxt(el); if (t) add(['# ' + t]); return; }
+    if (el.tagName === 'DETAILS' && el.querySelector('summary')){ const t = csvTxt(el.querySelector('summary')); if (t) add(['# ' + t]); for (const c of el.children) if (c.tagName !== 'SUMMARY') walk(c); return; }
+    const kids = [...el.children], hasBlock = kids.some(c => BLOCK.test(c.tagName) || c.querySelector && c.querySelector('table,h3,h4'));
+    if (!hasBlock || (el.querySelector('table,h3,h4,p,ul') === null && csvTxt(el).length < 160 && !/^(UL|OL)$/.test(el.tagName))){
+      if (el.querySelector('table')){ for (const c of kids) walk(c); return; }
+      const parts = kids.length > 1 && kids.every(c => !SKIP.test(c.tagName)) ? kids.map(csvTxt).filter(Boolean) : [csvTxt(el)].filter(Boolean); if (parts.length) add(parts); return; }
+    if (/^(UL|OL)$/.test(el.tagName)){ for (const li of kids){ const t = csvTxt(li); if (t) add([t]); } return; }
+    for (const c of kids) walk(c);
+  };
+  walk(root); while (rows.length && rows[rows.length - 1] === '') rows.pop();
+  return {text:'﻿' + rows.join('\r\n') + '\r\n', tables, lines:rows.length};
+}
+function csvTarget(){
+  const v = state.view; let root, title;
+  const btn = document.querySelector('button.nv[data-view="' + v + '"]'), name = btn ? btn.textContent.replace(/\s+/g, ' ').trim() : v;
+  if (v === 'table'){ root = $('tablewrap'); title = 'Scanner table (' + (state.mode || '') + ', ' + (state.scope || '') + ')'; }
+  else { root = [...document.querySelectorAll('.vcol')].find(e => !e.hidden); title = name; }
+  return {root, title};
+}
+function csvName(t){ const d = new Date(), p = n => String(n).padStart(2, '0'); return 'ELPP-' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) + '-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + '.csv'; }
+function csvRun(kind, root, title){
+  if (!root){ toast('Nothing to export on this page.'); return; }
+  const o = csvBuild(root, title); if (o.lines < 9){ toast('This page has no data to export yet.'); return; }
+  if (kind === 'copy'){ const pre = 'This is data exported from my ELPP crypto scanner, page "' + title + '". Lines starting with # are section titles; each section is a table. Please analyse it and point out what stands out, risks, and what I should check next.\r\n\r\n'; const txt = pre + o.text.replace('﻿', ''); (navigator.clipboard ? navigator.clipboard.writeText(txt).then(() => toast('Copied. Paste it into Claude, ChatGPT or Gemini.'), () => toast('Copy blocked: use Download CSV')) : Promise.resolve(toast('Copy not supported: use Download CSV'))); return; }
+  jrDownload(csvName(title), o.text, 'text/csv;charset=utf-8'); toast('Downloaded ' + o.tables + ' table' + (o.tables === 1 ? '' : 's') + ' as CSV');
+}
+window.__elppCsv = () => { const t = csvTarget(); return t.root ? csvBuild(t.root, t.title) : null; };
+(function(){
+  const mh = $('modeHint'); if (mh && !$('csvBar')){ const b = document.createElement('div'); b.id = 'csvBar'; b.className = 'row'; b.style.cssText = 'gap:6px;margin:2px 0 6px'; b.innerHTML = '<button class="btn sm" type="button" id="csvDl" title="Download everything on this page as a CSV file">⬇ Download CSV</button><button class="btn sm" type="button" id="csvCp" title="Copy this page as text to paste into Claude, ChatGPT or Gemini">Copy for AI</button>'; mh.insertAdjacentElement('afterend', b); }
+  for (const id of ['dlg', 'insDlg', 'chartDlg']){ const d = $(id); if (!d || d.querySelector('.dlgCsv')) continue; const host = id === 'chartDlg' ? d.querySelector('.cw-top .row') : d.querySelector('.dlg-h'); if (!host) continue; const x = document.createElement('button'); x.className = 'btn sm dlgCsv'; x.type = 'button'; x.dataset.dlg = id; x.textContent = '⬇ Download CSV'; x.title = 'Download this window as a CSV file'; const y = document.createElement('button'); y.className = 'btn sm dlgCsv'; y.type = 'button'; y.dataset.dlg = id; y.dataset.kind = 'copy'; y.textContent = 'Copy for AI'; const h3 = id === 'chartDlg' ? null : host.querySelector('h3'); if (h3){ h3.after(x, y); } else { host.insertBefore(y, host.firstChild); host.insertBefore(x, host.firstChild); } }
+  document.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('#csvDl,#csvCp,.dlgCsv'); if (!t) return;
+    try {
+      if (t.classList.contains('dlgCsv')){ const d = $(t.dataset.dlg), h = d.querySelector('h3'), body = id => id === 'chartDlg' ? $('cwBody') : d; const root = t.dataset.dlg === 'chartDlg' ? $('cwBody') : d, title = (h ? h.textContent : t.dataset.dlg).replace(/\s+/g, ' ').trim(); csvRun(t.dataset.kind || 'dl', root, 'Window: ' + title); return; }
+      const g = csvTarget(); csvRun(t.id === 'csvCp' ? 'copy' : 'dl', g.root, g.title);
+    } catch(x){ toast('Export failed: ' + errTxt(x)); }
+  });
+})();
 
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
 var X9 = {cb:new Map(), cbAt:0, cbBusy:false, cbProd:null, cbErr:null, seas:new Map(), seasQ:[], seasBusy:false, seasErr:null, want:new Set(), started:false};
