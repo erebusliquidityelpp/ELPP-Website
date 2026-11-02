@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.42</title>
+<title>ELPP CRYPTO SCANNER PRO V4.43</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.42</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.43</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10120,7 +10120,7 @@ document.addEventListener('change', e => { if (e.target && e.target.id === 'prAu
 
 /* ===== V4.42: live countdown (days/hours/min/sec) with the exact date and time ===== */
 function cdFmt(ms){ const neg = ms < 0; let t = Math.floor(Math.abs(ms) / 1000); const d = Math.floor(t / 86400), h = Math.floor(t % 86400 / 3600), m = Math.floor(t % 3600 / 60), sec = t % 60, p = v => String(v).padStart(2, '0'); const x = d + 'd ' + p(h) + 'h ' + p(m) + 'm ' + p(sec) + 's'; return neg ? 'started ' + x + ' ago' : 'in ' + x; }
-function cdWhen(t){ try { const dt = new Date(t); return dt.toLocaleString([], {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZoneName:'short'}) + ' · ' + dt.toISOString().slice(11, 19) + ' UTC'; } catch(e){ return ''; } }
+function cdWhen(t){ try { const dt = new Date(t), pk = dt.toLocaleString('en-GB', {timeZone:'Asia/Karachi', weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true}); return pk + ' Pakistan time (PKT) · ' + dt.toISOString().slice(11, 19) + ' UTC'; } catch(e){ return ''; } }
 function cdHtml(t, big){ return `<span data-cd="${t}"${big ? ' style="font-size:15px;font-weight:700"' : ''}>${esc(cdFmt(t - Date.now()))}</span><br><span class="dim">${esc(cdWhen(t))}</span>`; }
 function cdTick(){ const n = Date.now(); for (const e of document.querySelectorAll('[data-cd]')){ const t = +e.dataset.cd, txt = cdFmt(t - n); if (e.textContent !== txt) e.textContent = txt; } }
 setInterval(() => { try { cdTick(); } catch(e){} }, 1000);
