@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.29</title>
+<title>ELPP CRYPTO SCANNER PRO V4.30</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.29</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.30</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -2428,7 +2428,7 @@ const SECTORS = {};
 const SECTOR_LIST = ['HIP-3 market','Layer 1','Layer 2 / scaling','DeFi','AI / data','Meme','Oracle / infra','Exchange token','Gaming / metaverse','Privacy','RWA / payments','Storage / compute','Other'];
 const normSym = n => String(n).replace(/^k(?=[A-Z0-9]{2,}$)/, '').toUpperCase();
 const sectorOf = c => String(c.name).includes(':') ? 'HIP-3 market' : (SECTORS[normSym(c.name)] || 'Other');
-async function extRaw(url, headers, ms){
+async function extRaw0(url, headers, ms){
   const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), ms || 20000);
   try {
     const r = await fetch(url, {headers: headers || {}, signal: ctl.signal});
@@ -8882,9 +8882,9 @@ async function eiRun(k, fn, every, force){
 function eiLoadAll(force){
   if (eiCfg().off) return;
   eiRun('cot', eiCotLoad, 6 * 36e5, force); eiRun('term', eiTermLoad, 3e5, force); eiRun('etf', eiEtfLoad, 18e5, force); eiRun('poly', eiPolyLoad, 3e5, force);
-  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('oiex', eiOiLoad, 90000, force); eiRun('dvol', eiDvolLoad, 6e5, force);
+  eiRun('mem', eiMemLoad, 3e5, force); eiRun('fund', eiFundLoad, 6 * 36e5, force); eiRun('wiki', eiWikiLoad, 3 * 36e5, force); eiRun('gh', eiGhLoad, 6 * 36e5, force); eiRun('bfx', eiBfxLoad, 18e5, force); eiRun('oiex', eiOiLoad, 90000, force); eiRun('pf', eiPfLoad, 300000, force); eiRun('chain', eiChainLoad, 36e5, force); eiRun('dvol', eiDvolLoad, 6e5, force);
 }
-function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); setInterval(eiOiBnTick, 3000); setInterval(eiBkTick, 5000); }
+function eiStart(){ setTimeout(() => eiLoadAll(false), 20000); setInterval(() => eiLoadAll(false), 60000); setInterval(eiTakerTick, 3000); setInterval(eiTopTick, 4000); setInterval(eiOiBnTick, 3000); setInterval(eiBkTick, 5000); setInterval(eiOhTick, 4000); }
 /* 1. CFTC Commitments of Traders: what asset managers, leveraged funds and dealers hold in CME bitcoin and ether futures */
 async function eiCotLoad(){
   const base = 'https://publicreporting.cftc.gov/resource/gpe5-46if.json', tok = String(eiCfg().cftc || '').trim(), hdr = tok ? {'X-App-Token':tok} : null;
@@ -9032,6 +9032,9 @@ function eiFill(c, now){
   { const t = EI.top.get(k); if (t && Date.now() - t.at < 3 * 36e5){ m.topSmart = t.smart; m.topCrowd = t.crowd; if (isNum(t.smart) && isNum(t.crowd)) m.topDiv = t.smart >= 0.55 && t.crowd <= 0.48 ? 1 : t.smart <= 0.45 && t.crowd >= 0.52 ? 2 : 0; } }
   { const r = X.trend && X.trend.get(k); if (r) m.trendRank = r; }
   if ((k === 'BTC' || k === 'ETH') && EI.d.bfx && EI.d.bfx[k]) m.bfxChg = EI.d.bfx[k].chg;
+  { const pf = EI.pf.get(k); m.pfGap = pf ? pf.gap : null; m.pfN = pf ? pf.n : 0; m.pfHl = pf ? pf.hl : null; m.pfMed = pf ? pf.med : null;
+    const oh = EI.oh.get(k); m.oiTr = oh && isNum(oh.oiChg) && Date.now() - oh.at < 4 * 36e5 ? oh : null; m.pxTr = null; const cd = c.candles; if (m.oiTr && cd && cd.length > 100 && isNum(m.px) && cd[0].o > 0) m.pxTr = (m.px / cd[0].o - 1) * 100;
+    const chn = CHAIN_OF[k], cg = chn && EI.chain.get(chn); m.chainName = chn || null; m.chainChg = cg ? cg.chg7 : null; }
   eiBookFill(c, m, k);
   eiImpact(c, m, k);
 }
@@ -9058,6 +9061,9 @@ function eiImpact(c, m, k){
   { const ch = (m.chg || {})['1h']; if (isNum(m.oiAggChg) && isNum(ch) && m.oiAggN >= 3){ if (m.oiAggChg >= 3 && ch > 0.3) P('All-exchange open interest', 1, 'open interest across ' + m.oiAggN + ' exchanges is up ' + m.oiAggChg.toFixed(1) + '% in about an hour while price rises: new longs are real, not just one venue'); else if (m.oiAggChg >= 3 && ch < -0.3) P('All-exchange open interest', -1, 'open interest across ' + m.oiAggN + ' exchanges is up ' + m.oiAggChg.toFixed(1) + '% in about an hour while price falls: new shorts are piling in'); } }
   if (isNum(m.bkObi) && m.bkAgg && m.bkAgg.n >= 3 && Math.abs(m.bkObi) >= 0.25) P('Order book across exchanges', m.bkObi > 0 ? 1 : -1, 'within 0.5% of price the combined book on ' + m.bkAgg.n + ' exchanges holds ' + fmtUsd(m.bkAgg.b05) + ' of bids against ' + fmtUsd(m.bkAgg.a05) + ' of asks (' + (m.bkObi > 0 ? 'buyers' : 'sellers') + ' are stacked deeper)');
   if (m.lhmMag) P('Liquidation heatmap', m.lhmMag, m.lhmMag > 0 ? 'the estimated liquidation cluster above price is the bigger and closer one: price tends to be pulled up to hunt it' : 'the estimated liquidation cluster below price is the bigger and closer one: price tends to be pulled down to hunt it');
+  if (isNum(m.pfGap) && m.pfN >= 1){ if (m.pfGap >= 0.004) P('Venue funding gap', -1, 'Hyperliquid funding (' + sgn(m.pfHl, 4, '%/h') + ') is well above the other exchanges (' + sgn(m.pfMed, 4, '%/h') + '): longs here are paying a premium, a crowded long'); else if (m.pfGap <= -0.004) P('Venue funding gap', 1, 'Hyperliquid funding (' + sgn(m.pfHl, 4, '%/h') + ') is well below the other exchanges (' + sgn(m.pfMed, 4, '%/h') + '): shorts here are paying a premium, a crowded short'); }
+  if (m.oiTr && isNum(m.pxTr) && Math.abs(m.pxTr) >= 2 && Math.abs(m.oiTr.oiChg) >= 8){ const up = m.pxTr > 0, oiUp = m.oiTr.oiChg > 0; P('2-day open interest trend', oiUp ? (up ? 1 : -1) : (up ? -1 : 1), 'over about 2 days price is ' + sgn(m.pxTr, 1, '%') + ' while Binance open interest is ' + sgn(m.oiTr.oiChg, 1, '%') + ': ' + (oiUp ? (up ? 'the rise is backed by new positions' : 'the fall is backed by new shorts') : (up ? 'the rise is mostly shorts closing, a weaker move' : 'longs have been flushed out, selling pressure is fading'))); }
+  if (isNum(m.chainChg) && m.chainName){ if (m.chainChg >= 3) P('Chain stablecoin flow', 1, 'stablecoin supply on ' + m.chainName + ' grew ' + m.chainChg.toFixed(1) + '% in 7 days: fresh buying power on its own chain'); else if (m.chainChg <= -2) P('Chain stablecoin flow', -1, 'stablecoin supply on ' + m.chainName + ' shrank ' + Math.abs(m.chainChg).toFixed(1) + '% in 7 days: cash is leaving its chain'); }
   let net = 0; const out = []; for (const x of L){ if (Math.abs(net + x[1]) > 8) continue; net += x[1]; out.push(x); }
   if (eiCfg().tune){ try { const V = perfBuild(false); for (const x of out){ const mu = V.mult.get(x[0]); if (mu && mu !== 1) x[1] = Math.round(x[1] * mu); } net = out.reduce((a, x) => a + x[1], 0); } catch(e){} }
   m.eiImp = out.filter(x => x[1]); m.eiNet = out.length ? net : null;
@@ -9184,6 +9190,7 @@ function apiHtml(){
     h += `<div class="apirow" data-svc="${esc(s.id)}" style="border-top:1px solid var(--line,#2a3140);padding:8px 0"><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><b>${esc(s.name)}</b><span class="hint">${s.tier === 'free' ? 'free' : 'paid or special'}</span><span class="${has ? 'up' : 'dim'}">${has ? '● filled in' : '○ empty'}</span></div><div class="hint">${esc(s.what)} <i>Get it: ${esc(s.where)}</i></div><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${s.f.map(f => `<label class="hint" style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px">${esc(f.label)}<input type="${f.secret ? 'password' : 'text'}" data-fk="${esc(f.k)}" value="${esc(f.get())}" placeholder="${esc(f.ph)}" autocomplete="off" style="width:100%"></label>`).join('')}</div></div>`;
   }
   if (cur) h += '</div>';
+  try { h += healthHtml(); } catch(e){}
   return h;
 }
 function apiSync(){
@@ -9216,6 +9223,7 @@ function renderApi(){
     el.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.fk) APK.edit = true; });
     el.addEventListener('change', e => { if (e.target.id === 'apiFilt'){ APK.filter = e.target.value; APK.edit = false; el._h = ''; renderApi(); } });
     el.addEventListener('click', e => {
+      if (e.target.closest('#apiRec')){ recDownload(); return; }
       if (e.target.closest('#apiSave')){ const n = apiSave(el); APK.edit = false; const hh = apiHtml(); el.innerHTML = hh; el._h = hh; const m = $('apiMsg'); if (m && n) m.textContent = 'Saved ' + n + ' service' + (n > 1 ? 's' : '') + ' and started loading their data. Check each page for its own status line.'; if (n) toast('Saved ' + n + ' service' + (n > 1 ? 's' : '')); }
     });
   }
@@ -9382,6 +9390,8 @@ async function eiBkTick(){
       ['Binance', async () => { const j = await ext('https://fapi.binance.com/fapi/v1/depth?symbol=' + sym + '&limit=500', null, 12000); return bkCalc(nums(j.bids), nums(j.asks)); }],
       ['Bybit', async () => { const j = await ext('https://api.bybit.com/v5/market/orderbook?category=linear&symbol=' + sym + '&limit=200', null, 12000), r = j.result || {}; return bkCalc(nums(r.b), nums(r.a)); }],
       ['OKX', async () => { if (!LQ.okCt) return null; const id = k + '-USDT-SWAP', ct = LQ.okCt.get(id); if (!(ct > 0)) return null; const j = await ext('https://www.okx.com/api/v5/market/books?instId=' + id + '&sz=400', null, 12000), d = (j.data || [])[0]; if (!d) return null; return bkCalc(nums(d.bids).map(x => [x[0], x[1] * ct]), nums(d.asks).map(x => [x[0], x[1] * ct])); }],
+      ['Coinbase spot', async () => { const j = await ext('https://api.exchange.coinbase.com/products/' + k + '-USD/book?level=2', null, 12000); return bkCalc(nums(j.bids), nums(j.asks)); }],
+      ['Kraken spot', async () => { const j = await ext('https://api.kraken.com/0/public/Depth?pair=' + (k === 'BTC' ? 'XBT' : k) + 'USD&count=200', null, 12000), r = j && j.result && Object.values(j.result)[0]; if (!r) return null; return bkCalc(nums(r.bids), nums(r.asks)); }],
       ['Bitget', async () => { const j = await ext('https://api.bitget.com/api/v2/mix/market/merge-depth?productType=USDT-FUTURES&symbol=' + sym + '&limit=100', null, 12000), d = j.data || {}; return bkCalc(nums(d.bids), nums(d.asks)); }]
     ];
     const rs = await Promise.allSettled(jobs.map(x => x[1]()));
@@ -9483,6 +9493,64 @@ function moveStats(list){
   const av = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null, st = L.filter(x => x.status === 'stop'), wn = L.filter(x => x.r > 0);
   const hunt = st.filter(x => x.mfe >= 0.8).length;
   return {n:L.length, mfe:av(L.map(x => x.mfe)), maeWin:av(wn.map(x => x.mae)), mfeStop:av(st.map(x => x.mfe)), stops:st.length, hunt, huntPct:st.length ? hunt / st.length * 100 : null};
+}
+
+/* ===== V4.30: request manager, response recorder, data health, more free data ===== */
+var HQ = new Map(), HB = new Map(), INF = new Map(), REC = new Map();
+function recAdd(url, status, txt){ try { const u = new URL(url); if (u.search && /key|token|secret|sig/i.test(u.search)) return; const k = u.host + u.pathname; REC.set(k, {at:Date.now(), status, len:txt.length, sample:txt.slice(0, 2500), q:u.search.slice(0, 120)}); if (REC.size > 260) REC.delete(REC.keys().next().value); } catch(e){} }
+async function extRaw(url, headers, ms){
+  let host = ''; try { host = new URL(url).host; } catch(e){}
+  const pause = HB.get(host); if (pause && pause > Date.now()) throw new Error('rate limit reached (429), will retry');
+  const dedupe = !headers; if (dedupe && INF.has(url)) return (await INF.get(url)).clone();
+  const h = HQ.get(host) || {n:0, q:[]}; HQ.set(host, h); if (h.n >= 8) await new Promise(res => h.q.push(res)); h.n++;
+  const p = (async () => { try { const r = await extRaw0(url, headers, ms); if (!headers && !/alchemy|helius|telegram|anthropic/i.test(url)) r.clone().text().then(t => recAdd(url, r.status, t)).catch(() => {}); return r; } catch(e){ if (/429/.test((e && e.message) || '')) HB.set(host, Date.now() + 30000); throw e; } finally { h.n--; const nx = h.q.shift(); if (nx) nx(); } })();
+  if (dedupe){ INF.set(url, p); p.then(() => setTimeout(() => INF.delete(url), 1500), () => INF.delete(url)); }
+  const r = await p; return dedupe ? r.clone() : r;
+}
+function recDownload(){ const o = {app:'ELPP scanner', at:new Date().toISOString(), note:'Public exchange responses, first 2500 characters each. No keys or account data.', samples:[...REC.entries()].map(([k, v]) => ({url:k, q:v.q, status:v.status, bytes:v.len, at:new Date(v.at).toISOString(), sample:v.sample}))}; const b = new Blob([JSON.stringify(o, null, 1)], {type:'application/json'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'elpp_samples_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function healthRows(){
+  const R = [], add = (name, ok, at, err) => R.push({name, ok, at, err:err || ''});
+  for (const k in RD.src){ const s = RD.src[k]; add((k[0] === 's' ? 'Spot prices: ' : 'Futures prices: ') + k.slice(2), s.ok, s.at, s.err); }
+  const EN = {cot:'CFTC futures positioning', term:'Futures curve', etf:'Spot ETF flows', poly:'Prediction markets', mem:'Bitcoin network', fund:'SOFR / IORB', wiki:'Wikipedia attention', gh:'GitHub activity', bfx:'Bitfinex margin book', dvol:'Deribit DVOL', oiex:'Open interest: Bybit/OKX/Bitget/Gate', pf:'Hyperliquid predicted funding', chain:'Stablecoin supply by chain'};
+  for (const k in EN){ if (EI.at[k] || EI.err[k]) add(EN[k], !EI.err[k], EI.at[k] || EI.fail[k], EI.err[k]); }
+  for (const k in EI.oiSrc) add('Open interest: ' + k, EI.oiSrc[k].ok, EI.oiSrc[k].at, EI.oiSrc[k].err);
+  for (const k in EI.bkSrc) add('Order book: ' + k, EI.bkSrc[k].ok, EI.bkSrc[k].at, EI.bkSrc[k].err);
+  if (EI.ohSrc) add('Open interest history: Binance', EI.ohSrc.ok, EI.ohSrc.at, EI.ohSrc.err);
+    add('Liquidations: Binance stream', !!LQ.s.bn, LQ.t0 || 0, LQ.err); add('Liquidations: OKX stream', !!LQ.s.ok, LQ.t0 || 0, LQ.okErr); add('Liquidations: Bybit stream', !!LQ.s.by, LQ.t0 || 0, LQ.byErr);
+  try { for (const k in FX.errs){ if (FX.errs[k] || FX.at[k]) add('Market data: ' + k, !FX.errs[k], FX.at[k], FX.errs[k]); } } catch(e){}
+  return R;
+}
+function healthHtml(){
+  const R = healthRows(), bad = R.filter(x => !x.ok), now = Date.now();
+  let h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">Data health</h3><button class="btn sm" type="button" id="apiRec">Download response samples for support (${REC.size})</button></div><p class="hint"><b class="${bad.length ? 'warn' : 'up'}">${R.length - bad.length} working · ${bad.length} failing</b>. A failing source adds nothing to verdicts; the rest still works. The sample file holds public exchange responses only (no keys, no account data): send it to me if a source keeps failing and I can fix its format.</p>`;
+  h += `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Source</th><th>Status</th><th>Last answer</th><th style="text-align:left">Problem</th></tr></thead><tbody>` + [...bad, ...R.filter(x => x.ok)].map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.ok ? 'up' : 'dn'}">${x.ok ? 'working' : 'failing'}</td><td>${x.at ? esc(ago(x.at)) : '—'}</td><td style="text-align:left" class="dim">${esc(x.err)}</td></tr>`).join('') + `</tbody></table></div></div>`;
+  return h;
+}
+/* more free data: Hyperliquid predicted funding on other venues, Binance open-interest history, stablecoin supply by chain, Coinbase and Kraken books */
+Object.assign(EI, {pf:new Map(), oh:new Map(), ohBusy:false, chain:new Map()});
+const CHAIN_OF = {ETH:'Ethereum', SOL:'Solana', AVAX:'Avalanche', SUI:'Sui', APT:'Aptos', NEAR:'Near', ARB:'Arbitrum', OP:'OP Mainnet', BNB:'BSC', TON:'TON', TRX:'Tron', POL:'Polygon', MATIC:'Polygon', SEI:'Sei', INJ:'Injective', TIA:'Celestia', ATOM:'Cosmos', ADA:'Cardano', DOT:'Polkadot', HYPE:'Hyperliquid L1', MNT:'Mantle', BERA:'Berachain', ALGO:'Algorand', XLM:'Stellar', XRP:'XRPL', ICP:'ICP', S:'Sonic'};
+async function eiPfLoad(){
+  const r = await fetch('https://api.hyperliquid.xyz/info', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'predictedFundings'})}); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); if (!Array.isArray(j)) throw new Error('unexpected answer');
+  const out = new Map(); for (const row of j){ if (!Array.isArray(row) || row.length < 2) continue; const k = normSym(String(row[0])), v = {}; for (const e of (row[1] || [])){ if (!Array.isArray(e) || !e[1]) continue; const rate = +e[1].fundingRate, iv = +e[1].fundingIntervalHours || (e[0] === 'HlPerp' ? 1 : 8); if (isFinite(rate)) v[e[0]] = rate * 100 / iv; }
+    const hl = v.HlPerp, oth = Object.keys(v).filter(x => x !== 'HlPerp').map(x => v[x]).sort((a, b) => a - b); if (isFinite(hl) && oth.length >= 1){ const med = oth.length % 2 ? oth[oth.length >> 1] : (oth[oth.length / 2 - 1] + oth[oth.length / 2]) / 2; out.set(k, {hl, med, gap:hl - med, n:oth.length, v}); } }
+  if (!out.size) throw new Error('no predicted funding rows'); EI.pf = out;
+}
+async function eiOhTick(){
+  if (EI.ohBusy || document.hidden || eiCfg().off) return;
+  const list = [...state.coins.values()].filter(c => c.ctx && c.m && isNum(c.m.px) && !String(c.name).includes(':')).sort((a, b) => ((b.m && b.m.vol24) || 0) - ((a.m && a.m.vol24) || 0)).slice(0, 30); if (!list.length) return;
+  list.sort((a, b) => ((EI.oh.get(normSym(a.name)) || {at:0}).at) - ((EI.oh.get(normSym(b.name)) || {at:0}).at)); const c = list[0], k = normSym(c.name);
+  if (Date.now() - (EI.oh.get(k) || {at:0}).at < 1200000) return; EI.ohBusy = true;
+  try { const sym = (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT', B = 'https://fapi.binance.com/futures/data/';
+    const a = await ext(B + 'openInterestHist?symbol=' + sym + '&period=1h&limit=48', null, 12000); let ls = null; try { ls = await ext(B + 'globalLongShortAccountRatio?symbol=' + sym + '&period=1h&limit=24', null, 12000); } catch(e){}
+    if (Array.isArray(a) && a.length >= 24){ const v0 = +a[0].sumOpenInterestValue, v1 = +a[a.length - 1].sumOpenInterestValue; const rec = {oiChg:v0 > 0 ? (v1 / v0 - 1) * 100 : null, hours:a.length, at:Date.now(), lsNow:null, lsChg:null};
+      if (Array.isArray(ls) && ls.length >= 12){ const l0 = +ls[0].longShortRatio, l1 = +ls[ls.length - 1].longShortRatio; if (l0 > 0 && l1 > 0){ rec.lsNow = l1; rec.lsChg = (l1 / l0 - 1) * 100; } }
+      EI.oh.set(k, rec); EI.ohSrc = {ok:true, at:Date.now(), err:''}; } else EI.oh.set(k, {oiChg:null, at:Date.now() - 900000}); }
+  catch(e){ EI.ohSrc = {ok:false, at:Date.now(), err:errTxt(e)}; EI.oh.set(k, {oiChg:null, at:Date.now() - 900000}); } finally { EI.ohBusy = false; }
+}
+async function eiChainLoad(){
+  const names = [...new Set(Object.values(CHAIN_OF))]; let ok = 0;
+  for (const ch of names){ try { const j = await ext('https://stablecoins.llama.fi/stablecoincharts/' + encodeURIComponent(ch), null, 15000); if (Array.isArray(j) && j.length >= 9){ const val = x => +(x.totalCirculatingUSD && x.totalCirculatingUSD.peggedUSD); const a = val(j[j.length - 1]), b = val(j[j.length - 8]); if (a > 0 && b > 0){ EI.chain.set(ch, {chg7:(a / b - 1) * 100, usd:a, at:Date.now()}); ok++; } } } catch(e){} }
+  if (!ok) throw new Error('no chain answered');
 }
 
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
@@ -9605,6 +9673,9 @@ function ptRows(c, rd){
       row('All-exchange data', 'Liquidation heatmap: shorts to be wiped above price', f(H.above), m.lhmMag > 0 ? 'up' : 'warn', 'Where leveraged short positions opened in the last 2 days would be liquidated if price reaches them (10x to 100x), after removing levels price has already crossed. This is an estimate from volume, not an exchange feed.' + mix);
       row('All-exchange data', 'Liquidation heatmap: longs to be wiped below price', f(H.below), m.lhmMag < 0 ? 'dn' : 'warn', 'Same method for leveraged longs. The bigger and nearer side tends to attract price (stop-hunt magnet).' + (n(H.longUsd) && n(H.shortUsd) ? ' Total estimated: ' + fmtUsd(H.longUsd) + ' of longs below vs ' + fmtUsd(H.shortUsd) + ' of shorts above.' : '')); }
     if (m.liqEx){ const t = Object.keys(m.liqEx).map(x => x + ' longs ' + fmtUsd(m.liqEx[x].l) + ' / shorts ' + fmtUsd(m.liqEx[x].s)).join(' · '); row('All-exchange data', 'Real liquidations by exchange (last hour)', t, 'warn', 'Positions actually force-closed, from the Binance, OKX and Bybit streams. Longs liquidated means forced selling; shorts liquidated means forced buying.'); } }
+  { if (n(m.pfGap)) row('All-exchange data', 'Predicted funding: Hyperliquid vs ' + m.pfN + ' other exchanges', sgn(m.pfHl, 4, '%/h') + ' vs ' + sgn(m.pfMed, 4, '%/h') + ' (gap ' + sgn(m.pfGap, 4, '%/h') + ')', Math.abs(m.pfGap) >= 0.004 ? 'warn' : 'na', 'Hyperliquid publishes the next funding of other venues. A big gap shows where the crowd is leaning: much higher on Hyperliquid means longs here pay a premium.');
+    if (m.oiTr) row('All-exchange data', 'Binance open interest, last ' + m.oiTr.hours + ' hours', sgn(m.oiTr.oiChg, 1, '%') + (n(m.pxTr) ? ' · price ' + sgn(m.pxTr, 1, '%') : '') + (n(m.oiTr.lsChg) ? ' · crowd long/short ratio ' + m.oiTr.lsNow.toFixed(2) + ' (' + sgn(m.oiTr.lsChg, 0, '%') + ')' : ''), 'na', 'Open interest rising with price means new money backs the move; rising against price means new shorts; falling means positions are closing.');
+    if (n(m.chainChg)) row('All-exchange data', 'Stablecoin supply on ' + m.chainName + ' (7 days)', sgn(m.chainChg, 1, '%'), m.chainChg >= 3 ? 'up' : m.chainChg <= -2 ? 'dn' : 'na', 'Dollar stablecoins on a coin\'s own chain are the cash that can buy it. Growth is fresh buying power; shrinking is cash leaving.'); }
   { let P = null; try { P = pt30(c, rd); } catch(e){ P = null; }
     if (P){ const tone = {ok:'up', watch:'warn', bad:'dn', na:'na'}, word = {ok:'Pass', watch:'Watch', bad:'Fail', na:'No data'};
       row('30 pre-trade checks', 'Overall verdict', P.verdict + ' · ' + (P.net > 0 ? '+' : '') + P.net + ' pts', P.verdict === 'Go' ? 'up' : P.verdict === 'Avoid' || P.verdict === 'Wait' ? 'dn' : 'warn', P.have + ' of 30 checks had data. ' + P.fails.length + ' failed' + (P.hard.length ? ' (a must-fix one failed: ' + P.hard.map(x => x.label.toLowerCase()).join(', ') + ')' : '') + '. Go needs a score of +5 or more with at most one fail; Avoid is -4 or worse or four fails; any must-fix fail (data, news, big event, stablecoin peg, stale data) says Wait.');
