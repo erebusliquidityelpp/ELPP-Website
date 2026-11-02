@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.37</title>
+<title>ELPP CRYPTO SCANNER PRO V4.38</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,14 +746,14 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.37</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.38</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
     <span class="chip" id="chipSession">Session <b id="sessTxt">–</b></span>
     <span class="chip" id="chipSrc">Data <b id="srcTxt">–</b></span>
-    <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option></select> <b id="venTxt">–</b></span>
+    <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
     <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
@@ -916,7 +916,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
       <div class="fld"><label class="hint" for="topN">Coins</label><select id="topN" aria-label="How many coins to scan">
         <option value="30">Top 30</option><option value="60">Top 60</option><option value="100">Top 100</option><option value="150">Top 150</option><option value="220">Top 220</option><option value="9999">All</option>
       </select></div>
-      <div class="fld"><label class="hint" for="venueSel">Data source</label><select id="venueSel" aria-label="Exchange data source"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option></select></div>
+      <div class="fld"><label class="hint" for="venueSel">Data source</label><select id="venueSel" aria-label="Exchange data source"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select></div>
       <label class="tg"><input type="checkbox" id="onlyPass"> Only qualifying</label>
       <label class="tg" title="If fewer coins pass, fill the list with the closest matches">Show at least <input type="number" id="minShow" min="0" max="30" style="width:52px"> coins</label>
       <span class="sp"></span>
@@ -2150,10 +2150,10 @@ async function hl(body, w){
    Auto: Hyperliquid first; if it fails or is blocked, the other venues take over and the scanner switches back later.
    All venues merged: volume and open interest are summed across venues, funding is weighted, candles come from the busiest venue.
    One venue: only that venue. Every venue also acts as a per-coin backup for candles and the order book. */
-const VN = {hyperliquid:{n:'Hyperliquid', t:'DEX'}, binance:{n:'Binance', t:'CEX'}, bybit:{n:'Bybit', t:'CEX'}, okx:{n:'OKX', t:'CEX'}, bitget:{n:'Bitget', t:'CEX'}, gate:{n:'Gate', t:'CEX'}, dydx:{n:'dYdX', t:'DEX'}};
-const VFALL = ['binance', 'bybit', 'okx', 'bitget', 'gate', 'dydx'], VALL = ['hyperliquid'].concat(VFALL);
+const VN = {hyperliquid:{n:'Hyperliquid', t:'DEX'}, binance:{n:'Binance', t:'CEX'}, bybit:{n:'Bybit', t:'CEX'}, okx:{n:'OKX', t:'CEX'}, bitget:{n:'Bitget', t:'CEX'}, gate:{n:'Gate', t:'CEX'}, dydx:{n:'dYdX', t:'DEX'}, aster:{n:'Aster', t:'DEX'}, paradex:{n:'Paradex', t:'DEX'}, drift:{n:'Drift', t:'DEX'}, lighter:{n:'Lighter', t:'DEX'}};
+const VFALL = ['binance', 'bybit', 'okx', 'bitget', 'gate', 'dydx'], NEWV = new Set(['aster', 'paradex', 'drift', 'lighter']), VALL = ['hyperliquid'].concat(VFALL, [...NEWV]);
 const VS = {}, V = {fb:false, fbAt:0, hlFail:0, used:[], sig:'', note:'', meta:{}, metaAt:{}};
-const VGAP = {binance:220, bybit:130, okx:230, bitget:140, gate:150, dydx:220}, vLast = {};
+const VGAP = {binance:220, bybit:130, okx:230, bitget:140, gate:150, dydx:220, aster:220, paradex:250, drift:300, lighter:300}, vLast = {};
 const KSET = new Set(['PEPE', 'BONK', 'SHIB', 'FLOKI', 'LUNC', 'DOGS', 'NEIRO']);
 function vKey(raw){ raw = String(raw || '').toUpperCase(); let m = /^1000(?!0)([A-Z0-9]+)$/.exec(raw); if (m) return 'k' + m[1]; if (KSET.has(raw)) return 'k' + raw; return raw; }
 function vPlain(name){ return /^k[A-Z0-9]+$/.test(name) && name !== 'kBTC' ? name.slice(1) : name; }
@@ -2165,6 +2165,10 @@ function vSymFor(v, name){
   if (v === 'bitget') return plain + 'USDT';
   if (v === 'gate') return plain + '_USDT';
   if (v === 'dydx') return plain + '-USD';
+  if (v === 'aster') return (k ? '1000' : '') + plain + 'USDT';
+  if (v === 'paradex') return plain + '-USD-PERP';
+  if (v === 'drift') return plain + '-PERP';
+  if (v === 'lighter') return plain;
 }
 function vErr(v, e){ return e && e.name === 'AbortError' ? VN[v].n + ' did not answer in time' : /Failed to fetch|NetworkError|Load failed/i.test((e && e.message) || '') ? VN[v].n + ' blocked or offline (a relay can fix it)' : ((e && e.message) || String(e)); }
 /* browsers refuse many exchange APIs (no CORS headers) or your network blocks them: public read-only CORS helpers are the last fallback (market data only, never keys) */
@@ -2241,6 +2245,26 @@ const VT = {
     const j = await vget('dydx', 'https://indexer.dydx.trade/v4/perpetualMarkets'), out = [];
     for (const k in (j.markets || {})){ const x = j.markets[k]; if (x.status && x.status !== 'ACTIVE') continue; const imf = +x.initialMarginFraction; out.push({key:vKey(String(x.ticker || k).replace(/-USD$/, '')), sym:x.ticker || k, mark:+x.oraclePrice, oracle:+x.oraclePrice, funding:+x.nextFundingRate, oi:+x.openInterest, vol:+x.volume24H, maxLev:imf > 0 ? Math.round(1 / imf) : null}); }
     return out;
+  },
+  async aster(){
+    const B = 'https://fapi.asterdex.com/fapi/v1/', [t, p] = await Promise.all([vget('aster', B + 'ticker/24hr'), vget('aster', B + 'premiumIndex')]), pm = new Map(p.map(x => [x.symbol, x])), out = [];
+    for (const x of t){ if (!/USDT$/.test(x.symbol) || !pm.has(x.symbol)) continue; const q = pm.get(x.symbol), f = +q.lastFundingRate / 8; out.push({key:vKey(x.symbol.slice(0, -4)), sym:x.symbol, mark:+q.markPrice, oracle:+q.indexPrice, funding:Math.abs(f) < 0.002 ? f : NaN, oi:NaN, vol:+x.quoteVolume, maxLev:null}); }
+    return out;
+  },
+  async paradex(){
+    const j = await vget('paradex', 'https://api.prod.paradex.trade/v1/markets/summary?market=ALL'), out = [];
+    for (const x of (j.results || [])){ const m = /^(.+)-USD-PERP$/.exec(x.symbol || ''); if (!m) continue; const f = +x.funding_rate / 8, mk = +x.mark_price; out.push({key:vKey(m[1]), sym:x.symbol, mark:mk, oracle:+x.underlying_price > 0 ? +x.underlying_price : mk, funding:Math.abs(f) < 0.002 ? f : NaN, oi:+x.open_interest, vol:+x.volume_24h, maxLev:null}); }
+    return out;
+  },
+  async drift(){
+    const j = await vget('drift', 'https://data.api.drift.trade/contracts'), out = [];
+    for (const x of (j.contracts || [])){ const m = /^(.+)-PERP$/.exec(x.ticker_id || ''); if (!m || /^\d/.test(m[1]) || (x.product_type && String(x.product_type).toUpperCase() !== 'PERP')) continue; const px = +x.last_price > 0 ? +x.last_price : +x.index_price, vol = +x.quote_volume > 0 ? +x.quote_volume : +x.base_volume * px; out.push({key:vKey(m[1]), sym:x.ticker_id, mark:px, oracle:+x.index_price > 0 ? +x.index_price : px, funding:NaN, oi:+x.open_interest, vol, maxLev:null}); }
+    return out;
+  },
+  async lighter(){
+    const j = await vget('lighter', 'https://mainnet.zklighter.elliot.ai/api/v1/orderBookDetails'), L = j.order_book_details || j.orderBookDetails || j.order_books || [], out = [];
+    for (const x of L){ if (x.market_type && String(x.market_type).toLowerCase() !== 'perp') continue; const sym = String(x.symbol || '').toUpperCase(); if (!sym || /[^A-Z0-9]/.test(sym)) continue; const px = +x.last_trade_price; out.push({key:vKey(sym), sym, mark:px, oracle:px, funding:NaN, oi:NaN, vol:+x.daily_quote_token_volume, maxLev:null}); }
+    return out;
   }
 };
 /* price scale: a venue may quote a coin 1000x smaller or larger (PEPE vs 1000PEPE). Detect it from the price and align to the scanner's coin. */
@@ -2292,6 +2316,7 @@ async function ctxTickV(){
   /* merge rows by coin */
   const by = new Map();
   for (const v of used) for (const r of R[v]){ let e = by.get(r.key); if (!e){ e = {}; by.set(r.key, e); } e[v] = r; }
+  for (const [key, e] of by){ const ref = e.hyperliquid || e.binance || e.bybit || e.okx; for (const v of NEWV){ const r = e[v]; if (!r) continue; if (ref && !(Math.abs(r.mark / ref.mark - 1) <= 0.2)){ delete e[v]; continue; } if (used.length > 1) r.funding = NaN; } if (!Object.keys(e).length) by.delete(key); }
   const seen = new Set();
   for (const [key, e] of by){
     const vs = Object.entries(e).sort((a, b) => b[1].vol - a[1].vol), p = vs[0][1], c = coinFor(key), old = c.vs || {};
@@ -2333,6 +2358,10 @@ const VC = {
   },
   async bitget(sym, a, b){ const j = await vget('bitget', 'https://api.bitget.com/api/v2/mix/market/candles?symbol=' + encodeURIComponent(sym) + '&productType=USDT-FUTURES&granularity=5m&limit=1000&startTime=' + a + '&endTime=' + b); return (j.data || []).map(k => ({t:+k[0], T:+k[0] + 299999, o:k[1], h:k[2], l:k[3], c:k[4], v:k[5], n:0})); },
   async gate(sym, a, b){ const mul = (V.meta.gatemult && V.meta.gatemult[sym]) || 1, j = await vget('gate', 'https://api.gateio.ws/api/v4/futures/usdt/candlesticks?contract=' + encodeURIComponent(sym) + '&interval=5m&from=' + Math.floor(a / 1000) + '&to=' + Math.floor(b / 1000)); return (j || []).map(k => ({t:+k.t * 1000, T:+k.t * 1000 + 299999, o:k.o, h:k.h, l:k.l, c:k.c, v:+k.v * mul, n:0})); },
+  async aster(sym, a, b){ const j = await vget('aster', 'https://fapi.asterdex.com/fapi/v1/klines?symbol=' + encodeURIComponent(sym) + '&interval=5m&limit=1500&startTime=' + a + '&endTime=' + b); return j.map(k => ({t:+k[0], T:+k[6], o:k[1], h:k[2], l:k[3], c:k[4], v:k[5], n:+k[8]})); },
+  async paradex(sym, a, b){ const j = await vget('paradex', 'https://api.prod.paradex.trade/v1/markets/klines?symbol=' + encodeURIComponent(sym) + '&resolution=5&start_at=' + a + '&end_at=' + b); return (j.results || []).map(k => ({t:+k[0], T:+k[0] + 299999, o:k[1], h:k[2], l:k[3], c:k[4], v:k[5], n:0})); },
+  async drift(){ throw new Error('Drift has no candle feed here'); },
+  async lighter(){ throw new Error('Lighter has no candle feed here'); },
   async dydx(sym, a, b){
     let out = [], to = new Date(b).toISOString();
     for (let i = 0; i < 8; i++){ const j = await vget('dydx', 'https://indexer.dydx.trade/v4/candles/perpetualMarkets/' + encodeURIComponent(sym) + '?resolution=5MINS&limit=100&fromISO=' + new Date(a).toISOString() + '&toISO=' + to), d = j.candles || []; if (!d.length) break; for (const k of d){ const t = Date.parse(k.startedAt); out.push({t, T:t + 299999, o:k.open, h:k.high, l:k.low, c:k.close, v:k.baseTokenVolume, n:+k.trades || 0}); } const oldest = Date.parse(d[d.length - 1].startedAt); if (oldest <= a || d.length < 100) break; to = new Date(oldest - 1).toISOString(); }
@@ -2349,6 +2378,7 @@ function vFixScale(arr, mark){
 function candleVenues(c){
   const mode = state.venueMode || 'auto', now = Date.now(), bad = c.bad || {}, has = c.vs || {}; let order;
   if (c.lk) order = Object.entries(has).sort((a, b) => (b[1].vol || 0) - (a[1].vol || 0)).map(x => x[0]);
+  else if (NEWV.has(mode)) order = [mode, 'binance', 'bybit', 'hyperliquid'];
   else if (VN[mode]) order = [mode];
   else if (mode === 'merged'){ const byVol = Object.entries(has).sort((a, b) => b[1].vol - a[1].vol).map(x => x[0]); order = byVol.concat(VALL.filter(v => byVol.indexOf(v) < 0)); }
   else order = V.fb ? VFALL.concat(['hyperliquid']) : ['hyperliquid'].concat(VFALL);
@@ -2391,6 +2421,9 @@ async function vBook(c){
       else if (v === 'okx'){ const j = await vget(v, 'https://www.okx.com/api/v5/market/books?instId=' + sym + '&sz=100'), d = (j.data || [])[0] || {}, ct = (await vMeta('okx', 'okin', async () => ({})))[sym]; const m = ct && ct.ct ? ct.ct : 1; bids = (d.bids || []).map(x => ({px:x[0], sz:+x[1] * m})); asks = (d.asks || []).map(x => ({px:x[0], sz:+x[1] * m})); }
       else if (v === 'bitget'){ const j = await vget(v, 'https://api.bitget.com/api/v2/mix/market/merge-depth?symbol=' + sym + '&productType=USDT-FUTURES&limit=50'), d = j.data || {}; bids = (d.bids || []).map(x => ({px:x[0], sz:x[1]})); asks = (d.asks || []).map(x => ({px:x[0], sz:x[1]})); }
       else if (v === 'gate'){ const j = await vget(v, 'https://api.gateio.ws/api/v4/futures/usdt/order_book?contract=' + sym + '&limit=50'), mul = (V.meta.gatemult && V.meta.gatemult[sym]) || 1; bids = (j.bids || []).map(x => ({px:x.p, sz:+x.s * mul})); asks = (j.asks || []).map(x => ({px:x.p, sz:+x.s * mul})); }
+      else if (v === 'aster'){ const j = await vget(v, 'https://fapi.asterdex.com/fapi/v1/depth?symbol=' + sym + '&limit=100'); bids = j.bids.map(x => ({px:x[0], sz:x[1]})); asks = j.asks.map(x => ({px:x[0], sz:x[1]})); }
+      else if (v === 'paradex'){ const j = await vget(v, 'https://api.prod.paradex.trade/v1/orderbook/' + encodeURIComponent(sym) + '?depth=50'); bids = (j.bids || []).map(x => ({px:x[0], sz:x[1]})); asks = (j.asks || []).map(x => ({px:x[0], sz:x[1]})); }
+      else if (v === 'drift' || v === 'lighter') throw new Error('no order book feed on this venue');
       else if (v === 'dydx'){ const j = await vget(v, 'https://indexer.dydx.trade/v4/orderbooks/perpetualMarket/' + sym); bids = (j.bids || []).map(x => ({px:x.price, sz:x.size})); asks = (j.asks || []).map(x => ({px:x.price, sz:x.size})); }
       if (!bids.length || !asks.length) throw new Error('empty book');
       const mark = c.ctx ? c.ctx.mark : 0, mid = (+bids[0].px + +asks[0].px) / 2, r = mark > 0 && mid > 0 ? mark / mid : 1;
@@ -5110,6 +5143,10 @@ const XCT = {
   async okx(sym){ const j = await vget('okx', 'https://www.okx.com/api/v5/market/trades?instId=' + encodeURIComponent(sym) + '&limit=500'), ct = ((V.meta.okin || {})[sym] || {}).ct || 1; return (j.data || []).map(t => ({usd:xcNum(t.px) * xcNum(t.sz) * ct, buy:t.side === 'buy', t:+t.ts})); },
   async bitget(sym){ const j = await vget('bitget', 'https://api.bitget.com/api/v2/mix/market/fills?symbol=' + encodeURIComponent(sym) + '&productType=USDT-FUTURES&limit=100'); return (j.data || []).map(t => ({usd:xcNum(t.price) * xcNum(t.size), buy:String(t.side).toLowerCase() === 'buy', t:+t.ts})); },
   async gate(sym){ const j = await vget('gate', 'https://api.gateio.ws/api/v4/futures/usdt/trades?contract=' + encodeURIComponent(sym) + '&limit=1000'), mul = (V.meta.gatemult && V.meta.gatemult[sym]) || 1; return j.map(t => ({usd:Math.abs(xcNum(t.size)) * mul * xcNum(t.price), buy:+t.size > 0, t:t.create_time_ms ? +t.create_time_ms : +t.create_time * 1000})); },
+  async aster(sym){ const j = await vget('aster', 'https://fapi.asterdex.com/fapi/v1/aggTrades?symbol=' + encodeURIComponent(sym) + '&limit=1000'); return j.map(t => ({usd:xcNum(t.p) * xcNum(t.q), buy:!t.m, t:+t.T})); },
+  async paradex(){ throw new Error('no trade tape for this venue'); },
+  async drift(){ throw new Error('no trade tape for this venue'); },
+  async lighter(){ throw new Error('no trade tape for this venue'); },
   async dydx(sym){ const j = await vget('dydx', 'https://indexer.dydx.trade/v4/trades/perpetualMarket/' + encodeURIComponent(sym) + '?limit=100'); return (j.trades || []).map(t => ({usd:xcNum(t.price) * xcNum(t.size), buy:String(t.side).toUpperCase() === 'BUY', t:Date.parse(t.createdAt)})); }
 };
 function xcSum(list){ const L = list.filter(t => isFinite(t.usd) && t.usd > 0); if (!L.length) return null; let b = 0, s2 = 0, bb = 0, bs = 0, t0 = Infinity, t1 = 0; const avg = L.reduce((a, t) => a + t.usd, 0) / L.length; for (const t of L){ if (t.buy){ b += t.usd; if (t.usd >= 4 * avg) bb += t.usd; } else { s2 += t.usd; if (t.usd >= 4 * avg) bs += t.usd; } if (t.t < t0) t0 = t.t; if (t.t > t1) t1 = t.t; } return {buy:b, sell:s2, bigNet:bb - bs, n:L.length, span:Math.max(0, t1 - t0)}; }
@@ -9533,10 +9570,11 @@ function healthRows(){
   for (const k in EN){ if (EI.at[k] || EI.err[k]) add(EN[k], !EI.err[k], EI.at[k] || EI.fail[k], EI.err[k]); }
   for (const k in EI.oiSrc) add('Open interest: ' + k, EI.oiSrc[k].ok, EI.oiSrc[k].at, EI.oiSrc[k].err);
   for (const k in EI.bkSrc) add('Order book: ' + k, EI.bkSrc[k].ok, EI.bkSrc[k].at, EI.bkSrc[k].err);
+  for (const v of VALL){ if (VS[v] && VS[v].at) add('Exchange feed: ' + VN[v].n, !!VS[v].ok, VS[v].at, VS[v].err); }
   if (EI.ohSrc) add('Open interest history: Binance', EI.ohSrc.ok, EI.ohSrc.at, EI.ohSrc.err);
     add('Liquidations: Binance stream', !!LQ.s.bn, LQ.t0 || 0, LQ.err); add('Liquidations: OKX stream', !!LQ.s.ok, LQ.t0 || 0, LQ.okErr); add('Liquidations: Bybit stream', !!LQ.s.by, LQ.t0 || 0, LQ.byErr);
   try { for (const k in FX.errs){ if (FX.errs[k] || FX.at[k]) add('Market data: ' + k, !FX.errs[k], FX.at[k], FX.errs[k]); } } catch(e){}
-  for (const x of R){ if (!x.ok && /blocked|offline|failed to fetch|network/i.test(x.err) && /okx|kraken|:\s*ok$/i.test(x.name)) x.opt = true; }
+  for (const x of R){ if (!x.ok && /blocked|offline|failed to fetch|network/i.test(x.err) && /okx|kraken|:\s*ok$/i.test(x.name)) x.opt = true; if (!x.ok && /^Exchange feed: (Aster|Paradex|Drift|Lighter)/.test(x.name)) x.opt = true; }
   return R;
 }
 function healthHtml(){
