@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.31</title>
+<title>ELPP CRYPTO SCANNER PRO V4.32</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -745,7 +745,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.31</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.32</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -8911,18 +8911,22 @@ function eiCotView(sym){
 }
 /* 2. futures curve: annualised basis for each expiry */
 async function eiTermLoad(){
-  const out = {}, errs = [];
+  const out = {}, errs = [], MON = {JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11}, now = Date.now();
+  const fin = rows => (rows || []).filter(r => r && r.t > now && r.px > 0 && r.idx > 0).map(r => { const days = (r.t - now) / 864e5; return Object.assign(r, {days, basis:(r.px / r.idx - 1) * 100, ann:(r.px / r.idx - 1) * 365 / days * 100}); }).sort((a, b) => a.t - b.t);
   for (const cur of ['BTC', 'ETH']){
-    let rows = null;
-    try { const j = await ext('https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=' + cur + '&kind=future', null, 15000);
-      rows = (j.result || []).filter(x => /-\d{1,2}[A-Z]{3}\d{2}$/.test(x.instrument_name)).map(x => { const m = /-(\d{1,2})([A-Z]{3})(\d{2})$/.exec(x.instrument_name); return {name:x.instrument_name, t:Date.parse(m[1] + ' ' + m[2] + ' 20' + m[3] + ' 08:00:00 UTC'), px:+x.mark_price, idx:+x.underlying_price, oi:+x.open_interest, src:'Deribit'}; }); } catch(e){ errs.push('Deribit ' + errTxt(e)); }
-    if (!rows || !rows.length){ try { const j = await ext('https://dapi.binance.com/dapi/v1/premiumIndex?pair=' + cur + 'USD', null, 15000);
-      rows = (Array.isArray(j) ? j : []).filter(x => /_\d{6}$/.test(x.symbol)).map(x => { const m = /_(\d{2})(\d{2})(\d{2})$/.exec(x.symbol); return {name:x.symbol, t:Date.parse('20' + m[1] + '-' + m[2] + '-' + m[3] + 'T08:00:00Z'), px:+x.markPrice, idx:+x.indexPrice, oi:NaN, src:'Binance'}; }); } catch(e){ errs.push('Binance ' + errTxt(e)); } }
-    if (!rows || !rows.length) continue; const now = Date.now();
-    rows = rows.filter(r => r.t > now && r.px > 0 && r.idx > 0).map(r => { const days = (r.t - now) / 864e5; return Object.assign(r, {days, basis:(r.px / r.idx - 1) * 100, ann:(r.px / r.idx - 1) * 365 / days * 100}); }).sort((a, b) => a.t - b.t);
+    const tries = [
+      async () => { const j = await ext('https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=' + cur + '&kind=future', null, 15000), L = j.result || [], perp = L.find(x => /PERPETUAL$/.test(x.instrument_name));
+        return L.map(x => { const m = /-(\d{1,2})([A-Za-z]{3})(\d{2})$/.exec(x.instrument_name); if (!m) return null; const mo = MON[m[2].toUpperCase()]; if (mo === undefined) return null; return {name:x.instrument_name, t:Date.UTC(2000 + +m[3], mo, +m[1], 8), px:+x.mark_price, idx:+x.underlying_price || +x.estimated_delivery_price || (perp ? +perp.mark_price : NaN), oi:+x.open_interest, src:'Deribit'}; }).filter(Boolean); },
+      async () => { const j = await ext('https://dapi.binance.com/dapi/v1/premiumIndex?pair=' + cur + 'USD', null, 15000);
+        return (Array.isArray(j) ? j : []).map(x => { const m = /_(\d{2})(\d{2})(\d{2})$/.exec(x.symbol); return m ? {name:x.symbol, t:Date.UTC(2000 + +m[1], +m[2] - 1, +m[3], 8), px:+x.markPrice, idx:+x.indexPrice, oi:NaN, src:'Binance coin-margined'} : null; }).filter(Boolean); },
+      async () => { const j = await ext('https://fapi.binance.com/fapi/v1/premiumIndex', null, 15000);
+        return (Array.isArray(j) ? j : []).filter(x => x.symbol && x.symbol.indexOf(cur + 'USDT_') === 0).map(x => { const m = /_(\d{2})(\d{2})(\d{2})$/.exec(x.symbol); return m ? {name:x.symbol, t:Date.UTC(2000 + +m[1], +m[2] - 1, +m[3], 8), px:+x.markPrice, idx:+x.indexPrice, oi:NaN, src:'Binance USDT quarterly'} : null; }).filter(Boolean); }
+    ];
+    let rows = [];
+    for (const f of tries){ try { rows = fin(await f()); } catch(e){ errs.push(errTxt(e)); rows = []; } if (rows.length) break; }
     if (rows.length) out[cur] = rows;
   }
-  if (!Object.keys(out).length) throw new Error(errs.join(' · ') || 'no dated futures found');
+  if (!Object.keys(out).length) throw new Error('Deribit and Binance returned no dated futures' + (errs.length ? ' (' + errs[0] + ')' : ''));
   EI.d.term = out;
 }
 function eiTermView(sym){ const r = EI.d.term && EI.d.term[sym]; if (!r || !r.length) return null; const f = r.find(x => x.days >= 7) || r[0], a = f.ann; return {rows:r, front:f, ann:a, state:a >= 20 ? 1 : a >= 8 ? 2 : a >= 0 ? 3 : 4}; }
@@ -8988,13 +8992,15 @@ async function eiMemLoad(){
 }
 /* 7. funding stress: SOFR against the Fed's interest on reserves */
 async function eiFundLoad(){
-  try { await mxFred(['SOFR', 'IORB'], 90); } catch(e){
-    const key = String(eiCfg().fred || '').trim(); if (!key) throw e; const d0 = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10);
-    for (const id of ['SOFR', 'IORB']){ const j = await ext('https://api.stlouisfed.org/fred/series/observations?series_id=' + id + '&api_key=' + encodeURIComponent(key) + '&file_type=json&observation_start=' + d0, null, 15000); MX.f.set(id, (j.observations || []).filter(o => isFinite(+o.value)).map(o => [Date.parse(o.date), +o.value])); }
-  }
-  const s = MX.f.get('SOFR'), i = MX.f.get('IORB'); if (!s || !s.length || !i || !i.length) throw new Error('no SOFR or IORB rows');
-  const sl = s[s.length - 1], il = i[i.length - 1], sp = (sl[1] - il[1]) * 100, old = s[Math.max(0, s.length - 22)];
-  EI.d.fund = {sofr:sl[1], iorb:il[1], spread:sp, chg30:(sl[1] - old[1]) * 100, d:new Date(sl[0]).toISOString().slice(0, 10)};
+  const key = String(eiCfg().fred || '').trim(), errs = [];
+  const fin = () => { const s = MX.f.get('SOFR'), i = MX.f.get('IORB'); if (!s || !s.length || !i || !i.length) throw new Error('no SOFR or IORB rows'); const sl = s[s.length - 1], il = i[i.length - 1], sp = (sl[1] - il[1]) * 100, old = s[Math.max(0, s.length - 22)];
+    EI.d.fund = {sofr:sl[1], iorb:il[1], spread:sp, chg30:(sl[1] - old[1]) * 100, d:new Date(sl[0]).toISOString().slice(0, 10), est:!!EI.fundEst}; };
+  EI.fundEst = false;
+  try { await mxFred(['SOFR', 'IORB'], 90); return fin(); } catch(e){ errs.push('FRED ' + errTxt(e)); }
+  if (key){ try { const d0 = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10); for (const id of ['SOFR', 'IORB']){ const j = await ext('https://api.stlouisfed.org/fred/series/observations?series_id=' + id + '&api_key=' + encodeURIComponent(key) + '&file_type=json&observation_start=' + d0, null, 15000); MX.f.set(id, (j.observations || []).filter(o => isFinite(+o.value)).map(o => [Date.parse(o.date), +o.value])); } return fin(); } catch(e){ errs.push('FRED key ' + errTxt(e)); } }
+  try { const A = await ext('https://markets.newyorkfed.org/api/rates/secured/sofr/last/60.json', null, 15000), B = await ext('https://markets.newyorkfed.org/api/rates/unsecured/effr/last/5.json', null, 15000), sr = (A.refRates || []).slice().reverse(), er = B.refRates || [], top = er.length ? +er[0].targetRateTo : NaN;
+    if (!sr.length || !isFinite(top)) throw new Error('empty answer'); MX.f.set('SOFR', sr.map(o => [Date.parse(o.effectiveDate), +o.percentRate]).filter(x => isFinite(x[0]) && isFinite(x[1]))); MX.f.set('IORB', [[Date.parse(sr[sr.length - 1].effectiveDate), top - 0.10]]); EI.fundEst = true; return fin(); } catch(e){ errs.push('New York Fed ' + errTxt(e)); }
+  throw new Error(errs.join(' · ') + '. A free FRED key on the API keys page fixes this');
 }
 /* 8. Wikipedia attention */
 const EI_WIKI = {BTC:'Bitcoin', ETH:'Ethereum', SOL:'Solana_(blockchain_platform)', DOGE:'Dogecoin', ADA:'Cardano_(blockchain_platform)', LTC:'Litecoin', BCH:'Bitcoin_Cash', DOT:'Polkadot_(blockchain_platform)', LINK:'Chainlink_(blockchain_oracle)', AVAX:'Avalanche_(blockchain_platform)', XLM:'Stellar_(payment_network)', SHIB:'Shiba_Inu_(cryptocurrency)', XMR:'Monero', TON:'Toncoin', XRP:'XRP_Ledger'};
@@ -9397,7 +9403,7 @@ async function eiBkTick(){
       ['Bitget', async () => { const j = await ext('https://api.bitget.com/api/v2/mix/market/merge-depth?productType=USDT-FUTURES&symbol=' + sym + '&limit=100', null, 12000), d = j.data || {}; return bkCalc(nums(d.bids), nums(d.asks)); }]
     ];
     const rs = await Promise.allSettled(jobs.map(x => x[1]()));
-    rs.forEach((r, i) => { const nm = jobs[i][0]; if (r.status === 'fulfilled' && r.value){ ex[nm] = r.value; EI.bkSrc[nm] = {ok:true, at:Date.now(), err:''}; } else if (r.status === 'rejected') EI.bkSrc[nm] = {ok:false, at:Date.now(), err:errTxt(r.reason)}; });
+    rs.forEach((r, i) => { const nm = jobs[i][0]; if (r.status === 'rejected' && /HTTP 404|not found|Unknown/i.test(errTxt(r.reason))){ if (!EI.bkSrc[nm]) EI.bkSrc[nm] = {ok:true, at:Date.now(), err:'', note:'coin not listed there'}; return; } if (r.status === 'fulfilled' && r.value){ ex[nm] = r.value; EI.bkSrc[nm] = {ok:true, at:Date.now(), err:''}; } else if (r.status === 'rejected') EI.bkSrc[nm] = {ok:false, at:Date.now(), err:errTxt(r.reason)}; });
     if (c.l2 && c.l2.bk && c.l2.ak && Date.now() - c.l2.at < 600000){ const h = bkCalc(c.l2.bk.map(x => [x[0], x[1] / x[0]]), c.l2.ak.map(x => [x[0], x[1] / x[0]])); if (h) ex.Hyperliquid = h; }
     EI.bk.set(k, {ex, at:Object.keys(ex).length ? Date.now() : Date.now() - 300000});
   } finally { EI.bkBusy = false; }
@@ -9520,12 +9526,13 @@ function healthRows(){
   if (EI.ohSrc) add('Open interest history: Binance', EI.ohSrc.ok, EI.ohSrc.at, EI.ohSrc.err);
     add('Liquidations: Binance stream', !!LQ.s.bn, LQ.t0 || 0, LQ.err); add('Liquidations: OKX stream', !!LQ.s.ok, LQ.t0 || 0, LQ.okErr); add('Liquidations: Bybit stream', !!LQ.s.by, LQ.t0 || 0, LQ.byErr);
   try { for (const k in FX.errs){ if (FX.errs[k] || FX.at[k]) add('Market data: ' + k, !FX.errs[k], FX.at[k], FX.errs[k]); } } catch(e){}
+  for (const x of R){ if (!x.ok && /blocked|offline|failed to fetch|network/i.test(x.err) && /okx|kraken|:\s*ok$/i.test(x.name)) x.opt = true; }
   return R;
 }
 function healthHtml(){
-  const R = healthRows(), bad = R.filter(x => !x.ok), now = Date.now();
-  let h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">Data health</h3><button class="btn sm" type="button" id="apiRec">Download response samples for support (${REC.size})</button></div><p class="hint"><b class="${bad.length ? 'warn' : 'up'}">${R.length - bad.length} working · ${bad.length} failing</b>. A failing source adds nothing to verdicts; the rest still works. The sample file holds public exchange responses only (no keys, no account data): send it to me if a source keeps failing and I can fix its format.</p>`;
-  h += `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Source</th><th>Status</th><th>Last answer</th><th style="text-align:left">Problem</th></tr></thead><tbody>` + [...bad, ...R.filter(x => x.ok)].map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.ok ? 'up' : 'dn'}">${x.ok ? 'working' : 'failing'}</td><td>${x.at ? esc(ago(x.at)) : '—'}</td><td style="text-align:left" class="dim">${esc(x.err)}</td></tr>`).join('') + `</tbody></table></div></div>`;
+  const R = healthRows(), bad = R.filter(x => !x.ok && !x.opt), skip = R.filter(x => !x.ok && x.opt), now = Date.now();
+  let h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">Data health</h3><button class="btn sm" type="button" id="apiRec">Download response samples for support (${REC.size})</button></div><p class="hint"><b class="${bad.length ? 'warn' : 'up'}">${R.length - bad.length - skip.length} working · ${bad.length} failing${skip.length ? ' · ' + skip.length + ' blocked on your network (optional)' : ''}</b>. A failing source adds nothing to verdicts; the rest still works. The sample file holds public exchange responses only (no keys, no account data): send it to me if a source keeps failing and I can fix its format.</p>`;
+  h += `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Source</th><th>Status</th><th>Last answer</th><th style="text-align:left">Problem</th></tr></thead><tbody>` + [...bad, ...skip, ...R.filter(x => x.ok)].map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.ok ? 'up' : x.opt ? 'dim' : 'dn'}">${x.ok ? 'working' : x.opt ? 'blocked here (skipped)' : 'failing'}</td><td>${x.at ? esc(ago(x.at)) : '—'}</td><td style="text-align:left" class="dim">${esc(x.err)}</td></tr>`).join('') + `</tbody></table></div></div>`;
   return h;
 }
 /* more free data: Hyperliquid predicted funding on other venues, Binance open-interest history, stablecoin supply by chain, Coinbase and Kraken books */
