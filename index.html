@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.38</title>
+<title>ELPP CRYPTO SCANNER PRO V4.39</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.38</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.39</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -763,6 +763,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <main class="wrap" id="wrap">
   <nav class="side" id="side" aria-label="Sections">
     <button class="nv back" id="navBack" type="button" title="Back to the previous page" disabled>← Back</button>
+    <button class="nv" type="button" data-view="today" style="font-weight:700">Today</button>
     <button class="nv" type="button" data-view="overview" style="font-weight:700">Overview: market summary</button>
     <details class="ng" data-g="scanner" open><summary>Scanners</summary>
     <button class="nv" type="button" data-mode="perp">Perp scalp</button>
@@ -780,6 +781,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-view="ei">Institutional data+</button>
     <button class="nv" type="button" data-view="api">API keys</button>
     <button class="nv" type="button" data-view="bt">Backtest</button>
+    <button class="nv" type="button" data-view="decide">How it decides</button>
     <button class="nv" type="button" data-view="sdesk">Signal desk</button>
     <button class="nv" type="button" data-view="signals">Signals, alerts &amp; portfolio</button>
     <button class="nv" type="button" data-view="journal">Trading journal</button>
@@ -987,6 +989,8 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewEI" class="vcol" hidden></div>
     <div id="viewApi" class="vcol" hidden></div>
     <div id="viewBt" class="vcol" hidden></div>
+    <div id="viewToday" class="vcol" hidden></div>
+    <div id="viewDecide" class="vcol" hidden></div>
   </section>
 </main>
 <div id="panelBd" aria-hidden="true"></div>
@@ -1860,7 +1864,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','decide'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -1915,7 +1919,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate']) o[k] = state[k];
+    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -3835,7 +3839,7 @@ function instFill(c, now){
 const PAT_W = {7:[10,'a low was swept and reclaimed (spring)'], 3:[8,'a bullish change of character'], 5:[6,'a double bottom'], 1:[5,'a break of structure up'], 8:[-10,'a high was swept and rejected (upthrust)'], 4:[-8,'a bearish change of character'], 6:[-6,'a double top'], 2:[-5,'a break of structure down']};
 const VERDICT_LAB = METRICS.verdict.cat;
 function verdictFill(c){
-  const m = c.m; m.verdict = null; m.verdictScore = null; m.verdictWhy = ''; m.vPos = m.vNeg = null; m.vFlags = []; m.vThr = null;
+  const m = c.m; m.vAll = null; m.verdict = null; m.verdictScore = null; m.verdictWhy = ''; m.vPos = m.vNeg = null; m.vFlags = []; m.vThr = null;
   const f = [], flags = []; const add = (w, t) => { if (w) f.push([w, t]); };
   let strong = 35, lean = 15, ok = false;
   if (state.mode === 'perp'){
@@ -3874,7 +3878,7 @@ function verdictFill(c){
       if (m.liqFlush === 1 || m.liqFlush === 2) flags.push('a liquidation flush is still running: wait for price to reclaim');
       if (m.lsState === 1) add(-3, 'retail accounts are crowded long (reversal fuel down)'); else if (m.lsState === 2) add(3, 'retail accounts are crowded short (squeeze fuel up)');
       if (m.fngState === 1) add(2, 'the whole market is in extreme fear (contrarian long)'); else if (m.fngState === 2) add(-2, 'the whole market is in extreme greed (contrarian short)');
-      if (m.eiImp) for (const x of m.eiImp) add(x[1], x[2]);
+      if (m.eiImp) for (const x of m.eiImp) if (x[1]) f.push([x[1], x[2], 'ei']);
       { const RG = regimeNow(); if (RG.tag === 'Panic') flags.push('Bitcoin is in a panic move: signals are unreliable right now'); }
       if (m.cbState === 1) add(2, 'Coinbase (US spot) trades above Hyperliquid by ' + m.cbPrem.toFixed(2) + '%: US buyers are paying up'); else if (m.cbState === 2) add(-2, 'Coinbase (US spot) trades below Hyperliquid by ' + Math.abs(m.cbPrem).toFixed(2) + '%: US sellers are pressing');
       if (m.seasState === 1) add(1, 'this hour of the day has leaned up for this coin over the last 45 days (' + m.seasHit.toFixed(0) + '% of days up)'); else if (m.seasState === 2) add(-1, 'this hour of the day has leaned down for this coin over the last 45 days (' + (100 - m.seasHit).toFixed(0) + '% of days down)');
@@ -3959,6 +3963,7 @@ function verdictFill(c){
     if (side && isNum(m.pfCorr) && m.pfCorr >= 0.8 && m.pfCorrSide === side) flags.push('it moves with an open position of yours (correlation ' + m.pfCorr.toFixed(2) + '): adds the same risk twice');
     if (isNum(m.pfSector) && m.pfSector >= 3) flags.push('you already have ' + m.pfSector + ' open positions in this sector'); }
   m.verdictScore = Math.round(score); m.verdict = v;
+  m.vAll = f.slice();
   f.sort((a, b) => Math.abs(b[0]) - Math.abs(a[0]));
   m.vPos = f.filter(x => x[0] > 0).slice(0, 7); m.vNeg = f.filter(x => x[0] < 0).slice(0, 7); m.vFlags = flags.slice(); m.vThr = [lean, strong];
   const pos = f.filter(x => x[0] > 0).slice(0, 3).map(x => x[1]), neg = f.filter(x => x[0] < 0).slice(0, 3).map(x => x[1]);
@@ -4932,7 +4937,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -4987,6 +4992,7 @@ function render(){
   if (V.note) b += `<div class="banner">${esc(V.note)}</div>`;
   if (live.length && warm && state.mode === 'perp') b += `<div class="banner">${warm}</div>`;
   if (state.mode !== 'perp'){ if (X.cgWarn) b += `<div class="banner">${esc(X.cgWarn)}</div>`; if (X.cgErr && !X.cgAt) b += `<div class="banner err">CoinGecko: ${esc(X.cgErr)}. Market-cap data needs it.</div>`; }
+  try { b += rgBanner(); } catch(e){}
   $('banner').innerHTML = b;
   /* chips */
   const dot = $('dot'); const age = state.lastCtx ? Math.round((now - state.lastCtx)/1000) : null;
@@ -6197,6 +6203,7 @@ function verdictWatch(r){
 function fireAlert(c, dir, why, test){
   const AC = state.alerts || {}, pl = planFor(c), txt = `${c.name} ${dir.toUpperCase()} · score ${c.m && isNum(c.m.verdictScore) ? c.m.verdictScore : '?'}${pl ? ` · entry ${fmtPx(pl.entry)} · stop ${fmtPx(pl.sl)} · TP1 ${fmtPx(pl.tp1)} · TP2 ${fmtPx(pl.tp2)}` : ''}${(() => { try { const si = sgSigInfo(c, dir); return (si.inst ? ' · institutions ' + si.inst.score + '/100 ' + (si.inst.st === 'with' ? 'agree' : si.inst.st === 'against' ? 'AGAINST' : 'unclear') : '') + (si.cp ? ' · 13 checks ' + si.cp.ok + '/' + si.cp.n + ' ' + si.cp.label.toLowerCase() : ''); } catch(e){ return ''; } })()}${why ? ' · ' + why : ''}`;
   if (!test){ let mute = ''; const q1 = AC.q1, q2 = AC.q2; if (q1 && q2){ const d = new Date(), mm = d.getHours() * 60 + d.getMinutes(), a = (+q1.slice(0, 2)) * 60 + (+q1.slice(3, 5)), b = (+q2.slice(0, 2)) * 60 + (+q2.slice(3, 5)); if (a !== b && (a < b ? (mm >= a && mm < b) : (mm >= a || mm < b))) mute = 'quiet hours'; }
+    if (!mute){ try { const RS = rgStatus(); if (RS.locked) mute = 'daily risk guard: ' + RS.why; } catch(e){} }
     if (!mute && (AC.grade === 'go' || AC.grade === 'aplus')){ try { const P = pt30(c, instRow(c, 'perp')); if (AC.grade === 'go' && P.verdict !== 'Go') mute = 'the 30-check verdict is ' + P.verdict; else if (AC.grade === 'aplus' && !aPlusCheck(c, dir, {v:P.verdict, net:P.net}).ok) mute = 'not A+'; } catch(e){} }
     if (mute){ AL.log.unshift({t:Date.now(), txt:'(muted: ' + mute + ') ' + txt}); AL.log.length = Math.min(AL.log.length, 30); renderSignals(); return; } }
   if (AC.sound) beep();
@@ -7613,6 +7620,7 @@ function sigTick(){
       let P30 = null; try { P30 = pt30(c, instRow(c, 'perp')); P30 = {v:P30.verdict, net:P30.net}; } catch(e){}
       const RG = regimeNow(), AP = aPlusCheck(c, dir, P30), skipWhy = [];
       if (state.regGate !== false){ if (RG.tag === 'Panic') skipWhy.push('Bitcoin is in a panic move'); else { const rs = SIG.list.filter(x => x.reg === RG.tag && x.status !== 'open' && x.status !== 'tp1' && isNum(x.r)); if (rs.length >= 10 && rs.reduce((a, x) => a + x.r, 0) / rs.length <= -0.15) skipWhy.push('your record in a ' + RG.tag.toLowerCase() + ' market is negative'); } }
+      { const RS = rgStatus(); if (RS.locked) skipWhy.push('daily risk guard: ' + RS.why); }
       if (state.aplus && !AP.ok) skipWhy.push('not A+ (' + AP.n + ' of 5 groups agree)');
       { const cap = +state.capSide || 4, openSide = SIG.list.filter(x => (x.status === 'open' || x.status === 'tp1') && x.dir === dir).length + cands.filter(x => x.dir === dir).length; if (openSide >= cap) skipWhy.push('portfolio cap: ' + openSide + ' ' + dir + 's already open'); }
       if (skipWhy.length){ const why = 'held back: ' + skipWhy[0]; SKIPS.n++; SKIPS.why[why] = (SKIPS.why[why] || 0) + 1; continue; }
@@ -7644,7 +7652,7 @@ function renderSignals(){
       <div class="row" style="margin-top:6px"><input type="password" id="alTok" placeholder="Telegram bot token (optional)" style="min-width:260px"><input type="text" id="alChat" placeholder="Telegram chat id" style="width:170px"><button class="btn" id="alTest" type="button">Send test alert</button></div>
       <div class="row" style="margin-top:6px;gap:8px;flex-wrap:wrap;align-items:center"><label class="hint">Send alerts for <select id="alGrade"><option value="any">every signal</option><option value="go">only Go (30-check verdict)</option><option value="aplus">only A+</option></select></label><label class="hint">Quiet hours (your time) <input type="time" id="alQ1" style="width:110px"> to <input type="time" id="alQ2" style="width:110px"></label></div>
       <p class="hint">Telegram: create a bot with @BotFather, send it a message, then use the token and your chat id here. They are stored only in this browser.</p><div id="alLog" class="hint"></div></div>
-    <div class="nsec"><h3>Macro calendar</h3>
+    ${RG_HTML}<div class="nsec"><h3>Macro calendar</h3>
       <p class="hint">High-impact USD events (FOMC, CPI, jobs). 30 minutes before to 15 minutes after, coins are forced to Avoid; the hour before shows a warning. Sources: a free calendar feed, the built-in FOMC dates (check them on federalreserve.gov), and your own list.</p>
       <div class="row"><input type="text" id="macUrl" placeholder="Calendar feed address (blank = off)" style="flex:1;min-width:260px"><button class="btn" id="macReload" type="button">Reload</button></div>
       <textarea id="macManual" rows="3" style="width:100%;margin-top:6px" placeholder="Your own events, one per line, in UTC:&#10;2026-11-12 13:30 US CPI&#10;2026-11-06 13:30 Non-farm payrolls"></textarea>
@@ -7669,6 +7677,8 @@ function renderSignals(){
       <p class="hint">Used by the Execution filters (book depth, slippage). Depth and slippage come from the first 20 levels of the Hyperliquid order book, so a very large size on a liquid coin can read "more than the book" even when real liquidity is deeper.</p></div>`;
     $('alGrade').value = (state.alerts || {}).grade || 'any'; $('alQ1').value = (state.alerts || {}).q1 || ''; $('alQ2').value = (state.alerts || {}).q2 || ''; $('sgStrict').checked = state.sigStrict !== false; $('sgAplus').checked = !!state.aplus; $('sgReg').checked = state.regGate !== false; $('sgCap').value = state.capSide || 4; $('alOn').checked = !!AC.on; $('alSound').checked = !!AC.sound; $('alNotify').checked = !!AC.notify; $('alVerdict').checked = AC.verdict !== false; { const kb = NB(); $('alKeepWrap').hidden = !(kb && kb.keepAlive); if (kb && kb.isKeepAlive){ try { $('alKeep').checked = !!kb.isKeepAlive(); } catch(e){} } } $('alMin').value = AC.minScore || 60; $('alTok').value = AC.tgToken || ''; $('alChat').value = AC.tgChat || '';
     $('macUrl').value = MC.url === undefined ? MAC_URL : MC.url; $('macManual').value = MC.manual || ''; $('pfAddr').value = PC.addr || ''; $('mySize').value = state.mySize || 10000; $('hlpAddrs').value = state.hlpAddrs === undefined ? HLP_DEFAULT : state.hlpAddrs; $('czKey').value = (state.cz || {}).key || ''; $('cmcKey').value = (state.cmc || {}).key || ''; $('alchKey').value = (state.alch || {}).key || ''; $('helKey').value = (state.hel || {}).key || ''; $('ocLabels').value = state.ocl || ''; $('pxOn').checked = state.pubProxy !== false; $('pxMain').checked = state.pxMain === true; ocStatShow();
+    { const C = rgCfg(); $('rgOn').checked = !!C.on; $('rgLoss').value = C.maxLoss; $('rgTrades').value = C.maxTrades; $('rgLosses').value = C.losses; $('rgCool').value = C.coolH; $('rgJr').checked = C.jr !== false; rgRender();
+      el.addEventListener('change', e => { if (!/^rg/.test(e.target.id)) return; const C2 = rgCfg(); C2.on = $('rgOn').checked; C2.maxLoss = Math.max(0.5, +$('rgLoss').value || 3); C2.maxTrades = Math.max(1, Math.floor(+$('rgTrades').value || 6)); C2.losses = Math.max(1, Math.floor(+$('rgLosses').value || 2)); C2.coolH = Math.max(0.5, +$('rgCool').value || 2); C2.jr = $('rgJr').checked; state.rg = C2; RG_M.at = 0; saveState(); rgRender(); requestRender(); toast('Daily risk guard ' + (C2.on ? 'on' : 'off')); }); }
     { let shut = []; try { shut = JSON.parse(localStorage.getItem('elpp_fold_sig') || '[]'); } catch(e){}
       const save = () => { try { localStorage.setItem('elpp_fold_sig', JSON.stringify([...el.querySelectorAll('.nsec.fold.shut > h3')].map(h => h.textContent.trim()))); } catch(e){} };
       for (const h of el.querySelectorAll('.nsec > h3')){ const sec = h.parentNode; sec.classList.add('fold'); h.title = 'Click to open or close'; if (shut.includes(h.textContent.trim())) sec.classList.add('shut'); }
@@ -7714,7 +7724,7 @@ function renderSignals(){
     pf += `<p class="hint">Account ${isNum(PF.acct) ? esc(fmtUsd(PF.acct)) : '—'} · margin used ${isNum(used) ? used.toFixed(0) + '%' : '—'} · ${PF.pos.length} positions${PF.at ? ' · updated ' + new Date(PF.at).toLocaleTimeString() : ''}</p>` + (flags.length ? `<p class="warn">Warnings: ${esc(flags.join('; '))}.</p>` : '<p class="up">No warnings.</p>') +
       `<div style="overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Side</th><th>Size</th><th>Entry</th><th>Value</th><th>Unrealized P&amp;L</th><th>Margin</th><th>Leverage</th></tr></thead><tbody>${PF.pos.map(x => `<tr><td style="text-align:left"><a href="#" data-chart="${esc(x.coin)}" style="color:var(--accent)">${esc(x.coin)}</a></td><td class="${x.side === 'long' ? 'up' : 'dn'}">${x.side}</td><td>${x.sz}</td><td>${esc(P(x.entry))}</td><td>${esc(fmtUsd(x.value))}</td><td class="${x.upnl >= 0 ? 'up' : 'dn'}">${esc(fmtUsd(x.upnl, true))}</td><td>${esc(fmtUsd(x.margin))}</td><td>${x.lev || '—'}x</td></tr>`).join('')}</tbody></table></div>`;
   } else if (PF.addr && !PF.err) pf += '<p class="hint">No open positions on that wallet.</p>';
-  $('pfOut').innerHTML = pf; $('fxStat').innerHTML = fxStatHtml();
+  $('pfOut').innerHTML = pf; $('fxStat').innerHTML = fxStatHtml(); try { rgRender(); } catch(e){}
 }
 function passExtra(c){
   const m = c.m;
@@ -7742,7 +7752,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {today:'Your day on one screen: market state, next macro event, the strongest set-ups, open signals, risk guard and backup.', decide:'Exactly which rules add or subtract points: sweeps, volume, institutions, retail positioning and context, with a live breakdown for any coin.', bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -8050,7 +8060,7 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['bt','Backtest'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['today','Today'],['bt','Backtest'],['decide','How it decides'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   try { renderViewGuide(); } catch(e){}
@@ -8058,7 +8068,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -9801,6 +9811,147 @@ function elppDump(){
   let reg = null; try { reg = regimeNow().tag; } catch(e){} return {t:Date.now(), regime:reg, open:SIG.list.filter(x => x.status === 'open' || x.status === 'tp1').length, n:out.length, coins:out};
 }
 window.__elppDump = elppDump;
+/* ===== V4.39: How the scanner decides, Today page, optional daily risk guard, backup and restore ===== */
+const DG_GROUPS = [['sweeps', 'Liquidity sweeps & structure', 'The core of your strategy: stops grabbed above or below a level, price coming back, then the move.'], ['flow', 'Volume & money flow', 'Who is pushing price right now: buying vs selling pressure, volume bursts, order flow and book imbalance.'], ['inst', 'Institutions & whales', 'Big-money footprints: whale wallets, the 13 extra institutional checks, Coinbase premium, exchange coin flows, cross-exchange gaps.'], ['crowd', 'Crowd positioning (retail)', 'Where the crowd is leaning: funding, long/short accounts, fear and greed. Mostly contrarian.'], ['trend', 'Trend & chart patterns', 'Direction on 15m, 1h, 4h and the daily, plus candle patterns and the take-off score.'], ['ctx', 'Market context', 'Stocks and dollar, Bitcoin dominance, beta to BTC, sector strength and time-of-day habits.'], ['news', 'News, unlocks & risk', 'Headlines, token unlocks, delisting, thin trading and other things that can break a set-up.'], ['ei', 'Free institutional data+', 'ETF flows, CME positioning, futures curve, options, stablecoin and order-book data (the Institutional data+ page).']];
+const DG_NAME = Object.fromEntries(DG_GROUPS.map(x => [x[0], x[1]]));
+function dgOf(t, tag){
+  if (tag === 'ei') return 'ei'; t = String(t || '').toLowerCase();
+  if (/sweep|swept|reclaim|breakout|breakdown|order block|\bgap\b|\bote\b|buy zone|sell zone|liquidity sits|more liquidity|flush|squeeze was rejected|point of control|value-area|2nd test|pulling back|bouncing into/.test(t)) return 'sweeps';
+  if (/news|unlock|delist|hype|thin|lending|hack|lawsuit|monitoring|chasing|overhang|risk story/.test(t)) return 'news';
+  if (/whale|wallet|orca|shark|coinbase|institution|13 extra|on-chain|leaving exchanges|onto exchanges|exchanges\b.*(sent|pulled)|hyperliquid trades/.test(t)) return 'inst';
+  if (/crowded|retail|funding|fear|greed|accounts/.test(t)) return 'crowd';
+  if (/pressure|volume|delta|buying|selling|order book|imbalance|taker|absorb|big print|candle/.test(t)) return 'flow';
+  if (/stocks|dollar|dominance|beta|sector|hour of the day|rotating|bitcoin is leading|outperform|lag/.test(t)) return 'ctx';
+  return 'trend';
+}
+const DG_RULES = {
+  sweeps:[['A low or high was swept and reclaimed (15m/1h/4h)', '+/-3', 'the strategy core'], ['The 2nd test of that level held', '+/-4', ''], ['Breakout or breakdown confirmed after a sweep', '+/-6 (+/-5 more if an institutional candle backs it)', ''], ['Sweep reclaimed at yesterday\'s point of control or value-area edge', '+/-4', ''], ['More liquidity sits above (pulls price up) or below', '+/-5', ''], ['Price in the 62-79% pullback zone (OTE)', '+/-8', ''], ['Order block (supply or demand) at or near price', '+/-6 at, +/-3 near', ''], ['Fair-value gap at or near price', '+/-4 at, +/-2 near', ''], ['Long flush reclaimed, or short squeeze rejected, across Binance/Bybit/OKX', '+/-4', '']],
+  flow:[['Institutional flow state and institutional volume state (candle close location x volume)', 'up to about +/-10 each', ''], ['Buy/sell pressure on the 1h', '+/-4', 'strong at 15% or more'], ['Cumulative-delta divergence (hidden buying or selling) on 1h and 15m', 'up to about +/-6', ''], ['Order flow, order-book imbalance and taker flow reads', 'up to about +/-6', '']],
+  inst:[['Whale, orca and shark wallets mostly long or short', '+/-8', ''], ['The tracked wallets lean long or short on this coin', '+/-6', ''], ['The 13 extra institutional checks', 'up to +/-6', ''], ['Coinbase (US spot) premium or discount', '+/-2', 'at 0.08% or more'], ['Hyperliquid richer or cheaper than other exchanges', '+/-2', ''], ['Coins moving on or off exchanges, big whale transfers', '+/-4 and +/-3', 'needs Alchemy/Helius keys']],
+  crowd:[['Funding high (crowded longs) or very negative (crowded shorts)', '+/-4', 'contrarian'], ['Retail accounts crowded long or short', '+/-3', 'contrarian'], ['Accounts across exchanges crowded', '+/-2', 'contrarian'], ['Extreme fear or extreme greed for the whole market', '+/-2', 'contrarian']],
+  trend:[['4h and 12h trend', 'about +/-8', ''], ['1h and 15m chart patterns (candle structure)', 'about +/-6 and +/-3', ''], ['Take-off score (readiness for a long vs short)', '45% of the long-minus-short gap', ''], ['Spot, swing and positional modes: 7, 30 and 200-day trends', '5, 8 and 4 per trend', 'other modes only']],
+  ctx:[['Stocks down and dollar up (risk-off), or the reverse', '+/-2', ''], ['Bitcoin dominance falling or rising', '+/-2', ''], ['Outperforming or lagging BTC after beta', '+/-3', ''], ['Leading or lagging its sector', '+/-2', ''], ['This hour of the day has leaned up or down for 45 days', '+/-1', '']],
+  news:[['Delisting or monitoring-tag news', '-6', ''], ['Recent news positive or negative', '+/-4', ''], ['Token unlock due within 7 days', '-6 (and -8 for large overhang)', ''], ['Hype just starting, or late and overheated', '+5 / -8', 'hype mode'], ['Trading thin for its size', '-4', ''], ['Lending positions being force-liquidated', '-3', '']],
+  ei:[['ETF flows, CME positioning, futures curve, options, taker flow, stablecoin flow, order-book depth and the other Institutional data+ rules', 'capped at +/-8 in total', 'see the Institutional data+ page']]
+};
+function dgBreak(m){
+  const all = m && m.vAll; if (!all) return null; const G = {}; for (const g of DG_GROUPS) G[g[0]] = {up:0, dn:0, items:[]};
+  for (const x of all){ const g = G[dgOf(x[1], x[2])]; if (x[0] > 0) g.up += x[0]; else g.dn += x[0]; g.items.push(x); } return G;
+}
+function dgSel(){ const L = [...state.coins.values()].filter(c => c.m && isNum(c.m.verdict) && c.m.vAll); L.sort((a, b) => Math.abs(b.m.verdictScore || 0) - Math.abs(a.m.verdictScore || 0)); return L; }
+function dgHtml(){
+  const L = dgSel(), want = DG.coin && L.find(c => c.name === DG.coin) ? DG.coin : (L[0] && L[0].name), c = L.find(x => x.name === want), sg = v => (v > 0 ? '+' : '') + v;
+  let h = `<div class="nsec"><h3>How the scanner decides</h3><p class="hint">Every coin gets a score from -100 to +100. Each rule below adds or subtracts points, and the total decides the verdict. In perp scalp mode, +35 or more is a Strong long, +15 to +34 a Lean long, -15 to -34 a Lean short, -35 or less a Strong short, and anything between is Wait. Spot, swing and positional modes use +28 and +10. A few things force <b>Avoid</b> whatever the score: a risk story (hack, ban, delisting, lawsuit), very thin trading, or a big macro event within the blackout window.</p>
+    <p class="hint">Your strategy (liquidity sweeps) is the first group. The rest is a mix of volume and flow, institutional footprints, retail positioning and context. The groups are named by matching words in each reason, so a reason may land in a neighbouring group.</p></div>`;
+  h += `<div class="nsec"><h3>Live: why a coin got its verdict</h3>`;
+  if (!c) h += '<p class="hint">Waiting for coins with a verdict. Keep the app open for a minute.</p>';
+  else { const G = dgBreak(c.m), mx = Math.max(10, ...Object.values(G).map(g => Math.max(g.up, -g.dn)));
+    h += `<div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><label class="hint">Coin <select id="dgCoin">${L.slice(0, 80).map(x => `<option value="${esc(x.name)}"${x.name === c.name ? ' selected' : ''}>${esc(x.name)} (${sg(Math.round(x.m.verdictScore))})</option>`).join('')}</select></label><b>${esc(VERDICT_LAB[c.m.verdict] || '')}</b><span class="hint">score <b class="${c.m.verdictScore > 0 ? 'up' : c.m.verdictScore < 0 ? 'dn' : ''}">${sg(Math.round(c.m.verdictScore))}</b> (Strong at +/-${c.m.vThr ? c.m.vThr[1] : 35}, Lean at +/-${c.m.vThr ? c.m.vThr[0] : 15})</span><button class="btn sm" type="button" data-chart="${esc(c.name)}">Open chart</button></div>
+      <div style="margin-top:8px">${DG_GROUPS.map(([k, nm]) => { const g = G[k], w = v => Math.round(Math.abs(v) / mx * 100); return `<div style="display:grid;grid-template-columns:minmax(150px,230px) 1fr 70px;gap:8px;align-items:center;margin:3px 0"><span class="hint">${esc(nm)}</span><span style="display:flex;height:12px;background:var(--surface2,#151a22);border-radius:6px;overflow:hidden"><span style="width:50%;display:flex;justify-content:flex-end"><i style="width:${w(g.dn)}%;background:#ff6b6b"></i></span><span style="width:50%"><i style="display:block;height:100%;width:${w(g.up)}%;background:#2ecc8f"></i></span></span><b class="${g.up + g.dn > 0 ? 'up' : g.up + g.dn < 0 ? 'dn' : 'dim'}">${sg(Math.round(g.up + g.dn))}</b></div>`; }).join('')}</div>
+      <details class="ovd" style="margin-top:8px"><summary>Every reason behind this score</summary>${DG_GROUPS.map(([k, nm]) => { const g = G[k]; if (!g.items.length) return ''; return `<p class="hint"><b>${esc(nm)}</b></p>` + g.items.sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).map(x => `<div class="cwr"><span>${esc(x[1])}</span><span class="${x[0] > 0 ? 'up' : 'dn'}">${sg(x[0])}</span></div>`).join(''); }).join('')}${c.m.vFlags && c.m.vFlags.length ? `<p class="hint"><b>Cautions (not scored)</b></p>` + c.m.vFlags.map(x => `<div class="cwr"><span>${esc(x)}</span><span class="warn">!</span></div>`).join('') : ''}</details>`; }
+  h += '</div>';
+  /* market-wide */
+  const tot = {}; let n = 0; for (const g of DG_GROUPS) tot[g[0]] = 0; for (const x of L){ n++; for (const p of x.m.vAll) tot[dgOf(p[1], p[2])] += Math.abs(p[0]); } const sum = Object.values(tot).reduce((a, b) => a + b, 0) || 1;
+  h += `<div class="nsec"><h3>Across the market right now: where the points come from</h3><p class="hint">Share of all points (positive and negative) across ${n} coins with a verdict. This shows how much of the scanner's opinion comes from your sweep strategy versus everything else.</p>${DG_GROUPS.map(([k, nm]) => `<div style="display:grid;grid-template-columns:minmax(150px,230px) 1fr 60px;gap:8px;align-items:center;margin:3px 0"><span class="hint">${esc(nm)}</span><span style="height:12px;background:var(--surface2,#151a22);border-radius:6px;overflow:hidden"><i style="display:block;height:100%;width:${(tot[k] / sum * 100).toFixed(0)}%;background:${k === 'sweeps' ? 'var(--gold,#c9a227)' : '#5b8def'}"></i></span><b>${(tot[k] / sum * 100).toFixed(0)}%</b></div>`).join('')}</div>`;
+  /* rule book */
+  h += `<div class="nsec"><h3>The rule book: every group and its biggest rules</h3><p class="hint">Points are the largest a single rule can add. A coin rarely triggers all of them. Rules marked contrarian work against the crowd.</p>${DG_GROUPS.map(([k, nm, d]) => `<details class="ovd" ${k === 'sweeps' ? 'open' : ''}><summary>${esc(nm)}</summary><p class="hint">${esc(d)}</p><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Rule</th><th>Points</th><th style="text-align:left">Note</th></tr></thead><tbody>${DG_RULES[k].map(r => `<tr><td style="text-align:left">${esc(r[0])}</td><td>${esc(r[1])}</td><td style="text-align:left" class="dim">${esc(r[2])}</td></tr>`).join('')}</tbody></table></details>`).join('')}</div>`;
+  h += `<div class="nsec"><h3>What turns a verdict into a signal, and what blocks it</h3><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Gate</th><th style="text-align:left">What it requires</th></tr></thead><tbody>
+    <tr><td style="text-align:left">Verdict</td><td style="text-align:left">Strong long or Strong short (or an A-grade set-up with a Lean) and a trade plan that agrees with the direction.</td></tr>
+    <tr><td style="text-align:left">Strict filters (on by default)</td><td style="text-align:left">A confirmed 1h sweep breakout and an institutional candle on the same side, price not already run, the institutional read and the 13 extra checks not against it, and at most 3 signals per side per hour.</td></tr>
+    <tr><td style="text-align:left">A+ only (optional)</td><td style="text-align:left">All 5 evidence groups must agree: money flow, positioning, institutions, price structure and the 30-check verdict.</td></tr>
+    <tr><td style="text-align:left">Regime gate (optional)</td><td style="text-align:left">No signals when Bitcoin is in a panic move, or when this market regime has a negative record in your own log.</td></tr>
+    <tr><td style="text-align:left">Portfolio cap (optional)</td><td style="text-align:left">A maximum number of open signals per side.</td></tr>
+    <tr><td style="text-align:left">Daily risk guard (optional)</td><td style="text-align:left">Stops new signals and alerts after your daily loss, trade count or loss streak limit.</td></tr>
+    <tr><td style="text-align:left">Macro blackout</td><td style="text-align:left">Coins are forced to Avoid from 30 minutes before to 15 minutes after a high-impact US event.</td></tr></tbody></table></div>`;
+  return h;
+}
+const DG = {coin:null};
+function renderDecide(){
+  const el = $('viewDecide'); if (!el) return;
+  if (!el._built){ el._built = true; el.addEventListener('change', e => { if (e.target.id === 'dgCoin'){ DG.coin = e.target.value; el._h = ''; renderDecide(); } }); el.addEventListener('click', e => { const a = e.target.closest('[data-chart]'); if (a) openChart(a.dataset.chart); }); }
+  const ae = document.activeElement; if (ae && el.contains(ae) && ae.tagName === 'SELECT') return;
+  const html = dgHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
+}
+
+/* ---------- daily risk guard (optional) ---------- */
+function rgCfg(){ return state.rg || (state.rg = {on:false, maxLoss:3, maxTrades:6, losses:2, coolH:2, jr:true}); }
+const RG_M = {at:0, v:null};
+function rgStatus(){
+  const C = rgCfg(); if (!C.on) return {on:false}; if (Date.now() - RG_M.at < 3000 && RG_M.v) return RG_M.v; const R = rgCalc(C); RG_M.at = Date.now(); RG_M.v = R; return R;
+}
+function rgCalc(C){ const d0 = new Date(); d0.setHours(0, 0, 0, 0); const t0 = d0.getTime(), now = Date.now();
+  const fin = SIG.list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.r) && (x.tEnd || x.t) >= t0), opened = SIG.list.filter(x => x.t >= t0).length;
+  let jr = []; if (C.jr){ try { jrLoad(); jr = JR.trades.filter(t => t.status !== 'open' && (t.close || 0) >= t0).map(t => ({r:jrR(t), tEnd:t.close})).filter(x => isNum(x.r)); } catch(e){} }
+  const L = fin.map(x => ({r:x.r, tEnd:x.tEnd || x.t})).concat(jr).sort((a, b) => a.tEnd - b.tEnd), sum = L.reduce((s, x) => s + x.r, 0); let streak = 0, lastLoss = 0; for (let i = L.length - 1; i >= 0; i--){ if (L[i].r < 0){ streak++; if (!lastLoss) lastLoss = L[i].tEnd; } else break; }
+  let why = '', until = 0; if (sum <= -C.maxLoss){ why = 'daily loss limit reached (' + sum.toFixed(1) + 'R)'; const e = new Date(); e.setHours(24, 0, 0, 0); until = e.getTime(); } else if (opened >= C.maxTrades){ why = 'daily trade limit reached (' + opened + ' signals)'; const e = new Date(); e.setHours(24, 0, 0, 0); until = e.getTime(); } else if (streak >= C.losses && now - lastLoss < C.coolH * 36e5){ why = streak + ' losses in a row: cooling off'; until = lastLoss + C.coolH * 36e5; }
+  return {on:true, locked:!!why, why, until, sum, opened, streak, n:L.length};
+}
+function rgBanner(){
+  const S = rgStatus(), out = [];
+  if (S.on){ const C = rgCfg(); out.push(S.locked ? `<div class="banner err"><b>Daily risk guard: new signals and alerts paused.</b> ${esc(S.why)}. Resumes ${esc(new Date(S.until).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}))}. Step away from the screen.</div>` : `<div class="banner">Daily risk guard on: today ${S.sum >= 0 ? '+' : ''}${S.sum.toFixed(1)}R of -${C.maxLoss}R allowed, ${S.opened} of ${C.maxTrades} signals${S.streak ? ', ' + S.streak + ' loss' + (S.streak > 1 ? 'es' : '') + ' in a row' : ''}.</div>`); }
+  try { const at = +(LS.get('elpp_bk_at') || 0), has = SIG.list.length >= 5 || (JR.trades && JR.trades.length >= 5); if (has && Date.now() - at > 7 * 864e5) out.push(`<div class="banner">${at ? 'Your last backup was ' + Math.floor((Date.now() - at) / 864e5) + ' days ago.' : 'You have not backed up your signal log and journal yet.'} Your data lives only in this browser. <a href="#" data-gotoday style="color:var(--accent)">Back up now</a></div>`); } catch(e){}
+  return out.join('');
+}
+document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('[data-gotoday]'); if (a){ e.preventDefault(); const b = document.querySelector('button.nv[data-view="today"]'); if (b) b.click(); } });
+function rgRender(){
+  const el = $('rgStat'); if (!el) return; const C = rgCfg(), S = rgStatus();
+  el.innerHTML = !C.on ? 'The guard is off. Turn it on to pause new signals and alerts when you hit your own limits.' : S.locked ? `<b class="dn">Locked: ${esc(S.why)}.</b> Resumes ${esc(new Date(S.until).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}))}.` : `<b class="up">Active.</b> Today ${S.sum >= 0 ? '+' : ''}${S.sum.toFixed(1)}R, ${S.opened} signals, ${S.streak} losses in a row.`;
+}
+const RG_HTML = `<div class="nsec"><h3>Daily risk guard (optional)</h3>
+      <p class="hint">Off by default. When on, the scanner stops writing new signals and muting alerts once you hit a limit you choose, because most losses come from overtrading after a bad run. Your day resets at midnight on this device. R means units of your stop distance.</p>
+      <div class="row" style="gap:10px;flex-wrap:wrap;align-items:center"><label class="hint"><input type="checkbox" id="rgOn"> Turn the daily risk guard on</label><label class="hint">Daily loss limit, R <input type="number" step="0.5" min="0.5" id="rgLoss" style="width:70px"></label><label class="hint">Max signals per day <input type="number" step="1" min="1" id="rgTrades" style="width:70px"></label><label class="hint">Pause after <input type="number" step="1" min="1" id="rgLosses" style="width:60px"> losses in a row</label><label class="hint">for <input type="number" step="0.5" min="0.5" id="rgCool" style="width:60px"> hours</label><label class="hint"><input type="checkbox" id="rgJr"> Also count my real journal trades</label></div>
+      <p class="hint" id="rgStat"></p></div>
+    `;
+
+/* ---------- backup and restore ---------- */
+function bkScrub(o, force){
+  if (Array.isArray(o)) return o.map(x => bkScrub(x, force));
+  if (o && typeof o === 'object'){ const r = {}; for (const k in o){ const v = o[k]; if (typeof v === 'string' && (force || /key|token|secret|^tok|chat|relay|addr|pass|soso|fred|auth|bearer|proxy/i.test(k))) r[k] = ''; else r[k] = bkScrub(v, force || /keys?$/i.test(k)); } return r; }
+  return o;
+}
+function bkMerge(a, b){
+  if (b === '' && typeof a === 'string' && a) return a;
+  if (b && typeof b === 'object' && !Array.isArray(b) && a && typeof a === 'object' && !Array.isArray(a)){ const r = Object.assign({}, a); for (const k in b) r[k] = bkMerge(a[k], b[k]); return r; }
+  return b;
+}
+function bkExport(withKeys){
+  const out = {app:'ELPP', v:1, at:Date.now(), keys:!!withKeys, ls:{}}; for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (!/^elpp_/.test(k) || /^elpp_(xfeed|samples|vsig|fold|vg_)/.test(k)) continue; let v = localStorage.getItem(k); if (!withKeys){ try { v = JSON.stringify(bkScrub(JSON.parse(v), false)); } catch(e){} } out.ls[k] = v; }
+  const b = new Blob([JSON.stringify(out)], {type:'application/json'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'ELPP-backup-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); LS.set('elpp_bk_at', Date.now()); return Object.keys(out.ls).length;
+}
+function bkImport(text){
+  const j = JSON.parse(text); if (!j || j.app !== 'ELPP' || !j.ls) throw new Error('This is not an ELPP backup file'); let n = 0;
+  for (const k in j.ls){ if (!/^elpp_/.test(k)) continue; let nv = j.ls[k]; try { const inc = JSON.parse(nv), cur = JSON.parse(localStorage.getItem(k) || 'null'); nv = JSON.stringify(cur && typeof cur === 'object' && !Array.isArray(cur) ? bkMerge(cur, inc) : inc); } catch(e){} localStorage.setItem(k, nv); n++; }
+  return n;
+}
+
+/* ---------- Today page ---------- */
+function todayHtml(){
+  const sg = v => (v > 0 ? '+' : '') + v, now = Date.now(), r = MK.last, S = rgStatus(), nx = macNext();
+  const all = [...state.coins.values()].filter(c => c.m && isNum(c.m.verdict) && (c.m.verdict === 5 || c.m.verdict === 3)).sort((a, b) => Math.abs(b.m.verdictScore) - Math.abs(a.m.verdictScore)).slice(0, 5);
+  const open = SIG.list.filter(x => x.status === 'open' || x.status === 'tp1').slice(-8).reverse(), d0 = new Date(); d0.setHours(0, 0, 0, 0);
+  const closedToday = SIG.list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.r) && (x.tEnd || x.t) >= d0.getTime()), sumR = closedToday.reduce((s, x) => s + x.r, 0);
+  let hs = []; try { hs = healthRows(); } catch(e){} const bad = hs.filter(x => !x.ok && !x.opt).length;
+  const tile = (lab, val, sub, cls) => `<div style="flex:1;min-width:170px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:18px;font-weight:700" class="${cls || ''}">${val}</div><small class="hint">${esc(sub || '')}</small></div>`;
+  let h = `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(r.state + '') : 'Collecting…', r ? r.grade + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? (nx.min >= 0 ? 'in ' + Math.round(nx.min) + ' min' : Math.round(-nx.min) + ' min ago') : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
+  h += `<div class="nsec"><h3>Top set-ups right now</h3>${all.length ? `<table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Verdict</th><th>Score</th><th style="text-align:left">Psychology</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th></th></tr></thead><tbody>${all.map(c => { const p = (() => { try { return planFor(c); } catch(e){ return null; } })(), m = c.m; return `<tr><td style="text-align:left"><b>${esc(c.name)}</b></td><td class="${m.verdict === 5 ? 'up' : 'dn'}">${esc(VERDICT_LAB[m.verdict])}</td><td>${sg(Math.round(m.verdictScore))}</td><td style="text-align:left" class="dim">${esc(m.psy ? m.psy.tag : '—')}</td><td>${p ? esc(fmtPx(p.entry)) : '—'}</td><td>${p ? esc(fmtPx(p.sl)) : '—'}</td><td>${p ? esc(fmtPx(p.tp1)) : '—'}</td><td>${p ? esc(fmtPx(p.tp2)) : '—'}</td><td><button class="btn sm" type="button" data-chart="${esc(c.name)}">Chart</button></td></tr>`; }).join('')}</tbody></table><p class="hint">Check each one on your own chart before taking it. Open "How it decides" to see why a coin scored what it did.</p>` : '<p class="hint">No Strong long or short verdicts at the moment. Waiting is also a position.</p>'}</div>`;
+  h += `<div class="nsec"><h3>Your open signals</h3>${open.length ? `<table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Side</th><th>Entry</th><th>Stop</th><th>TP1</th><th>Age</th><th>MAE</th><th>MFE</th><th style="text-align:left">Status</th></tr></thead><tbody>${open.map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td>${esc(fmtPx(x.entry))}</td><td>${esc(fmtPx(x.sl))}</td><td>${esc(fmtPx(x.tp1))}</td><td>${esc(ago(x.t))}</td><td>${isNum(x.mae) ? x.mae.toFixed(2) + 'R' : '—'}</td><td>${isNum(x.mfe) ? x.mfe.toFixed(2) + 'R' : '—'}</td><td style="text-align:left">${esc(SIG_LAB[x.status] || x.status)}</td></tr>`).join('')}</tbody></table>` : '<p class="hint">No open signals.</p>'}</div>`;
+  const at = +(LS.get('elpp_bk_at') || 0);
+  h += `<div class="nsec"><h3>Backup and restore</h3><p class="hint">Your signal log, journal and settings are stored only in this browser. Clearing the browser data would erase them. ${at ? 'Last backup: ' + esc(ago(at)) + '.' : 'No backup yet.'} By default the file leaves out your API keys, tokens and wallet addresses, so it is safe to keep. Restoring never overwrites a key you already have with a blank.</p><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="bkOut">Download backup</button><label class="hint"><input type="checkbox" id="bkKeys"> include my API keys and tokens (keep this file private)</label><label class="btn" style="cursor:pointer">Restore from file<input type="file" id="bkIn" accept=".json,application/json" hidden></label></div><p class="hint" id="bkMsg"></p></div>`;
+  return h;
+}
+function renderToday(){
+  const el = $('viewToday'); if (!el) return;
+  if (!el._built){ el._built = true;
+    el.addEventListener('click', e => { const t = e.target; const a = t.closest('[data-chart]'); if (a){ openChart(a.dataset.chart); return; }
+      if (t.closest('#bkOut')){ const n = bkExport($('bkKeys').checked); $('bkMsg').textContent = 'Saved ' + n + ' items to your downloads folder.'; el._h = ''; } });
+    el.addEventListener('change', e => { if (e.target.id === 'bkIn' && e.target.files[0]){ const rd = new FileReader(); rd.onload = () => { try { const n = bkImport(rd.result); $('bkMsg').textContent = 'Restored ' + n + ' items. Reloading…'; setTimeout(() => location.reload(), 900); } catch(x){ $('bkMsg').textContent = 'Could not restore: ' + errTxt(x); } }; rd.readAsText(e.target.files[0]); } }); }
+  const ae = document.activeElement; if (ae && el.contains(ae) && (ae.tagName === 'INPUT' || ae.tagName === 'SELECT')) return;
+  const html = todayHtml(); if (el._h !== html){ const msg = $('bkMsg') ? $('bkMsg').textContent : ''; el.innerHTML = html; el._h = html; if (msg && $('bkMsg')) $('bkMsg').textContent = msg; }
+}
+
+VIEW_GUIDE.today = [['Market verdict', 'Overall tradability right now.', 'BEST/GOOD TO TRADE = normal size. SELECTIVE or TRADE WITH CARE = reduce size. NOT TRADEABLE = skip.'], ['Signals today', 'Closed signals today and their total in R.', 'Judge the day only after 5 or more closed signals; one day proves nothing.'], ['Risk guard', 'Your optional daily limits.', 'LOCKED means a limit was hit: stop looking for trades until it resumes.'], ['Data health', 'Feeds working or failing.', 'A few failing optional feeds are fine. Many failing means your connection is the problem.'], ['Top set-ups', 'Strongest long and short verdicts.', 'Strong needs a score of +35 or more (or -35 or less). Always check your own chart first.']];
+VIEW_GUIDE.decide = [['Score', 'Sum of every rule that fired, from -100 to +100.', 'Strong at +/-35, Lean at +/-15 (perp scalp). Spot, swing and positional use 28 and 10.'], ['Group bars', 'Net points from one family of rules.', 'A verdict where only one group carries the score is weaker than one where 3 or more groups agree.'], ['Market-wide share', 'How much of all points each group supplies.', 'If the sweeps group is a small share, most verdicts are driven by other things.'], ['Gates', 'Extra conditions before a signal is logged.', 'Strict filters are recommended; A+ only is the strictest.']];
+
 /* ===== V4.18: extra signal inputs (Coinbase premium, hour-of-day seasonality, protocol fee yield) ===== */
 var X9 = {cb:new Map(), cbAt:0, cbBusy:false, cbProd:null, cbErr:null, seas:new Map(), seasQ:[], seasBusy:false, seasErr:null, want:new Set(), started:false};
 function x9Mult(name){ return /^k[A-Z0-9]{2,}$/.test(name) ? 1000 : 1; }
