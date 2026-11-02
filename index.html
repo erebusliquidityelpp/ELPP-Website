@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.36</title>
+<title>ELPP CRYPTO SCANNER PRO V4.37</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -746,7 +746,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.36</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.37</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9651,7 +9651,7 @@ function btCompute(){
   let bh = null; { const a = []; for (const E of BT.cache.values()){ const b = E.D.bars; if (b.length > 10) a.push((b[b.length - 1].c / b[0].c - 1) * 100); } if (a.length) bh = a.reduce((s, x) => s + x, 0) / a.length; }
   BT.res = {rows, bh, coins:BT.cache.size, days:BT.days, at:Date.now(), P:Object.assign({}, P)}; if (!BT.sel || !rows.find(r => r.k === BT.sel)){ const c = rows.filter(r => r.A.n >= 20).sort((a, b) => b.A.avg - a.A.avg)[0]; BT.sel = c ? c.k : 'R10'; } BT.sweep = null; BT.mc = null;
 }
-function btSweep(rk){
+function bxSweep(rk){
   const out = []; for (const sp of [1, 1.5, 2, 3]){ const row = []; for (const rr of [1.5, 2, 3]){ const P = Object.assign({}, BT.P, {stop:sp, rr}), L = btTrades(P, rk)[rk], S = btStat(L, P); row.push({sp, rr, n:S.n, avg:S.avg, pf:S.pf, win:S.win}); } out.push(row); } BT.sweep = {rk, out, at:Date.now()};
 }
 async function btRun(){
@@ -9710,7 +9710,7 @@ function renderBt(){
     el.addEventListener('click', e => { const t = e.target;
       if (t.closest('#btRun')){ BT.coins = +$('btCoins').value || 20; BT.days = +$('btDays').value || 30; rd(); btRun(); }
       else if (t.closest('#btApply')){ rd(); btCompute(); renderBt(); } else if (t.closest('#btStop')) BT.stop = true; else if (t.closest('#btCsv')) btCsv(); else if (t.closest('#btTrCsv')) btTradesCsv();
-      else if (t.closest('#btSweepGo')){ btSweep(BT.sel); renderBt(); }
+      else if (t.closest('#btSweepGo')){ bxSweep(BT.sel); renderBt(); }
       else { const tr = t.closest('tr[data-rule]'); if (tr){ BT.sel = tr.dataset.rule; renderBt(); } } });
     el.addEventListener('change', e => { if (e.target.id === 'btCoins') BT.coins = +e.target.value; else if (e.target.id === 'btDays') BT.days = +e.target.value; }); }
   const ae = document.activeElement; if (ae && el.contains(ae) && (ae.tagName === 'SELECT' || ae.tagName === 'INPUT')) return;
