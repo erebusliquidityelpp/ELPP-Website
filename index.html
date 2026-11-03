@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.50</title>
+<title>ELPP CRYPTO SCANNER PRO V4.51</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -749,7 +749,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.50</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.51</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5037,7 +5037,7 @@ function renderMarket(all){
   const topList = k => all.filter(c => isNum(c.m[k]) && c.m[k] >= takeMinV()).sort((a,b) => b.m[k] - a.m[k]).slice(0, 4).map(c => c.name + ' ' + c.m[k]).join(', ');
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
   const badgeCard = (l, b) => card(l, `<span class="mkb-pill mkb-p-${b.tone}">${esc(b.label)}</span>`, esc(b.why));
-  const BADGE_ROWS = [['Liquidity','liq'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare']];
+  const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare']];
   el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p><div class="mkgrid">` +
     (mk ? BADGE_ROWS.map(([label, key]) => badgeCard(label, mk[key])).join('') : '') +
     card('BTC', isNum(bt) ? (bt === 1 ? '▲ Uptrend' : bt === -1 ? '▼ Downtrend' : '◆ Consolidating') : '—', bm ? `1h ${sg(bm.chg['1h'])} · 4h ${sg(bm.chg['4h'])} · 1d ${sg(bm.chg['1d'])}` : '') +
@@ -5990,6 +5990,16 @@ function liqBadge(vol){
     : vol < 1.3 ? {label:'Normal liquidity', tone:'muted', why:`volume is ${vol.toFixed(2)}x normal`}
     : {label:'High liquidity', tone:'up', why:`volume is ${vol.toFixed(2)}x normal, above the usual range`};
 }
+/* ===== V4.51: Volume trend badge (Rising / Flat / Falling) - is volume picking up or fading right now, not just its level ===== */
+function volTrendBadge(volShort, volLong){
+  if (volShort === null || volLong === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet'};
+  const ratio = volLong > 0 ? volShort / volLong : null;
+  if (ratio === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet'};
+  const txt = `the last 15m is running ${volShort.toFixed(2)}x its own normal, against ${volLong.toFixed(2)}x on the 4h`;
+  return ratio >= 1.25 ? {label:'Volume rising', tone:'up', why:`${txt}: trading is picking up right now`}
+    : ratio <= 0.75 ? {label:'Volume falling', tone:'dn', why:`${txt}: trading is fading right now`}
+    : {label:'Volume flat', tone:'muted', why:`${txt}: no real change in activity`};
+}
 function voltBadge(vx){
   return vx === null ? {label:'Volatility unknown', tone:'muted', why:'not enough range data yet'}
     : vx < 0.9 ? {label:'Low volatility', tone:'muted', why:`range is ${vx.toFixed(2)}x normal: price is coiling`}
@@ -6082,6 +6092,7 @@ function mkCalc(all){
   const bull = (b4 >= 60) + (bt === 1) + (isNum(f4) && f4 >= 5), bear = (b4 <= 40) + (bt === -1) + (isNum(f4) && f4 <= -5);
   const manipHi = manip >= 40, crowdHi = crowdL >= 45 || crowdS >= 45, chopHi = (chop >= 55 && (er === null || er < 0.30)) || (er !== null && er < 0.18), crowdLow = crowdL < 15 && crowdS < 15;
   const liq = liqBadge(vol), volt = voltBadge(vx), press = pressBadge(bull, bear, b4, f4);
+  const volTrend = volTrendBadge(med(c => c.m.rvol && c.m.rvol['15m']), med(c => c.m.rvol && c.m.rvol['4h']));
   /* V4.50 badges */
   const crowd = crowdBadge(crowdL, crowdS, crowdLow);
   const oiChg1h = mkWavg(top, c => c.m.oiChg && c.m.oiChg['1h'], c => c.m.oiUsd), pxChg1h = mkWavg(top, c => c.m.chg && c.m.chg['1h'], c => c.m.vol24);
@@ -6130,13 +6141,13 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
   const pill = b => `<span class="mkb-pill mkb-p-${b.tone}" title="${esc(b.why)}">${esc(b.label)}</span>`;
-  const pills = [r.liq, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
+  const pills = [r.liq, r.volTrend, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
   el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
 const OPT_GLOSS = [
