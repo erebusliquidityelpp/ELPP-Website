@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.58</title>
+<title>ELPP CRYPTO SCANNER PRO V4.59</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -769,7 +769,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.58</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.59</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -2918,6 +2918,76 @@ async function loadStable(){
   } catch(e){ X.stableErr = errTxt(e); }
   requestRender();
 }
+/* ===== V4.59: three more free institutional-data layers - CME futures gap tracker, exchange insurance-fund health, DeFi stablecoin borrow demand ===== */
+const CME = {gaps:[], price:null, at:0, err:''};
+async function loadCmeGaps(){
+  try {
+    const u = 'https://query1.finance.yahoo.com/v8/finance/chart/BTC%3DF?range=3mo&interval=1d';
+    const rel = String(state.mxRelay || '').replace(/\/+$/, '');
+    let j = null;
+    if (rel){ try { j = await ext(rel + '/yahoo?s=' + encodeURIComponent('BTC=F') + '&range=3mo&interval=1d', null, 15000); } catch(e){} }
+    if (!j || !j.chart){
+      for (const wrap of [x => x, x => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(x), x => 'https://corsproxy.io/?' + encodeURIComponent(x)]){
+        try { const r = await ext(wrap(u), null, 15000); if (r && r.chart && r.chart.result){ j = r; break; } } catch(e){}
+      }
+    }
+    const res = (((j || {}).chart || {}).result || [])[0]; if (!res) throw new Error('no data');
+    const ts = res.timestamp || [], q = ((res.indicators || {}).quote || [])[0] || {};
+    const O = q.open || [], H = q.high || [], L = q.low || [], C = q.close || [];
+    const bars = ts.map((t, i) => ({t:t * 1000, o:O[i], h:H[i], l:L[i], c:C[i]})).filter(b => isFinite(b.o) && isFinite(b.c) && isFinite(b.h) && isFinite(b.l));
+    const gaps = [];
+    for (let i = 1; i < bars.length; i++){
+      const prev = bars[i - 1], cur = bars[i], daysBetween = Math.round((cur.t - prev.t) / 864e5);
+      /* a weekend or holiday gap: more than a day passed and price opened away from the last close */
+      if (daysBetween >= 2 && Math.abs(cur.o - prev.c) / prev.c > 0.0005){
+        gaps.push({t:cur.t, lo:Math.min(prev.c, cur.o), hi:Math.max(prev.c, cur.o), dir:cur.o > prev.c ? 1 : -1});
+      }
+    }
+    /* a gap is filled once price trades back to the pre-gap level: for a gap up, a later low back at or below the old close; for a gap down, a later high back at or above it */
+    for (const g of gaps) g.filled = bars.some(b => b.t >= g.t && (g.dir === 1 ? b.l <= g.lo : b.h >= g.hi));
+    CME.gaps = gaps.filter(g => !g.filled);
+    CME.price = bars.length ? bars[bars.length - 1].c : null;
+    CME.at = Date.now(); CME.err = '';
+  } catch(e){ CME.err = errTxt(e); }
+  requestRender();
+}
+const INSUR = {now:null, hist:[], at:0, err:''};
+async function loadInsurance(){
+  try {
+    const j = await vget('bybit', 'https://api.bybit.com/v5/market/insurance');
+    const list = ((j.result || {}).list) || [];
+    const usdt = list.find(r => r.coin === 'USDT');
+    if (usdt && isFinite(+usdt.balance)){
+      const now = Date.now(), v = +usdt.balance;
+      INSUR.now = v; INSUR.at = now; INSUR.err = '';
+      if (!INSUR.hist.length || now - INSUR.hist[INSUR.hist.length - 1][0] >= 1800000) INSUR.hist.push([now, v]);
+      const cut = now - 7 * 864e5; while (INSUR.hist.length && INSUR.hist[0][0] < cut) INSUR.hist.shift();
+    } else throw new Error('USDT insurance balance not in the answer');
+  } catch(e){ INSUR.err = errTxt(e); }
+  requestRender();
+}
+const AAVE = {usdc:null, usdt:null, hist:[], at:0, err:''};
+async function loadAaveBorrow(){
+  try {
+    const j = await ext('https://yields.llama.fi/pools', null, 25000);
+    const pools = (j.data || []).filter(p => p.project === 'aave-v3' && p.chain === 'Ethereum' && (p.symbol === 'USDC' || p.symbol === 'USDT'));
+    const usdc = pools.find(p => p.symbol === 'USDC'), usdt = pools.find(p => p.symbol === 'USDT');
+    AAVE.usdc = usdc && isFinite(usdc.apyBaseBorrow) ? usdc.apyBaseBorrow : null;
+    AAVE.usdt = usdt && isFinite(usdt.apyBaseBorrow) ? usdt.apyBaseBorrow : null;
+    if (!usdc && !usdt) throw new Error('Aave v3 USDC/USDT pools not found in the answer');
+    const avg = mkAvg([AAVE.usdc, AAVE.usdt]);
+    if (avg !== null){ const now = Date.now(); if (!AAVE.hist.length || now - AAVE.hist[AAVE.hist.length - 1][0] >= 1800000) AAVE.hist.push([now, avg]); const cut = now - 7 * 864e5; while (AAVE.hist.length && AAVE.hist[0][0] < cut) AAVE.hist.shift(); }
+    AAVE.at = Date.now(); AAVE.err = '';
+  } catch(e){ AAVE.err = errTxt(e); }
+  requestRender();
+}
+function histChgPct(hist, backMs){
+  if (!hist || hist.length < 2) return null;
+  const now = Date.now(), target = now - backMs;
+  let p = hist[0]; for (const pt of hist){ if (pt[0] <= target) p = pt; else break; }
+  const last = hist[hist.length - 1];
+  return (p && p[1] > 0 && isFinite(last[1])) ? (last[1] / p[1] - 1) * 100 : null;
+}
 const TYPE_RE = {
   invest: /\b(etfs?|institution\w*|treasury|reserves?|funds?|invest\w*|stakes?|accumulat\w*|buys|bought|purchas\w*|acquir\w*|grayscale|blackrock|fidelity|bitwise|vaneck|saylor|strategy)\b/i,
   listing: /\b(lists?|listed|listing|will list|coinbase|robinhood|upbit|bithumb|launchpool|launchpad)\b/i,
@@ -3932,6 +4002,21 @@ function verdictFill(c){
       if (m.fngState === 1) add(2, 'the whole market is in extreme fear (contrarian long)'); else if (m.fngState === 2) add(-2, 'the whole market is in extreme greed (contrarian short)');
       if (m.eiImp) for (const x of m.eiImp) if (x[1]) f.push([x[1], x[2], 'ei']);
       { const RG = regimeNow(); if (RG.tag === 'Panic') flags.push('Bitcoin is in a panic move: signals are unreliable right now'); }
+      /* ===== V4.59: CME futures gap, exchange insurance-fund health, DeFi borrow demand - woven into every coin's verdict, same way the Bitcoin panic check above is ===== */
+      if (CME.gaps && CME.gaps.length){
+        /* the gap is a Bitcoin price level, so it must be measured against Bitcoin's own price, never this coin's - comparing it to an altcoin's price would be meaningless */
+        const btcC = state.coins.get('BTC'), btcPx = btcC && btcC.m && isNum(btcC.m.px) ? btcC.m.px : null;
+        if (isNum(btcPx)){
+          const near = CME.gaps.slice().sort((a, b) => Math.min(Math.abs(a.lo - btcPx), Math.abs(a.hi - btcPx)) - Math.min(Math.abs(b.lo - btcPx), Math.abs(b.hi - btcPx)))[0];
+          const mid = (near.lo + near.hi) / 2, dist = Math.abs(mid - btcPx) / btcPx * 100, above = mid > btcPx;
+          if (dist <= 3){
+            if (c.name === 'BTC') add(above ? 4 : -4, `an unfilled CME futures gap sits ${above ? 'above' : 'below'} price near $${Math.round(mid).toLocaleString()} (${dist.toFixed(1)}% away): CME gaps get filled an unusually high share of the time, so price tends to get pulled toward it`);
+            else flags.push(`Bitcoin has an open CME futures gap ${above ? 'above' : 'below'} its price (${dist.toFixed(1)}% away): that can pull the whole market ${above ? 'up' : 'down'} toward it, this coin included`);
+          }
+        }
+      }
+      { const insChg = isNum(INSUR.now) ? histChgPct(INSUR.hist, 21600000) : null; if (isNum(insChg) && insChg <= -3) flags.push(`Bybit's insurance fund is down ${Math.abs(insChg).toFixed(1)}% this session: recent liquidations have been one-sided and costly, raising the odds of a forced flush`); }
+      { const bAvg = mkAvg([AAVE.usdc, AAVE.usdt]); if (isNum(bAvg) && bAvg >= 8) add(-2, `stablecoin borrow cost on Aave is ${bAvg.toFixed(1)}% a year: a lot of people are paying up to borrow and lever up, often a late-cycle, euphoric sign`); }
       if (m.cbState === 1) add(2, 'Coinbase (US spot) trades above Hyperliquid by ' + m.cbPrem.toFixed(2) + '%: US buyers are paying up'); else if (m.cbState === 2) add(-2, 'Coinbase (US spot) trades below Hyperliquid by ' + Math.abs(m.cbPrem).toFixed(2) + '%: US sellers are pressing');
       if (m.seasState === 1) add(1, 'this hour of the day has leaned up for this coin over the last 45 days (' + m.seasHit.toFixed(0) + '% of days up)'); else if (m.seasState === 2) add(-1, 'this hour of the day has leaned down for this coin over the last 45 days (' + (100 - m.seasHit).toFixed(0) + '% of days down)');
       if (isNum(m.dqScore) && m.dqScore < 45) flags.push('data quality is low for this coin (' + m.dqWhy + '): trust the signal less');
@@ -5084,7 +5169,7 @@ function renderMarket(all){
   const topList = k => all.filter(c => isNum(c.m[k]) && c.m[k] >= takeMinV()).sort((a,b) => b.m[k] - a.m[k]).slice(0, 4).map(c => c.name + ' ' + c.m[k]).join(', ');
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
   const badgeCard = (l, b) => card(l, `<span class="mkb-pill mkb-p-${b.tone}">${esc(b.label)}</span>`, esc(b.why));
-  const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare']];
+  const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare'],['CME futures gap','cmeGap'],['Exchange insurance fund','insurFund'],['DeFi borrow demand','borrowRate']];
   el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p>` +
     (mk && mk.liqVolTip ? `<div class="vbox" style="margin:0 0 10px"><b>Liquidity + volume, together:</b> ${esc(mk.liqVolTip)}</div>` : '') +
     `<div class="mkgrid">` +
@@ -6301,6 +6386,32 @@ function dexShareBadge(med, n){
     : pct >= 5 ? {label:'Some DEX volume', tone:'muted', why:`for the ${n} alts with a matched pool, DEX volume is ${pct.toFixed(0)}% of tracked perp volume`}
     : {label:'Mostly CEX/perp volume', tone:'muted', why:`for the ${n} alts with a matched pool, DEX volume is only ${pct.toFixed(0)}% of tracked perp volume`};
 }
+/* ===== V4.59: badges for the three new institutional-data layers ===== */
+function cmeGapBadge(gaps, livePx){
+  if (!CME.at) return {label:'CME gap: unknown', tone:'muted', why:'CME Bitcoin futures data has not loaded yet'};
+  if (CME.err && !gaps.length) return {label:'CME gap: unknown', tone:'muted', why:'CME Bitcoin futures data could not be reached (' + CME.err + ')'};
+  if (!gaps.length) return {label:'No open CME gap', tone:'muted', why:'no unfilled weekend gap on CME Bitcoin futures right now'};
+  if (!isNum(livePx)) return {label:'CME gap: unknown', tone:'muted', why:'no live BTC price yet'};
+  const near = gaps.slice().sort((a, b) => Math.min(Math.abs(a.lo - livePx), Math.abs(a.hi - livePx)) - Math.min(Math.abs(b.lo - livePx), Math.abs(b.hi - livePx)))[0];
+  const mid = (near.lo + near.hi) / 2, dist = Math.abs(mid - livePx) / livePx * 100, above = mid > livePx;
+  const close = dist <= 2;
+  return {label:close ? 'CME gap nearby' : 'Open CME gap', tone:close ? (above ? 'up' : 'dn') : 'muted',
+    why:`an unfilled CME futures gap sits ${above ? 'above' : 'below'} price around $${Math.round(mid).toLocaleString()} (${dist.toFixed(1)}% away): CME gaps get filled an unusually high share of the time, so that level tends to pull price toward it, especially early in the week`};
+}
+function insurFundBadge(){
+  if (!INSUR.at) return {label:'Insurance fund: unknown', tone:'muted', why:'Bybit insurance-fund data has not loaded yet' + (INSUR.err ? ' (' + INSUR.err + ')' : '')};
+  const chg = histChgPct(INSUR.hist, 21600000);
+  if (chg === null) return {label:'Insurance fund: collecting data', tone:'muted', why:"tracking Bybit's USDT insurance fund since this session opened; a trend needs a bit more time to show"};
+  return chg <= -3 ? {label:'Insurance fund draining', tone:'dn', why:`Bybit's USDT insurance fund is down ${Math.abs(chg).toFixed(1)}% this session: recent liquidations have been one-sided and costly, a sign of stress`}
+    : chg >= 2 ? {label:'Insurance fund growing', tone:'up', why:`Bybit's USDT insurance fund is up ${chg.toFixed(1)}% this session: no large one-sided payouts lately`}
+    : {label:'Insurance fund steady', tone:'muted', why:`Bybit's USDT insurance fund is little changed this session (${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%)`};
+}
+function borrowRateBadge(){
+  const avg = mkAvg([AAVE.usdc, AAVE.usdt]);
+  if (!AAVE.at || avg === null) return {label:'Borrow demand: unknown', tone:'muted', why:'Aave stablecoin borrow rates have not loaded yet' + (AAVE.err ? ' (' + AAVE.err + ')' : '')};
+  const label = avg >= 8 ? 'High borrow demand' : avg >= 4 ? 'Normal borrow demand' : 'Low borrow demand', tone = avg >= 8 ? 'warn' : 'muted';
+  return {label, tone, why:`Aave USDC/USDT borrow cost averages ${avg.toFixed(1)}% a year: ${avg >= 8 ? 'a lot of people are paying up to borrow stablecoins and lever up, often a late-cycle, euphoric sign' : avg >= 4 ? 'normal leverage demand in DeFi' : 'leverage demand in DeFi is quiet'}`};
+}
 function mkCalc(all){
   if (all.length < 5) return null;
   const top = all.slice().sort((a, b) => (b.m.vol24 || 0) - (a.m.vol24 || 0)).slice(0, 60), med = f => mkMed(top.map(f));
@@ -6338,6 +6449,10 @@ function mkCalc(all){
   const bookDepth = bookDepthBadge(bookMed);
   const dxList = top.map(c => c.m.dxRatio).filter(isNum);
   const dexShare = dexShareBadge(mkMed(dxList), dxList.length);
+  const btcLivePx = (state.coins.get('BTC') && state.coins.get('BTC').m && state.coins.get('BTC').m.px) || null;
+  const cmeGap = cmeGapBadge(CME.gaps, btcLivePx);
+  const insurFund = insurFundBadge();
+  const borrowRate = borrowRateBadge();
   let stt, tone, line, act;
   if (manipHi && !(bull >= 3 || bear >= 3)){ stt = 'Manipulation'; tone = 'dn'; line = `Stop-hunt behaviour shows on ${manip.toFixed(0)}% of coins: price spikes through obvious highs and lows, then reverses.`; act = 'Enter only after a sweep and a reclaim is confirmed, and keep stops away from obvious levels.'; }
   else if (dead){ stt = 'Dead'; tone = 'warn'; line = 'Volume is far below normal, so moves are unreliable and easy to fake.'; act = 'Do not take trades. If you must, use half size or less.'; }
@@ -6367,7 +6482,7 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
@@ -12075,6 +12190,7 @@ l2Worker(); bnOiWorker(); whaleWorker(); whHourBoot(); buildX();
 (async () => { await loadCg(); await sleep(2000); await loadTrend(); })();
 loadBinance(); loadMexc(); loadNews(); loadStable(); dropsAuto(); loadLb(); loadOptions(); lqConnect(); setTimeout(lqOkx, 8000); setTimeout(lqBybit, 15000); loadMacro(); loadPf(); setInterval(lsTick, 2500); setInterval(loadMacro, 900000); setInterval(loadPf, 30000); setInterval(sigTick, 10000); loadFng(); loadPred(); loadHlp(); loadVenues(); loadLlama(); loadMarkets(); setInterval(loadFng, 1800000); setInterval(loadPred, 300000); setInterval(fhTick, 4500); setInterval(loadHlp, 120000); setInterval(loadVenues, 30000); setInterval(loadLlama, 1800000); setInterval(dxTick, 3200); ocGlobal(); setInterval(ocGlobal, 600000); setInterval(ocTick, 20000); setInterval(loadMarkets, 600000); setInterval(czTick, 2700); loadCmc(); setInterval(loadCmc, 1800000); setTimeout(ofSync, 6000); setInterval(ofSync, 30000); setInterval(loadOptions, 600000); exfAuto(); setInterval(exfAuto, 120000); eiStart();
 setInterval(loadLb, 1800000); setInterval(loadCg, 300000); setInterval(loadTrend, 600000); setInterval(loadBinance, 90000); setInterval(loadMexc, 90000); setInterval(dropsAuto, 1800000); setInterval(loadNews, 300000); setInterval(loadStable, 900000);
+loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(loadInsurance, 600000); loadAaveBorrow(); setInterval(loadAaveBorrow, 1800000);
 })();
 </script>
 <script>
