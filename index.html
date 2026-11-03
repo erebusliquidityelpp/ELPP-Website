@@ -11310,7 +11310,7 @@ function t10Build(){
       const long = d0 > 0, dir = long ? 'long' : 'short', strong = hasV && (v === 5 || v === 3), sc = isNum(m.verdictScore) ? m.verdictScore : 0;
       const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = isNum(m.dqScore) ? m.dqScore : null;
       const is = rd && rd.sc && isNum(rd.sc.score) ? rd.sc.score : null, fin = rd && rd.fin ? rd.fin : {};
-      const tag = !vdir ? 'INSTITUTIONAL LEAN ONLY - NO COIN VERDICT YET' : strong && (gr.g === 'A' || gr.g === 'B') && !gr.hard.length ? 'STRONG SIGNAL - TRADEABLE' : strong ? 'STRONG VERDICT - NOT CONFIRMED, WAIT' : (gr.g === 'A' || gr.g === 'B') ? 'LEAN WITH CONFIRMATION - WATCH' : 'LEAN ONLY - NOT A TRADE YET';
+      const tag = !vdir ? (hasV ? 'INSTITUTIONAL LEAN ONLY - COIN VERDICT IS ' + LAB[v] : 'INSTITUTIONAL LEAN ONLY - NO COIN VERDICT YET') : strong && (gr.g === 'A' || gr.g === 'B') && !gr.hard.length ? 'STRONG SIGNAL - TRADEABLE' : strong ? 'STRONG VERDICT - NOT CONFIRMED, WAIT' : (gr.g === 'A' || gr.g === 'B') ? 'LEAN WITH CONFIRMATION - WATCH' : 'LEAN ONLY - NOT A TRADE YET';
       const rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
       const V = t10Venues(c), cell = id => { try { const col = cwCols().get(id), r = col && col.cell(c); return r ? String(r[0]).replace(/<[^>]*>/g, '') : ''; } catch(e){ return ''; } };
       const why = (arr, n) => (arr || []).slice(0, n).map(x => (x[0] > 0 ? '+' : '') + x[0] + ' ' + x[1]).join('; ');
