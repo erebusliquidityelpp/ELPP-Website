@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.48</title>
+<title>ELPP CRYPTO SCANNER PRO V4.49</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -146,6 +146,7 @@ button,select,input{font:inherit;color:inherit}
 .mkb-up .mkb-state{color:var(--up)} .mkb-dn .mkb-state{color:var(--down)} .mkb-warn .mkb-state{color:var(--warn)}
 .mkb-grade{margin-left:auto;font:700 11px var(--mono);letter-spacing:.05em;border-radius:5px;padding:2px 10px;border:1px solid var(--line)} .mkb-g-best{color:#fff;background:#0a9f5c;border-color:#0a9f5c} .mkb-g-good{color:#0a9f5c;border-color:#0a9f5c} .mkb-g-sel{color:#b8860b;border-color:#b8860b} .mkb-g-care{color:#e07b00;border-color:#e07b00} .mkb-g-no{color:#fff;background:#d6334a;border-color:#d6334a} .mkb-why{opacity:.75;font-size:12px}
 .mkb-size{margin-left:8px;font:600 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 10px} .mkb-s-full{color:var(--up);border-color:var(--up)} .mkb-s-reduce{color:var(--warn);border-color:var(--warn)} .mkb-s-skip{color:var(--down);border-color:var(--down)}
+.mkb-pill{font:600 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 10px;cursor:default} .mkb-p-up{color:var(--up);border-color:var(--up)} .mkb-p-dn{color:var(--down);border-color:var(--down)} .mkb-p-warn{color:var(--warn);border-color:var(--warn)} .mkb-p-muted{color:var(--muted);border-color:var(--line)}
 .mkb2{font-size:13.5px;line-height:1.45} .mkb3{font-size:13px;line-height:1.45;border-top:1px dashed var(--line);padding-top:6px}
 .mkb4{display:flex;flex-wrap:wrap;gap:6px} .mkb4 span{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:11.5px} .mkb4 em{font-style:normal;color:var(--muted)} .mkb-n{color:var(--muted);margin-left:auto;border:none!important;background:none!important}
 .dkwin{border:1px solid var(--line);border-top:3px solid var(--muted);border-radius:10px;padding:10px 12px;margin-top:10px} .dkwin-long{border-top-color:var(--up)} .dkwin-short{border-top-color:var(--down)}
@@ -521,6 +522,7 @@ td.h{background:color-mix(in srgb,var(--c) calc(var(--a) * 55%),transparent)}
   #mktBar .mkbar{padding:10px 12px!important}
   #mktBar .mkb1{flex-wrap:wrap;gap:6px 8px}
   #mktBar .mkb-size{margin-left:0!important}
+  #mktBar .mkb-pill{margin-left:0!important}
   #mktBar .mkb-grade{margin-left:auto!important}
   #mktBar .mkb2{font-size:13px;line-height:1.45}
   #mktBar .mkb-why{display:none}
@@ -747,7 +749,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.48</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.49</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5007,7 +5009,7 @@ function render(){
   $('sessTxt').textContent = sessionText();
 }
 function renderMarket(all){
-  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} if (!el) return;
+  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; if (!el) return;
   if (all.length < 5){ vd.textContent = 'collecting data…'; vd.className = ''; el.innerHTML = ''; return; }
   const W = (f, wf) => { let a = 0, w = 0; for (const c of all){ const v = f(c), x = wf(c); if (isNum(v) && isNum(x) && x > 0){ a += v * x; w += x; } } return w ? a / w : null; };
   const byVol = c => c.m.vol24;
@@ -5035,6 +5037,7 @@ function renderMarket(all){
   const topList = k => all.filter(c => isNum(c.m[k]) && c.m[k] >= takeMinV()).sort((a,b) => b.m[k] - a.m[k]).slice(0, 4).map(c => c.name + ' ' + c.m[k]).join(', ');
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
   el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p><div class="mkgrid">` +
+    (mk ? card('Liquidity', `<span class="mkb-pill mkb-p-${mk.liq.tone}">${esc(mk.liq.label)}</span>`, esc(mk.liq.why)) + card('Volatility', `<span class="mkb-pill mkb-p-${mk.volt.tone}">${esc(mk.volt.label)}</span>`, esc(mk.volt.why)) + card('Buyers or sellers', `<span class="mkb-pill mkb-p-${mk.press.tone}">${esc(mk.press.label)}</span>`, esc(mk.press.why)) : '') +
     card('BTC', isNum(bt) ? (bt === 1 ? '▲ Uptrend' : bt === -1 ? '▼ Downtrend' : '◆ Consolidating') : '—', bm ? `1h ${sg(bm.chg['1h'])} · 4h ${sg(bm.chg['4h'])} · 1d ${sg(bm.chg['1d'])}` : '') +
     card('Breadth (coins up)', `${pc(b1)} · ${pc(b4)} · ${pc(bd)}`, '1h · 4h · 1d') +
     card('Net money flow', `${sg(f1,0)} · ${sg(f4,0)}`, '1h · 4h, volume-weighted') +
@@ -5976,6 +5979,27 @@ const MK = {last:null};
 function mkWeekend(){ const t = new Date(), d = t.getUTCDay(), h = t.getUTCHours(); return d === 6 || (d === 0 && h < 22) || (d === 5 && h >= 22); }
 const mkMed = a => { a = a.filter(isNum).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
 const mkAvg = a => { a = a.filter(isNum); return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; };
+/* ===== V4.49: Liquidity / Volatility / Buyers-or-sellers badges on the Market Verdict banner and the Market-now panel ===== */
+function liqBadge(vol){
+  return vol === null ? {label:'Liquidity unknown', tone:'muted', why:'not enough volume data yet'}
+    : vol < 0.45 ? {label:'Illiquid', tone:'dn', why:`volume is only ${vol.toFixed(2)}x normal across the busiest coins`}
+    : vol < 0.7 ? {label:'Low liquidity', tone:'warn', why:`volume is ${vol.toFixed(2)}x normal, below the usual range`}
+    : vol < 1.3 ? {label:'Normal liquidity', tone:'muted', why:`volume is ${vol.toFixed(2)}x normal`}
+    : {label:'High liquidity', tone:'up', why:`volume is ${vol.toFixed(2)}x normal, above the usual range`};
+}
+function voltBadge(vx){
+  return vx === null ? {label:'Volatility unknown', tone:'muted', why:'not enough range data yet'}
+    : vx < 0.9 ? {label:'Low volatility', tone:'muted', why:`range is ${vx.toFixed(2)}x normal: price is coiling`}
+    : vx < 1.5 ? {label:'Normal volatility', tone:'muted', why:`range is ${vx.toFixed(2)}x normal`}
+    : vx < 2.2 ? {label:'High volatility', tone:'warn', why:`range is ${vx.toFixed(2)}x normal: moves are bigger than usual`}
+    : {label:'Extreme volatility', tone:'dn', why:`range is ${vx.toFixed(2)}x normal: very large, fast moves`};
+}
+function pressBadge(bull, bear, b4, f4){
+  const flow = isNum(f4) ? `, net money flow ${f4 >= 0 ? '+' : ''}${f4.toFixed(1)}%` : '';
+  return bull > bear ? {label:bull >= 2 ? 'Buyers in control' : 'Buyers lean', tone:'up', why:`${b4.toFixed(0)}% of coins are up on the 4h${flow}`}
+    : bear > bull ? {label:bear >= 2 ? 'Sellers in control' : 'Sellers lean', tone:'dn', why:`${b4.toFixed(0)}% of coins are up on the 4h${flow}`}
+    : {label:'Balanced', tone:'muted', why:`${b4.toFixed(0)}% of coins are up on the 4h: no clear side buying or selling yet`};
+}
 function mkCalc(all){
   if (all.length < 5) return null;
   const top = all.slice().sort((a, b) => (b.m.vol24 || 0) - (a.m.vol24 || 0)).slice(0, 60), med = f => mkMed(top.map(f));
@@ -5991,6 +6015,7 @@ function mkCalc(all){
   const wk = mkWeekend(), thin = vol !== null && vol < 0.7, dead = vol !== null && vol < 0.45, hot = vx !== null && vx >= 1.8;
   const bull = (b4 >= 60) + (bt === 1) + (isNum(f4) && f4 >= 5), bear = (b4 <= 40) + (bt === -1) + (isNum(f4) && f4 <= -5);
   const manipHi = manip >= 40, crowdHi = crowdL >= 45 || crowdS >= 45, chopHi = (chop >= 55 && (er === null || er < 0.30)) || (er !== null && er < 0.18), crowdLow = crowdL < 15 && crowdS < 15;
+  const liq = liqBadge(vol), volt = voltBadge(vx), press = pressBadge(bull, bear, b4, f4);
   let stt, tone, line, act;
   if (manipHi && !(bull >= 3 || bear >= 3)){ stt = 'Manipulation'; tone = 'dn'; line = `Stop-hunt behaviour shows on ${manip.toFixed(0)}% of coins: price spikes through obvious highs and lows, then reverses.`; act = 'Enter only after a sweep and a reclaim is confirmed, and keep stops away from obvious levels.'; }
   else if (dead){ stt = 'Dead'; tone = 'warn'; line = 'Volume is far below normal, so moves are unreliable and easy to fake.'; act = 'Do not take trades. If you must, use half size or less.'; }
@@ -6020,12 +6045,12 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volt, press, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
-  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span></div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
+  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span><span class="mkb-pill mkb-p-${r.liq.tone}" title="${esc(r.liq.why)}">${esc(r.liq.label)}</span><span class="mkb-pill mkb-p-${r.volt.tone}" title="${esc(r.volt.why)}">${esc(r.volt.label)}</span><span class="mkb-pill mkb-p-${r.press.tone}" title="${esc(r.press.why)}">${esc(r.press.label)}</span></div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
 const OPT_GLOSS = [
   ['Option','A contract that gives the right, not the duty, to buy or sell at a fixed price before a date.'],
