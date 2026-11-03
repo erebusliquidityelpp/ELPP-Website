@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.51</title>
+<title>ELPP CRYPTO SCANNER PRO V4.52</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -749,7 +749,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.51</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.52</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5038,7 +5038,9 @@ function renderMarket(all){
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
   const badgeCard = (l, b) => card(l, `<span class="mkb-pill mkb-p-${b.tone}">${esc(b.label)}</span>`, esc(b.why));
   const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare']];
-  el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p><div class="mkgrid">` +
+  el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p>` +
+    (mk && mk.liqVolTip ? `<div class="vbox" style="margin:0 0 10px"><b>Liquidity + volume, together:</b> ${esc(mk.liqVolTip)}</div>` : '') +
+    `<div class="mkgrid">` +
     (mk ? BADGE_ROWS.map(([label, key]) => badgeCard(label, mk[key])).join('') : '') +
     card('BTC', isNum(bt) ? (bt === 1 ? '▲ Uptrend' : bt === -1 ? '▼ Downtrend' : '◆ Consolidating') : '—', bm ? `1h ${sg(bm.chg['1h'])} · 4h ${sg(bm.chg['4h'])} · 1d ${sg(bm.chg['1d'])}` : '') +
     card('Breadth (coins up)', `${pc(b1)} · ${pc(b4)} · ${pc(bd)}`, '1h · 4h · 1d') +
@@ -5990,15 +5992,38 @@ function liqBadge(vol){
     : vol < 1.3 ? {label:'Normal liquidity', tone:'muted', why:`volume is ${vol.toFixed(2)}x normal`}
     : {label:'High liquidity', tone:'up', why:`volume is ${vol.toFixed(2)}x normal, above the usual range`};
 }
-/* ===== V4.51: Volume trend badge (Rising / Flat / Falling) - is volume picking up or fading right now, not just its level ===== */
-function volTrendBadge(volShort, volLong){
-  if (volShort === null || volLong === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet'};
+/* ===== V4.51: Volume trend badge (Rising / Flat / Falling), who it belongs to (buyer-led / seller-led / balanced), and the plain-English Liquidity+Volume-trend read ===== */
+function volTrendBadge(volShort, volLong, f4){
+  if (volShort === null || volLong === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet', dir:'unknown'};
   const ratio = volLong > 0 ? volShort / volLong : null;
-  if (ratio === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet'};
-  const txt = `the last 15m is running ${volShort.toFixed(2)}x its own normal, against ${volLong.toFixed(2)}x on the 4h`;
-  return ratio >= 1.25 ? {label:'Volume rising', tone:'up', why:`${txt}: trading is picking up right now`}
-    : ratio <= 0.75 ? {label:'Volume falling', tone:'dn', why:`${txt}: trading is fading right now`}
-    : {label:'Volume flat', tone:'muted', why:`${txt}: no real change in activity`};
+  if (ratio === null) return {label:'Volume trend unknown', tone:'muted', why:'not enough volume data yet', dir:'unknown'};
+  const side = isNum(f4) && f4 >= 5 ? 'buyer-led' : isNum(f4) && f4 <= -5 ? 'seller-led' : 'balanced';
+  const sideTxt = isNum(f4) ? `, net money flow ${f4 >= 0 ? '+' : ''}${f4.toFixed(1)}% (${side})` : '';
+  const txt = `the last 15m is running ${volShort.toFixed(2)}x its own normal, against ${volLong.toFixed(2)}x on the 4h${sideTxt}`;
+  if (ratio >= 1.25){
+    const label = 'Volume rising' + (side !== 'balanced' ? ` (${side})` : '');
+    const tone = side === 'seller-led' ? 'dn' : side === 'buyer-led' ? 'up' : 'warn';
+    const meaning = side === 'buyer-led' ? 'buyers are driving the extra volume' : side === 'seller-led' ? 'sellers are driving the extra volume' : 'activity is picking up without a clear side yet';
+    return {label, tone, why:`${txt}: ${meaning}`, dir:'rising', side};
+  }
+  if (ratio <= 0.75){
+    const label = 'Volume falling' + (side !== 'balanced' ? ` (${side})` : '');
+    const meaning = side === 'buyer-led' ? 'what volume is left still leans to buyers, but overall trading is fading' : side === 'seller-led' ? 'what volume is left still leans to sellers, but overall trading is fading' : 'trading is fading on both sides';
+    return {label, tone:'muted', why:`${txt}: ${meaning}`, dir:'falling', side};
+  }
+  return {label:'Volume flat' + (side !== 'balanced' ? ` (${side})` : ''), tone:'muted', why:`${txt}: no real change in activity`, dir:'flat', side};
+}
+function liqVolNote(liq, volTrend){
+  if (liq.label === 'Liquidity unknown' || volTrend.dir === 'unknown') return '';
+  const lo = liq.label === 'Illiquid' || liq.label === 'Low liquidity', hi = liq.label === 'High liquidity';
+  if (lo && volTrend.dir === 'rising') return `${liq.label} but volume is rising: liquidity may be returning, watch before committing size.`;
+  if (lo && volTrend.dir === 'falling') return `${liq.label} and fading further: very thin, expect bad fills and avoid size here.`;
+  if (lo) return `${liq.label} with volume holding steady: still thin, trade smaller than usual.`;
+  if (hi && volTrend.dir === 'falling') return `High liquidity but volume is fading off a high base: still tradeable, but losing steam.`;
+  if (hi) return `High liquidity and volume ${volTrend.dir === 'rising' ? 'still rising' : 'steady'}: strong, active conditions.`;
+  if (volTrend.dir === 'rising') return 'Normal liquidity and volume rising: the market is waking up.';
+  if (volTrend.dir === 'falling') return 'Normal liquidity and volume fading: the market is going quiet.';
+  return 'Normal liquidity, volume holding steady: no real change in conditions.';
 }
 function voltBadge(vx){
   return vx === null ? {label:'Volatility unknown', tone:'muted', why:'not enough range data yet'}
@@ -6092,7 +6117,8 @@ function mkCalc(all){
   const bull = (b4 >= 60) + (bt === 1) + (isNum(f4) && f4 >= 5), bear = (b4 <= 40) + (bt === -1) + (isNum(f4) && f4 <= -5);
   const manipHi = manip >= 40, crowdHi = crowdL >= 45 || crowdS >= 45, chopHi = (chop >= 55 && (er === null || er < 0.30)) || (er !== null && er < 0.18), crowdLow = crowdL < 15 && crowdS < 15;
   const liq = liqBadge(vol), volt = voltBadge(vx), press = pressBadge(bull, bear, b4, f4);
-  const volTrend = volTrendBadge(med(c => c.m.rvol && c.m.rvol['15m']), med(c => c.m.rvol && c.m.rvol['4h']));
+  const volTrend = volTrendBadge(med(c => c.m.rvol && c.m.rvol['15m']), med(c => c.m.rvol && c.m.rvol['4h']), f4);
+  const liqVolTip = liqVolNote(liq, volTrend);
   /* V4.50 badges */
   const crowd = crowdBadge(crowdL, crowdS, crowdLow);
   const oiChg1h = mkWavg(top, c => c.m.oiChg && c.m.oiChg['1h'], c => c.m.oiUsd), pxChg1h = mkWavg(top, c => c.m.chg && c.m.chg['1h'], c => c.m.vol24);
@@ -6141,7 +6167,7 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
