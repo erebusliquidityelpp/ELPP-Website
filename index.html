@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.56</title>
+<title>ELPP CRYPTO SCANNER PRO V4.57</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -761,7 +761,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.56</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.57</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1885,21 +1885,22 @@ if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
 const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
-/* ===== V4.56: open any menu page in a new tab, landing straight on it (#view=NAME in the URL) ===== */
-(function(){ try { const m = /(?:^|[#&])view=([a-zA-Z]+)/.exec(location.hash); if (m && VIEW_LIST.includes(m[1])) state.view = m[1]; } catch(e){} })();
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
+function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
 function addMenuTabLinks(){
-  document.querySelectorAll('#side .nv[data-view]').forEach(btn => {
+  const wrapOne = (btn, href) => {
     if (btn.parentElement && btn.parentElement.classList.contains('nv-wrap')) return;
-    const view = btn.dataset.view, wrap = document.createElement('span');
+    const wrap = document.createElement('span');
     wrap.className = 'nv-wrap';
     btn.parentNode.insertBefore(wrap, btn);
     wrap.appendChild(btn);
     const a = document.createElement('a');
-    a.className = 'nv-tab'; a.href = menuTabHref(view); a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.className = 'nv-tab'; a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
     a.title = 'Open "' + btn.textContent.trim() + '" in a new tab'; a.setAttribute('aria-label', a.title); a.textContent = '↗';
     wrap.appendChild(a);
-  });
+  };
+  document.querySelectorAll('#side .nv[data-view]').forEach(btn => wrapOne(btn, menuTabHref(btn.dataset.view)));
+  document.querySelectorAll('#side .nv[data-mode]').forEach(btn => wrapOne(btn, menuTabHrefMode(btn.dataset.mode)));
 }
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
@@ -1912,6 +1913,13 @@ state.tier = Object.assign({mega:'500M', mid:'50M', capMega:'10B', capMid:'1B'},
 state.btcLink = Object.assign({tf:'1h', corr:'0.6'}, state.btcLink || {});
 state.rules = validateRules(state.rules);
 if (!state.rules) loadPreset(state.mode === 'perp' ? state.preset : MODE_PRESET[state.mode]);
+/* ===== V4.56/57: open any menu page - including the Perp scalp/Spot/Swing/Positional/Hype mode tabs - in a new tab, landing straight on it (#view=NAME or #view=table&mode=NAME in the URL). Runs after state.rules/presets are sorted out above so switchMode() has safe data to work with. ===== */
+(function(){
+  try {
+    const m = /(?:^|[#&])view=([a-zA-Z]+)/.exec(location.hash); if (m && VIEW_LIST.includes(m[1])) state.view = m[1];
+    const mm = /(?:^|[#&])mode=([a-zA-Z]+)/.exec(location.hash); if (mm && MODES[mm[1]]){ switchMode(mm[1]); state.view = 'table'; }
+  } catch(e){}
+})();
 function scopeKey(){ return state.mode === 'perp' ? state.scope : state.mode + ':' + state.scope; }
 function defaultPreset(){ return state.mode === 'perp' ? SCOPE_PRESET[state.scope] : MODE_PRESET[state.mode]; }
 function stashScope(){ state.scopes[scopeKey()] = {preset:state.preset, edited:state.edited, minSoft:state.minSoft, aSoft:state.aSoft, rules:state.rules.map(r => ({...r}))}; }
