@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.59</title>
+<title>ELPP CRYPTO SCANNER PRO V4.72</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.71</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.72</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11288,11 +11288,63 @@ function ptCard(r){
     <h4>5. Caution before entry</h4><ul class="ovstory">${cau.map(w => `<li>${esc(w)}</li>`).join('')}</ul>
     <details class="ovd" data-ptfull="${esc(c.name)}"><summary>Full institutional breakdown (score parts, all timeframes)</summary><div class="ptfull"></div></details></details>`;
 }
+
+/* ---------- V4.72: Export best top 10 coins, ranked across every connected exchange, with verdict data and the exchanges that list each coin ---------- */
+function t10Venues(c){
+  const vs = c.vs || {}, rows = Object.entries(vs).filter(x => x[1] && isNum(x[1].mark || x[1].px)).sort((a, b) => (b[1].vol || 0) - (a[1].vol || 0));
+  const px = r => +(r.mark != null ? r.mark : r.px), nm = v => (VN[v] && VN[v].n) || v, ty = v => (VN[v] && VN[v].t) || '';
+  const list = rows.map(([v, r]) => nm(v) + (ty(v) ? ' (' + ty(v) + ')' : '') + ' ' + fmtPx(px(r)) + (isNum(r.vol) ? ' · 24h ' + fmtUsd(r.vol) : '') + (isNum(r.oi) ? ' · OI ' + fmtUsd(r.oi * (px(r) || 1)) : ''));
+  const ps = rows.map(([v, r]) => px(r)).filter(x => x > 0), gap = ps.length > 1 ? (Math.max(...ps) / Math.min(...ps) - 1) * 100 : null;
+  let spot = ''; try { const L = instListed(c); spot = L.full.join(', '); } catch(e){}
+  return {names:rows.map(x => nm(x[0])), list, gap, spot, hl:!!vs.hyperliquid, top:rows.length ? nm(rows[0][0]) : ''};
+}
+function t10Build(){
+  const mk = vcMk(), LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG'], out = [];
+  const live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && isNum(c.m.vol24) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 150);
+  for (const c of live){
+    try {
+      const m = c.m, v = m.verdict; if (!isNum(v)) continue;
+      const long = v >= 4, short = v === 2 || v === 3; if (!long && !short) continue;
+      const dir = long ? 'long' : 'short', strong = v === 5 || v === 3, sc = isNum(m.verdictScore) ? m.verdictScore : 0;
+      const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = isNum(m.dqScore) ? m.dqScore : null;
+      let rd = null; try { rd = instRow(c, 'perp'); } catch(e){}
+      const is = rd && rd.sc && isNum(rd.sc.score) ? rd.sc.score : null, fin = rd && rd.fin ? rd.fin : {};
+      const tag = strong && (gr.g === 'A' || gr.g === 'B') && !gr.hard.length ? 'STRONG SIGNAL - TRADEABLE' : strong ? 'STRONG VERDICT - NOT CONFIRMED, WAIT' : (gr.g === 'A' || gr.g === 'B') ? 'LEAN WITH CONFIRMATION - WATCH' : 'LEAN ONLY - NOT A TRADE YET';
+      const rank = Math.abs(sc) * 0.5 + gr.p * 50 + (strong ? 10 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0) + (is == null ? 0 : (is - 50) / 10);
+      const V = t10Venues(c), cell = id => { try { const col = cwCols().get(id), r = col && col.cell(c); return r ? String(r[0]).replace(/<[^>]*>/g, '') : ''; } catch(e){ return ''; } };
+      const why = (arr, n) => (arr || []).slice(0, n).map(x => (x[0] > 0 ? '+' : '') + x[0] + ' ' + x[1]).join('; ');
+      const notes = []; if (String(c.name).includes(':')) notes.push('HIP-3 market (builder-deployed): thin data, use smaller size'); if (!V.hl) notes.push('Not listed on Hyperliquid: trade it on ' + (V.top || 'another exchange')); if (V.names.length < 2) notes.push('Only one exchange quotes it'); if (dq != null && dq < 45) notes.push('Data quality below 45: scanner says do not trade');
+      out.push({rank, name:c.name, dir, verdict:LAB[v], sc, tag, grade:gr.g, ok:gr.ok, n:gr.n, hard:gr.hard.map(x => x.label).join('; '), is, final:fin.final ? 'FINAL' : fin.building ? 'building' : '', px:m.px, c1h:(m.chg || {})['1h'], c4h:(m.chg || {})['4h'], vol:m.vol24, oi:m.oiUsd, dq, fund:cell('fund8'), pl, lev:c.maxLev, V, long:why(m.vPos, 3), short:why(m.vNeg, 3), flags:(m.vFlags || []).join('; '), notes:notes.join('; '), fails:chk.filter(x => x.st === 'bad').map(x => x.label + ' (' + x.why + ')').join('; ')});
+    } catch(e){}
+  }
+  out.sort((a, b) => b.rank - a.rank);
+  return {top:out.slice(0, 10), total:live.length, cand:out.length};
+}
+function t10Csv(){
+  const D = t10Build(), now = new Date(), r = [], add = a => r.push(a.map(csvCell).join(',')), P = x => isNum(x) ? fmtPx(x) : '', pc = x => isNum(x) ? (x > 0 ? '+' : '') + x.toFixed(2) + '%' : '';
+  add(['ELPP Crypto Scanner Pro export']); add(['Page', 'Best top 10 coins (all exchanges)']); add(['Exported (UTC)', now.toISOString()]); add(['Exported (Pakistan time)', now.toLocaleString('en-GB', {timeZone:'Asia/Karachi', hour12:false}) + ' PKT']); add(['Version', (document.querySelector('.v4b') || {}).textContent || '']); add(['Data source', ($('venueSel') || {}).selectedOptions ? $('venueSel').selectedOptions[0].textContent : '']);
+  add(['Coins scanned', D.total + ' with live data, ' + D.cand + ' with a long or short verdict']);
+  add(['How ranked', 'Verdict strength (half the score) + signal-quality grade + strong-verdict bonus - blocker penalty + data-quality adjustment + institutional score + reward-to-risk bonus. A coin with data quality under 45 is pushed down. Preparation only, not a signal.']);
+  add([]); add(['# BEST TOP 10 (ranked)']);
+  add(['Rank', 'Coin', 'Side', 'Scanner verdict', 'Verdict score', 'Status', 'Signal quality', 'Checks met', 'Blockers', 'Institutional score', 'Final/building', 'Price', '1h', '4h', '24h volume (all exchanges)', 'Open interest', 'Data quality', 'Funding / 8h', 'Entry', 'Stop', 'Stop %', 'TP1', 'R:R TP1', 'TP2', 'R:R TP2', 'Max leverage (scanner plan)', 'Max leverage (exchange)', 'Exchanges (perp, by volume)', 'Listed on (incl. spot)', 'Number of exchanges', 'Price gap between exchanges', 'Trade it on', 'Why long', 'Why short', 'Failed checks', 'Cautions', 'Notes']);
+  D.top.forEach((x, i) => { const pl = x.pl && x.pl.dir === x.dir ? x.pl : null; add([i + 1, x.name, x.dir.toUpperCase(), x.verdict, x.sc, x.tag, x.grade, x.ok + '/' + x.n, x.hard, x.is == null ? '' : x.is + '/100', x.final, P(x.px), pc(x.c1h), pc(x.c4h), isNum(x.vol) ? fmtUsd(x.vol) : '', isNum(x.oi) ? fmtUsd(x.oi) : '', x.dq == null ? '' : x.dq + '/100', x.fund, pl ? P(pl.entry) : '', pl ? P(pl.sl) : '', pl ? ((pl.sl / pl.entry - 1) * 100).toFixed(2) + '%' : '', pl ? P(pl.tp1) : '', pl ? pl.rr1.toFixed(1) : '', pl ? P(pl.tp2) : '', pl ? pl.rr2.toFixed(1) : '', pl && pl.lev ? pl.lev + 'x' : '', x.lev ? x.lev + 'x' : '', x.V.list.join(' | '), x.V.spot, x.V.names.length, x.V.gap == null ? '' : x.V.gap.toFixed(2) + '%', x.V.hl ? 'Hyperliquid (and ' + (x.V.names.filter(n => n !== 'Hyperliquid').join(', ') || 'no other') + ')' : x.V.top, x.long, x.short, x.fails, x.flags, x.notes]); });
+  add([]);
+  try { const B = ptBackdrop(); if (B.length){ add(['# MARKET BACKDROP']); for (const b of B) add([b.t]); } } catch(e){}
+  return {text:'﻿' + r.join('\r\n'), n:D.top.length};
+}
+function t10Run(kind){
+  try {
+    const o = t10Csv(); if (!o.n){ toast('No coin has a long or short verdict yet. Wait for the scanner to warm up, then try again.'); return; }
+    if (kind === 'copy'){ const pre = 'This is data exported from my ELPP crypto scanner, page "Best top 10 coins (all exchanges)". It lists the ten best coins across every connected exchange, with the verdict, signal quality, trade plan and the exchanges that list each coin. Please tell me which 3 I should pick and why, point out risks, and what I should check next.\r\n\r\n'; const txt = pre + o.text.replace('﻿', ''); (navigator.clipboard ? navigator.clipboard.writeText(txt).then(() => toast('Copied the top 10. Paste it into Claude.'), () => toast('Copy blocked: use Export best top 10')) : toast('Copy not supported: use Export best top 10')); return; }
+    const d = new Date(), p2 = n => String(n).padStart(2, '0'); jrDownload('ELPP-top10-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.csv', o.text, 'text/csv;charset=utf-8'); toast('Downloaded the best top ' + o.n + ' coins');
+  } catch(e){ toast('Top 10 export failed: ' + errTxt(e)); }
+}
+window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
 function ptHtml(){
   ptLoad(); const B = ptBackdrop(), D = ptBuild(), list = D.list; if (list[0]) list[0].first = true; try { x9Want(list.filter(r => r.c).map(r => r.c.name).slice(0, 20)); } catch(e){}
   const bd = B.length ? `<div class="nsec"><h3>1. Read the backdrop first</h3><p class="hint">Before looking at any coin, know what the market around it is doing.</p><ul class="ovstory">${B.map(b => `<li class="${b.k === 'up' ? 'up' : b.k === 'dn' ? 'dn' : ''}"><b>${esc(b.t)}</b><br><span class="hint">${esc(b.why)}</span></li>`).join('')}</ul></div>` : '';
   const sel = (k, v, t) => `<button type="button" class="btn sm${PT[k] === v ? ' primary' : ''}" data-ptset="${k}:${v}">${t}</button>`;
-  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Pre-trade preparation</h3><button class="btn sm" type="button" id="ptRefresh">↻ Re-scan now</button></div>
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Pre-trade preparation</h3><span class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" id="ptTop10" title="Download the ten best coins across all exchanges, with verdict data and the exchanges that list each coin">⬇ Export best top 10</button><button class="btn sm" type="button" id="ptTop10c" title="Copy the top 10 as text to paste into Claude, ChatGPT or Gemini">Copy top 10 for AI</button><button class="btn sm" type="button" id="ptRefresh">↻ Re-scan now</button></span></div>
     <p class="hint" style="margin:6px 0 8px">The scanner prepares your watchlist for you. It ranks every liquid coin by institutional evidence, then writes the full preparation for the best ones: why it is interesting, every institutional data point with its meaning, what still has to confirm, a liquidity-based plan, and the cautions. Go through it before the session, then wait for the 15m confirmation to trigger. It is preparation, never a signal on its own.</p>
     <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center"><span class="hint">Coins:</span>${[5, 8, 12].map(v => sel('n', v, v)).join('')}<span class="hint" style="margin-left:8px">Side:</span>${sel('side', 'all', 'All')}${sel('side', 'long', 'Longs')}${sel('side', 'short', 'Shorts')}
     <input type="text" id="ptAdd" placeholder="Add your own coin, e.g. SOL" style="width:190px;margin-left:8px"><button class="btn sm" type="button" id="ptAddBtn">Add</button></div>
@@ -11307,6 +11359,8 @@ function renderPrep(){
     el._built = true;
     el.addEventListener('click', e => {
       const T = e.target, c = s => T.closest(s); let b;
+      if (c('#ptTop10')){ t10Run('dl'); return; }
+      if (c('#ptTop10c')){ t10Run('copy'); return; }
       if (c('#ptRefresh')){ PT.at = 0; renderPrep(); return; }
       if ((b = c('[data-ptset]'))){ const [k, v] = b.dataset.ptset.split(':'); PT[k] = k === 'n' ? +v : v; ptSave(); PT.at = 0; renderPrep(); return; }
       if (c('#ptAddBtn')){ const v = normSym(($('ptAdd').value || '').trim().toUpperCase()); if (v){ if (!PT.pins.includes(v)) PT.pins.unshift(v); ptSave(); PT.at = 0; renderPrep(); } return; }
