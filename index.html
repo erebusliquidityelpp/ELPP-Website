@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.54</title>
+<title>ELPP CRYPTO SCANNER PRO V4.55</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -83,9 +83,12 @@ button,select,input{font:inherit;color:inherit}
 .cw-verdict{font-size:26px;font-weight:800;letter-spacing:.02em}
 .cw-main{display:grid;grid-template-columns:minmax(0,3fr) minmax(300px,2fr);gap:12px;margin-top:10px}
 .cw-chart iframe{width:100%;height:64dvh;min-height:380px;border:0;border-radius:8px;background:var(--surface)}
-.cs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:10px}
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(440px,100%),1fr));gap:10px}
 .cs-pane{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
-.cs-pane-h{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--line)}
+.cs-pane-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;padding:6px 8px}
+.cs-pane-h .cspX{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+.cs-pane-h+.cspCorr,.cspCorr+.cspSug{margin-bottom:4px}
+.cspSug:not(:empty),.cspCorr:not(:empty){padding-bottom:4px}
 .cs-pane-h b{font:600 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .cs-pane iframe{width:100%;height:46dvh;min-height:320px;border:0;display:block;background:var(--surface)}
 .cw-side>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--surface)}
@@ -754,7 +757,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.54</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.55</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5492,105 +5495,132 @@ function lkDraw(){
   if ($('lkPlan')._h !== ph){ $('lkPlan')._h = ph; $('lkPlan').innerHTML = ph; } if ($('lkFlow')._h !== fh){ $('lkFlow')._h = fh; $('lkFlow').innerHTML = fh; }
   if (col._g !== gh){ col._g = gh; for (const x of [...col.children]) if (x.tagName === 'SECTION') x.remove(); col.insertAdjacentHTML('beforeend', gh); }
 }
-/* ===== V4.53: Charts page - a permanent TradingView chart for any coin, as its own menu instead of a per-coin popup ===== */
-const CS = {name:null, mode:'single', tfs:['15','60','240','D']};
+/* ===== V4.55: Charts page - up to 10 independent TradingView panes, each with its own coin, exchange, timeframe and drawing-tools toggle, plus an "open in new tab" link on every chart surface ===== */
+const CS_MAX = 10, CS_TF_OPTS = [['5','5m'],['15','15m'],['60','1h'],['240','4h'],['D','1D']];
+const CS = {panes:[]};
 function csPool(){ return [...state.coins.values()].filter(c => c.ctx).map(c => c.name); }
 function csFindSug(q){
   const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
   const pool = csPool();
   return pool.filter(n => n.includes(sym)).sort((a, b) => (a.startsWith(sym) ? 0 : 1) - (b.startsWith(sym) ? 0 : 1) || a.length - b.length).slice(0, 8);
 }
-function csUrl(venue, iv, compact){
-  const c = state.coins.get(CS.name) || X.cgObj.get(CS.name); if (!c) return '';
-  const sym = tvSymbol(venue, c);
-  const studies = JSON.stringify(compact ? ['Volume@tv-basicstudies'] : ['Volume@tv-basicstudies', 'MASimple@tv-basicstudies', 'RSI@tv-basicstudies']);
-  return 'https://s.tradingview.com/widgetembed/?' + `symbol=${encodeURIComponent(sym)}&interval=${iv}&theme=${isDark() ? 'dark' : 'light'}&style=1&timezone=${encodeURIComponent('Asia/Karachi')}&withdateranges=1&hidesidetoolbar=0&hide_side_toolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=1&hideideas=1&studies=${encodeURIComponent(studies)}&locale=en`;
+function csVenueFor(c){
+  if (!c) return 'COINBASE|usd';
+  const k = normSym(c.name);
+  return X.bnFut.has(k) || (c.ctx && !X.bnAt) ? 'BINANCE|perp' : X.bnSpot.has(k) ? 'BINANCE|spot' : 'COINBASE|usd';
+}
+function csNewPane(copyFrom){
+  if (copyFrom) return {name:copyFrom.name, venue:copyFrom.venue, iv:copyFrom.iv, tb:copyFrom.tb};
+  const c = state.coins.get('BTC');
+  return {name:c ? 'BTC' : (csPool()[0] || null), venue:csVenueFor(c), iv:'15', tb:true};
+}
+function csPaneSrc(p){
+  if (!p.name) return '';
+  const c = state.coins.get(p.name) || X.cgObj.get(p.name); if (!c) return '';
+  const sym = tvSymbol(p.venue, c);
+  const studies = JSON.stringify(['Volume@tv-basicstudies']);
+  const tb = p.tb ? 0 : 1;
+  return 'https://s.tradingview.com/widgetembed/?' + `symbol=${encodeURIComponent(sym)}&interval=${p.iv}&theme=${isDark() ? 'dark' : 'light'}&style=1&timezone=${encodeURIComponent('Asia/Karachi')}&withdateranges=1&hidesidetoolbar=${tb}&hide_side_toolbar=${tb}&hidetoptoolbar=0&symboledit=1&saveimage=1&hideideas=1&studies=${encodeURIComponent(studies)}&locale=en`;
+}
+function csPaneTvUrl(p){
+  const c = state.coins.get(p.name) || X.cgObj.get(p.name); if (!c) return '';
+  return 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSymbol(p.venue, c)) + '&interval=' + p.iv;
 }
 function csCorrHtml(c){
   if (!c || !c.m) return '';
-  if (c.name === 'BTC') return 'This is BTC itself, so there is nothing to compare it against.';
+  if (c.name === 'BTC') return 'This is BTC itself.';
   const r = c.m.corr && isNum(c.m.corr['1h']) ? c.m.corr['1h'] : null, beta = isNum(c.m.beta) ? c.m.beta : null;
   if (r === null) return 'Correlation to BTC: not enough data yet.';
-  const read = r >= 0.7 ? 'moves closely with BTC' : r <= 0.3 ? 'is moving mostly on its own' : 'has a middling link to BTC';
-  return `Correlation to BTC (1h): <b>${r.toFixed(2)}</b> — ${read}${beta !== null ? ' · beta ' + beta.toFixed(2) : ''}. To compare it on the chart directly, use the chart's own "Compare" tool (top toolbar) and add BTC.`;
+  const read = r >= 0.7 ? 'moves closely with BTC' : r <= 0.3 ? 'moving mostly on its own' : 'middling link to BTC';
+  return `Correlation to BTC (1h): <b>${r.toFixed(2)}</b> — ${read}${beta !== null ? ' · beta ' + beta.toFixed(2) : ''}`;
 }
-function csSaveState(){ state.cs = {name:CS.name, venue:$('csVenue').value, iv:$('csIv').value, mode:CS.mode, tfs:CS.tfs.slice()}; saveState(); }
-function csLoad(){
-  if (!CS.name) return;
-  const c = state.coins.get(CS.name) || X.cgObj.get(CS.name); if (!c) return;
-  const venue = $('csVenue').value, iv = $('csIv').value;
-  $('csTitle').textContent = c.name + (c.cg ? ' · ' + (c.cg.name || '') : '') + (c.ctx ? ' · Hyperliquid perp' : '');
-  $('csCorr').innerHTML = csCorrHtml(c);
-  $('csExt').href = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSymbol(venue, c)) + '&interval=' + iv;
-  if (CS.mode === 'grid') csLoadGrid(); else { $('csFrame').src = csUrl(venue, iv); }
+function csSaveState(){ state.cs = {panes:CS.panes.map(p => ({...p}))}; saveState(); }
+function csPaneHeadHtml(i, p){
+  const c = p.name ? (state.coins.get(p.name) || X.cgObj.get(p.name)) : null;
+  return `<div class="cs-pane-h" data-pi="${i}">
+    <b>${i + 1}</b>
+    <input type="text" class="cspIn" data-pi="${i}" value="${p.name ? esc(p.name) : ''}" placeholder="Coin" autocomplete="off" style="width:78px;font-family:var(--mono);text-transform:uppercase">
+    <select class="cspVenue" data-pi="${i}" aria-label="Exchange for pane ${i + 1}">${TV_HOSTS.map(([ex, kind, lab]) => `<option value="${ex}|${kind}"${ex + '|' + kind === p.venue ? ' selected' : ''}>${lab}</option>`).join('')}</select>
+    <select class="cspIv" data-pi="${i}" aria-label="Timeframe for pane ${i + 1}">${CS_TF_OPTS.map(([v, l]) => `<option value="${v}"${v === p.iv ? ' selected' : ''}>${l}</option>`).join('')}</select>
+    <label class="hint" style="display:flex;align-items:center;gap:3px;white-space:nowrap"><input type="checkbox" class="cspTb" data-pi="${i}"${p.tb ? ' checked' : ''}> Tools</label>
+    <a href="${esc((p.name && csPaneTvUrl(p)) || '#')}" class="cspTab" data-pi="${i}" target="_blank" rel="noopener noreferrer" title="Open this pane in a new tab" style="color:var(--accent);white-space:nowrap">↗ New tab</a>
+    <button type="button" class="x cspX" data-pi="${i}" aria-label="Remove pane ${i + 1}" title="Remove this pane">×</button>
+  </div>
+  <div class="hint cspCorr" data-pi="${i}" style="padding:0 8px">${c ? csCorrHtml(c) : ''}</div>
+  <div class="cspSug hint" data-pi="${i}" style="padding:0 8px"></div>`;
+}
+function csPaneHtml(i, p){
+  return `<div class="cs-pane">${csPaneHeadHtml(i, p)}<iframe id="csFrame${i}" title="TradingView chart, pane ${i + 1}" src="${esc(csPaneSrc(p))}" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>`;
+}
+function csRenderAll(){
+  const wrap = $('csGridWrap'); if (!wrap) return;
+  wrap.innerHTML = CS.panes.map((p, i) => csPaneHtml(i, p)).join('');
+  $('csCount').textContent = CS.panes.length + ' / ' + CS_MAX;
+  $('csAddPane').disabled = CS.panes.length >= CS_MAX;
   csSaveState();
 }
-function csLoadGrid(){
-  if (!CS.name) return;
-  const venue = $('csVenue').value;
-  CS.tfs.forEach((tf, i) => { const f = $('csFrame' + i); if (f) f.src = csUrl(venue, tf, true); });
+function csRefreshPaneHead(i){
+  const p = CS.panes[i], head = document.querySelector(`.cs-pane-h[data-pi="${i}"]`); if (!head) return;
+  const outer = head.parentElement, rest = csPaneHeadHtml(i, p);
+  const frame = outer.querySelector('iframe');
+  outer.innerHTML = rest + frame.outerHTML;
 }
-function csSetMode(mode){
-  CS.mode = mode;
-  $('csModeSingle').classList.toggle('on', mode === 'single'); $('csModeGrid').classList.toggle('on', mode === 'grid');
-  $('csSingleWrap').hidden = mode !== 'single'; $('csGridWrap').hidden = mode !== 'grid'; $('csIv').disabled = mode === 'grid';
-  if (mode === 'grid') csLoadGrid(); else csLoad();
+function csReloadPane(i, fullHeadRefresh){
+  const p = CS.panes[i]; if (!p) return;
+  const f = $('csFrame' + i); if (f) f.src = csPaneSrc(p);
+  if (fullHeadRefresh) csRefreshPaneHead(i);
+  else { const corr = document.querySelector(`.cspCorr[data-pi="${i}"]`); if (corr){ const c = p.name ? (state.coins.get(p.name) || X.cgObj.get(p.name)) : null; corr.innerHTML = c ? csCorrHtml(c) : ''; } }
   csSaveState();
 }
-function csPick(name){
+function csPanePick(i, name){
   const c = state.coins.get(name) || X.cgObj.get(name); if (!c) return;
-  CS.name = c.name; $('csIn').value = c.name; $('csSug').innerHTML = '';
-  const k = normSym(c.name), def = X.bnFut.has(k) || (c.ctx && !X.bnAt) ? 'BINANCE|perp' : X.bnSpot.has(k) ? 'BINANCE|spot' : 'COINBASE|usd';
-  $('csVenue').innerHTML = TV_HOSTS.map(([ex, kind, lab]) => `<option value="${ex}|${kind}"${ex + '|' + kind === def ? ' selected' : ''}>${lab}</option>`).join('');
-  csLoad();
+  const p = CS.panes[i]; p.name = c.name; p.venue = csVenueFor(c);
+  const sug = document.querySelector(`.cspSug[data-pi="${i}"]`); if (sug) sug.innerHTML = '';
+  csReloadPane(i, true);
 }
-const CS_TF_OPTS = [['5','5m'],['15','15m'],['60','1h'],['240','4h'],['D','1D']];
-function csPaneHtml(i){
-  return `<div class="cs-pane"><div class="cs-pane-h"><b>Pane ${i + 1}</b><select data-cstf="${i}" aria-label="Timeframe for pane ${i + 1}">${CS_TF_OPTS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></div><iframe id="csFrame${i}" title="TradingView chart, pane ${i + 1}" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>`;
+function csAddPane(){
+  if (CS.panes.length >= CS_MAX) return;
+  CS.panes.push(csNewPane(CS.panes[CS.panes.length - 1]));
+  csRenderAll();
+}
+function csRemovePane(i){
+  if (CS.panes.length <= 1) return;
+  CS.panes.splice(i, 1);
+  csRenderAll();
 }
 function renderCharts(){
   const el = $('viewCharts'); if (!el) return;
   if (!el._built){
     el._built = true;
     el.innerHTML = `<div class="nsec"><h3>Charts: full technical analysis, built in</h3>
-      <p class="hint">Pick any coin, pick the exchange and timeframe, and use TradingView's own drawing tools, indicators and compare/correlation overlay — right here, nothing else to open. Switch to "4 timeframes" to see several timeframes of the same coin at once, no switching back and forth.</p>
-      <div class="row"><input type="text" id="csIn" placeholder="Type a coin symbol (e.g. BTC, SOL, DOGE)" autocomplete="off" style="flex:1 1 220px"><button class="btn" id="csGo" type="button">Go</button></div>
-      <p class="hint" id="csSug"></p>
-      <div class="row" style="margin-top:4px"><select id="csVenue" aria-label="Exchange"></select><select id="csIv" aria-label="Timeframe">${CS_TF_OPTS.map(([v, l]) => `<option value="${v}"${v === '15' ? ' selected' : ''}>${l}</option>`).join('')}</select><button class="btn sm scope on" id="csModeSingle" type="button">1 chart</button><button class="btn sm scope" id="csModeGrid" type="button">4 timeframes</button><a class="btn sm" id="csExt" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open in TradingView</a><button class="btn sm" id="csFull" type="button">Full coin window (plan, order flow, signals)</button></div>
-      <h4 id="csTitle" style="margin:10px 0 2px"></h4>
-      <p class="hint" id="csCorr"></p>
-      <div id="csSingleWrap" class="cw-chart"><iframe id="csFrame" title="TradingView chart" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
-      <div id="csGridWrap" class="cs-grid" hidden>${[0, 1, 2, 3].map(csPaneHtml).join('')}</div>
-      <p class="hint">If a chart stays blank, TradingView may be blocked on your network. The drawing toolbar on the left can be hidden by TradingView itself on a narrow phone screen — turn the phone sideways or use a wider window to see it. Drawings you make here are not saved between visits.</p></div>`;
-    const doSearch = () => {
-      const q = $('csIn').value, sug = csFindSug(q);
-      if (q && sug.length && sug[0].toUpperCase() === q.toUpperCase().replace(/[\s$]/g, '')){ csPick(sug[0]); return; }
-      $('csSug').innerHTML = sug.length ? 'Did you mean: ' + sug.map(n => `<a href="#" data-pick="${esc(n)}" style="color:var(--accent)">${esc(n)}</a>`).join(', ') : (q ? 'No coin matches "' + esc(q) + '".' : '');
-    };
-    el.addEventListener('input', e => { if (e.target.id === 'csIn') doSearch(); });
-    el.addEventListener('keydown', e => { if (e.target.id === 'csIn' && e.key === 'Enter'){ const sug = csFindSug(e.target.value); if (sug.length) csPick(sug[0]); } });
+      <p class="hint">Up to ${CS_MAX} independent TradingView charts, side by side — each with its own coin, exchange, timeframe and drawing tools, exactly like a single chart. Compare different coins, or the same coin on different timeframes, all at once. "Tools" shows or hides that pane's drawing toolbar to save space; "↗ New tab" opens that exact chart on tradingview.com.</p>
+      <div class="row"><span class="hint">Panes: <b id="csCount"></b></span><button class="btn sm" id="csAddPane" type="button">+ Add pane</button></div>
+      <div id="csGridWrap" class="cs-grid"></div>
+      <p class="hint">If a chart stays blank, TradingView may be blocked on your network. TradingView can still auto-hide a pane's toolbar on a narrow phone screen even with "Tools" checked — turn the phone sideways or use a wider window to force it open. Drawings you make here are not saved between visits.</p></div>`;
+    el.addEventListener('input', e => {
+      const i = e.target.dataset.pi; if (i === undefined || !e.target.classList.contains('cspIn')) return;
+      const sug = csFindSug(e.target.value), box = document.querySelector(`.cspSug[data-pi="${i}"]`); if (!box) return;
+      box.innerHTML = sug.length ? 'Did you mean: ' + sug.map(n => `<a href="#" data-pick="${esc(n)}" data-pi="${i}" style="color:var(--accent)">${esc(n)}</a>`).join(', ') : (e.target.value ? 'No coin matches.' : '');
+    });
+    el.addEventListener('keydown', e => {
+      if (!e.target.classList.contains('cspIn') || e.key !== 'Enter') return;
+      const i = +e.target.dataset.pi, sug = csFindSug(e.target.value); if (sug.length) csPanePick(i, sug[0]);
+    });
     el.addEventListener('click', e => {
-      const p = e.target.closest('[data-pick]'); if (p){ csPick(p.dataset.pick); return; }
-      if (e.target.closest('#csGo')){ const sug = csFindSug($('csIn').value); if (sug.length) csPick(sug[0]); return; }
-      if (e.target.closest('#csFull')){ if (CS.name) openChart(CS.name); return; }
-      if (e.target.closest('#csModeSingle')){ csSetMode('single'); return; }
-      if (e.target.closest('#csModeGrid')){ csSetMode('grid'); return; }
+      const pick = e.target.closest('[data-pick]'); if (pick){ e.preventDefault(); csPanePick(+pick.dataset.pi, pick.dataset.pick); return; }
+      if (e.target.closest('#csAddPane')){ csAddPane(); return; }
+      const rm = e.target.closest('.cspX'); if (rm){ csRemovePane(+rm.dataset.pi); return; }
     });
     el.addEventListener('change', e => {
-      if (e.target.id === 'csVenue' || e.target.id === 'csIv') csLoad();
-      else if (e.target.dataset.cstf !== undefined){ CS.tfs[+e.target.dataset.cstf] = e.target.value; csLoadGrid(); csSaveState(); }
+      const i = e.target.dataset.pi; if (i === undefined) return; const idx = +i, p = CS.panes[idx]; if (!p) return;
+      if (e.target.classList.contains('cspVenue')){ p.venue = e.target.value; csReloadPane(idx); }
+      else if (e.target.classList.contains('cspIv')){ p.iv = e.target.value; csReloadPane(idx); }
+      else if (e.target.classList.contains('cspTb')){ p.tb = e.target.checked; csReloadPane(idx); }
     });
     const sv = state.cs || {};
-    const start = (sv.name && (state.coins.get(sv.name) || X.cgObj.get(sv.name))) ? sv.name : (state.coins.get('BTC') ? 'BTC' : (csPool()[0] || null));
-    if (Array.isArray(sv.tfs) && sv.tfs.length === 4) CS.tfs = sv.tfs.slice();
-    [...el.querySelectorAll('[data-cstf]')].forEach((s, i) => { s.value = CS.tfs[i]; });
-    if (start){
-      csPick(start);
-      if (sv.iv) $('csIv').value = sv.iv;
-      if (sv.venue && [...$('csVenue').options].some(o => o.value === sv.venue)) $('csVenue').value = sv.venue;
-      if (sv.mode === 'grid') csSetMode('grid'); else csLoad();
-    }
-  } else if (!CS.name && state.coins.get('BTC')) csPick('BTC');
+    CS.panes = (Array.isArray(sv.panes) && sv.panes.length) ? sv.panes.slice(0, CS_MAX).map(p => ({name:p.name || null, venue:p.venue || 'BINANCE|perp', iv:p.iv || '15', tb:p.tb !== false})) : [csNewPane(), csNewPane({name:'BTC', venue:csVenueFor(state.coins.get('BTC')), iv:'60', tb:true}), csNewPane({name:'BTC', venue:csVenueFor(state.coins.get('BTC')), iv:'240', tb:true}), csNewPane({name:'BTC', venue:csVenueFor(state.coins.get('BTC')), iv:'D', tb:true})];
+    csRenderAll();
+  }
 }
 function renderLookup(){
   const el = $('viewLookup'); if (!el) return;
