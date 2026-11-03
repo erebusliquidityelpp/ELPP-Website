@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.49</title>
+<title>ELPP CRYPTO SCANNER PRO V4.50</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -749,7 +749,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.49</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.50</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5036,8 +5036,10 @@ function renderMarket(all){
   vd.textContent = verdict; vd.className = cls;
   const topList = k => all.filter(c => isNum(c.m[k]) && c.m[k] >= takeMinV()).sort((a,b) => b.m[k] - a.m[k]).slice(0, 4).map(c => c.name + ' ' + c.m[k]).join(', ');
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
+  const badgeCard = (l, b) => card(l, `<span class="mkb-pill mkb-p-${b.tone}">${esc(b.label)}</span>`, esc(b.why));
+  const BADGE_ROWS = [['Liquidity','liq'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare']];
   el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p><div class="mkgrid">` +
-    (mk ? card('Liquidity', `<span class="mkb-pill mkb-p-${mk.liq.tone}">${esc(mk.liq.label)}</span>`, esc(mk.liq.why)) + card('Volatility', `<span class="mkb-pill mkb-p-${mk.volt.tone}">${esc(mk.volt.label)}</span>`, esc(mk.volt.why)) + card('Buyers or sellers', `<span class="mkb-pill mkb-p-${mk.press.tone}">${esc(mk.press.label)}</span>`, esc(mk.press.why)) : '') +
+    (mk ? BADGE_ROWS.map(([label, key]) => badgeCard(label, mk[key])).join('') : '') +
     card('BTC', isNum(bt) ? (bt === 1 ? '▲ Uptrend' : bt === -1 ? '▼ Downtrend' : '◆ Consolidating') : '—', bm ? `1h ${sg(bm.chg['1h'])} · 4h ${sg(bm.chg['4h'])} · 1d ${sg(bm.chg['1d'])}` : '') +
     card('Breadth (coins up)', `${pc(b1)} · ${pc(b4)} · ${pc(bd)}`, '1h · 4h · 1d') +
     card('Net money flow', `${sg(f1,0)} · ${sg(f4,0)}`, '1h · 4h, volume-weighted') +
@@ -5979,6 +5981,7 @@ const MK = {last:null};
 function mkWeekend(){ const t = new Date(), d = t.getUTCDay(), h = t.getUTCHours(); return d === 6 || (d === 0 && h < 22) || (d === 5 && h >= 22); }
 const mkMed = a => { a = a.filter(isNum).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
 const mkAvg = a => { a = a.filter(isNum); return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; };
+const mkWavg = (list, f, wf) => { let a = 0, w = 0; for (const c of list){ const v = f(c), x = wf(c); if (isNum(v) && isNum(x) && x > 0){ a += v * x; w += x; } } return w ? a / w : null; };
 /* ===== V4.49: Liquidity / Volatility / Buyers-or-sellers badges on the Market Verdict banner and the Market-now panel ===== */
 function liqBadge(vol){
   return vol === null ? {label:'Liquidity unknown', tone:'muted', why:'not enough volume data yet'}
@@ -6000,6 +6003,69 @@ function pressBadge(bull, bear, b4, f4){
     : bear > bull ? {label:bear >= 2 ? 'Sellers in control' : 'Sellers lean', tone:'dn', why:`${b4.toFixed(0)}% of coins are up on the 4h${flow}`}
     : {label:'Balanced', tone:'muted', why:`${b4.toFixed(0)}% of coins are up on the 4h: no clear side buying or selling yet`};
 }
+/* ===== V4.50: nine more market-state badges, same shared-helper pattern as V4.49 ===== */
+function crowdBadge(crowdL, crowdS, crowdLow){
+  return crowdL >= 45 ? {label:'Crowded longs', tone:'warn', why:`${crowdL.toFixed(0)}% of coins have the long side crowded (funding): squeeze-down risk`}
+    : crowdS >= 45 ? {label:'Crowded shorts', tone:'warn', why:`${crowdS.toFixed(0)}% of coins have the short side crowded (funding): squeeze-up risk`}
+    : crowdLow ? {label:'Thin positioning', tone:'muted', why:'few traders are positioned either way: little fuel for a big move'}
+    : {label:'Neutral positioning', tone:'muted', why:`long ${crowdL.toFixed(0)}% · short ${crowdS.toFixed(0)}% crowded: no squeeze fuel built up`};
+}
+function oiBadge(oiChg, pxChg){
+  if (oiChg === null || pxChg === null) return {label:'OI trend unknown', tone:'muted', why:'not enough open-interest data yet'};
+  const oiTxt = `open interest ${oiChg >= 0 ? '+' : ''}${oiChg.toFixed(1)}% in 1h, price ${pxChg >= 0 ? '+' : ''}${pxChg.toFixed(2)}%`;
+  if (oiChg >= 3 && pxChg >= 0.4) return {label:'Longs building', tone:'up', why:oiTxt + ': fresh money is buying, the move looks real'};
+  if (oiChg >= 3 && pxChg <= -0.4) return {label:'Shorts building', tone:'dn', why:oiTxt + ': fresh money is selling, the move looks real'};
+  if (oiChg >= 3) return {label:'Squeeze loading', tone:'warn', why:oiTxt + ': positions are piling in while price goes nowhere, a flush can follow'};
+  if (oiChg <= -3) return {label:'Positions unwinding', tone:'muted', why:oiTxt + ': traders are closing out, the move may be running out of fuel'};
+  return {label:'OI steady', tone:'muted', why:oiTxt};
+}
+function trendStrengthBadge(trend, chopHi){
+  return trend >= 35 ? {label:'Trending', tone:'up', why:`${trend.toFixed(0)}% of coins are in a clean trend regime`}
+    : chopHi ? {label:'Choppy', tone:'warn', why:'most coins are chopping sideways without going anywhere'}
+    : {label:'Mixed', tone:'muted', why:`only ${trend.toFixed(0)}% of coins are trending cleanly`};
+}
+function corrBadge(med){
+  return med === null ? {label:'Correlation unknown', tone:'muted', why:'not enough history yet'}
+    : med >= 0.7 ? {label:'Highly correlated', tone:'warn', why:`median correlation to BTC is ${med.toFixed(2)}: one macro move drives nearly everything, less edge in picking coins`}
+    : med >= 0.4 ? {label:'Normal correlation', tone:'muted', why:`median correlation to BTC is ${med.toFixed(2)}`}
+    : {label:'Dispersed', tone:'up', why:`median correlation to BTC is only ${med.toFixed(2)}: coins are moving on their own stories, better for coin-by-coin setups`};
+}
+function liqMagnetBadge(up, dn){
+  return up >= 40 && up > dn ? {label:'Liquidity pulls up', tone:'up', why:`${up.toFixed(0)}% of coins have more liquidity sitting above price, which tends to pull it up`}
+    : dn >= 40 && dn > up ? {label:'Liquidity pulls down', tone:'dn', why:`${dn.toFixed(0)}% of coins have more liquidity sitting below price, which tends to pull it down`}
+    : {label:'No dominant pull', tone:'muted', why:`liquidity is fairly balanced above and below price (up ${up.toFixed(0)}% · down ${dn.toFixed(0)}%)`};
+}
+function gammaBadge(gex, src){
+  return gex === null ? {label:'Dealer gamma unknown', tone:'muted', why:'Deribit options data is not loaded yet'}
+    : gex >= 0 ? {label:'Positive gamma', tone:'muted', why:`${src} dealer gamma is positive: dealer hedging calms price, expect more range until a wall breaks`}
+    : {label:'Negative gamma', tone:'warn', why:`${src} dealer gamma is negative: dealer hedging adds fuel, moves can run fast in either direction`};
+}
+function stableBadge(chg7){
+  return chg7 === null ? {label:'Stablecoin supply unknown', tone:'muted', why:'stablecoin supply data is not loaded yet'}
+    : chg7 >= 1 ? {label:'Stablecoin supply expanding', tone:'up', why:`total USD stablecoin supply is up ${chg7.toFixed(1)}% over 7 days: fresh buying power entering`}
+    : chg7 <= -1 ? {label:'Stablecoin supply contracting', tone:'dn', why:`total USD stablecoin supply is down ${Math.abs(chg7).toFixed(1)}% over 7 days: capital is leaving, risk-off`}
+    : {label:'Stablecoin supply flat', tone:'muted', why:`total USD stablecoin supply is roughly flat over 7 days (${chg7 >= 0 ? '+' : ''}${chg7.toFixed(1)}%)`};
+}
+function eventBadge(n){
+  if (!n) return {label:'No major event soon', tone:'muted', why:'nothing on the macro calendar in the next hour'};
+  const name = (n.ev && n.ev.name) || 'a high-impact event', min = n.min;
+  if (min >= -15 && min <= 30) return {label:'Event window', tone:'dn', why:`${name} is ${min >= 0 ? 'due in ' + Math.round(min) + ' min' : 'just out'}: expect a spike, consider standing aside`};
+  if (min > 30 && min <= 60) return {label:'Event approaching', tone:'warn', why:`${name} is due in ${Math.round(min)} min: size down before it prints`};
+  return {label:'No major event soon', tone:'muted', why:'nothing on the macro calendar in the next hour'};
+}
+function bookDepthBadge(med){
+  return med === null ? {label:'Book depth unknown', tone:'muted', why:'not enough live order-book data yet'}
+    : med < 300000 ? {label:'Thin book', tone:'dn', why:`median depth within 1% is only ${fmtUsd(med)}: expect slippage on size`}
+    : med < 3000000 ? {label:'Normal book depth', tone:'muted', why:`median depth within 1% is ${fmtUsd(med)}`}
+    : {label:'Deep book', tone:'up', why:`median depth within 1% is ${fmtUsd(med)}: large size should fill cleanly`};
+}
+function dexShareBadge(med, n){
+  if (med === null || n < 8) return {label:'DEX share: limited data', tone:'muted', why:'not enough coins with a matched DEX pool yet'};
+  const pct = med * 100;
+  return pct >= 30 ? {label:'Heavy DEX volume', tone:'muted', why:`for the ${n} alts with a matched pool, DEX volume is ${pct.toFixed(0)}% of tracked perp volume: a lot of this flow is on-chain`}
+    : pct >= 5 ? {label:'Some DEX volume', tone:'muted', why:`for the ${n} alts with a matched pool, DEX volume is ${pct.toFixed(0)}% of tracked perp volume`}
+    : {label:'Mostly CEX/perp volume', tone:'muted', why:`for the ${n} alts with a matched pool, DEX volume is only ${pct.toFixed(0)}% of tracked perp volume`};
+}
 function mkCalc(all){
   if (all.length < 5) return null;
   const top = all.slice().sort((a, b) => (b.m.vol24 || 0) - (a.m.vol24 || 0)).slice(0, 60), med = f => mkMed(top.map(f));
@@ -6016,6 +6082,25 @@ function mkCalc(all){
   const bull = (b4 >= 60) + (bt === 1) + (isNum(f4) && f4 >= 5), bear = (b4 <= 40) + (bt === -1) + (isNum(f4) && f4 <= -5);
   const manipHi = manip >= 40, crowdHi = crowdL >= 45 || crowdS >= 45, chopHi = (chop >= 55 && (er === null || er < 0.30)) || (er !== null && er < 0.18), crowdLow = crowdL < 15 && crowdS < 15;
   const liq = liqBadge(vol), volt = voltBadge(vx), press = pressBadge(bull, bear, b4, f4);
+  /* V4.50 badges */
+  const crowd = crowdBadge(crowdL, crowdS, crowdLow);
+  const oiChg1h = mkWavg(top, c => c.m.oiChg && c.m.oiChg['1h'], c => c.m.oiUsd), pxChg1h = mkWavg(top, c => c.m.chg && c.m.chg['1h'], c => c.m.vol24);
+  const oiTrend = oiBadge(oiChg1h, pxChg1h);
+  const trendStr = trendStrengthBadge(trend, chopHi);
+  const corrMed = mkMed(top.filter(c => c.name !== 'BTC').map(c => c.m.corr && c.m.corr['1h']));
+  const corr = corrBadge(corrMed);
+  const magUp = pct(all, c => isNum(c.m.liqMagnet) ? c.m.liqMagnet === 1 : null), magDn = pct(all, c => isNum(c.m.liqMagnet) ? c.m.liqMagnet === 2 : null);
+  const liqMag = liqMagnetBadge(magUp, magDn);
+  const gexBtc = OPT.by.BTC && isNum(OPT.by.BTC.gex) ? OPT.by.BTC.gex : null, gexEth = OPT.by.ETH && isNum(OPT.by.ETH.gex) ? OPT.by.ETH.gex : null;
+  const gexUse = gexBtc !== null ? gexBtc : gexEth, gexSrc = gexBtc !== null ? 'BTC' : 'ETH';
+  const gamma = gammaBadge(gexUse, gexSrc);
+  const stAll = X.stable && X.stable.all, stChg7 = stAll && stAll.d7 > 0 ? (stAll.now / stAll.d7 - 1) * 100 : null;
+  const stable = stableBadge(stChg7);
+  const event = eventBadge(macNext());
+  const bookMed = mkMed(top.map(c => c.m.liqUsd));
+  const bookDepth = bookDepthBadge(bookMed);
+  const dxList = top.map(c => c.m.dxRatio).filter(isNum);
+  const dexShare = dexShareBadge(mkMed(dxList), dxList.length);
   let stt, tone, line, act;
   if (manipHi && !(bull >= 3 || bear >= 3)){ stt = 'Manipulation'; tone = 'dn'; line = `Stop-hunt behaviour shows on ${manip.toFixed(0)}% of coins: price spikes through obvious highs and lows, then reverses.`; act = 'Enter only after a sweep and a reclaim is confirmed, and keep stops away from obvious levels.'; }
   else if (dead){ stt = 'Dead'; tone = 'warn'; line = 'Volume is far below normal, so moves are unreliable and easy to fake.'; act = 'Do not take trades. If you must, use half size or less.'; }
@@ -6045,12 +6130,14 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volt, press, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
-  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span><span class="mkb-pill mkb-p-${r.liq.tone}" title="${esc(r.liq.why)}">${esc(r.liq.label)}</span><span class="mkb-pill mkb-p-${r.volt.tone}" title="${esc(r.volt.why)}">${esc(r.volt.label)}</span><span class="mkb-pill mkb-p-${r.press.tone}" title="${esc(r.press.why)}">${esc(r.press.label)}</span></div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
+  const pill = b => `<span class="mkb-pill mkb-p-${b.tone}" title="${esc(b.why)}">${esc(b.label)}</span>`;
+  const pills = [r.liq, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
+  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
 const OPT_GLOSS = [
   ['Option','A contract that gives the right, not the duty, to buy or sell at a fixed price before a date.'],
