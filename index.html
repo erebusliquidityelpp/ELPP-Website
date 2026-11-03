@@ -11340,6 +11340,7 @@ function t10Run(kind){
     const d = new Date(), p2 = n => String(n).padStart(2, '0'); jrDownload('ELPP-top10-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.csv', o.text, 'text/csv;charset=utf-8'); toast('Downloaded the best top ' + o.n + ' coins');
   } catch(e){ toast('Top 10 export failed: ' + errTxt(e)); }
 }
+window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
 function ptHtml(){
   ptLoad(); const B = ptBackdrop(), D = ptBuild(), list = D.list; if (list[0]) list[0].first = true; try { x9Want(list.filter(r => r.c).map(r => r.c.name).slice(0, 20)); } catch(e){}
