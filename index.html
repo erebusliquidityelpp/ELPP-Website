@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.69</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.70</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -12211,7 +12211,7 @@ function citySess(tz, startMin, endMin){
 }
 /* London opens when New York is still asleep and New York opens while London is still trading - the overlap is whichever opens later to whichever closes first, in real elapsed minutes from now (so it compares correctly across the two cities) */
 function overlapSess(){
-  const lO = 480 - sessMinNow('Europe/London'), lC = 990 - sessMinNow('Europe/London'), nO = 480 - sessMinNow('America/New_York'), nC = 1020 - sessMinNow('America/New_York');
+  const lO = 480 - sessMinNow('Europe/London'), lC = 990 - sessMinNow('Europe/London'), nO = 570 - sessMinNow('America/New_York'), nC = 960 - sessMinNow('America/New_York');
   let startRaw = Math.max(lO, nO), endRaw = Math.min(lC, nC); const open = startRaw <= 0 && endRaw > 0;
   if (!open && endRaw <= 0){ startRaw += 1440; endRaw += 1440; }
   return {open, toOpen:open ? 0 : Math.max(startRaw, 0), toClose:open ? endRaw : null};
@@ -12232,7 +12232,7 @@ function chipAcc(el, color){ const chip = el && el.closest('.chip'); if (chip) c
 function sessLiveSummary(){
   const list = [
     ['Overlap', overlapSess(), 'OPEN - busiest time'],
-    ['New York', citySess('America/New_York', 480, 1020), 'OPEN'],
+    ['New York', citySess('America/New_York', 570, 960), 'OPEN'],
     ['London', citySess('Europe/London', 480, 990), 'OPEN'],
     ['Tokyo', citySess('Asia/Tokyo', 540, 1080), 'OPEN'],
     ['Sydney', citySess('Australia/Sydney', 480, 1020), 'OPEN']
@@ -12247,7 +12247,7 @@ function sessDraw(){
   syd.innerHTML = sessChipHtml(citySess('Australia/Sydney', 480, 1020), 'OPEN');
   tok.innerHTML = sessChipHtml(citySess('Asia/Tokyo', 540, 1080), 'OPEN');
   lon.innerHTML = sessChipHtml(citySess('Europe/London', 480, 990), 'OPEN');
-  ny.innerHTML = sessChipHtml(citySess('America/New_York', 480, 1020), 'OPEN');
+  ny.innerHTML = sessChipHtml(citySess('America/New_York', 570, 960), 'OPEN');
   ovl.innerHTML = sessChipHtml(overlapSess(), 'OPEN - busiest time');
   const live = sessLiveSummary();
   sum.innerHTML = '<b>' + esc(live.name) + '</b> ' + sessChipHtml(live.s, live.word);
