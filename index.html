@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.55</title>
+<title>ELPP CRYPTO SCANNER PRO V4.56</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -209,6 +209,10 @@ label.tg{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size
 .side .nv:hover{background:var(--surface2)}
 .side .nv.on{background:var(--accent);color:var(--accent-fg);font-weight:500}
 .side .nv:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.nv-wrap{display:flex;align-items:stretch;gap:2px}
+.nv-wrap .nv{flex:1 1 auto;min-width:0}
+.nv-tab{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:26px;border-radius:6px;color:var(--muted);text-decoration:none;font-size:13px;opacity:.6}
+.nv-tab:hover{opacity:1;background:var(--surface2);color:var(--accent)}
 .side .back{display:flex;align-items:center;gap:6px;border:1px solid var(--line);margin-bottom:4px}
 .side .back:disabled{opacity:.4;cursor:default}
 #modes{display:none}
@@ -757,7 +761,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.55</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.56</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1879,7 +1883,24 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'].includes(state.view)) state.view = 'table';
+const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+if (!VIEW_LIST.includes(state.view)) state.view = 'table';
+/* ===== V4.56: open any menu page in a new tab, landing straight on it (#view=NAME in the URL) ===== */
+(function(){ try { const m = /(?:^|[#&])view=([a-zA-Z]+)/.exec(location.hash); if (m && VIEW_LIST.includes(m[1])) state.view = m[1]; } catch(e){} })();
+function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
+function addMenuTabLinks(){
+  document.querySelectorAll('#side .nv[data-view]').forEach(btn => {
+    if (btn.parentElement && btn.parentElement.classList.contains('nv-wrap')) return;
+    const view = btn.dataset.view, wrap = document.createElement('span');
+    wrap.className = 'nv-wrap';
+    btn.parentNode.insertBefore(wrap, btn);
+    wrap.appendChild(btn);
+    const a = document.createElement('a');
+    a.className = 'nv-tab'; a.href = menuTabHref(view); a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.title = 'Open "' + btn.textContent.trim() + '" in a new tab'; a.setAttribute('aria-label', a.title); a.textContent = '↗';
+    wrap.appendChild(a);
+  });
+}
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -12000,6 +12021,7 @@ if (state.theme) document.documentElement.setAttribute('data-theme', state.theme
 if (state.panelOpen === null) state.panelOpen = innerWidth > 1000;
 $('wrap').classList.toggle('nofilters', !state.panelOpen);
 bindToolbar(); bindPanel(); applyStateToUI();
+addMenuTabLinks();
 render();
 ctxTick();
 setInterval(ctxTick, 10000);
