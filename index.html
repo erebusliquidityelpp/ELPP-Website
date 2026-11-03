@@ -11299,12 +11299,12 @@ function t10Venues(c){
   return {names:rows.map(x => nm(x[0])), list, gap, spot, hl:!!vs.hyperliquid, top:rows.length ? nm(rows[0][0]) : ''};
 }
 function t10Build(){
-  const mk = vcMk(), LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG'], out = [];
+  const mk = vcMk(), LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG'], out = [], dbg = {nv:0, nd:0, err:[]};
   const live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && isNum(c.m.vol24) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 150);
   for (const c of live){
     try {
-      const m = c.m, v = m.verdict; if (!isNum(v)) continue;
-      const long = v >= 4, short = v === 2 || v === 3; if (!long && !short) continue;
+      const m = c.m, v = m.verdict; if (!isNum(v)){ dbg.nv++; continue; }
+      const long = v >= 4, short = v === 2 || v === 3; if (!long && !short){ dbg.nd++; continue; }
       const dir = long ? 'long' : 'short', strong = v === 5 || v === 3, sc = isNum(m.verdictScore) ? m.verdictScore : 0;
       const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = isNum(m.dqScore) ? m.dqScore : null;
       let rd = null; try { rd = instRow(c, 'perp'); } catch(e){}
@@ -11315,10 +11315,10 @@ function t10Build(){
       const why = (arr, n) => (arr || []).slice(0, n).map(x => (x[0] > 0 ? '+' : '') + x[0] + ' ' + x[1]).join('; ');
       const notes = []; if (String(c.name).includes(':')) notes.push('HIP-3 market (builder-deployed): thin data, use smaller size'); if (!V.hl) notes.push('Not listed on Hyperliquid: trade it on ' + (V.top || 'another exchange')); if (V.names.length < 2) notes.push('Only one exchange quotes it'); if (dq != null && dq < 45) notes.push('Data quality below 45: scanner says do not trade');
       out.push({rank, name:c.name, dir, verdict:LAB[v], sc, tag, grade:gr.g, ok:gr.ok, n:gr.n, hard:gr.hard.map(x => x.label).join('; '), is, final:fin.final ? 'FINAL' : fin.building ? 'building' : '', px:m.px, c1h:(m.chg || {})['1h'], c4h:(m.chg || {})['4h'], vol:m.vol24, oi:m.oiUsd, dq, fund:cell('fund8'), pl, lev:c.maxLev, V, long:why(m.vPos, 3), short:why(m.vNeg, 3), flags:(m.vFlags || []).join('; '), notes:notes.join('; '), fails:chk.filter(x => x.st === 'bad').map(x => x.label + ' (' + x.why + ')').join('; ')});
-    } catch(e){}
+    } catch(e){ if (dbg.err.length < 4) dbg.err.push(c.name + ': ' + String(e && e.message || e)); }
   }
   out.sort((a, b) => b.rank - a.rank);
-  return {top:out.slice(0, 10), total:live.length, cand:out.length};
+  return {top:out.slice(0, 10), total:live.length, cand:out.length, dbg};
 }
 function t10Csv(){
   const D = t10Build(), now = new Date(), r = [], add = a => r.push(a.map(csvCell).join(',')), P = x => isNum(x) ? fmtPx(x) : '', pc = x => isNum(x) ? (x > 0 ? '+' : '') + x.toFixed(2) + '%' : '';
