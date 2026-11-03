@@ -771,12 +771,14 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.61</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.62</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
     <span class="chip" id="chipSession">Session <b id="sessTxt">–</b></span>
+    <span class="chip" id="chipSyd" title="Sydney session: open 08:00-17:00 Sydney local time. Quietest of the four, but the first to open the trading day.">Sydney <b id="sydOut">–</b></span>
+    <span class="chip" id="chipTok" title="Tokyo session: open 09:00-18:00 Tokyo local time. Asia's main session.">Tokyo <b id="tokOut">–</b></span>
     <span class="chip" id="chipLon" title="London session: open 08:00-16:30 London local time. This is when a trade is most likely to actually fill well.">London <b id="lonOut">–</b></span>
     <span class="chip" id="chipNY" title="New York session: open 08:00-17:00 New York local time. This is when a trade is most likely to actually fill well.">New York <b id="nyOut">–</b></span>
     <span class="chip" id="chipOvl" title="London and New York both open at once: the busiest, most liquid couple of hours of the day.">Overlap <b id="ovlOut">–</b></span>
@@ -12050,7 +12052,9 @@ function tzInit(){
   sel.addEventListener('change', () => { state.tzPref = sel.value; saveState(); sessDraw(); });
 }
 function sessDraw(){
-  const lon = $('lonOut'), ny = $('nyOut'), ovl = $('ovlOut'), now = $('tzNow'); if (!lon || !ny || !ovl || !now) return;
+  const syd = $('sydOut'), tok = $('tokOut'), lon = $('lonOut'), ny = $('nyOut'), ovl = $('ovlOut'), now = $('tzNow'); if (!syd || !tok || !lon || !ny || !ovl || !now) return;
+  syd.innerHTML = sessChipHtml(citySess('Australia/Sydney', 480, 1020), 'OPEN');
+  tok.innerHTML = sessChipHtml(citySess('Asia/Tokyo', 540, 1080), 'OPEN');
   lon.innerHTML = sessChipHtml(citySess('Europe/London', 480, 990), 'OPEN');
   ny.innerHTML = sessChipHtml(citySess('America/New_York', 480, 1020), 'OPEN');
   ovl.innerHTML = sessChipHtml(overlapSess(), 'OPEN - busiest time');
