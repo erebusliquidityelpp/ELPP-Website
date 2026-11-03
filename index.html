@@ -771,7 +771,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.62</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.63</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5803,6 +5803,42 @@ function renderLookup(){
 }
 /* ===== Elite Coin Terminal: one coin, the full institutional read - supercharts, star-rated verdict, liquidity map, price outlook, all built from the scanner's own live data ===== */
 const ET = {seq:0, name:'', busy:false, err:'', t:null};
+/* same math as the Price outlook cone, but just the numbers: used to scan every coin at once for the institutional forecast list */
+function fcQuick(c){
+  const cd = c && c.candles, m = c && c.m;
+  if (!cd || cd.length < 30 || !m || !isNum(m.verdictScore) || !isNum(m.verdict)) return null;
+  const B = cd.slice(-80), px = isNum(m.px) ? m.px : B[B.length - 1].c;
+  const atrPct = m.atr && (m.atr['1h'] || m.atr['15m']);
+  const atrAbs = isNum(atrPct) && atrPct > 0 ? atrPct / 100 * px : (() => { let s = 0, n = 0; for (let i = 1; i < B.length; i++){ s += Math.abs(B[i].c - B[i - 1].c); n++; } return n ? Math.max(s / n, px * 0.001) : px * 0.003; })();
+  const K = 24, standAside = m.verdict === 0, dirStrength = standAside ? 0 : Math.max(-1, Math.min(1, (m.verdictScore || 0) / 100));
+  const totalDrift = atrAbs * Math.sqrt(K) * dirStrength * 0.5, hw = atrAbs * Math.sqrt(K), center = px + totalDrift;
+  const dirWord = standAside ? 'flat' : dirStrength > 0.1 ? 'up' : dirStrength < -0.1 ? 'down' : 'flat';
+  return {px, up:center + hw, dn:center - hw, dirStrength, dirWord, standAside, score:m.verdictScore, verdict:m.verdict};
+}
+function etListRows(){
+  const filt = state.etFilter || 'all', rows = [];
+  for (const c of state.coins.values()){
+    if (!c.ctx) continue; const f = fcQuick(c); if (!f) continue;
+    if (filt !== 'all' && f.dirWord !== filt) continue;
+    rows.push({c, f});
+  }
+  rows.sort((a, b) => Math.abs(b.f.score) - Math.abs(a.f.score));
+  return rows.slice(0, 40);
+}
+function etListHtml(){
+  const rows = etListRows(), tabs = [['all', 'All'], ['up', '▲ Up'], ['down', '▼ Down'], ['flat', 'Flat']], filt = state.etFilter || 'all';
+  const tabsH = tabs.map(([k, l]) => `<button type="button" class="btn sm${filt === k ? ' primary' : ''}" data-etf="${k}">${esc(l)}</button>`).join(' ');
+  if (!rows.length) return `<div class="row" style="gap:6px;flex-wrap:wrap">${tabsH}</div><p class="hint">No coin in this universe has a verdict and enough candles yet. Give the scanner a minute, or switch to the Perp scalp page once to warm it up.</p>`;
+  const tr = rows.map(({c, f}) => {
+    const dirCol = f.dirWord === 'up' ? 'up' : f.dirWord === 'down' ? 'dn' : 'dim', arrow = f.dirWord === 'up' ? '▲' : f.dirWord === 'down' ? '▼' : '–';
+    const thr = (c.m.vThr || [15, 35]), sc = Math.abs(f.score), n = f.standAside ? 0 : sc >= thr[1] ? 5 : sc >= thr[1] * 0.65 ? 4 : sc >= thr[0] ? 3 : sc >= thr[0] * 0.5 ? 2 : 1;
+    return `<tr data-etsym="${esc(c.name)}" style="cursor:pointer"><td>${esc(c.name)}</td><td>${esc(fmtPx(f.px))}</td><td class="${dirCol}">${arrow} ${f.standAside ? 'avoid' : f.dirWord}</td><td>${f.standAside ? '' : `<span class="${dirCol}">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</span>`}</td><td>${esc(fmtPx(f.dn))} – ${esc(fmtPx(f.up))}</td><td class="${f.score >= 0 ? 'up' : 'dn'}">${f.score >= 0 ? '+' : ''}${f.score}</td></tr>`;
+  }).join('');
+  return `<div class="row" style="gap:6px;flex-wrap:wrap">${tabsH}</div>
+    <div style="overflow:auto;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Price</th><th style="text-align:left">Lean</th><th style="text-align:left">Stars</th><th style="text-align:left">Projected range, next ~2h</th><th style="text-align:left">Score</th></tr></thead><tbody>${tr}</tbody></table></div>
+    <p class="hint">Ranked by conviction, strongest first. The range is a volatility-based projection built from each coin's own ATR and trend, not a guaranteed target. Click a row to open that coin's full terminal below.</p>`;
+}
+function etListDraw(){ const el = $('etList'); if (el) el.innerHTML = etListHtml(); }
 function etStars(c){
   const m = c.m || {};
   if (!isNum(m.verdict)) return '<span class="dim" style="font-size:18px">☆☆☆☆☆</span> <small class="dim">no verdict yet</small>';
@@ -5880,12 +5916,19 @@ function renderElite(){
       <p class="hint">Type any coin and get the full institutional read in one screen: supercharts across three timeframes, the scanner's star-rated verdict with the plain-English why and how it was reached, the liquidity map, and a short-term price outlook built from this coin's own trend, momentum and volatility — not a trained prediction model. Works for any coin, not only BTC.</p>
       <div class="row"><label class="hint" for="etIn">Coin</label><input type="text" id="etIn" placeholder="e.g. BTC, SOL, PEPE, HYPE" autocomplete="off" autocapitalize="characters" spellcheck="false" style="min-width:220px;font-family:var(--mono);text-transform:uppercase"><button class="btn primary" id="etGo" type="button">Scan</button></div>
       <div id="etHist" class="row"></div></div>
+      <div class="nsec"><h3>Institutional forecast: every coin, ranked</h3>
+      <p class="hint">Every Hyperliquid perp the scanner is already tracking, scored the same way as a single coin's terminal: which way it currently leans, how strong the conviction is, and the projected price range for the next couple of hours. Click any coin to open its full terminal below.</p>
+      <div id="etList"></div></div>
       <div id="etOut"></div>`;
     $('etIn').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); etScan(); } });
     $('etGo').addEventListener('click', () => etScan());
-    el.addEventListener('click', e => { const sy = e.target.closest('[data-etsym]'); if (sy){ e.preventDefault(); $('etIn').value = sy.dataset.etsym; etScan(sy.dataset.etsym); } });
+    el.addEventListener('click', e => {
+      const ft = e.target.closest('[data-etf]'); if (ft){ state.etFilter = ft.dataset.etf; saveState(); etListDraw(); return; }
+      const sy = e.target.closest('[data-etsym]'); if (sy){ e.preventDefault(); $('etIn').value = sy.dataset.etsym; etScan(sy.dataset.etsym); $('etOut').scrollIntoView({block:'start', behavior:'smooth'}); }
+    });
     etDraw(); setTimeout(() => { try { $('etIn').focus(); } catch(e){} }, 50);
   }
+  etListDraw();
 }
 function renderMovers(){
   const el = $('viewMovers'); if (!el) return; const c = mvCfg();
