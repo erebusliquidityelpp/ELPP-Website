@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.70</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.71</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -3295,7 +3295,15 @@ const EXF_SRC = [
   ['netflow','Exchange netflow (CryptoQuant or Glassnode)','Needs a paid CryptoQuant or Glassnode key. Coins moving onto exchanges (positive netflow) is usually selling pressure; moving off is accumulation. Paste the endpoint, key and header, then the field name.','paid'],
   ['social','Social sentiment (LunarCrush or Santiment)','Needs a paid key. Paste the endpoint that lists coins with a social score, plus key, header and the field name to filter on.','paid'],
   ['revenue','Real protocol revenue (Token Terminal)','Needs a paid Token Terminal key. Free DefiLlama fees are already used for fees; this is for a second opinion on revenue.','paid'],
-  ['primexbt','PrimeXBT (prices, funding, open interest)','Leave blank unless PrimeXBT gives you API access. I could not find a public data address for PrimeXBT, only a trading API that needs a key from your PrimeXBT account settings (the API address and header name come from PrimeXBT\'s own documentation). Paste the address for a market-data list that includes a symbol per row, your key and header, then the field name to filter on (for example a funding rate or open interest field).','paid']
+  ['primexbt','PrimeXBT (prices, funding, open interest)','Leave blank unless PrimeXBT gives you API access. I could not find a public data address for PrimeXBT, only a trading API that needs a key from your PrimeXBT account settings (the API address and header name come from PrimeXBT\'s own documentation). Paste the address for a market-data list that includes a symbol per row, your key and header, then the field name to filter on (for example a funding rate or open interest field).','paid'],
+  ['hyblock','Hyblock Capital (liquidation heatmap, order book, 400+ tickers)','Needs a paid Hyblock Capital key (hyblockcapital.com). Paste the endpoint for the metric you want (for example their liquidation-levels or order-book-imbalance endpoint), your key, the header name Hyblock expects, then the field name to filter on.','paid'],
+  ['velo','Velo Data / Buildix (CVD, VPIN, cross-exchange order flow)','Needs a paid Velo Data or Buildix key (velodata.app or buildix.trade). Paste the endpoint that lists coins with the metric you want (CVD, VPIN, order-book imbalance), key, header, then the field name.','paid'],
+  ['cryptoquant','CryptoQuant (exchange netflow, miner flows, reserves)','Needs a paid CryptoQuant key (cryptoquant.com). Coins moving onto exchanges is usually selling pressure; moving off is accumulation. Paste the endpoint, key, header, then the field name. Keep this separate from Glassnode below if you use both.','paid'],
+  ['glassnode','Glassnode (on-chain metrics, exchange flows, SOPR)','Needs a paid Glassnode key (glassnode.com). Paste the metric endpoint you want, key, header, then the field name to filter on.','paid'],
+  ['nansen','Nansen (smart-money wallet labels)','Needs a paid Nansen key (nansen.ai). Paste the endpoint for the list you want (for example Smart Money inflow/outflow by token), key, header, then the field name.','paid'],
+  ['arkham','Arkham Intelligence (entity-labelled on-chain tracking)','Needs a paid Arkham key (arkhamintelligence.com, Arkham Exchange API). Paste the endpoint, key, header, then the field name to filter on.','paid'],
+  ['kaiko','Kaiko (institutional market data: basis, liquidity, funding)','Needs a paid Kaiko key (kaiko.com). Paste the endpoint for the metric you want, key, header, then the field name.','paid'],
+  ['itb','IntoTheBlock (on-chain analytics, holder behaviour)','Needs a paid IntoTheBlock key (intotheblock.com). Paste the endpoint, key, header, then the field name to filter on.','paid']
 ];
 Object.assign(X, {exf:{}, exfAt:{}, exfErr:{}});
 function exfParse(j){
