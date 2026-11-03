@@ -771,7 +771,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.63</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.64</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -936,6 +936,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
   <section class="results">
     <div id="mktBar"></div>
     <details class="mkt" id="mkt" open><summary>Market now: <span id="mktVerdict">collecting data…</span></summary><div id="mktBody"></div></details>
+    <details class="mkt" id="mktCombo"><summary>Liquidity + volume + volatility: what the mix means <span id="comboNow"></span></summary><div id="mktComboBody"></div></details>
     <div class="scopes" id="modes" role="group" aria-label="Mode"></div>
     <p class="hint modehint" id="modeHint"></p>
     <div class="scopes" id="scopes" role="group" aria-label="Scope"></div>
@@ -5151,7 +5152,7 @@ function render(){
   $('sessTxt').textContent = sessionText(); sessDraw();
 }
 function renderMarket(all){
-  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; if (!el) return;
+  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; try { renderMktCombo(); } catch(e){} if (!el) return;
   if (all.length < 5){ vd.textContent = 'collecting data…'; vd.className = ''; el.innerHTML = ''; return; }
   const W = (f, wf) => { let a = 0, w = 0; for (const c of all){ const v = f(c), x = wf(c); if (isNum(v) && isNum(x) && x > 0){ a += v * x; w += x; } } return w ? a / w : null; };
   const byVol = c => c.m.vol24;
@@ -5179,7 +5180,7 @@ function renderMarket(all){
   const topList = k => all.filter(c => isNum(c.m[k]) && c.m[k] >= takeMinV()).sort((a,b) => b.m[k] - a.m[k]).slice(0, 4).map(c => c.name + ' ' + c.m[k]).join(', ');
   const card = (l, v, h) => `<div class="mk"><small>${l}</small><b>${v}</b>${h ? `<small>${h}</small>` : ''}</div>`;
   const badgeCard = (l, b) => card(l, `<span class="mkb-pill mkb-p-${b.tone}">${esc(b.label)}</span>`, esc(b.why));
-  const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare'],['CME futures gap','cmeGap'],['Exchange insurance fund','insurFund'],['DeFi borrow demand','borrowRate']];
+  const BADGE_ROWS = [['Liquidity','liq'],['Volume trend','volTrend'],['Volatility','volt'],['Bot / algo activity','bot'],['Buyers or sellers','press'],['Positioning','crowd'],['Open interest trend','oiTrend'],['Trend strength','trendStr'],['Correlation to BTC','corr'],['Liquidation magnet','liqMag'],['Dealer gamma (BTC/ETH)','gamma'],['Stablecoin supply','stable'],['Macro event','event'],['Order-book depth','bookDepth'],['DEX volume share','dexShare'],['CME futures gap','cmeGap'],['Exchange insurance fund','insurFund'],['DeFi borrow demand','borrowRate']];
   el.innerHTML = `<p class="hint" style="margin:0 0 6px">${esc(tip)} Based on ${all.length} coins, all scopes.</p>` +
     (mk && mk.liqVolTip ? `<div class="vbox" style="margin:0 0 10px"><b>Liquidity + volume, together:</b> ${esc(mk.liqVolTip)}</div>` : '') +
     `<div class="mkgrid">` +
@@ -5193,6 +5194,36 @@ function renderMarket(all){
     card('Coin regimes', `Chop ${rg[0]} · Accum ${rg[1]} · Dist ${rg[2]} · Manip ${rg[3]} · Trend ${rg[4]}`, '') +
     card('Take-off radar', `Long: ${esc(topList('readyLong') || 'none ready')}<br>Short: ${esc(topList('readyShort') || 'none ready')}`, `score ${takeMinV()}+ · full list: Set-ups filter`) +
     card('Coin trends 4h', `Up ${tr['1']} · Down ${tr['-1']} · Consolidating ${tr['0']}`, '') + '</div>';
+}
+function renderMktCombo(){
+  const now = $('comboNow'), body = $('mktComboBody'); if (!now || !body) return;
+  if (!body._built){ body._built = true; body.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true); }
+  const mk = MK.last;
+  if (!mk){ now.textContent = ''; body.innerHTML = '<p class="hint">Collecting data…</p>'; return; }
+  const arrow = d => d === 'rise' ? '▲ rising' : d === 'fall' ? '▼ falling' : d === 'flat' ? '◆ flat' : '– unknown';
+  const curKey = mk.combo.ready && mk.liqDir !== 'flat' && mk.volDir !== 'flat' && mk.voltDir !== 'flat' ? [mk.liqDir, mk.volDir, mk.voltDir].join('|') : null;
+  now.textContent = mk.combo.ready ? '· ' + mk.combo.title : '';
+  const pairKey = (mk.liqDir === 'rise' || mk.liqDir === 'fall') && (mk.volDir === 'rise' || mk.volDir === 'fall') ? mk.liqDir + '|' + mk.volDir : null;
+  const pairRow = pairKey ? COMBO_PAIR[pairKey] : null;
+  let h = `<p class="hint">Three independent trend reads, each compared with its own level from about 20 minutes ago: <b>liquidity</b> (order-book depth), <b>volume</b> (trading activity), <b>volatility</b> (price range). Eight combinations, each read in plain English, plus what it means when bots rather than people are doing most of the trading.</p>
+    <div class="row" style="gap:10px;flex-wrap:wrap;margin:6px 0 10px"><span class="mkb-pill mkb-p-${mk.liqDir === 'rise' ? 'up' : mk.liqDir === 'fall' ? 'dn' : 'muted'}">Liquidity ${esc(arrow(mk.liqDir))}</span><span class="mkb-pill mkb-p-${mk.volDir === 'rise' ? 'up' : mk.volDir === 'fall' ? 'dn' : 'muted'}">Volume ${esc(arrow(mk.volDir))}</span><span class="mkb-pill mkb-p-${mk.voltDir === 'rise' ? 'up' : mk.voltDir === 'fall' ? 'dn' : 'muted'}">Volatility ${esc(arrow(mk.voltDir))}</span></div>
+    <div class="vbox" style="margin:0 0 10px"><b>Right now: ${esc(mk.combo.title)}.</b> ${esc(mk.combo.why)}</div>
+    <div class="vbox" style="margin:0 0 10px"><b>${esc(mk.bot.label)}.</b> ${esc(mk.bot.why)}</div>
+    <details class="ovd" data-ovd="combo-all"${OV.open.has('combo-all') ? ' open' : ''}><summary>All 8 liquidity + volume + volatility combinations</summary>
+    <table class="gtab sm" style="width:100%;margin-top:6px"><thead><tr><th style="text-align:left">Liquidity</th><th style="text-align:left">Volume</th><th style="text-align:left">Volatility</th><th style="text-align:left">Reads as</th><th style="text-align:left">What it means</th></tr></thead><tbody>`;
+  for (const l of ['rise', 'fall']) for (const v of ['rise', 'fall']) for (const x of ['rise', 'fall']){
+    const key = [l, v, x].join('|'), [title, why] = COMBO_TRIPLE[key], live = key === curKey;
+    h += `<tr${live ? ' style="background:color-mix(in srgb,var(--gold) 14%,transparent)"' : ''}><td>${l === 'rise' ? '▲' : '▼'}</td><td>${v === 'rise' ? '▲' : '▼'}</td><td>${x === 'rise' ? '▲' : '▼'}</td><td><b>${esc(title)}</b>${live ? ' <small class="dim">(now)</small>' : ''}</td><td>${esc(why)}</td></tr>`;
+  }
+  h += `</tbody></table></details>
+    <details class="ovd" data-ovd="combo-pair" style="margin-top:8px"${OV.open.has('combo-pair') ? ' open' : ''}><summary>Liquidity + volume on their own (volatility aside)</summary>
+    <table class="gtab sm" style="width:100%;margin-top:6px"><thead><tr><th style="text-align:left">Liquidity</th><th style="text-align:left">Volume</th><th style="text-align:left">Reads as</th><th style="text-align:left">What it means</th></tr></thead><tbody>`;
+  for (const l of ['rise', 'fall']) for (const v of ['rise', 'fall']){
+    const key = l + '|' + v, [title, why] = COMBO_PAIR[key], live = key === pairKey;
+    h += `<tr${live ? ' style="background:color-mix(in srgb,var(--gold) 14%,transparent)"' : ''}><td>${l === 'rise' ? '▲' : '▼'}</td><td>${v === 'rise' ? '▲' : '▼'}</td><td><b>${esc(title)}</b>${live ? ' <small class="dim">(now)</small>' : ''}</td><td>${esc(why)}</td></tr>`;
+  }
+  h += `</tbody></table></details>`;
+  body.innerHTML = h;
 }
 const MV_TF_HL = ['15m','1h','4h','12h','1d'], MV_TF_CG = ['1h','24h','7d','30d'];
 function mvCfg(){ state.mv = state.mv || {}; const c = state.mv; if (!['perp','all'].includes(c.uni)) c.uni = 'perp'; const list = c.uni === 'perp' ? MV_TF_HL : MV_TF_CG; if (!list.includes(c.tf)) c.tf = c.uni === 'perp' ? '1h' : '24h'; if (c.vol === undefined) c.vol = '1000000'; return c; }
@@ -6403,7 +6434,7 @@ function renderMemes(){
   $('hdDetail').innerHTML = d;
 }
 /* ===================== Market verdict bar ===================== */
-const MK = {last:null};
+const MK = {last:null, liqHist:[], voltHist:[]};
 function mkWeekend(){ const t = new Date(), d = t.getUTCDay(), h = t.getUTCHours(); return d === 6 || (d === 0 && h < 22) || (d === 5 && h >= 22); }
 const mkMed = a => { a = a.filter(isNum).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
 const mkAvg = a => { a = a.filter(isNum); return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; };
@@ -6448,6 +6479,44 @@ function liqVolNote(liq, volTrend){
   if (volTrend.dir === 'rising') return 'Normal liquidity and volume rising: the market is waking up.';
   if (volTrend.dir === 'falling') return 'Normal liquidity and volume fading: the market is going quiet.';
   return 'Normal liquidity, volume holding steady: no real change in conditions.';
+}
+/* ===== liquidity + volume + volatility, every combination in plain English ===== */
+const COMBO_PAIR = {
+  'rise|rise':['Waking up', 'More resting orders and more trades happening together: real participation returning. Usually the healthiest condition to trade in.'],
+  'fall|fall':['Drying up', 'Fewer resting orders and fewer trades: the market is going quiet. Fills get worse and moves become less trustworthy.'],
+  'rise|fall':['Orders building, action cooling', 'The book is getting deeper while actual trading slows down: liquidity providers are stepping in before the next move, not during one. Often a lull.'],
+  'fall|rise':['Thinning book, more trades', 'Trades are eating through a shallower book: each trade now moves price more than it did before, even though things look busier. Expect worse fills.']
+};
+const COMBO_TRIPLE = {
+  'rise|rise|rise':['Breakout building', 'Depth, participation and swings are all growing together: a real, broad move with size behind it. The highest-conviction condition of the eight - trends started here tend to have legs.'],
+  'rise|rise|fall':['Orderly accumulation', 'Plenty of size trading hands, book deepening, but price barely moving. Classic quiet absorption - often the calm before volatility catches up to the volume.'],
+  'rise|fall|rise':['Thin follow-through on a deep book', 'The book is deepening but actual trades are fewer, and price is still swinging. Often large resting orders or hedging flow doing the moving, not broad participation. Can reverse fast.'],
+  'rise|fall|fall':['Calm and stable', 'Depth is building while both participation and swings fade. The market is settling into a well-supported, quiet range: fine for mean-reversion, poor for breakouts.'],
+  'fall|rise|rise':['Thin and aggressive - danger', 'Less resting liquidity but more trades hitting the book, and bigger swings. The classic recipe for slippage, stop-hunts and flash moves. Size down.'],
+  'fall|rise|fall':['Aggressive but contained', 'A lot of trading going through a thinning book, yet the price range stays tight: a tug-of-war or absorption at a level. Watch for a sudden break once the liquidity runs out.'],
+  'fall|fall|rise':['Fragile - do not trust it', 'Book thinning, participation drying up, but price still swinging. Often just one or two large orders or a bot sweeping a thin book moving price alone. Fakeouts are common here.'],
+  'fall|fall|fall':['Dead market', 'Thin book, nobody trading, barely moving. The classic dead period (weekend, late night). Best to stand aside entirely.']
+};
+function comboRead(liqDir, volDir, voltDir){
+  if (liqDir === null || volDir === null || voltDir === null){
+    const missing = []; if (liqDir === null) missing.push('liquidity'); if (volDir === null) missing.push('volume'); if (voltDir === null) missing.push('volatility');
+    return {ready:false, title:'Still collecting trends', why:`Needs about 20 minutes of history to read a trend in ${missing.join(' and ')}; showing the snapshot view above until then.`};
+  }
+  if (liqDir === 'flat' || volDir === 'flat' || voltDir === 'flat'){
+    const parts = [liqDir, volDir, voltDir].map((d, i) => (['Liquidity', 'Volume', 'Volatility'][i]) + ' ' + (d === 'rise' ? 'rising' : d === 'fall' ? 'falling' : 'flat'));
+    return {ready:true, title:'Mixed - one factor flat', why:parts.join(', ') + ': no single combination fits cleanly, so read the three badges above on their own.'};
+  }
+  const [title, why] = COMBO_TRIPLE[[liqDir, volDir, voltDir].join('|')];
+  return {ready:true, title, why};
+}
+function botBadge(manipPct, churnPct, crowdHi){
+  const m = isNum(manipPct) ? manipPct : null, ch = isNum(churnPct) ? churnPct : null;
+  if (m === null && ch === null) return {label:'Bot activity: unknown', tone:'muted', why:'not enough regime data yet'};
+  const hi = (m !== null && m >= 35) || (ch !== null && ch >= 35), mid = (m !== null && m >= 20) || (ch !== null && ch >= 20);
+  const bits = []; if (m !== null) bits.push(m.toFixed(0) + '% of coins show stop-hunt (manipulation) behaviour'); if (ch !== null) bits.push(ch.toFixed(0) + '% show churn (big volume, no real progress)');
+  if (hi) return {label:'Bot-driven, choppy', tone:'dn', why:`${bits.join(' and ')}: a large share of the tape looks algorithmic rather than human - price spiking through obvious levels and snapping back, or heavy volume going nowhere. Expect fakeouts and whipsaws; wait for a sweep-and-reclaim before entering, and do not trust a breakout until it holds.`};
+  if (mid) return {label:'Some bot footprint', tone:'warn', why:`${bits.join(' and ')}: a noticeable but not dominant share of coins show algorithmic churn or stop-hunting. Real, human-driven moves are still mixed in - be selective and confirm before entering.`};
+  return {label:'Human-led tape', tone:'up', why:`${bits.join(' and ')}: little sign of algorithmic stop-hunting or churn right now - price action is more likely to reflect real participation.${crowdHi ? ' Positioning is still crowded though, which is its own squeeze risk.' : ''}`};
 }
 function voltBadge(vx){
   return vx === null ? {label:'Volatility unknown', tone:'muted', why:'not enough range data yet'}
@@ -6621,7 +6690,17 @@ function mkCalc(all){
   const sizeText = size === 'skip' ? 'Not worth trading right now; if you must, half size or less.' : size === 'reduce' ? 'If you trade, use reduced size.' : 'Normal size is fine for clean set-ups.';
   let weekend = '';
   if (wk) weekend = `Today is a weekend and the market is in a ${({'Crowded longs':'crowded-long','Crowded shorts':'crowded-short','Dead':'dead (no volume)'})[stt] || stt.toLowerCase()} state. ` + (thin ? 'There is little volume and liquidity behind it, so do not take trades, or cut size to half or less. ' : `Stock and forex markets are closed, so liquidity is usually thinner and moves can be sharp or fake; volume is ${vol !== null && vol >= 1 ? 'normal' : 'light'} (${vol !== null ? vol.toFixed(1) + 'x average' : 'unknown'}), so reduce size. `) + (crowdHi ? 'Positioning is crowded one way, which adds squeeze risk.' : crowdLow ? 'Few traders are positioned, so there is little fuel for a big move.' : '');
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  /* ===== liquidity + volume + volatility combo, and a bot/algo-activity read - three real trend reads tracked over time, not just a snapshot ===== */
+  const now0 = Date.now();
+  if (bookMed !== null){ if (!MK.liqHist.length || now0 - MK.liqHist[MK.liqHist.length - 1][0] >= 600000) MK.liqHist.push([now0, bookMed]); const cut = now0 - 21600000; while (MK.liqHist.length && MK.liqHist[0][0] < cut) MK.liqHist.shift(); }
+  if (vx !== null){ if (!MK.voltHist.length || now0 - MK.voltHist[MK.voltHist.length - 1][0] >= 600000) MK.voltHist.push([now0, vx]); const cut = now0 - 21600000; while (MK.voltHist.length && MK.voltHist[0][0] < cut) MK.voltHist.shift(); }
+  const liqChgPct = histChgPct(MK.liqHist, 1200000), voltChgPct = histChgPct(MK.voltHist, 1200000);
+  const trendDir = pct => pct === null ? null : pct >= 12 ? 'rise' : pct <= -12 ? 'fall' : 'flat';
+  const liqDir = trendDir(liqChgPct), volDir = volTrend.dir === 'rising' ? 'rise' : volTrend.dir === 'falling' ? 'fall' : volTrend.dir === 'flat' ? 'flat' : null, voltDir = trendDir(voltChgPct);
+  const combo = comboRead(liqDir, volDir, voltDir);
+  const churnPct = pct(top, c => isNum(c.m.instVolState) ? c.m.instVolState === 5 : null);
+  const bot = botBadge(manip, churnPct, crowdHi);
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, liqDir, volDir, voltDir, liqChgPct, voltChgPct, combo, bot, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
@@ -12447,6 +12526,7 @@ loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(l
   try{ window.updateNav(); }catch(e){}
   /* "Market now" panel remembers its state, closed by default for a cleaner first view */
   var mk=$('mkt'); if(mk){ mk.open = st.mkt===undefined ? false : !!st.mkt; mk.addEventListener('toggle', function(){ st.mkt=mk.open; save(); }); }
+  var mkc=$('mktCombo'); if(mkc){ mkc.open = st.mktCombo===undefined ? false : !!st.mktCombo; mkc.addEventListener('toggle', function(){ st.mktCombo=mkc.open; save(); }); }
 })();
 </script>
 <script>
