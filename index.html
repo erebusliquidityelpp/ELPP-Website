@@ -667,6 +667,11 @@ a{color:var(--accent)}
 .nsec h3,.cw-grid h4,.cw-side h4{color:color-mix(in srgb,var(--gold) 82%,var(--muted));letter-spacing:.16em}
 .elite-band{border-top:2px solid var(--gold);background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 92%,var(--gold)),var(--surface) 70%)}
 .elite-band h2,.elite-band h3{color:color-mix(in srgb,var(--gold) 70%,var(--text,#e8eaed))}
+.scan-bar{height:8px;border-radius:5px;background:var(--surface2,#151a22);border:1px solid var(--line);overflow:hidden}
+.scan-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--up,#2ecc8f));border-radius:5px;transition:width .6s ease}
+.scan-now{display:flex;align-items:center;gap:8px;font-size:13px}
+.scan-dot{width:9px;height:9px;border-radius:50%;background:var(--up,#2ecc8f);display:inline-block;animation:scanpulse 1.1s ease-in-out infinite}
+@keyframes scanpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 color-mix(in srgb,var(--up,#2ecc8f) 55%,transparent)}50%{opacity:.5;box-shadow:0 0 0 5px transparent}}
 .mkbar{background:linear-gradient(135deg,color-mix(in srgb,var(--surface) 90%,var(--accent)),var(--surface) 60%)}
 .mkb-state{font:600 22px var(--serif);letter-spacing:-.005em}
 .dlg-h h3,.cw-top h3{font-family:var(--serif);font-weight:600;letter-spacing:.005em}
@@ -771,7 +776,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.64</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.65</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10623,6 +10628,31 @@ function bkImport(text){
 }
 
 /* ---------- Today page ---------- */
+/* ===== Live Market Scan: the real fetch queue, shown live - how many tracked markets are up to date, which ones are being fetched right now, and which have a live flag ===== */
+function scanWidgetHtml(){
+  const now = Date.now(), uni = [...state.universe];
+  const rows = uni.map(name => {
+    const c = state.coins.get(name); if (!c) return null;
+    const need = name === 'BTC' ? 60000 : state.refreshSec * 1000;
+    const age = c.candles.length ? now - (c.fetchedAt || 0) : Infinity;
+    const status = c.busy ? 'scanning' : (age < need ? 'fresh' : 'queued');
+    const v = c.m && c.m.verdict;
+    const flag = isNum(v) ? (v === 5 ? 'Strong long' : v === 3 ? 'Strong short' : v === 4 ? 'Lean long' : v === 2 ? 'Lean short' : v === 0 ? 'Avoid' : null) : null;
+    return {name, status, fetchedAt:c.fetchedAt || 0, flag, v, dayVol:(c.ctx && c.ctx.dayVol) || 0};
+  }).filter(Boolean).sort((a, b) => b.dayVol - a.dayVol);
+  const total = rows.length, fresh = rows.filter(r => r.status === 'fresh').length, scanning = rows.filter(r => r.status === 'scanning');
+  const pct = total ? Math.round(fresh / total * 100) : 0;
+  const tickerTxt = scanning.length ? scanning.map(r => r.name).join(', ') : (total ? 'between sweeps…' : 'warming up…');
+  if (!total) return '<div class="nsec elite-band scan-widget"><h3>🔍 Live Market Scan</h3><p class="hint">Collecting the market list…</p></div>';
+  return `<div class="nsec elite-band scan-widget"><h3>🔍 Live Market Scan</h3>
+    <p class="hint">The scanner continuously re-checks every tracked market in rotation, 3 at a time. This is the real fetch queue, not a simulation.</p>
+    <div class="row" style="align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><div class="scan-bar"><i style="width:${pct}%"></i></div><small class="hint">${fresh} of ${total} markets up to date (${pct}%)</small></div>
+      <div class="scan-now"><span class="scan-dot"></span> scanning now: <b>${esc(tickerTxt)}</b></div>
+    </div>
+    <details class="ovd" data-ovd="scan-table" style="margin-top:8px"${OV.open.has('scan-table') ? ' open' : ''}><summary>All ${total} tracked markets, live status</summary>
+    <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
+}
 function todayHtml(){
   const sg = v => (v > 0 ? '+' : '') + v, now = Date.now(), r = MK.last, S = rgStatus(), nx = macNext();
   const all = [...state.coins.values()].filter(c => c.m && isNum(c.m.verdict) && (c.m.verdict === 5 || c.m.verdict === 3)).sort((a, b) => Math.abs(b.m.verdictScore) - Math.abs(a.m.verdictScore)).slice(0, 5);
@@ -10630,7 +10660,8 @@ function todayHtml(){
   const closedToday = SIG.list.filter(x => x.status !== 'open' && x.status !== 'tp1' && isNum(x.r) && (x.tEnd || x.t) >= d0.getTime()), sumR = closedToday.reduce((s, x) => s + x.r, 0);
   let hs = []; try { hs = healthRows(); } catch(e){} const bad = hs.filter(x => !x.ok && !x.opt).length;
   const tile = (lab, val, sub, cls) => `<div style="flex:1;min-width:170px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:18px;font-weight:700" class="${cls || ''}">${val}</div><small class="hint">${sub && sub.raw ? sub.raw : esc(sub || '')}</small></div>`;
-  let h = `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(r.state + '') : 'Collecting…', r ? r.grade + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
+  let h = scanWidgetHtml();
+  h += `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(r.state + '') : 'Collecting…', r ? r.grade + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
   h += `<div class="nsec"><h3>Top set-ups right now</h3>${all.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Verdict</th><th>Score</th><th style="text-align:left">Psychology</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th></th></tr></thead><tbody>${all.map(c => { const p = (() => { try { return planFor(c); } catch(e){ return null; } })(), m = c.m; return `<tr><td style="text-align:left"><b>${esc(c.name)}</b></td><td class="${m.verdict === 5 ? 'up' : 'dn'}">${esc(VERDICT_LAB[m.verdict])}</td><td>${sg(Math.round(m.verdictScore))}</td><td style="text-align:left" class="dim">${esc(m.psy ? m.psy.tag : '—')}</td><td>${p ? esc(fmtPx(p.entry)) : '—'}</td><td>${p ? esc(fmtPx(p.sl)) : '—'}</td><td>${p ? esc(fmtPx(p.tp1)) : '—'}</td><td>${p ? esc(fmtPx(p.tp2)) : '—'}</td><td><button class="btn sm" type="button" data-chart="${esc(c.name)}">Chart</button></td></tr>`; }).join('')}</tbody></table><p class="hint">Check each one on your own chart before taking it. Open "How it decides" to see why a coin scored what it did.</p>` : '<p class="hint">No Strong long or short verdicts at the moment. Waiting is also a position.</p>'}</div>`;
   h += `<div class="nsec"><h3>Your open signals</h3>${open.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Side</th><th>Entry</th><th>Stop</th><th>TP1</th><th>Age</th><th>MAE</th><th>MFE</th><th style="text-align:left">Status</th></tr></thead><tbody>${open.map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td>${esc(fmtPx(x.entry))}</td><td>${esc(fmtPx(x.sl))}${x.slWhy ? '<br><small class="dim">' + esc(stShort(x.slWhy)) + '</small>' : ''}</td><td>${esc(fmtPx(x.tp1))}</td><td>${esc(ago(x.t))}</td><td>${isNum(x.mae) ? x.mae.toFixed(2) + 'R' : '—'}</td><td>${isNum(x.mfe) ? x.mfe.toFixed(2) + 'R' : '—'}</td><td style="text-align:left">${esc(SIG_LAB[x.status] || x.status)}</td></tr>`).join('')}</tbody></table>` : '<p class="hint">No open signals.</p>'}</div>`;
   const at = +(LS.get('elpp_bk_at') || 0);
@@ -10640,6 +10671,7 @@ function todayHtml(){
 function renderToday(){
   const el = $('viewToday'); if (!el) return;
   if (!el._built){ el._built = true;
+    el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
     el.addEventListener('click', e => { const t = e.target; const a = t.closest('[data-chart]'); if (a){ openChart(a.dataset.chart); return; }
       if (t.closest('#bkOut')){ const n = bkExport($('bkKeys').checked); $('bkMsg').textContent = 'Saved ' + n + ' items to your downloads folder.'; el._h = ''; } });
     el.addEventListener('change', e => { if (e.target.id === 'bkIn' && e.target.files[0]){ const rd = new FileReader(); rd.onload = () => { try { const n = bkImport(rd.result); $('bkMsg').textContent = 'Restored ' + n + ' items. Reloading…'; setTimeout(() => location.reload(), 900); } catch(x){ $('bkMsg').textContent = 'Could not restore: ' + errTxt(x); } }; rd.readAsText(e.target.files[0]); } }); }
