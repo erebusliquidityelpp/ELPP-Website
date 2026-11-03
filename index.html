@@ -779,7 +779,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.67</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.68</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1879,7 +1879,7 @@ const state = Object.assign({
   sweepBars:12,
   hiddenCols:['chgUsd','volDUsd','trades','tradesX','vlt','oiChgUsd','basis','distLo','maxLev','iso','hist','spread','flowUsd','obi','volMcap','fdvRatio','athDist','newsCount','hypeWhy'],
   scope:'all', scopes:{}, tier:{mega:'500M', mid:'50M', capMega:'10B', capMid:'1B'}, btcLink:{tf:'1h', corr:'0.6'},
-  mode:'perp', venueMode:'auto', sigStrict:true, lkHist:[], tierBy:'vol', cgKey:'', sector:'', newsFilter:'all',
+  mode:'perp', venueMode:'merged', sigStrict:true, lkHist:[], tierBy:'vol', cgKey:'', sector:'', newsFilter:'all',
   hiddenColsCg:['pch_1h','pch_1y','cgVol','supplyPct','atlDist']
 }, LS.get('elpp_scan_state_v1') || {});
 if (!Array.isArray(state.hiddenCols)) state.hiddenCols = [];
@@ -10642,20 +10642,24 @@ function scanWidgetHtml(){
     const status = c.busy ? 'scanning' : (age < need ? 'fresh' : 'queued');
     const v = c.m && c.m.verdict;
     const flag = isNum(v) ? (v === 5 ? 'Strong long' : v === 3 ? 'Strong short' : v === 4 ? 'Lean long' : v === 2 ? 'Lean short' : v === 0 ? 'Avoid' : null) : null;
-    return {name, status, fetchedAt:c.fetchedAt || 0, flag, v, dayVol:(c.ctx && c.ctx.dayVol) || 0};
+    return {name, status, fetchedAt:c.fetchedAt || 0, flag, v, dayVol:(c.ctx && c.ctx.dayVol) || 0, venN:Object.keys(c.vs || {}).length || 1};
   }).filter(Boolean).sort((a, b) => b.dayVol - a.dayVol);
   const total = rows.length, fresh = rows.filter(r => r.status === 'fresh').length, scanning = rows.filter(r => r.status === 'scanning');
   const pct = total ? Math.round(fresh / total * 100) : 0;
   const tickerTxt = scanning.length ? scanning.map(r => r.name).join(', ') : (total ? 'between sweeps…' : 'warming up…');
   if (!total) return '<div class="nsec elite-band scan-widget"><h3>🔍 Live Market Scan</h3><p class="hint">Collecting the market list…</p></div>';
+  const venNames = {hyperliquid:'Hyperliquid', binance:'Binance', bybit:'Bybit', okx:'OKX', bitget:'Bitget', gate:'Gate', dydx:'dYdX', aster:'Aster', paradex:'Paradex', drift:'Drift', lighter:'Lighter'};
+  const venUsed = (V.used && V.used.length ? V.used : ['hyperliquid']).map(v => venNames[v] || v);
+  const hip3N = rows.filter(r => /^[a-z0-9]+:/i.test(r.name)).length;
+  const cgN = (X.cgRows || []).length;
   return `<div class="nsec elite-band scan-widget"><h3>🔍 Live Market Scan</h3>
-    <p class="hint">The scanner continuously re-checks every tracked market in rotation, 3 at a time. This is the real fetch queue, not a simulation.</p>
+    <p class="hint">The scanner continuously re-checks every tracked market in rotation, 3 at a time. This is the real fetch queue, not a simulation. Merged across ${venUsed.length} exchange${venUsed.length === 1 ? '' : 's'} (CEX and DEX together): <b>${esc(venUsed.join(', '))}</b>${hip3N ? `, including ${hip3N} Hyperliquid HIP-3 builder market${hip3N === 1 ? '' : 's'}` : ''}.${cgN ? ` Plus ${cgN.toLocaleString()} further altcoins and meme coins tracked with no perp market, on the Spot page.` : ''}</p>
     <div class="row" style="align-items:center;gap:16px;flex-wrap:wrap">
-      <div style="flex:1;min-width:220px"><div class="scan-bar"><i style="width:${pct}%"></i></div><small class="hint">${fresh} of ${total} markets up to date (${pct}%)</small></div>
+      <div style="flex:1;min-width:220px"><div class="scan-bar"><i style="width:${pct}%"></i></div><small class="hint">${fresh} of ${total} perp markets up to date (${pct}%)</small></div>
       <div class="scan-now"><span class="scan-dot"></span> scanning now: <b>${esc(tickerTxt)}</b></div>
     </div>
     <details class="ovd" data-ovd="scan-table" style="margin-top:8px"${OV.open.has('scan-table') ? ' open' : ''}><summary>All ${total} tracked markets, live status</summary>
-    <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
+    <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 function todayHtml(){
   const sg = v => (v > 0 ? '+' : '') + v, now = Date.now(), r = MK.last, S = rgStatus(), nx = macNext();
@@ -12528,6 +12532,8 @@ if (state.panelOpen === null) state.panelOpen = innerWidth > 1000;
 $('wrap').classList.toggle('nofilters', !state.panelOpen);
 /* V4.67: one-time bump so the Live Market Scan widget (and the scanner itself) covers every coin, not just the old Top 60 default; the user can still dial it back down in Filters -> Coins */
 if (!state.topNAllBump){ state.topNAllBump = true; state.topN = 9999; saveState(); }
+/* V4.68: one-time bump to merge every connected exchange (Hyperliquid, Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Paradex, Drift, Lighter) on every refresh, CEX and DEX together, instead of Hyperliquid-only with fallback; dial back to Auto in the Venue chip or Filters if the extra requests are too much */
+if (!state.venueMergedBump){ state.venueMergedBump = true; state.venueMode = 'merged'; saveState(); }
 try { rankUniverse(); } catch(e){}
 bindToolbar(); bindPanel(); applyStateToUI(); tzInit(); sessDraw(); setInterval(sessDraw, 60000);
 addMenuTabLinks();
