@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.57</title>
+<title>ELPP CRYPTO SCANNER PRO V4.58</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -90,6 +90,14 @@ button,select,input{font:inherit;color:inherit}
 .cs-pane-h+.cspCorr,.cspCorr+.cspSug{margin-bottom:4px}
 .cspSug:not(:empty),.cspCorr:not(:empty){padding-bottom:4px}
 .cs-pane-h b{font:600 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.cs-pane-h .cspStar{border:1px solid var(--line);background:none;border-radius:999px;padding:1px 8px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.cs-pane-h .cspStar.on{color:#f5b942;border-color:#f5b942}
+.cs-pane-h .cspMax{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
+.cs-pane-h .cspMax:hover{color:var(--accent)}
+.cs-grid.cs-maxmode{display:block}
+.cs-grid.cs-maxmode .cs-pane{display:none}
+.cs-grid.cs-maxmode .cs-pane.cs-maxed{display:block}
+.cs-pane.cs-maxed iframe{height:80vh;min-height:520px}
 .cs-pane iframe{width:100%;height:46dvh;min-height:320px;border:0;display:block;background:var(--surface)}
 .cw-side>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--surface)}
 .cw-side h4,.cw-grid h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -761,7 +769,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.57</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.58</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5526,7 +5534,7 @@ function lkDraw(){
 }
 /* ===== V4.55: Charts page - up to 10 independent TradingView panes, each with its own coin, exchange, timeframe and drawing-tools toggle, plus an "open in new tab" link on every chart surface ===== */
 const CS_MAX = 10, CS_TF_OPTS = [['5','5m'],['15','15m'],['60','1h'],['240','4h'],['D','1D']];
-const CS = {panes:[]};
+const CS = {panes:[], maxIdx:null};
 function csPool(){ return [...state.coins.values()].filter(c => c.ctx).map(c => c.name); }
 function csFindSug(q){
   const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
@@ -5566,13 +5574,16 @@ function csCorrHtml(c){
 function csSaveState(){ state.cs = {panes:CS.panes.map(p => ({...p}))}; saveState(); }
 function csPaneHeadHtml(i, p){
   const c = p.name ? (state.coins.get(p.name) || X.cgObj.get(p.name)) : null;
+  const watching = !!(p.name && wlGet(p.name)), maxed = CS.maxIdx === i;
   return `<div class="cs-pane-h" data-pi="${i}">
     <b>${i + 1}</b>
     <input type="text" class="cspIn" data-pi="${i}" value="${p.name ? esc(p.name) : ''}" placeholder="Coin" autocomplete="off" style="width:78px;font-family:var(--mono);text-transform:uppercase">
     <select class="cspVenue" data-pi="${i}" aria-label="Exchange for pane ${i + 1}">${TV_HOSTS.map(([ex, kind, lab]) => `<option value="${ex}|${kind}"${ex + '|' + kind === p.venue ? ' selected' : ''}>${lab}</option>`).join('')}</select>
     <select class="cspIv" data-pi="${i}" aria-label="Timeframe for pane ${i + 1}">${CS_TF_OPTS.map(([v, l]) => `<option value="${v}"${v === p.iv ? ' selected' : ''}>${l}</option>`).join('')}</select>
     <label class="hint" style="display:flex;align-items:center;gap:3px;white-space:nowrap"><input type="checkbox" class="cspTb" data-pi="${i}"${p.tb ? ' checked' : ''}> Tools</label>
+    <button type="button" class="cspStar${watching ? ' on' : ''}" data-pi="${i}" title="${watching ? 'Remove from watchlist' : 'Add to watchlist'}">${watching ? '★' : '☆'} Watch</button>
     <a href="${esc((p.name && csPaneTvUrl(p)) || '#')}" class="cspTab" data-pi="${i}" target="_blank" rel="noopener noreferrer" title="Open this pane in a new tab" style="color:var(--accent);white-space:nowrap">↗ New tab</a>
+    <button type="button" class="cspMax" data-pi="${i}" title="${maxed ? 'Restore to grid' : 'Expand this pane'}" aria-label="${maxed ? 'Restore this pane to the grid' : 'Expand this pane to fill the screen'}">${maxed ? '⤡' : '⤢'}</button>
     <button type="button" class="x cspX" data-pi="${i}" aria-label="Remove pane ${i + 1}" title="Remove this pane">×</button>
   </div>
   <div class="hint cspCorr" data-pi="${i}" style="padding:0 8px">${c ? csCorrHtml(c) : ''}</div>
@@ -5583,10 +5594,31 @@ function csPaneHtml(i, p){
 }
 function csRenderAll(){
   const wrap = $('csGridWrap'); if (!wrap) return;
+  CS.maxIdx = null; wrap.classList.remove('cs-maxmode');
   wrap.innerHTML = CS.panes.map((p, i) => csPaneHtml(i, p)).join('');
   $('csCount').textContent = CS.panes.length + ' / ' + CS_MAX;
   $('csAddPane').disabled = CS.panes.length >= CS_MAX;
   csSaveState();
+}
+function csToggleWatch(i){
+  const p = CS.panes[i]; if (!p || !p.name) return;
+  if (wlGet(p.name)) wlRemove(p.name); else wlAdd(p.name);
+  const btn = document.querySelector(`.cspStar[data-pi="${i}"]`); if (!btn) return;
+  const on = !!wlGet(p.name);
+  btn.classList.toggle('on', on); btn.textContent = (on ? '★' : '☆') + ' Watch'; btn.title = on ? 'Remove from watchlist' : 'Add to watchlist';
+  try { requestRender(); } catch(e){}
+}
+function csToggleMax(i){
+  CS.maxIdx = (CS.maxIdx === i) ? null : i;
+  const wrap = $('csGridWrap'); if (!wrap) return;
+  wrap.classList.toggle('cs-maxmode', CS.maxIdx !== null);
+  wrap.querySelectorAll('.cs-pane').forEach((el, idx) => el.classList.toggle('cs-maxed', idx === CS.maxIdx));
+  wrap.querySelectorAll('.cspMax').forEach(btn => {
+    const idx = +btn.dataset.pi, maxed = idx === CS.maxIdx;
+    btn.textContent = maxed ? '⤡' : '⤢';
+    btn.title = maxed ? 'Restore to grid' : 'Expand this pane';
+    btn.setAttribute('aria-label', maxed ? 'Restore this pane to the grid' : 'Expand this pane to fill the screen');
+  });
 }
 function csRefreshPaneHead(i){
   const p = CS.panes[i], head = document.querySelector(`.cs-pane-h[data-pi="${i}"]`); if (!head) return;
@@ -5622,7 +5654,7 @@ function renderCharts(){
   if (!el._built){
     el._built = true;
     el.innerHTML = `<div class="nsec"><h3>Charts: full technical analysis, built in</h3>
-      <p class="hint">Up to ${CS_MAX} independent TradingView charts, side by side — each with its own coin, exchange, timeframe and drawing tools, exactly like a single chart. Compare different coins, or the same coin on different timeframes, all at once. "Tools" shows or hides that pane's drawing toolbar to save space; "↗ New tab" opens that exact chart on tradingview.com.</p>
+      <p class="hint">Up to ${CS_MAX} independent TradingView charts, side by side — each with its own coin, exchange, timeframe and drawing tools, exactly like a single chart. Compare different coins, or the same coin on different timeframes, all at once. "Tools" shows or hides that pane's drawing toolbar to save space; "☆ Watch" adds that pane's coin to your watchlist; "⤢" expands a pane to fill the screen (click it again, or the "⤡" that replaces it, to go back); "↗ New tab" opens that exact chart on tradingview.com.</p>
       <div class="row"><span class="hint">Panes: <b id="csCount"></b></span><button class="btn sm" id="csAddPane" type="button">+ Add pane</button></div>
       <div id="csGridWrap" class="cs-grid"></div>
       <p class="hint">If a chart stays blank, TradingView may be blocked on your network. TradingView can still auto-hide a pane's toolbar on a narrow phone screen even with "Tools" checked — turn the phone sideways or use a wider window to force it open. Drawings you make here are not saved between visits.</p></div>`;
@@ -5639,6 +5671,8 @@ function renderCharts(){
       const pick = e.target.closest('[data-pick]'); if (pick){ e.preventDefault(); csPanePick(+pick.dataset.pi, pick.dataset.pick); return; }
       if (e.target.closest('#csAddPane')){ csAddPane(); return; }
       const rm = e.target.closest('.cspX'); if (rm){ csRemovePane(+rm.dataset.pi); return; }
+      const star = e.target.closest('.cspStar'); if (star){ csToggleWatch(+star.dataset.pi); return; }
+      const max = e.target.closest('.cspMax'); if (max){ csToggleMax(+max.dataset.pi); return; }
     });
     el.addEventListener('change', e => {
       const i = e.target.dataset.pi; if (i === undefined) return; const idx = +i, p = CS.panes[idx]; if (!p) return;
