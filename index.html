@@ -665,6 +665,8 @@ a{color:var(--accent)}
 /* cards and panels */
 .nsec,.mv,.xcard,.hdset,.dkwin,.vbox,.dkcard,.mapk,.mkt,.mkbar,#setupBar,.cw-grid>section,#cwV4>div{border-radius:var(--r);border-color:var(--line);background:var(--surface);box-shadow:var(--card-sh)}
 .nsec h3,.cw-grid h4,.cw-side h4{color:color-mix(in srgb,var(--gold) 82%,var(--muted));letter-spacing:.16em}
+.elite-band{border-top:2px solid var(--gold);background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 92%,var(--gold)),var(--surface) 70%)}
+.elite-band h2,.elite-band h3{color:color-mix(in srgb,var(--gold) 70%,var(--text,#e8eaed))}
 .mkbar{background:linear-gradient(135deg,color-mix(in srgb,var(--surface) 90%,var(--accent)),var(--surface) 60%)}
 .mkb-state{font:600 22px var(--serif);letter-spacing:-.005em}
 .dlg-h h3,.cw-top h3{font-family:var(--serif);font-weight:600;letter-spacing:.005em}
@@ -769,12 +771,13 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.59</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.60</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
     <span class="chip" id="chipSession">Session <b id="sessTxt">–</b></span>
+    <span class="chip" id="chipNY" title="Countdown to the New York session open (12:30 UTC), the highest-liquidity, most tradeable window. PKT is always shown; pick another zone to add it too.">NY <b id="nyOut">–</b> <select id="nyTzSel" aria-label="Show the New York session open/close time in this time zone, in addition to PKT"></select></span>
     <span class="chip" id="chipSrc">Data <b id="srcTxt">–</b></span>
     <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
@@ -822,6 +825,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-view="drops">Airdrops &amp; unlocks</button>
     </details>
   <details class="ng" data-g="research" open><summary>Research</summary>
+    <button class="nv" type="button" data-view="elite" style="font-weight:700">⭐ Elite Coin Terminal</button>
     <button class="nv" type="button" data-view="lookup">Coin lookup: type a symbol</button>
     <button class="nv" type="button" data-view="charts">Charts: full technical analysis</button>
     <button class="nv" type="button" data-view="news">News &amp; big names</button>
@@ -996,6 +1000,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewDrops" class="vcol" hidden></div>
     <div id="viewWhales" class="vcol" hidden></div>
     <div id="viewLookup" class="vcol" hidden></div>
+    <div id="viewElite" class="vcol" hidden></div>
     <div id="viewCharts" class="vcol" hidden></div>
     <div id="viewMovers" class="vcol" hidden></div>
     <div id="viewMap" class="vcol" hidden></div>
@@ -1024,7 +1029,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 
 <dialog id="dlg"><div class="dlg-h"><h3 id="dlgTitle"></h3><button class="btn sm" id="dlgClose" type="button">Close</button></div><div class="dlg-b" id="dlgBody"></div></dialog>
 <dialog id="chartDlg" class="coinwin"><div class="cw-top"><h3 id="chartTitle">Coin</h3><div class="row"><select id="chartVenue" aria-label="Exchange"></select><select id="chartIv" aria-label="Timeframe"><option value="5">5m</option><option value="15" selected>15m</option><option value="60">1h</option><option value="240">4h</option><option value="D">1D</option></select><a class="btn sm" id="chartExt" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open in TradingView</a><button class="btn sm" id="cwPop" type="button">Pop out to a new window</button><button class="btn sm" id="cwWatch" type="button">☆ Add to watchlist</button><button class="btn sm" id="chartClose" type="button">Close</button></div></div>
-<div class="cw-body" id="cwBody"><div id="cwBanner"></div><div id="cwSig" style="margin:6px 10px"></div><div class="cw-main cw-one"><div class="cw-chart"><iframe id="chartFrame" title="TradingView chart" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe><p class="hint">If the chart stays blank, TradingView may be blocked on your network. Drawings you make here are not saved.</p></div></div><div id="cwData" class="cw-grid"><div id="cwPlan"></div><div id="cwFlow"></div><div id="cwV4"></div></div></div></dialog>
+<div class="cw-body" id="cwBody"><div id="cwBanner"></div><div id="cwSig" style="margin:6px 10px"></div><div id="cwFc" style="margin:6px 10px"></div><div class="cw-main cw-one"><div class="cw-chart"><iframe id="chartFrame" title="TradingView chart" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe><p class="hint">If the chart stays blank, TradingView may be blocked on your network. Drawings you make here are not saved.</p></div></div><div id="cwData" class="cw-grid"><div id="cwPlan"></div><div id="cwFlow"></div><div id="cwV4"></div></div></div></dialog>
 <dialog id="guideDlg" style="width:min(1100px,calc(100vw - 24px))"><div class="dlg-h"><h3>Threshold guide</h3><button class="btn sm" id="guideClose" type="button">Close</button></div><div class="dlg-b" id="guideBody"></div></dialog>
 <dialog id="colDlg"><div class="dlg-h"><h3>Columns</h3><button class="btn sm" id="colClose" type="button">Close</button></div><div class="dlg-b" id="colBody"></div></dialog>
 <dialog id="insDlg" style="width:min(900px,calc(100vw - 16px))"><div class="dlg-h"><h3 id="insDlgT">Institutional scan</h3><span class="row" style="gap:6px;align-items:center"><button class="btn sm" id="insPrev" type="button" title="Previous coin (left arrow key)">◀</button><span class="hint" id="insPos"></span><button class="btn sm" id="insNext" type="button" title="Next coin (right arrow key)">▶</button><button class="btn sm" id="insDlgRe" type="button" title="Reload this coin">↻</button><button class="btn sm" id="insDlgX" type="button">Close</button></span></div><div class="dlg-b" id="insDlgB"></div></dialog>
@@ -1891,7 +1896,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','elite','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -5075,7 +5080,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -5138,7 +5143,7 @@ function render(){
   else if (!state.lastCtx){ dot.className = 'dot ' + (state.err ? 'bad' : 'wait'); $('liveTxt').textContent = state.err ? 'No connection' : 'Connecting…'; }
   else { dot.className = 'dot ' + (age > 40 ? 'bad' : 'ok'); $('liveTxt').textContent = `Live · prices ${age}s ago · candles ${live.length}/${live.length + loading.length}`; }
   $('budTxt').textContent = `${budgetUsed()}/1200`; $('venTxt').textContent = venueLabel();
-  $('sessTxt').textContent = sessionText();
+  $('sessTxt').textContent = sessionText(); nyDraw();
 }
 function renderMarket(all){
   const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; if (!el) return;
@@ -5789,6 +5794,92 @@ function renderLookup(){
       const wh = e.target.closest('[data-lkwh]'); if (wh){ if (W.agg.get(wh.dataset.lkwh)) showWhales(wh.dataset.lkwh); else toast('No tracked whale wallet holds this coin right now'); return; }
       const a = e.target.closest('[data-chart]'); if (a){ e.preventDefault(); openChart(a.dataset.chart); } });
     lkDraw(); setTimeout(() => { try { $('lkIn').focus(); } catch(e){} }, 50);
+  }
+}
+/* ===== Elite Coin Terminal: one coin, the full institutional read - supercharts, star-rated verdict, liquidity map, price outlook, all built from the scanner's own live data ===== */
+const ET = {seq:0, name:'', busy:false, err:'', t:null};
+function etStars(c){
+  const m = c.m || {};
+  if (!isNum(m.verdict)) return '<span class="dim" style="font-size:18px">☆☆☆☆☆</span> <small class="dim">no verdict yet</small>';
+  if (m.verdict === 0) return '<span class="dn" style="font-size:18px">☆☆☆☆☆</span> <small class="dn">stand aside</small>';
+  const sc = Math.abs(m.verdictScore || 0), thr = m.vThr || [15, 35];
+  const n = sc >= thr[1] ? 5 : sc >= thr[1] * 0.65 ? 4 : sc >= thr[0] ? 3 : sc >= thr[0] * 0.5 ? 2 : 1;
+  const dir = m.verdict >= 4 ? 'up' : (m.verdict === 2 || m.verdict === 3) ? 'dn' : 'dim';
+  return `<span class="${dir}" style="font-size:18px;letter-spacing:1px">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</span> <small class="${dir}">${n} of 5 conviction</small>`;
+}
+function etTvSrc(venue, c, iv){
+  const sym = tvSymbol(venue, c), studies = JSON.stringify(['Volume@tv-basicstudies']);
+  return 'https://s.tradingview.com/widgetembed/?' + `symbol=${encodeURIComponent(sym)}&interval=${iv}&theme=${isDark() ? 'dark' : 'light'}&style=1&timezone=${encodeURIComponent('Asia/Karachi')}&withdateranges=1&hidesidetoolbar=1&hide_side_toolbar=1&hidetoptoolbar=0&symboledit=0&saveimage=0&hideideas=1&studies=${encodeURIComponent(studies)}&locale=en`;
+}
+function etHistHtml(){
+  const h = state.etHist || []; return h.length ? 'Recent: ' + h.map(n => `<a href="#" data-etsym="${esc(n)}" style="color:var(--accent);margin-right:8px">${esc(n)}</a>`).join('') : '';
+}
+async function etScan(q){
+  q = String(q === undefined ? $('etIn').value : q).trim(); if (!q) return;
+  const my = ++ET.seq; ET.busy = true; ET.err = ''; budget.tokens = Math.max(budget.tokens, 0) + 70; etDraw();
+  try {
+    await lkLoadVenues(); if (my !== ET.seq) return;
+    let {c, sug} = lkFind(q);
+    if (!c){ const k = vKey(lkNorm(q)); c = lkMakeForeign(k); if (c) sug = []; }
+    if (!c){ ET.name = ''; ET.err = 'No coin matches "' + q + '".' + (sug && sug.length ? ' Did you mean: ' + sug.slice(0, 6).join(', ') + '?' : ''); }
+    else {
+      ET.name = c.name; const h = (state.etHist || []).filter(x => x !== normSym(c.name)); h.unshift(normSym(c.name)); state.etHist = h.slice(0, 10); saveState();
+      if (c.ctx && (!c.candles.length || !c.loaded || Date.now() - (c.fetchedAt || 0) > 60000)){ try { await fetchCandles(c); } catch(e){ if (my === ET.seq) ET.err = 'Candles could not be loaded (' + errTxt(e) + '). Showing what is available.'; } }
+      if (my !== ET.seq) return;
+      try { compute(c, Date.now()); } catch(e){}
+    }
+  } catch(e){ if (my === ET.seq) ET.err = errTxt(e); }
+  if (my !== ET.seq) return;
+  ET.busy = false; etDraw();
+  if (!ET.t) ET.t = setInterval(etTick, 4000);
+}
+function etTick(){
+  if (state.view !== 'elite' || !ET.name || ET.busy) return;
+  const c = state.coins.get(ET.name) || LK.ext.get(ET.name); if (!c) return;
+  if (c.lk && !c.busy && Date.now() - (c.fetchedAt || 0) > 45000){ c.busy = true; fetchCandles(c).catch(() => {}).then(() => { c.busy = false; }); }
+  try { compute(c, Date.now()); } catch(e){}
+  etDraw();
+}
+function etDraw(){
+  const out = $('etOut'); if (!out) return; const hh = $('etHist'); if (hh) hh.innerHTML = etHistHtml();
+  if (ET.busy){ out.innerHTML = '<p class="hint">Scanning…</p>'; return; }
+  if (!ET.name){ out.innerHTML = ET.err ? `<p class="hint warn">${esc(ET.err)}</p>` : '<p class="hint">Type a coin above to open its terminal.</p>'; return; }
+  const c = state.coins.get(ET.name) || LK.ext.get(ET.name) || X.cgObj.get(ET.name);
+  if (!c){ out.innerHTML = '<p class="hint">Coin no longer available.</p>'; return; }
+  const m = c.m || {}, px = isNum(m.px) ? m.px : (c.cg && c.cg.current_price), chg24 = (m.chg && m.chg['24h']) || (c.cg && c.cg.price_change_percentage_24h);
+  const k = normSym(c.name), def = X.bnFut.has(k) || (c.ctx && !X.bnAt) ? 'BINANCE|perp' : X.bnSpot.has(k) ? 'BINANCE|spot' : 'COINBASE|usd';
+  const canChart = c.ctx || X.bnSpot.has(k) || X.bnFut.has(k);
+  const panes = [['15 min', '15'], ['1 hour', '60'], ['4 hour', '240']];
+  const scharts = canChart ? panes.map(([lab, iv]) => `<div class="jrc"><h4>${esc(lab)} supercharts</h4><iframe src="${esc(etTvSrc(def, c, iv))}" style="width:100%;height:260px;border:0;border-radius:8px" title="${esc(c.name)} ${esc(lab)} chart"></iframe></div>`).join('') : '<p class="hint">No chart venue found for this coin yet.</p>';
+  out.innerHTML = `
+    <div class="nsec elite-band">
+      <div class="row" style="align-items:baseline;gap:14px;flex-wrap:wrap">
+        <h2 style="margin:0;letter-spacing:.04em">${esc(c.name)}</h2>
+        <span style="font-size:22px;font-weight:700;font-family:var(--mono)">${isNum(px) ? esc(fmtPx(px)) : '—'}</span>
+        ${isNum(chg24) ? `<span class="${chg24 >= 0 ? 'up' : 'dn'}" style="font-weight:700">${chg24 > 0 ? '+' : ''}${chg24.toFixed(2)}% 24h</span>` : ''}
+        ${etStars(c)}
+      </div>
+      <p class="hint">${c.ctx ? 'Hyperliquid perp' : (c.lk ? 'Synthesized from other exchanges (no Hyperliquid market for this coin)' : 'Spot / CoinGecko coin')} · scanned ${new Date().toLocaleTimeString()}</p>
+    </div>
+    <div class="nsec"><h3>Supercharts</h3><div class="jrch">${scharts}</div></div>
+    <div class="nsec"><h3>Liquidity map &amp; price outlook</h3><div id="etSig" style="margin:6px 0"></div><div id="etFc" style="margin:6px 0"></div></div>
+    <div class="nsec">${verdictCard(c)}</div>`;
+  try { cwSigDraw(c, 'etSig'); } catch(e){}
+  try { cwFcDraw(c, 'etFc'); } catch(e){}
+}
+function renderElite(){
+  const el = $('viewElite'); if (!el) return;
+  if (!el._built){
+    el._built = true;
+    el.innerHTML = `<div class="nsec elite-band"><h3>⭐ Elite Coin Terminal</h3>
+      <p class="hint">Type any coin and get the full institutional read in one screen: supercharts across three timeframes, the scanner's star-rated verdict with the plain-English why and how it was reached, the liquidity map, and a short-term price outlook built from this coin's own trend, momentum and volatility — not a trained prediction model. Works for any coin, not only BTC.</p>
+      <div class="row"><label class="hint" for="etIn">Coin</label><input type="text" id="etIn" placeholder="e.g. BTC, SOL, PEPE, HYPE" autocomplete="off" autocapitalize="characters" spellcheck="false" style="min-width:220px;font-family:var(--mono);text-transform:uppercase"><button class="btn primary" id="etGo" type="button">Scan</button></div>
+      <div id="etHist" class="row"></div></div>
+      <div id="etOut"></div>`;
+    $('etIn').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); etScan(); } });
+    $('etGo').addEventListener('click', () => etScan());
+    el.addEventListener('click', e => { const sy = e.target.closest('[data-etsym]'); if (sy){ e.preventDefault(); $('etIn').value = sy.dataset.etsym; etScan(sy.dataset.etsym); } });
+    etDraw(); setTimeout(() => { try { $('etIn').focus(); } catch(e){} }, 50);
   }
 }
 function renderMovers(){
@@ -8533,7 +8624,7 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['today','Today'],['bt','Backtest'],['decide','How it decides'],['proof','Verified results'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['elite','Elite Terminal'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['today','Today'],['bt','Backtest'],['decide','How it decides'],['proof','Verified results'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   try { renderViewGuide(); } catch(e){}
@@ -8541,7 +8632,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewCharts').hidden = state.view !== 'charts'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -10474,8 +10565,8 @@ function bwMult(){
 }
 function bwApply(f){ const M = bwMult(); if (!M) return; for (const x of f){ const g = dgOf(x[1], x[2]); if (M[g] && M[g] !== 1) x[0] = Math.round(x[0] * M[g] * 10) / 10; } }
 /* ---------- signal levels on a chart (the TradingView embed cannot be drawn on, so this is a small chart of its own) ---------- */
-function cwSigDraw(c){
-  const el = $('cwSig'); if (!el) return; const cd = c && c.candles; if (!cd || cd.length < 30){ el.innerHTML = ''; return; }
+function cwSigDraw(c, elId){
+  const el = $(elId || 'cwSig'); if (!el) return; const cd = c && c.candles; if (!cd || cd.length < 30){ el.innerHTML = ''; return; }
   const m = c.m || {}, N = Math.min(150, cd.length), B = cd.slice(-N), sig = [...SIG.list].reverse().find(x => x.name === c.name && (x.status === 'open' || x.status === 'tp1')) || null, pl = sig ? null : (() => { try { return planFor(c); } catch(e){ return null; } })(), lv = [];
   const px = isNum(m.px) ? m.px : B[B.length - 1].c; const src = sig || pl;
   if (src){ const tag = sig ? '' : ' (plan)'; lv.push(['Entry' + tag, src.entry, '#9aa4b2'], ['Stop' + tag, src.sl, '#ff6b6b'], ['TP1' + tag, src.tp1, '#2ecc8f'], ['TP2' + tag, src.tp2, '#2ecc8f']); }
@@ -10487,6 +10578,50 @@ function cwSigDraw(c){
   for (const [nm, v, col] of lv){ if (!isFinite(v) || v < lo || v > hi) continue; const y = sy(v); s += `<line x1="${pad}" x2="${W - rgt + 6}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${col}" stroke-dasharray="${/Entry|Stop|TP/.test(nm) ? '0' : '4 4'}" stroke-opacity=".8"/><text x="${W - rgt + 10}" y="${(y + 4).toFixed(1)}" font-size="11" fill="${col}">${esc(String(nm).slice(0, 14))} ${esc(fmtPx(v))}</text>`; }
   s += `<line x1="${pad}" x2="${W - rgt + 6}" y1="${sy(px).toFixed(1)}" y2="${sy(px).toFixed(1)}" stroke="currentColor" stroke-opacity=".5"/><text x="${W - rgt + 10}" y="${(sy(px) + 4).toFixed(1)}" font-size="11" fill="currentColor">now ${esc(fmtPx(px))}</text></svg>`;
   el.innerHTML = `<div class="hint" style="margin:6px 0 2px"><b>Signal levels</b> · last ${N} five-minute candles · ${sig ? 'open signal (' + esc(sig.dir) + ', opened ' + esc(ago(sig.t)) + ')' : (pl ? 'plan only: no open signal, levels are the current trade plan' : 'no plan for this coin right now')}. Gold dashed lines are estimated liquidity pools.</div>` + s;
+}
+/* ===== Price Outlook: a short-term forecast cone built from this coin's own ATR, trend/momentum verdict score and liquidity map - works for any coin, not a trained model ===== */
+function cwFcDraw(c, elId){
+  const el = $(elId || 'cwFc'); if (!el) return; const cd = c && c.candles, m = c && c.m;
+  if (!cd || cd.length < 30 || !m || !isNum(m.verdictScore) || !isNum(m.verdict)){ el.innerHTML = ''; return; }
+  const N = Math.min(80, cd.length), B = cd.slice(-N), px = isNum(m.px) ? m.px : B[B.length - 1].c;
+  const atrPct = m.atr && (m.atr['1h'] || m.atr['15m']);
+  const atrAbs = isNum(atrPct) && atrPct > 0 ? atrPct / 100 * px : (() => { let s = 0, n = 0; for (let i = 1; i < B.length; i++){ s += Math.abs(B[i].c - B[i - 1].c); n++; } return n ? Math.max(s / n, px * 0.001) : px * 0.003; })();
+  const K = 24, standAside = m.verdict === 0, dirStrength = standAside ? 0 : Math.max(-1, Math.min(1, (m.verdictScore || 0) / 100));
+  const totalDrift = atrAbs * Math.sqrt(K) * dirStrength * 0.5;
+  const steps = []; for (let k = 1; k <= K; k++){ const center = px + totalDrift * (k / K), hw = atrAbs * Math.sqrt(k); steps.push({k, center, up: center + hw, dn: center - hw}); }
+  const pools = (m.pools || []).filter(q => isNum(q.p)); let magnet = null;
+  if (Math.abs(dirStrength) >= 0.15){
+    const side = dirStrength > 0 ? 1 : 2, cand = pools.slice().sort((a, b) => Math.abs(a.d) - Math.abs(b.d)).find(q => q.side === side);
+    const last = steps[steps.length - 1], reach = side === 1 ? last.up - px : px - last.dn;
+    if (cand && Math.abs(cand.p - px) <= reach * 1.4) magnet = cand;
+  }
+  let lo = Math.min(...B.map(x => x.l), ...steps.map(s => s.dn)), hi = Math.max(...B.map(x => x.h), ...steps.map(s => s.up));
+  if (magnet && isFinite(magnet.p)){ lo = Math.min(lo, magnet.p); hi = Math.max(hi, magnet.p); }
+  const total = N + K, W = 900, H = 230, pad = 8, rgt = 110, sx = i => pad + i / (total - 1) * (W - pad - rgt), sy = v => H - 14 - (v - lo) / ((hi - lo) || 1) * (H - 28), bw = Math.max(1.5, (W - pad - rgt) / total * 0.6);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--surface2,#151a22);border-radius:8px" role="img" aria-label="Price forecast cone">`;
+  B.forEach((x, i) => { const up = x.c >= x.o, col = up ? '#2ecc8f' : '#ff6b6b', X = sx(i); s += `<line x1="${X.toFixed(1)}" x2="${X.toFixed(1)}" y1="${sy(x.h).toFixed(1)}" y2="${sy(x.l).toFixed(1)}" stroke="${col}" stroke-width="1"/><rect x="${(X - bw / 2).toFixed(1)}" y="${sy(Math.max(x.o, x.c)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1, Math.abs(sy(x.o) - sy(x.c))).toFixed(1)}" fill="${col}"/>`; });
+  const nowX = sx(N - 1); s += `<line x1="${nowX.toFixed(1)}" x2="${nowX.toFixed(1)}" y1="6" y2="${H - 14}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="2 3"/>`;
+  const upPts = steps.map((st, idx) => sx(N + idx).toFixed(1) + ',' + sy(st.up).toFixed(1)).join(' '), dnPts = steps.slice().reverse().map(st => sx(N + st.k - 1).toFixed(1) + ',' + sy(st.dn).toFixed(1)).join(' '), startPt = nowX.toFixed(1) + ',' + sy(px).toFixed(1);
+  const coneCol = standAside ? '#9aa4b2' : (dirStrength >= 0 ? '#2ecc8f' : '#ff6b6b');
+  s += `<polygon points="${startPt} ${upPts} ${dnPts}" fill="${coneCol}" fill-opacity=".14" stroke="${coneCol}" stroke-opacity=".4" stroke-width="1"/>`;
+  s += `<polyline points="${[startPt].concat(steps.map((st, idx) => sx(N + idx).toFixed(1) + ',' + sy(st.center).toFixed(1))).join(' ')}" fill="none" stroke="${coneCol}" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  s += `<line x1="${pad}" x2="${W - rgt + 6}" y1="${sy(px).toFixed(1)}" y2="${sy(px).toFixed(1)}" stroke="currentColor" stroke-opacity=".5"/><text x="${W - rgt + 10}" y="${(sy(px) + 4).toFixed(1)}" font-size="11" fill="currentColor">now ${esc(fmtPx(px))}</text>`;
+  const last = steps[steps.length - 1];
+  s += `<text x="${W - rgt + 10}" y="${(sy(last.up) + 4).toFixed(1)}" font-size="11" fill="${coneCol}">${esc(fmtPx(last.up))}</text><text x="${W - rgt + 10}" y="${(sy(last.dn) + 4).toFixed(1)}" font-size="11" fill="${coneCol}">${esc(fmtPx(last.dn))}</text>`;
+  if (magnet) s += `<line x1="${pad}" x2="${W - rgt + 6}" y1="${sy(magnet.p).toFixed(1)}" y2="${sy(magnet.p).toFixed(1)}" stroke="#c9a227" stroke-dasharray="4 4" stroke-opacity=".85"/><text x="${W - rgt + 10}" y="${(sy(magnet.p) + 4).toFixed(1)}" font-size="11" fill="#c9a227">${esc(fmtPx(magnet.p))} magnet</text>`;
+  s += `</svg>`;
+  const [lean, strong] = m.vThr || [15, 35], absScore = Math.abs(m.verdictScore || 0), conv = standAside ? 'stood aside' : absScore >= strong ? 'high' : absScore >= lean ? 'moderate' : 'low';
+  const dirWord = standAside ? 'flat (stand-aside flagged)' : dirStrength > 0.05 ? 'tilts up' : dirStrength < -0.05 ? 'tilts down' : 'flat / sideways';
+  const pos = (m.vPos || []).slice(0, 3).map(x => x[1]), neg = (m.vNeg || []).slice(0, 3).map(x => x[1]);
+  let why = '<ul class="ovstory" style="margin:4px 0">';
+  if (pos.length) why += pos.map(t => `<li class="up">${esc(t)}</li>`).join('');
+  if (neg.length) why += neg.map(t => `<li class="dn">${esc(t)}</li>`).join('');
+  if (!pos.length && !neg.length) why += '<li class="dim">No strong signals either way right now.</li>';
+  why += '</ul>';
+  el.innerHTML = `<div class="hint" style="margin:10px 0 2px"><b>Price outlook</b> · next ~2h (24 five-minute bars), built from this coin's own trend, momentum and volatility — not a trained prediction model.</div>${s}
+    <div class="hint" style="margin-top:4px"><b>${esc(VERDICT_LAB[m.verdict] || 'Verdict')}</b> (score ${m.verdictScore >= 0 ? '+' : ''}${m.verdictScore}, ${conv} conviction) · the projected path ${dirWord}.${magnet ? ' Price tends to get pulled toward the nearest resting liquidity at ' + esc(fmtPx(magnet.p)) + ' (' + esc(magnet.name || 'pool') + ').' : ''}</div>
+    ${why}
+    <div class="hint" style="opacity:.8">How this is built: the shaded band is this coin's own recent volatility (ATR) spread forward using the usual square-root-of-time rule; the dashed line tilts up or down by the scanner's current verdict score. It's a statistical read of this coin's own data, not a guarantee, and it knows nothing about sudden news.</div>`;
 }
 /* ---------- morning brief (optional) ---------- */
 function brCfg(){ return state.brief || (state.brief = {on:false, time:'08:00', last:''}); }
@@ -11844,11 +11979,11 @@ function openChart(name){
   $('chartTitle').textContent = name + (c.cg ? ' · ' + (c.cg.name || '') : '') + (c.ctx ? ' · Hyperliquid perp' : '');
   const ac = state.acct || {};
   $('cwPlan').innerHTML = `<h4>Trade plan (estimated from the liquidity map and ATR)</h4><div class="row"><label class="hint">Account $ <input id="cwAcct" type="text" value="${esc(String(ac.bal || 1000))}" style="width:90px"></label><label class="hint">Risk % <input id="cwRisk" type="text" value="${esc(String(ac.risk || 1))}" style="width:56px"></label></div><div id="cwPlanOut"></div><p class="hint">Stop sits just beyond the nearest liquidity pool on the wrong side; targets are the next pools on the right side. Not financial advice: check the 4h structure before any entry.</p>`;
-  $('cwBanner').innerHTML = cwBanner(live); cwFill(live); cwPlanCalc(); try { cwSigDraw(live); } catch(e){}
+  $('cwBanner').innerHTML = cwBanner(live); cwFill(live); cwPlanCalc(); try { cwSigDraw(live); } catch(e){} try { cwFcDraw(live); } catch(e){}
   loadChart();
   if (c.ctx){ OF.tape = []; OF.tapeCoin = c.name; OF.book = null; OF.ofi = null; ofConnect(); ofSub('trades', c.name); ofSub('l2Book', c.name); }
   $('cwFlow').innerHTML = cwFlowHtml(live); try { v4Flow(live); } catch(e){}
-  cwT1 = setInterval(() => cwRefresh(false), 2000); cwT2 = setInterval(() => { cwRefresh(true); cwPlanCalc(); try { cwSigDraw(snapshot.get(chartCoin.name) || chartCoin); } catch(e){} }, 8000);
+  cwT1 = setInterval(() => cwRefresh(false), 2000); cwT2 = setInterval(() => { cwRefresh(true); cwPlanCalc(); try { cwSigDraw(snapshot.get(chartCoin.name) || chartCoin); } catch(e){} try { cwFcDraw(snapshot.get(chartCoin.name) || chartCoin); } catch(e){} }, 8000);
   $('chartDlg').showModal(); $('chartDlg').scrollTop = 0;
 }
 function cwPop(){
@@ -11876,6 +12011,32 @@ function sessionText(){
   const pkt = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
   const name = inL && inN ? 'London–NY overlap' : inL ? 'London' : inN ? 'New York' : 'Asia / off-hours';
   return `${name} · ${pkt} PKT`;
+}
+/* ===== America (New York) session countdown: opens 12:30 UTC, the highest-liquidity window the scanner itself uses for kill-zone scoring; closes 20:00 UTC. PKT always shown, plus any time zone the user picks ===== */
+function tzList(){
+  try { if (Intl.supportedValuesOf) return Intl.supportedValuesOf('timeZone'); } catch(e){}
+  return ['UTC','Asia/Karachi','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Sao_Paulo','Europe/London','Europe/Berlin','Europe/Moscow','Africa/Lagos','Africa/Cairo','Asia/Dubai','Asia/Kolkata','Asia/Dhaka','Asia/Shanghai','Asia/Hong_Kong','Asia/Singapore','Asia/Tokyo','Asia/Seoul','Australia/Sydney','Pacific/Auckland'];
+}
+function tzClock(tz, t){ try { return new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false}).format(t); } catch(e){ return '—'; } }
+function tzLabel(tz){ return tz.replace(/_/g, ' '); }
+function nyBounds(){
+  const now = Date.now(), d0 = new Date(now); d0.setUTCHours(0, 0, 0, 0);
+  const openMs = d0.getTime() + 12.5 * 3600000, closeMs = d0.getTime() + 20 * 3600000;
+  const nextOpen = openMs > now ? openMs : openMs + 864e5, nextClose = closeMs > now ? closeMs : closeMs + 864e5;
+  return {open:now >= openMs && now < closeMs, nextOpen, nextClose};
+}
+function nyInit(){
+  const sel = $('nyTzSel'); if (!sel || sel._built) return; sel._built = true;
+  if (!state.tzPref){ try { state.tzPref = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Karachi'; } catch(e){ state.tzPref = 'Asia/Karachi'; } }
+  const list = tzList(); if (!list.includes(state.tzPref)) list.unshift(state.tzPref);
+  sel.innerHTML = list.map(tz => `<option value="${esc(tz)}"${tz === state.tzPref ? ' selected' : ''}>${esc(tzLabel(tz))}</option>`).join('');
+  sel.addEventListener('change', () => { state.tzPref = sel.value; saveState(); nyDraw(); });
+}
+function nyDraw(){
+  const el = $('nyOut'); if (!el) return;
+  const B = nyBounds(), tz = state.tzPref || 'Asia/Karachi', pkt = tzClock('Asia/Karachi', B.nextOpen), loc = tz === 'Asia/Karachi' ? null : tzClock(tz, B.nextOpen);
+  const cdTarget = B.open ? B.nextClose : B.nextOpen;
+  el.innerHTML = `${B.open ? '<span class="up">LIVE · closes in</span>' : '<span>opens in</span>'} <span data-cd="${cdTarget}">${esc(cdFmt(cdTarget - Date.now()))}</span> <small class="dim">· next open ${esc(pkt)} PKT${loc ? ' · ' + esc(loc) + ' ' + esc(tzLabel(tz)) : ''}</small>`;
 }
 
 /* ---------- rules panel ---------- */
@@ -12177,7 +12338,7 @@ function applyStateToUI(){
 if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
 if (state.panelOpen === null) state.panelOpen = innerWidth > 1000;
 $('wrap').classList.toggle('nofilters', !state.panelOpen);
-bindToolbar(); bindPanel(); applyStateToUI();
+bindToolbar(); bindPanel(); applyStateToUI(); nyInit(); nyDraw();
 addMenuTabLinks();
 render();
 ctxTick();
