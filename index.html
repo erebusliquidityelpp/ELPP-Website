@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.52</title>
+<title>ELPP CRYPTO SCANNER PRO V4.53</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -749,7 +749,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.52</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.53</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -803,6 +803,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     </details>
   <details class="ng" data-g="research" open><summary>Research</summary>
     <button class="nv" type="button" data-view="lookup">Coin lookup: type a symbol</button>
+    <button class="nv" type="button" data-view="charts">Charts: full technical analysis</button>
     <button class="nv" type="button" data-view="news">News &amp; big names</button>
     </details>
   <details class="ng" data-g="tools" open><summary>Tools</summary>
@@ -975,6 +976,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewDrops" class="vcol" hidden></div>
     <div id="viewWhales" class="vcol" hidden></div>
     <div id="viewLookup" class="vcol" hidden></div>
+    <div id="viewCharts" class="vcol" hidden></div>
     <div id="viewMovers" class="vcol" hidden></div>
     <div id="viewMap" class="vcol" hidden></div>
     <div id="viewSdesk" class="vcol" hidden></div>
@@ -1869,7 +1871,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-if (!['table','news','flows','drops','whales','movers','lookup','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'].includes(state.view)) state.view = 'table';
+if (!['table','news','flows','drops','whales','movers','lookup','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'].includes(state.view)) state.view = 'table';
 if (typeof state.autoApply !== 'boolean') state.autoApply = true;
 if (!state.newsType) state.newsType = 'all';
 for (const [k, v] of [['takeSel','any'],['boSel','any'],['icSel','any'],['moveSel','any'],['optSel','any'],['ofSel','any'],['takeMin','60'],['phaseSel','any'],['pressSel','any'],['pressMin','15']]) if (state[k] === undefined) state[k] = v;
@@ -1924,7 +1926,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
+    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','cs','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -4943,7 +4945,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -5484,6 +5486,81 @@ function lkDraw(){
   const col = $('lkCols'), ph = c.ctx ? lkPlanHtml(c) : '', fh = c.lk ? '' : cwFlowHtml(c), gh = cwGroups(c);
   if ($('lkPlan')._h !== ph){ $('lkPlan')._h = ph; $('lkPlan').innerHTML = ph; } if ($('lkFlow')._h !== fh){ $('lkFlow')._h = fh; $('lkFlow').innerHTML = fh; }
   if (col._g !== gh){ col._g = gh; for (const x of [...col.children]) if (x.tagName === 'SECTION') x.remove(); col.insertAdjacentHTML('beforeend', gh); }
+}
+/* ===== V4.53: Charts page - a permanent TradingView chart for any coin, as its own menu instead of a per-coin popup ===== */
+const CS = {name:null};
+function csPool(){ return [...state.coins.values()].filter(c => c.ctx).map(c => c.name); }
+function csFindSug(q){
+  const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
+  const pool = csPool();
+  return pool.filter(n => n.includes(sym)).sort((a, b) => (a.startsWith(sym) ? 0 : 1) - (b.startsWith(sym) ? 0 : 1) || a.length - b.length).slice(0, 8);
+}
+function csUrl(venue, iv){
+  const c = state.coins.get(CS.name) || X.cgObj.get(CS.name); if (!c) return '';
+  const sym = tvSymbol(venue, c);
+  const studies = JSON.stringify(['Volume@tv-basicstudies', 'MASimple@tv-basicstudies', 'RSI@tv-basicstudies']);
+  return 'https://s.tradingview.com/widgetembed/?' + `symbol=${encodeURIComponent(sym)}&interval=${iv}&theme=${isDark() ? 'dark' : 'light'}&style=1&timezone=${encodeURIComponent('Asia/Karachi')}&withdateranges=1&hidesidetoolbar=0&symboledit=1&saveimage=1&hideideas=1&studies=${encodeURIComponent(studies)}&locale=en`;
+}
+function csCorrHtml(c){
+  if (!c || !c.m) return '';
+  if (c.name === 'BTC') return 'This is BTC itself, so there is nothing to compare it against.';
+  const r = c.m.corr && isNum(c.m.corr['1h']) ? c.m.corr['1h'] : null, beta = isNum(c.m.beta) ? c.m.beta : null;
+  if (r === null) return 'Correlation to BTC: not enough data yet.';
+  const read = r >= 0.7 ? 'moves closely with BTC' : r <= 0.3 ? 'is moving mostly on its own' : 'has a middling link to BTC';
+  return `Correlation to BTC (1h): <b>${r.toFixed(2)}</b> — ${read}${beta !== null ? ' · beta ' + beta.toFixed(2) : ''}. To compare it on the chart directly, use the chart's own "Compare" tool (top toolbar) and add BTC.`;
+}
+function csLoad(){
+  if (!CS.name) return;
+  const c = state.coins.get(CS.name) || X.cgObj.get(CS.name); if (!c) return;
+  const venue = $('csVenue').value, iv = $('csIv').value;
+  $('csFrame').src = csUrl(venue, iv);
+  $('csExt').href = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSymbol(venue, c)) + '&interval=' + iv;
+  $('csTitle').textContent = c.name + (c.cg ? ' · ' + (c.cg.name || '') : '') + (c.ctx ? ' · Hyperliquid perp' : '');
+  $('csCorr').innerHTML = csCorrHtml(c);
+  state.cs = {name:CS.name, venue, iv}; saveState();
+}
+function csPick(name){
+  const c = state.coins.get(name) || X.cgObj.get(name); if (!c) return;
+  CS.name = c.name; $('csIn').value = c.name; $('csSug').innerHTML = '';
+  const k = normSym(c.name), def = X.bnFut.has(k) || (c.ctx && !X.bnAt) ? 'BINANCE|perp' : X.bnSpot.has(k) ? 'BINANCE|spot' : 'COINBASE|usd';
+  $('csVenue').innerHTML = TV_HOSTS.map(([ex, kind, lab]) => `<option value="${ex}|${kind}"${ex + '|' + kind === def ? ' selected' : ''}>${lab}</option>`).join('');
+  csLoad();
+}
+function renderCharts(){
+  const el = $('viewCharts'); if (!el) return;
+  if (!el._built){
+    el._built = true;
+    el.innerHTML = `<div class="nsec"><h3>Charts: full technical analysis, built in</h3>
+      <p class="hint">Pick any coin, pick the exchange and timeframe, and use TradingView's own drawing tools, indicators and compare/correlation overlay — right here, nothing else to open.</p>
+      <div class="row"><input type="text" id="csIn" placeholder="Type a coin symbol (e.g. BTC, SOL, DOGE)" autocomplete="off" style="flex:1 1 220px"><button class="btn" id="csGo" type="button">Go</button></div>
+      <p class="hint" id="csSug"></p>
+      <div class="row" style="margin-top:4px"><select id="csVenue" aria-label="Exchange"></select><select id="csIv" aria-label="Timeframe"><option value="5">5m</option><option value="15" selected>15m</option><option value="60">1h</option><option value="240">4h</option><option value="D">1D</option></select><a class="btn sm" id="csExt" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open in TradingView</a><button class="btn sm" id="csFull" type="button">Full coin window (plan, order flow, signals)</button></div>
+      <h4 id="csTitle" style="margin:10px 0 2px"></h4>
+      <p class="hint" id="csCorr"></p>
+      <div class="cw-chart"><iframe id="csFrame" title="TradingView chart" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+      <p class="hint">If the chart stays blank, TradingView may be blocked on your network. Drawings you make here are not saved between visits.</p></div>`;
+    const doSearch = () => {
+      const q = $('csIn').value, sug = csFindSug(q);
+      if (q && sug.length && sug[0].toUpperCase() === q.toUpperCase().replace(/[\s$]/g, '')){ csPick(sug[0]); return; }
+      $('csSug').innerHTML = sug.length ? 'Did you mean: ' + sug.map(n => `<a href="#" data-pick="${esc(n)}" style="color:var(--accent)">${esc(n)}</a>`).join(', ') : (q ? 'No coin matches "' + esc(q) + '".' : '');
+    };
+    el.addEventListener('input', e => { if (e.target.id === 'csIn') doSearch(); });
+    el.addEventListener('keydown', e => { if (e.target.id === 'csIn' && e.key === 'Enter'){ const sug = csFindSug(e.target.value); if (sug.length) csPick(sug[0]); } });
+    el.addEventListener('click', e => {
+      const p = e.target.closest('[data-pick]'); if (p){ csPick(p.dataset.pick); return; }
+      if (e.target.closest('#csGo')){ const sug = csFindSug($('csIn').value); if (sug.length) csPick(sug[0]); return; }
+      if (e.target.closest('#csFull')){ if (CS.name) openChart(CS.name); return; }
+    });
+    el.addEventListener('change', e => { if (e.target.id === 'csVenue' || e.target.id === 'csIv') csLoad(); });
+    const sv = state.cs || {};
+    const start = (sv.name && (state.coins.get(sv.name) || X.cgObj.get(sv.name))) ? sv.name : (state.coins.get('BTC') ? 'BTC' : (csPool()[0] || null));
+    if (start){
+      csPick(start);
+      if (sv.iv) $('csIv').value = sv.iv;
+      if (sv.venue && [...$('csVenue').options].some(o => o.value === sv.venue)) $('csVenue').value = sv.venue;
+      csLoad();
+    }
+  } else if (!CS.name && state.coins.get('BTC')) csPick('BTC');
 }
 function renderLookup(){
   const el = $('viewLookup'); if (!el) return;
@@ -7910,7 +7987,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {proof:'Automatic proof of how the scanner performs: live signal record plus a daily backtest of every idea, ready to download as clean data for your website.', today:'Your day on one screen: market state, next macro event, the strongest set-ups, open signals, risk guard and backup.', decide:'Exactly which rules add or subtract points: sweeps, volume, institutions, retail positioning and context, with a live breakdown for any coin.', bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {proof:'Automatic proof of how the scanner performs: live signal record plus a daily backtest of every idea, ready to download as clean data for your website.', today:'Your day on one screen: market state, next macro event, the strongest set-ups, open signals, risk guard and backup.', decide:'Exactly which rules add or subtract points: sweeps, volume, institutions, retail positioning and context, with a live breakdown for any coin.', bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', charts:'A full TradingView chart for any coin, built in: pick a coin, pick the exchange and timeframe, and use TradingView\'s own drawing tools, indicators and compare/correlation overlay, all inside the scanner.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -8226,7 +8303,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewCharts').hidden = state.view !== 'charts'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -9937,6 +10014,7 @@ const VIEW_GUIDE = {
   screener: [['Change % (5m / 1h / 24h)', 'How far price moved.', '1h move 0.5% or more is moving; 3% or more is a strong burst. Under 0.3% = dead.'], ['Volume and RVOL', 'RVOL = volume compared with its normal level.', 'RVOL 1.5x or more = interest; 3x or more = unusual; under 0.7x = quiet.'], ['Open interest and OI change', 'Size of open futures positions and its 1h change.', 'OI +3% in an hour with price moving = real participation. OI falling while price rises = weak.'], ['Funding (per year)', 'What longs pay shorts, shown as a yearly rate.', '0-15% normal. Above 60% crowded longs; below -20% crowded shorts. Extreme values are contrarian.'], ['24h trend line', 'Mini chart of the day.', 'A line making higher highs = trend; a flat noisy line = chop.']],
   listings: [['Exchange tags', 'Where the coin trades.', 'Listed on Binance, Bybit and Hyperliquid = deep liquidity. Only on small exchanges = thin, risky.'], ['HIP-3 / HIP-4', 'Hyperliquid builder markets and outcome markets.', 'HIP-3 markets can be thin: check book depth before sizing up.'], ['Perp vs spot', 'Futures contract vs the real coin.', 'Perps allow leverage and shorting; spot is the real asset.']],
   lookup: [['Verdict and score', 'The overall call for the coin.', 'Perp scalp: +35 or more Strong, +15 Lean, in between Wait; mirror for shorts. Avoid = hard block.'], ['Trade plan (entry, stop, TP1, TP2, R:R)', 'Levels from liquidity sweeps and ATR.', 'R:R 1.5 or more to TP1 and 2.5 or more to TP2 is a healthy plan. Under 1:1 skip.'], ['ATR', 'Average candle range: a normal move.', 'Stop under 1x ATR gets hit by noise. 1.5x ATR is typical. Above 3x ATR makes position too large to risk.'], ['Trend efficiency (er)', '0 = chop, 1 = straight line.', 'Under 0.25 range play only; 0.4 or more = clean trend.'], ['Liquidity levels', 'Where stops cluster.', 'Price tends to visit big clusters before reversing; do not put your stop on a visible cluster.']],
+  charts: [['Timeframe', 'Switch between 5m, 15m, 1h, 4h and 1D without leaving the page.', 'Scalp on 15m/1h; use 4h/1D only as a bias check, same as the rest of the scanner.'], ['Exchange', 'Which venue’s candles you are looking at.', 'Prices are nearly identical across venues (arbitrage keeps them in line); pick whichever has the deepest book for that coin.'], ['Compare / correlation', 'Add another symbol (e.g. BTC) on top of the chart from TradingView’s own toolbar.', 'If the coin tracks BTC closely, a BTC-only move explains most of its price action; if it decouples, something coin-specific is happening.']],
   news: [['News tags', 'investment, listing, upgrade, unlock, risk.', 'Listing and investment = positive catalysts; unlock and risk = negative. Old news (over 24h) is already priced in.'], ['Big names', 'Posts from people who move markets.', 'Treat as a trigger to check the chart, not a trade signal.']],
   flows: [['Stablecoin supply change', 'New USDT/USDC minted is money waiting to buy.', 'Growth above +0.5% in 7 days = fuel. Within +/-0.2% = neutral. Shrinking over 0.5% = money leaving.'], ['USDT vs USDC', 'Offshore vs US regulated money.', 'USDC growth often means US institutions; USDT growth means global retail and exchanges.']],
   drops: [['Unlock date and size', 'When new tokens reach the market.', 'Less than 7 days away and over 2% of supply = reduce size. Over 5% = avoid longs.'], ['Airdrops', 'Free tokens to users.', 'Airdrop day often sees selling from recipients.']],
