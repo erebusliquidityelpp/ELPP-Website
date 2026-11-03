@@ -53,6 +53,9 @@ button,select,input{font:inherit;color:inherit}
 .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;color:var(--muted);white-space:nowrap}
 .chip b{color:var(--fg);font-weight:500;font-family:var(--mono)}
+/* elite accent rectangle on each header chip, so the bar reads as distinct tags rather than a flat row of plain text */
+header.top .chips .chip{position:relative;padding-left:17px;background:color-mix(in srgb,var(--surface) 90%,var(--gold) 7%);border-color:color-mix(in srgb,var(--line) 75%,var(--gold) 18%)}
+header.top .chips .chip::before{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:5px;height:13px;border-radius:2px;background:var(--chipacc,var(--gold))}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .dot.ok{background:var(--up)} .dot.bad{background:var(--down)} .dot.wait{background:var(--warn)}
 
@@ -776,12 +779,13 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.65</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.66</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
     <span class="chip" id="chipSession">Session <b id="sessTxt">–</b></span>
+    <span class="chip" id="chipBot" title="Whether the tape right now looks human-led or algorithmic/choppy, built from the stop-hunt and churn metrics the scanner already tracks per coin.">Tape <b id="botTxt">–</b></span>
     <span class="chip" id="chipSyd" title="Sydney session: open 08:00-17:00 Sydney local time. Quietest of the four, but the first to open the trading day.">Sydney <b id="sydOut">–</b></span>
     <span class="chip" id="chipTok" title="Tokyo session: open 09:00-18:00 Tokyo local time. Asia's main session.">Tokyo <b id="tokOut">–</b></span>
     <span class="chip" id="chipLon" title="London session: open 08:00-16:30 London local time. This is when a trade is most likely to actually fill well.">London <b id="lonOut">–</b></span>
@@ -5157,7 +5161,7 @@ function render(){
   $('sessTxt').textContent = sessionText(); sessDraw();
 }
 function renderMarket(all){
-  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; try { renderMktCombo(); } catch(e){} if (!el) return;
+  const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; try { renderMktCombo(); } catch(e){} try { botHeaderDraw(mk); } catch(e){} if (!el) return;
   if (all.length < 5){ vd.textContent = 'collecting data…'; vd.className = ''; el.innerHTML = ''; return; }
   const W = (f, wf) => { let a = 0, w = 0; for (const c of all){ const v = f(c), x = wf(c); if (isNum(v) && isNum(x) && x > 0){ a += v * x; w += x; } } return w ? a / w : null; };
   const byVol = c => c.m.vol24;
@@ -12205,15 +12209,22 @@ function tzInit(){
   sel.innerHTML = list.map(tz => `<option value="${esc(tz)}"${tz === state.tzPref ? ' selected' : ''}>${esc(tzLabel(tz))}</option>`).join('');
   sel.addEventListener('change', () => { state.tzPref = sel.value; saveState(); sessDraw(); });
 }
+function chipAcc(el, color){ const chip = el && el.closest('.chip'); if (chip) chip.style.setProperty('--chipacc', color || ''); }
 function sessDraw(){
   const syd = $('sydOut'), tok = $('tokOut'), lon = $('lonOut'), ny = $('nyOut'), ovl = $('ovlOut'), now = $('tzNow'); if (!syd || !tok || !lon || !ny || !ovl || !now) return;
-  syd.innerHTML = sessChipHtml(citySess('Australia/Sydney', 480, 1020), 'OPEN');
-  tok.innerHTML = sessChipHtml(citySess('Asia/Tokyo', 540, 1080), 'OPEN');
-  lon.innerHTML = sessChipHtml(citySess('Europe/London', 480, 990), 'OPEN');
-  ny.innerHTML = sessChipHtml(citySess('America/New_York', 480, 1020), 'OPEN');
-  ovl.innerHTML = sessChipHtml(overlapSess(), 'OPEN - busiest time');
+  const fill = (el, s) => { el.innerHTML = sessChipHtml(s, 'OPEN'); chipAcc(el, s.open ? 'var(--up)' : ''); };
+  fill(syd, citySess('Australia/Sydney', 480, 1020));
+  fill(tok, citySess('Asia/Tokyo', 540, 1080));
+  fill(lon, citySess('Europe/London', 480, 990));
+  fill(ny, citySess('America/New_York', 480, 1020));
+  { const s = overlapSess(); ovl.innerHTML = sessChipHtml(s, 'OPEN - busiest time'); chipAcc(ovl, s.open ? 'var(--up)' : ''); }
   const tz = state.tzPref || 'Asia/Karachi';
   try { now.textContent = new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false}).format(new Date()) + (tz === 'Asia/Karachi' ? ' PKT' : ' ' + tzLabel(tz)); } catch(e){ now.textContent = '—'; }
+}
+function botHeaderDraw(mk){
+  const el = $('botTxt'); if (!el) return;
+  if (!mk || !mk.bot){ el.textContent = '–'; chipAcc(el, ''); return; }
+  el.textContent = mk.bot.label; chipAcc(el, mk.bot.tone === 'up' ? 'var(--up)' : mk.bot.tone === 'warn' ? 'var(--warn)' : mk.bot.tone === 'dn' ? 'var(--down)' : '');
 }
 
 /* ---------- rules panel ---------- */
