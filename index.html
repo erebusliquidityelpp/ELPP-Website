@@ -779,7 +779,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.66</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.67</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1874,7 +1874,7 @@ const LS = {
 /* ---------- state ---------- */
 const state = Object.assign({
   preset:DEFAULT_PRESET, edited:false, rules:null, minSoft:5, aSoft:7, missing:'ignore',
-  topN:60, statsTf:'1h', readTf:'1h', closedOnly:true, onlyPass:true, minShow:10,
+  topN:9999, statsTf:'1h', readTf:'1h', closedOnly:true, onlyPass:true, minShow:10,
   sort:{id:'score',dir:-1}, theme:null, panelOpen:null, custom:{}, refreshSec:120, search:'',
   sweepBars:12,
   hiddenCols:['chgUsd','volDUsd','trades','tradesX','vlt','oiChgUsd','basis','distLo','maxLev','iso','hist','spread','flowUsd','obi','volMcap','fdvRatio','athDist','newsCount','hypeWhy'],
@@ -12526,6 +12526,9 @@ function applyStateToUI(){
 if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
 if (state.panelOpen === null) state.panelOpen = innerWidth > 1000;
 $('wrap').classList.toggle('nofilters', !state.panelOpen);
+/* V4.67: one-time bump so the Live Market Scan widget (and the scanner itself) covers every coin, not just the old Top 60 default; the user can still dial it back down in Filters -> Coins */
+if (!state.topNAllBump){ state.topNAllBump = true; state.topN = 9999; saveState(); }
+try { rankUniverse(); } catch(e){}
 bindToolbar(); bindPanel(); applyStateToUI(); tzInit(); sessDraw(); setInterval(sessDraw, 60000);
 addMenuTabLinks();
 render();
