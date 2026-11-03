@@ -771,13 +771,16 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.60</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.61</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
     <span class="chip" id="chipSession">Session <b id="sessTxt">–</b></span>
-    <span class="chip" id="chipNY" title="Countdown to the New York session open (12:30 UTC), the highest-liquidity, most tradeable window. PKT is always shown; pick another zone to add it too.">NY <b id="nyOut">–</b> <select id="nyTzSel" aria-label="Show the New York session open/close time in this time zone, in addition to PKT"></select></span>
+    <span class="chip" id="chipLon" title="London session: open 08:00-16:30 London local time. This is when a trade is most likely to actually fill well.">London <b id="lonOut">–</b></span>
+    <span class="chip" id="chipNY" title="New York session: open 08:00-17:00 New York local time. This is when a trade is most likely to actually fill well.">New York <b id="nyOut">–</b></span>
+    <span class="chip" id="chipOvl" title="London and New York both open at once: the busiest, most liquid couple of hours of the day.">Overlap <b id="ovlOut">–</b></span>
+    <span class="chip" id="chipTz" title="Current time. Pick any time zone to see it in that zone instead.">Now <b id="tzNow">–</b> <select id="nyTzSel" aria-label="Show the current time in this time zone"></select></span>
     <span class="chip" id="chipSrc">Data <b id="srcTxt">–</b></span>
     <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
@@ -5143,7 +5146,7 @@ function render(){
   else if (!state.lastCtx){ dot.className = 'dot ' + (state.err ? 'bad' : 'wait'); $('liveTxt').textContent = state.err ? 'No connection' : 'Connecting…'; }
   else { dot.className = 'dot ' + (age > 40 ? 'bad' : 'ok'); $('liveTxt').textContent = `Live · prices ${age}s ago · candles ${live.length}/${live.length + loading.length}`; }
   $('budTxt').textContent = `${budgetUsed()}/1200`; $('venTxt').textContent = venueLabel();
-  $('sessTxt').textContent = sessionText(); nyDraw();
+  $('sessTxt').textContent = sessionText(); sessDraw();
 }
 function renderMarket(all){
   const el = $('mktBody'), vd = $('mktVerdict'); try { renderMktBar(all); } catch(e){} const mk = MK.last; if (!el) return;
@@ -12012,31 +12015,47 @@ function sessionText(){
   const name = inL && inN ? 'London–NY overlap' : inL ? 'London' : inN ? 'New York' : 'Asia / off-hours';
   return `${name} · ${pkt} PKT`;
 }
-/* ===== America (New York) session countdown: opens 12:30 UTC, the highest-liquidity window the scanner itself uses for kill-zone scoring; closes 20:00 UTC. PKT always shown, plus any time zone the user picks ===== */
+/* ===== London, New York and their overlap: three plain countdowns, plus a clock you can set to any time zone ===== */
 function tzList(){
   try { if (Intl.supportedValuesOf) return Intl.supportedValuesOf('timeZone'); } catch(e){}
   return ['UTC','Asia/Karachi','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Sao_Paulo','Europe/London','Europe/Berlin','Europe/Moscow','Africa/Lagos','Africa/Cairo','Asia/Dubai','Asia/Kolkata','Asia/Dhaka','Asia/Shanghai','Asia/Hong_Kong','Asia/Singapore','Asia/Tokyo','Asia/Seoul','Australia/Sydney','Pacific/Auckland'];
 }
-function tzClock(tz, t){ try { return new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false}).format(t); } catch(e){ return '—'; } }
 function tzLabel(tz){ return tz.replace(/_/g, ' '); }
-function nyBounds(){
-  const now = Date.now(), d0 = new Date(now); d0.setUTCHours(0, 0, 0, 0);
-  const openMs = d0.getTime() + 12.5 * 3600000, closeMs = d0.getTime() + 20 * 3600000;
-  const nextOpen = openMs > now ? openMs : openMs + 864e5, nextClose = closeMs > now ? closeMs : closeMs + 864e5;
-  return {open:now >= openMs && now < closeMs, nextOpen, nextClose};
+/* minute of day (0-1439) right now, in a city's own local clock - so London's 8am and New York's 8am are each that city's real 8am, DST included */
+function sessMinNow(tz){
+  const p = new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false}).formatToParts(new Date());
+  return (+p.find(x => x.type === 'hour').value % 24) * 60 + (+p.find(x => x.type === 'minute').value);
 }
-function nyInit(){
+/* a single city's own session: open flag, plus minutes until it next opens or closes */
+function citySess(tz, startMin, endMin){
+  const now = sessMinNow(tz), open = now >= startMin && now < endMin, wrap = x => x <= 0 ? x + 1440 : x;
+  return {open, toOpen:wrap(startMin - now), toClose:wrap(endMin - now)};
+}
+/* London opens when New York is still asleep and New York opens while London is still trading - the overlap is whichever opens later to whichever closes first, in real elapsed minutes from now (so it compares correctly across the two cities) */
+function overlapSess(){
+  const lO = 480 - sessMinNow('Europe/London'), lC = 990 - sessMinNow('Europe/London'), nO = 480 - sessMinNow('America/New_York'), nC = 1020 - sessMinNow('America/New_York');
+  let startRaw = Math.max(lO, nO), endRaw = Math.min(lC, nC); const open = startRaw <= 0 && endRaw > 0;
+  if (!open && endRaw <= 0){ startRaw += 1440; endRaw += 1440; }
+  return {open, toOpen:open ? 0 : Math.max(startRaw, 0), toClose:open ? endRaw : null};
+}
+function sessChipHtml(s, openWord){
+  const mins = s.open ? s.toClose : s.toOpen, t = Date.now() + mins * 60000;
+  return s.open ? `<span class="up">${esc(openWord)}, closes in</span> <span data-cd="${t}">${esc(cdFmt(t - Date.now()))}</span>` : `<span>opens in</span> <span data-cd="${t}">${esc(cdFmt(t - Date.now()))}</span>`;
+}
+function tzInit(){
   const sel = $('nyTzSel'); if (!sel || sel._built) return; sel._built = true;
   if (!state.tzPref){ try { state.tzPref = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Karachi'; } catch(e){ state.tzPref = 'Asia/Karachi'; } }
   const list = tzList(); if (!list.includes(state.tzPref)) list.unshift(state.tzPref);
   sel.innerHTML = list.map(tz => `<option value="${esc(tz)}"${tz === state.tzPref ? ' selected' : ''}>${esc(tzLabel(tz))}</option>`).join('');
-  sel.addEventListener('change', () => { state.tzPref = sel.value; saveState(); nyDraw(); });
+  sel.addEventListener('change', () => { state.tzPref = sel.value; saveState(); sessDraw(); });
 }
-function nyDraw(){
-  const el = $('nyOut'); if (!el) return;
-  const B = nyBounds(), tz = state.tzPref || 'Asia/Karachi', pkt = tzClock('Asia/Karachi', B.nextOpen), loc = tz === 'Asia/Karachi' ? null : tzClock(tz, B.nextOpen);
-  const cdTarget = B.open ? B.nextClose : B.nextOpen;
-  el.innerHTML = `${B.open ? '<span class="up">LIVE · closes in</span>' : '<span>opens in</span>'} <span data-cd="${cdTarget}">${esc(cdFmt(cdTarget - Date.now()))}</span> <small class="dim">· next open ${esc(pkt)} PKT${loc ? ' · ' + esc(loc) + ' ' + esc(tzLabel(tz)) : ''}</small>`;
+function sessDraw(){
+  const lon = $('lonOut'), ny = $('nyOut'), ovl = $('ovlOut'), now = $('tzNow'); if (!lon || !ny || !ovl || !now) return;
+  lon.innerHTML = sessChipHtml(citySess('Europe/London', 480, 990), 'OPEN');
+  ny.innerHTML = sessChipHtml(citySess('America/New_York', 480, 1020), 'OPEN');
+  ovl.innerHTML = sessChipHtml(overlapSess(), 'OPEN - busiest time');
+  const tz = state.tzPref || 'Asia/Karachi';
+  try { now.textContent = new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false}).format(new Date()) + (tz === 'Asia/Karachi' ? ' PKT' : ' ' + tzLabel(tz)); } catch(e){ now.textContent = '—'; }
 }
 
 /* ---------- rules panel ---------- */
@@ -12338,7 +12357,7 @@ function applyStateToUI(){
 if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
 if (state.panelOpen === null) state.panelOpen = innerWidth > 1000;
 $('wrap').classList.toggle('nofilters', !state.panelOpen);
-bindToolbar(); bindPanel(); applyStateToUI(); nyInit(); nyDraw();
+bindToolbar(); bindPanel(); applyStateToUI(); tzInit(); sessDraw(); setInterval(sessDraw, 60000);
 addMenuTabLinks();
 render();
 ctxTick();
