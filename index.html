@@ -11694,6 +11694,7 @@ function prCalc(c, hz){
   const dq = isNum(m.dqScore) ? m.dqScore : 60;
   let conf = Math.round(Math.min(100, Math.abs(net) * 1.25 + (have / Math.max(1, all)) * 25 + agree + (dq >= 60 ? 8 : dq < 45 ? -15 : 0) + (m.regime === 0 ? -10 : m.regime === 4 ? 6 : 0)));
   const warn = []; if (m.eventRisk === 2){ conf = Math.round(conf * 0.5); warn.push('Macro event blackout: predictions are unreliable now'); } else if (m.eventRisk === 1) warn.push('High-impact event within 60 minutes'); if (m.verdict === 0) warn.push('Scanner verdict says AVOID (risk story, thin or event)'); if (dq < 45) warn.push('Data quality below 45'); if (m.regime === 0) warn.push('Coin is choppy: low edge');
+  if (dq < 45) conf = Math.min(conf, 44);
   conf = Math.max(5, Math.min(97, conf));
   /* psychology story */
   const mood = psy ? psy.retail : 'unknown';
