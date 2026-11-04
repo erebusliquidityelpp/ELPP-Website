@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.78</title>
+<title>ELPP CRYPTO SCANNER PRO V4.79</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.78</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.79</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5693,7 +5693,10 @@ function lkDraw(){
 /* ===== V4.55: Charts page - up to 10 independent TradingView panes, each with its own coin, exchange, timeframe and drawing-tools toggle, plus an "open in new tab" link on every chart surface ===== */
 const CS_MAX = 10, CS_TF_OPTS = [['5','5m'],['15','15m'],['60','1h'],['240','4h'],['D','1D']];
 const CS = {panes:[], maxIdx:null};
-function csPool(){ return [...state.coins.values()].filter(c => c.ctx).map(c => c.name); }
+const HLU = {set:new Set(), at:0, busy:false};
+function hluLoad(){ if (HLU.busy || (HLU.set.size && Date.now() - HLU.at < 3600000)) return; HLU.busy = true; fetch('https://api.hyperliquid.xyz/info', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'meta'})}).then(r => r.json()).then(j => { (j.universe || []).forEach(u => { if (u && u.name && !u.isDelisted) HLU.set.add(u.name); }); HLU.at = Date.now(); HLU.busy = false; }).catch(() => { HLU.busy = false; }); }
+function csCoin(name){ if (!name) return null; return state.coins.get(name) || X.cgObj.get(name) || (HLU.set.has(name) ? {name, hlOnly:true} : null); }
+function csPool(){ hluLoad(); const s = new Set([...state.coins.values()].filter(c => c.ctx).map(c => c.name)); HLU.set.forEach(n => s.add(n)); return [...s]; }
 function csFindSug(q){
   const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
   const pool = csPool();
@@ -5702,6 +5705,7 @@ function csFindSug(q){
 function csVenueFor(c){
   if (!c) return 'COINBASE|usd';
   const k = normSym(c.name);
+  if ((c.ctx || c.hlOnly) && !/^xyz:/i.test(c.name)) return 'HYPERLIQUID|perp';
   return X.bnFut.has(k) || (c.ctx && !X.bnAt) ? 'BINANCE|perp' : X.bnSpot.has(k) ? 'BINANCE|spot' : 'COINBASE|usd';
 }
 function csNewPane(copyFrom){
@@ -5711,14 +5715,14 @@ function csNewPane(copyFrom){
 }
 function csPaneSrc(p){
   if (!p.name) return '';
-  const c = state.coins.get(p.name) || X.cgObj.get(p.name); if (!c) return '';
+  const c = csCoin(p.name); if (!c) return '';
   const sym = tvSymbol(p.venue, c);
   const studies = JSON.stringify(['Volume@tv-basicstudies']);
   const tb = p.tb ? 0 : 1;
   return 'https://s.tradingview.com/widgetembed/?' + `symbol=${encodeURIComponent(sym)}&interval=${p.iv}&theme=${isDark() ? 'dark' : 'light'}&style=1&timezone=${encodeURIComponent('Asia/Karachi')}&withdateranges=1&hidesidetoolbar=${tb}&hide_side_toolbar=${tb}&hidetoptoolbar=0&symboledit=1&saveimage=1&hideideas=1&studies=${encodeURIComponent(studies)}&locale=en`;
 }
 function csPaneTvUrl(p){
-  const c = state.coins.get(p.name) || X.cgObj.get(p.name); if (!c) return '';
+  const c = csCoin(p.name); if (!c) return '';
   return 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSymbol(p.venue, c)) + '&interval=' + p.iv;
 }
 function csCorrHtml(c){
@@ -5731,7 +5735,7 @@ function csCorrHtml(c){
 }
 function csSaveState(){ state.cs = {panes:CS.panes.map(p => ({...p}))}; saveState(); }
 function csPaneHeadHtml(i, p){
-  const c = p.name ? (state.coins.get(p.name) || X.cgObj.get(p.name)) : null;
+  const c = p.name ? csCoin(p.name) : null;
   const watching = !!(p.name && wlGet(p.name)), maxed = CS.maxIdx === i;
   return `<div class="cs-pane-h" data-pi="${i}">
     <b>${i + 1}</b>
@@ -5788,11 +5792,11 @@ function csReloadPane(i, fullHeadRefresh){
   const p = CS.panes[i]; if (!p) return;
   const f = $('csFrame' + i); if (f) f.src = csPaneSrc(p);
   if (fullHeadRefresh) csRefreshPaneHead(i);
-  else { const corr = document.querySelector(`.cspCorr[data-pi="${i}"]`); if (corr){ const c = p.name ? (state.coins.get(p.name) || X.cgObj.get(p.name)) : null; corr.innerHTML = c ? csCorrHtml(c) : ''; } }
+  else { const corr = document.querySelector(`.cspCorr[data-pi="${i}"]`); if (corr){ const c = p.name ? csCoin(p.name) : null; corr.innerHTML = c ? csCorrHtml(c) : ''; } }
   csSaveState();
 }
 function csPanePick(i, name){
-  const c = state.coins.get(name) || X.cgObj.get(name); if (!c) return;
+  const c = csCoin(name); if (!c) return;
   const p = CS.panes[i]; p.name = c.name; p.venue = csVenueFor(c);
   const sug = document.querySelector(`.cspSug[data-pi="${i}"]`); if (sug) sug.innerHTML = '';
   csReloadPane(i, true);
@@ -5810,7 +5814,7 @@ function csRemovePane(i){
 function renderCharts(){
   const el = $('viewCharts'); if (!el) return;
   if (!el._built){
-    el._built = true;
+    el._built = true; hluLoad();
     el.innerHTML = `<div class="nsec"><h3>Charts: full technical analysis, built in</h3>
       <p class="hint">Up to ${CS_MAX} independent TradingView charts, side by side — each with its own coin, exchange, timeframe and drawing tools, exactly like a single chart. Compare different coins, or the same coin on different timeframes, all at once. "Tools" shows or hides that pane's drawing toolbar to save space; "☆ Watch" adds that pane's coin to your watchlist; "⤢" expands a pane to fill the screen (click it again, or the "⤡" that replaces it, to go back); "↗ New tab" opens that exact chart on tradingview.com.</p>
       <div class="row"><span class="hint">Panes: <b id="csCount"></b></span><button class="btn sm" id="csAddPane" type="button">+ Add pane</button></div>
@@ -12061,10 +12065,11 @@ function buildGuide(){
     return `<tr><th scope="row">${esc(METRICS[k].label)}<small>${esc(g.say)}</small></th>${td(P[0])}${td(P[1])}${td(P[2])}${td(g.spot)}${td(g.swing)}${td(g.pos)}${td(g.hype)}</tr>`; }).join('');
   $('guideBody').innerHTML = `<p class="hint">Starting values, not rules. Markets change, so test them on your journal before you trust them. Pick the column that matches your trade: scalp (minutes to a day, with leverage), spot (buy and hold weeks), swing (days to weeks), positional (months).</p><div class="gwrap"><table class="gtab"><thead><tr><th>Filter, in plain words</th><th>Scalp: mega caps</th><th>Scalp: mid caps</th><th>Scalp: micro caps</th><th>Spot</th><th>Swing</th><th>Positional</th><th>Hype</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
-const TV_HOSTS = [['MEXC','perp','MEXC perp'],['MEXC','spot','MEXC spot'],['BINANCE','perp','Binance perp'],['BINANCE','spot','Binance spot'],['BYBIT','perp','Bybit perp'],['OKX','perp','OKX perp'],['BITGET','perp','Bitget perp'],['GATEIO','perp','Gate perp'],['COINBASE','usd','Coinbase spot']];
+const TV_HOSTS = [['HYPERLIQUID','perp','Hyperliquid perp'],['MEXC','perp','MEXC perp'],['MEXC','spot','MEXC spot'],['BINANCE','perp','Binance perp'],['BINANCE','spot','Binance spot'],['BYBIT','perp','Bybit perp'],['OKX','perp','OKX perp'],['BITGET','perp','Bitget perp'],['GATEIO','perp','Gate perp'],['COINBASE','usd','Coinbase spot']];
 function tvSymbol(venue, c){
   const b = normSym(c.name), k = /^k[A-Z0-9]{2,}$/.test(c.name), thou = (venue === 'BINANCE|perp' || venue === 'BYBIT|perp' || venue === 'OKX|perp' || venue === 'BITGET|perp') && k ? '1000' + b : b;
   const [ex, kind] = venue.split('|');
+  if (ex === 'HYPERLIQUID') return 'HYPERLIQUID:' + String(c.name).replace(/^xyz:/i, '').toUpperCase() + 'USDC.P';
   if (kind === 'perp') return `${ex}:${thou}USDT.P`; if (kind === 'spot') return `${ex}:${b}USDT`; return `${ex}:${b}USD`;
 }
 const isDark = () => state.theme ? state.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
