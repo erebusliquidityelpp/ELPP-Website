@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.75</title>
+<title>ELPP CRYPTO SCANNER PRO V4.76</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.75</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.76</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -12763,7 +12763,7 @@ const TFQUICK = ['1m','5m','15m','1h','4h','1d'];
 const MAXPANES = 6;
 const LAYOUTS = {'1':{n:1,cols:'1fr',rows:1,lab:'1'},'2':{n:2,cols:'1fr 1fr',rows:1,lab:'2'},'2v':{n:2,cols:'1fr',rows:2,lab:'2↕'},'3':{n:3,cols:'1fr 1fr 1fr',rows:1,lab:'3'},'4':{n:4,cols:'1fr 1fr',rows:2,lab:'4'},'6':{n:6,cols:'1fr 1fr 1fr',rows:2,lab:'6'}};
 const DEFSYMS = ['BTC','ETH','SOL','XRP','BNB','TAO','DOGE','SUI','AVAX','LINK','INJ','WLD','ONDO','AAVE','HYPE','PEPE','kPEPE','CL','BZ','XAU','XAG','NVDA','TSLA','SKHY'];
-function mkPane(sym, tf){ return {sym, tf, type:'candle', log:false, vol:true, plan:false, liq:false, fvg:false, ind:[]}; }
+function mkPane(sym, tf){ return {sym, tf, type:'candle', log:false, vol:true, plan:false, liq:false, fvg:false, smc:{}, ind:[]}; }
 function defState(){ return {layout:'2', sync:true, link:false, magnet:true, tz:'Asia/Karachi', stars:['BTC','ETH','SOL','TAO','BNB','XRP','CL','BZ'], draws:{}, active:0, panes:[mkPane('BTC','15m'), mkPane('BTC','1h')], tpl:{}}; }
 let S = (function(){ try { const j = JSON.parse(localStorage.getItem(LSK)); if (j && Array.isArray(j.panes) && j.panes.length) { const d = defState(); for (const k in d) if (!(k in j)) j[k] = d[k]; return j; } } catch(e){} return defState(); })();
 let saveT = 0;
@@ -12954,6 +12954,7 @@ class Chart {
     const z = this.zones, xr = plotW;
     if (z.fvg) for (const q of z.fvg){ const x0 = this.xOf(q.i), y0 = this.yOf(q.hi), y1 = this.yOf(q.lo); g.fillStyle = rgba(q.up ? '#2fbf71' : '#f0616d', 0.13); g.fillRect(x0, y0, xr - x0, Math.max(1, y1 - y0)); g.fillStyle = rgba(q.up ? '#2fbf71' : '#f0616d', 0.7); g.font = '10px ' + ff; g.fillText('FVG', Math.max(x0, 2) + 3, y0 + 10); }
     if (z.liq){ g.font = '10px ' + ff; for (const [arr, col, lab] of [[z.liq.hi, '#f0616d', 'BSL'], [z.liq.lo, '#2fbf71', 'SSL']]) for (const q of arr){ const y = Math.round(this.yOf(q.p)) + 0.5, x0 = this.xOf(q.i), x1 = q.sw >= 0 ? this.xOf(q.sw) : xr; g.strokeStyle = rgba(col, q.sw >= 0 ? 0.28 : 0.85); g.lineWidth = 1; g.setLineDash(q.sw >= 0 ? [2, 4] : [6, 3]); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.setLineDash([]); g.fillStyle = rgba(col, q.sw >= 0 ? 0.45 : 0.95); g.fillText(lab + (q.sw >= 0 ? ' swept' : ''), Math.max(x0, 4) + 2, y + (lab === 'BSL' ? -3 : 10)); } }
+    this.smcBack(g, plotW, ff);
     /* volume */
     if (p.vol && vmax > 0){ const vh = mainH * 0.15; for (let i = i0; i <= i1; i++){ const k = D[i], x = this.xOf(i), h = k.v / vmax * vh; g.fillStyle = rgba(k.c >= k.o ? '#2fbf71' : '#f0616d', 0.28); g.fillRect(x - Math.max(1, this.bw * 0.35), mainH - h, Math.max(1, this.bw * 0.7), h); } }
     /* overlay indicators: fills first */
@@ -12962,6 +12963,7 @@ class Chart {
     /* price */
     this.drawPrice(g, D, i0, i1, p.type, P);
     for (const x of ovs){ const r = this.res[x.id]; if (!r) continue; r.lines.forEach((ln, li) => this.strokeLine(g, ln, x.c[li] || x.c[0] || '#58a6ff', i0, i1, n)); }
+    this.smcFront(g, plotW, ff);
     /* plan, drawings, replay position */
     if (p.plan && this.plan) this.drawPlan(g, plotW);
     this.drawRepPos(g, plotW);
@@ -13194,6 +13196,117 @@ Object.assign(Chart.prototype, {
   }
 });
 
+/* ---------- SMC / institutional layer: every item is computed from the candles on screen and toggled with a small chip ---------- */
+const SMC = [
+  ['swing', 'Swings', 'Structure', 'Higher highs, higher lows, lower highs and lower lows, labelled on the swing points'],
+  ['bos', 'BOS', 'Structure', 'Break of structure: price closes beyond the last swing in the direction of the trend (continuation)'],
+  ['choch', 'CHoCH', 'Structure', 'Change of character: price closes beyond the last swing against the trend (first sign of a reversal)'],
+  ['fractal', 'Fractals', 'Structure', 'Tiny 5-candle fractal highs and lows'],
+  ['ob', 'Order blocks', 'Zones', 'The last opposite candle before a structure break. Green = demand, red = supply. Drawn until price closes through it'],
+  ['brk', 'Breakers', 'Zones', 'Order blocks that failed: price closed through them, so they flip and now act the other way (dashed)'],
+  ['fvg', 'FVG', 'Zones', 'Fair-value gaps: unfilled imbalance left by a fast move'],
+  ['pd', 'Prem/Disc', 'Zones', 'Premium (top half, expensive) and discount (bottom half, cheap) of the latest swing range, with the 50% equilibrium'],
+  ['ote', 'OTE', 'Zones', 'Optimal trade entry: the 61.8% to 78.6% pullback zone of the latest swing'],
+  ['liq', 'Liquidity', 'Liquidity', 'Unswept swing highs (BSL, buy-side) and lows (SSL, sell-side). Swept ones are faded'],
+  ['eq', 'EQH/EQL', 'Liquidity', 'Equal highs / equal lows: stop clusters that price often runs to'],
+  ['sweep', 'Sweeps', 'Liquidity', 'A wick through a swing high or low that closes back inside: a stop hunt'],
+  ['wick', 'Hunt wicks', 'Liquidity', 'Long rejection wicks on above-normal volume'],
+  ['inst', 'Inst. candles', 'Candles & volume', 'Big range + big volume + strong body: candles where institutions pushed price'],
+  ['volEntry', 'Volume entry', 'Candles & volume', 'Volume at least 2x normal and the close near the high (L) or low (S): a volume-backed long or short entry candle'],
+  ['disp', 'Displacement', 'Candles & volume', 'Very large body candles (over 2 ATR): aggressive one-sided moves'],
+  ['absorb', 'Absorption', 'Candles & volume', 'Huge volume but a small range: big orders absorbing the other side'],
+  ['vp', 'Vol profile', 'Candles & volume', 'Volume by price for the candles on screen: POC, value area high and low'],
+  ['avwap', 'Anchored VWAP', 'Levels', 'VWAP that starts at the latest swing point'],
+  ['pdh', 'PDH/PDL', 'Levels', 'Previous day high and low'],
+  ['pwh', 'PWH/PWL', 'Levels', 'Previous week high and low'],
+  ['opens', 'D/W/M open', 'Levels', 'Daily, weekly and monthly opening prices'],
+  ['asia', 'Asia range', 'Levels', 'High and low of the Asia session (00:00 to 08:00 UTC). London often sweeps it'],
+  ['kz', 'Kill zones', 'Levels', 'London (07 to 10 UTC) and New York (12 to 15 UTC) kill zones shaded'],
+  ['round', 'Round #', 'Levels', 'Round-number levels where orders cluster']
+];
+const SMC_PRESETS = {ict:['swing', 'bos', 'choch', 'ob', 'fvg', 'liq', 'pd'], volume:['inst', 'volEntry', 'absorb', 'vp'], sessions:['kz', 'asia', 'pdh', 'opens']};
+const smcOn = (p, k) => (k === 'liq' || k === 'fvg') ? !!p[k] : !!(p.smc && p.smc[k]);
+const dayK = t => Math.floor(t / 86400000), weekK = t => Math.floor((t / 86400000 + 3) / 7), monK = t => { const d = new Date(t); return d.getUTCFullYear() * 12 + d.getUTCMonth(); };
+function smcRun(c){
+  const p = c.pane, n = c.n, B = c.bars, keys = SMC.map(q => smcOn(p, q[0]) ? 1 : 0).join(''), key = n + '|' + c.ver + '|' + keys + '|' + p.tf;
+  if (c.smcC && c.smcC.key === key) return c.smcC; const R = {key}; c.smcC = R;
+  const on = k => smcOn(p, k); if (n < 12) return R; const s0 = Math.max(0, n - 1500), Bs = B.slice(0, n), tfs = TFSEC[p.tf], L = 5;
+  const needAtr = on('inst') || on('disp') || on('absorb') || on('wick') || on('volEntry') || on('eq'); let atr = null, avv = null;
+  if (needAtr){ atr = ATRs(Bs, 14); avv = SMA(Bs.map(x => x.v), 20); }
+  /* pivots, structure, order blocks */
+  if (on('swing') || on('bos') || on('choch') || on('ob') || on('brk') || on('pd') || on('ote') || on('eq') || on('sweep') || on('avwap')){
+    const PH = [], PL = []; for (let j = s0 + L; j < n - L; j++){ let ph = true, pl = true; for (let k = j - L; k <= j + L; k++){ if (k === j) continue; if (Bs[k].h >= Bs[j].h) ph = false; if (Bs[k].l <= Bs[j].l) pl = false; } if (ph) PH.push({i:j, p:Bs[j].h}); if (pl) PL.push({i:j, p:Bs[j].l}); }
+    R.PH = PH; R.PL = PL; const ev = [], obs = []; let sh = null, sl = null, trend = 0, ih = 0, il = 0;
+    for (let i = s0 + L; i < n; i++){
+      while (ih < PH.length && PH[ih].i + L <= i){ sh = Object.assign({}, PH[ih]); sh.broken = false; ih++; }
+      while (il < PL.length && PL[il].i + L <= i){ sl = Object.assign({}, PL[il]); sl.broken = false; il++; }
+      if (sh && !sh.broken && Bs[i].c > sh.p){ sh.broken = true; const e = {type:trend < 0 ? 'CHoCH' : 'BOS', dir:1, from:sh.i, to:i, p:sh.p}; trend = 1; ev.push(e);
+        let m = e.from, lw = Infinity; for (let k = Math.max(s0, e.from - 25); k <= i; k++) if (Bs[k].l < lw){ lw = Bs[k].l; m = k; } let ob = m; for (let k = m; k >= Math.max(s0, m - 6); k--) if (Bs[k].c < Bs[k].o){ ob = k; break; } obs.push({i:ob, lo:Bs[ob].l, hi:Bs[ob].h, up:true, ev:e, end:-1, flip:-1}); }
+      if (sl && !sl.broken && Bs[i].c < sl.p){ sl.broken = true; const e = {type:trend > 0 ? 'CHoCH' : 'BOS', dir:-1, from:sl.i, to:i, p:sl.p}; trend = -1; ev.push(e);
+        let m = e.from, hw = -Infinity; for (let k = Math.max(s0, e.from - 25); k <= i; k++) if (Bs[k].h > hw){ hw = Bs[k].h; m = k; } let ob = m; for (let k = m; k >= Math.max(s0, m - 6); k--) if (Bs[k].c > Bs[k].o){ ob = k; break; } obs.push({i:ob, lo:Bs[ob].l, hi:Bs[ob].h, up:false, ev:e, end:-1, flip:-1}); }
+    }
+    for (const o of obs){ for (let k = o.ev.to + 1; k < n; k++){ if (o.end < 0){ if (o.up ? Bs[k].c < o.lo : Bs[k].c > o.hi){ o.end = k; } } else if (o.flip < 0){ if (o.up ? Bs[k].c > o.hi : Bs[k].c < o.lo){ o.flip = k; break; } } } }
+    R.ev = ev; R.obs = obs; R.trend = trend;
+  }
+  /* sweeps */
+  if (on('sweep') && R.PH){ const sw = [], used = new Set(); for (let i = s0 + L + 2; i < n; i++){ for (const q of R.PH){ if (q.i + L >= i || used.has('h' + q.i)) continue; if (Bs[i].h > q.p){ used.add('h' + q.i); if (Bs[i].c < q.p && i - q.i < 200) sw.push({i, p:q.p, from:q.i, up:true}); } } for (const q of R.PL){ if (q.i + L >= i || used.has('l' + q.i)) continue; if (Bs[i].l < q.p){ used.add('l' + q.i); if (Bs[i].c > q.p && i - q.i < 200) sw.push({i, p:q.p, from:q.i, up:false}); } } } R.sw = sw; }
+  /* candle classes */
+  if (needAtr){ const m = []; for (let i = Math.max(20, s0); i < n; i++){ const k = Bs[i], a = atr[i], av = avv[i - 1], rg = k.h - k.l, body = Math.abs(k.c - k.o), up = k.c >= k.o; if (!isN(a) || !isN(av) || !(a > 0) || !(av > 0) || rg <= 0) continue; const vr = k.v / av, tag = [];
+      if (on('inst') && rg >= 1.5 * a && vr >= 1.5 && body / rg >= 0.55) tag.push(up ? 'iu' : 'id');
+      if (on('volEntry') && vr >= 2 && (k.c - k.l) / rg >= 0.7 && up) tag.push('L'); else if (on('volEntry') && vr >= 2 && (k.h - k.c) / rg >= 0.7 && !up) tag.push('S');
+      if (on('disp') && body >= 2 * a) tag.push(up ? 'du' : 'dd');
+      if (on('absorb') && vr >= 2 && rg <= 0.6 * a) tag.push('A');
+      if (on('wick') && vr >= 1.3){ const uw = k.h - Math.max(k.o, k.c), lw = Math.min(k.o, k.c) - k.l; if (uw >= 2 * Math.max(body, rg * 0.05) && uw >= 0.9 * a) tag.push('wu'); else if (lw >= 2 * Math.max(body, rg * 0.05) && lw >= 0.9 * a) tag.push('wd'); }
+      if (tag.length) m.push({i, tag}); } R.marks = m; }
+  if (on('fractal')){ const f = []; for (let i = Math.max(2, s0); i < n - 2; i++){ if (Bs[i].h > Bs[i - 1].h && Bs[i].h > Bs[i - 2].h && Bs[i].h > Bs[i + 1].h && Bs[i].h > Bs[i + 2].h) f.push({i, up:true}); if (Bs[i].l < Bs[i - 1].l && Bs[i].l < Bs[i - 2].l && Bs[i].l < Bs[i + 1].l && Bs[i].l < Bs[i + 2].l) f.push({i, up:false}); } R.fr = f; }
+  /* time levels */
+  const last = Bs[n - 1], lv = []; R.lv = lv;
+  const prevOf = fn => { const kk = fn(last.t); let j = n - 1; while (j >= 0 && fn(Bs[j].t) === kk) j--; if (j < 0) return null; const pk = fn(Bs[j].t); let hi = -Infinity, lo = Infinity; while (j >= 0 && fn(Bs[j].t) === pk){ if (Bs[j].h > hi) hi = Bs[j].h; if (Bs[j].l < lo) lo = Bs[j].l; j--; } return {hi, lo}; };
+  const openOf = fn => { const kk = fn(last.t); let j = n - 1; while (j > 0 && fn(Bs[j - 1].t) === kk) j--; return {p:Bs[j].o, i:j}; };
+  if (on('pdh') && tfs < 86400){ const q = prevOf(dayK); if (q){ lv.push({p:q.hi, l:'PDH', col:'#f0616d'}); lv.push({p:q.lo, l:'PDL', col:'#2fbf71'}); } }
+  if (on('pwh') && tfs < 604800){ const q = prevOf(weekK); if (q){ lv.push({p:q.hi, l:'PWH', col:'#fb923c'}); lv.push({p:q.lo, l:'PWL', col:'#22d3ee'}); } }
+  if (on('opens')){ if (tfs < 86400){ const o = openOf(dayK); lv.push({p:o.p, l:'DO', col:'#8393a7', from:o.i}); } if (tfs < 604800){ const o = openOf(weekK); lv.push({p:o.p, l:'WO', col:'#a78bfa', from:o.i}); } if (tfs < 2592000){ const o = openOf(monK); lv.push({p:o.p, l:'MO', col:'#e879f9', from:o.i}); } }
+  if (on('asia') && tfs <= 3600){ R.asia = []; const dkLast = dayK(last.t); for (let dk = dkLast; dk >= dkLast - 2; dk--){ let hi = -Infinity, lo = Infinity, a = -1, e = -1; for (let j = n - 1; j >= 0; j--){ const dj = dayK(Bs[j].t); if (dj < dk) break; if (dj !== dk) continue; if (e < 0) e = j; const h = new Date(Bs[j].t).getUTCHours(); if (h < 8){ a = j; if (Bs[j].h > hi) hi = Bs[j].h; if (Bs[j].l < lo) lo = Bs[j].l; } } if (a >= 0 && hi > -Infinity) R.asia.push({a, e, hi, lo}); } }
+  if (on('avwap')){ const pv = [].concat(R.PH || [], R.PL || []).sort((x, y) => y.i - x.i)[0]; if (pv){ const o = NaNs(n); let sp = 0, sv = 0; for (let i = pv.i; i < n; i++){ const tp = (Bs[i].h + Bs[i].l + Bs[i].c) / 3; sp += tp * Bs[i].v; sv += Bs[i].v; o[i] = sv > 0 ? sp / sv : tp; } R.av = {d:o, up:R.PH && R.PL ? (R.PL.length && (!R.PH.length || R.PL[R.PL.length - 1].i > R.PH[R.PH.length - 1].i)) : true, from:pv.i}; } }
+  return R;
+}
+function tri(g, x, y, up, s, col){ g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y - s); g.lineTo(x - s, y + s * 0.7); g.lineTo(x + s, y + s * 0.7); } else { g.moveTo(x, y + s); g.lineTo(x - s, y - s * 0.7); g.lineTo(x + s, y - s * 0.7); } g.closePath(); g.fill(); }
+Object.assign(Chart.prototype, {
+  /* zones that sit behind the candles */
+  smcBack(g, plotW, ff){
+    const p = this.pane, R = smcRun(this), n = this.n, mh = this.L.mainH, xr = plotW, on = k => smcOn(p, k), B = this.bars; if (!R || !n) return; g.font = '9px ' + ff;
+    const vis0 = Math.floor(this.v0) - 1, vis1 = Math.ceil(this.v0 + plotW / this.bw) + 1;
+    if (on('kz') && TFSEC[p.tf] <= 3600){ let run = null; const flush = () => { if (!run) return; const x0 = this.xOf(run.a) - this.bw / 2, x1 = this.xOf(run.b) + this.bw / 2; g.fillStyle = rgba(run.col, 0.07); g.fillRect(x0, 0, x1 - x0, mh); g.fillStyle = rgba(run.col, 0.8); g.fillRect(x0, 0, x1 - x0, 3); if (x1 - x0 > 34){ g.fillStyle = rgba(run.col, 0.9); g.fillText(run.l, x0 + 3, 13); } run = null; };
+      for (let i = Math.max(0, vis0); i <= Math.min(n - 1, vis1); i++){ const h = new Date(B[i].t).getUTCHours(), z = h >= 7 && h < 10 ? ['LDN KZ', '#58a6ff'] : h >= 12 && h < 15 ? ['NY KZ', '#fb923c'] : null; if (z && run && run.l === z[0] && B[i].t - B[i - 1].t <= TFSEC[p.tf] * 1500) run.b = i; else { flush(); if (z) run = {a:i, b:i, l:z[0], col:z[1]}; } } flush(); }
+    if (on('pd') && R.PH && R.PL && R.PH.length && R.PL.length){ const ph = R.PH[R.PH.length - 1], pl = R.PL[R.PL.length - 1], hi = ph.p, lo = pl.p, mid = (hi + lo) / 2, x0 = Math.max(0, this.xOf(Math.min(ph.i, pl.i))); if (hi > lo){ g.fillStyle = rgba('#f0616d', 0.07); g.fillRect(x0, this.yOf(hi), xr - x0, this.yOf(mid) - this.yOf(hi)); g.fillStyle = rgba('#2fbf71', 0.07); g.fillRect(x0, this.yOf(mid), xr - x0, this.yOf(lo) - this.yOf(mid)); g.strokeStyle = rgba('#8393a7', 0.6); g.setLineDash([2, 3]); g.beginPath(); g.moveTo(x0, Math.round(this.yOf(mid)) + 0.5); g.lineTo(xr, Math.round(this.yOf(mid)) + 0.5); g.stroke(); g.setLineDash([]); g.fillStyle = rgba('#f0616d', 0.85); g.fillText('Premium', x0 + 4, this.yOf(hi) + 10); g.fillStyle = rgba('#8393a7', 0.95); g.fillText('EQ 50%', x0 + 4, this.yOf(mid) - 3); g.fillStyle = rgba('#2fbf71', 0.85); g.fillText('Discount', x0 + 4, this.yOf(lo) - 4); } }
+    if (on('ote') && R.PH && R.PL && R.PH.length && R.PL.length){ const ph = R.PH[R.PH.length - 1], pl = R.PL[R.PL.length - 1], rg = ph.p - pl.p; if (rg > 0){ const bull = ph.i > pl.i, a = bull ? ph.p - rg * 0.786 : pl.p + rg * 0.618, b = bull ? ph.p - rg * 0.618 : pl.p + rg * 0.786, x0 = Math.max(0, this.xOf(Math.max(ph.i, pl.i))); g.fillStyle = rgba('#f0b429', 0.13); g.fillRect(x0, this.yOf(b), xr - x0, this.yOf(a) - this.yOf(b)); g.fillStyle = rgba('#f0b429', 0.95); g.fillText('OTE ' + (bull ? 'long' : 'short') + ' 61.8-78.6%', x0 + 4, this.yOf(b) + 10); } }
+    if (R.obs && (on('ob') || on('brk'))){ const list = R.obs.slice(-14); for (const o of list){ const unm = o.end < 0; if (unm && !on('ob')) continue; if (!unm && !on('brk')) continue; if (!unm && o.flip >= 0) continue; const x0 = this.xOf(o.i) - this.bw / 2, x1 = unm ? xr : xr, col = unm ? (o.up ? '#2fbf71' : '#f0616d') : (o.up ? '#f0616d' : '#2fbf71'), xs = unm ? x0 : this.xOf(o.end) - this.bw / 2; if (xs > xr) continue; g.fillStyle = rgba(col, unm ? 0.15 : 0.09); g.fillRect(xs, this.yOf(o.hi), x1 - xs, Math.max(1, this.yOf(o.lo) - this.yOf(o.hi))); g.strokeStyle = rgba(col, unm ? 0.7 : 0.6); g.lineWidth = 1; if (!unm) g.setLineDash([4, 3]); g.strokeRect(xs + 0.5, this.yOf(o.hi) + 0.5, x1 - xs, Math.max(1, this.yOf(o.lo) - this.yOf(o.hi))); g.setLineDash([]); g.fillStyle = rgba(col, 0.95); g.fillText(unm ? (o.up ? 'OB demand' : 'OB supply') : (o.up ? 'Breaker (sell)' : 'Breaker (buy)'), Math.max(xs, 2) + 3, this.yOf(o.hi) + 9); } }
+    if (on('vp')){ const i0 = Math.max(0, vis0), i1 = Math.min(n - 1, vis1); let lo = Infinity, hi = -Infinity; for (let i = i0; i <= i1; i++){ if (B[i].l < lo) lo = B[i].l; if (B[i].h > hi) hi = B[i].h; } if (hi > lo){ const NB = 44, bin = new Array(NB).fill(0), st = (hi - lo) / NB; for (let i = i0; i <= i1; i++){ const tp = (B[i].h + B[i].l + B[i].c) / 3; bin[Math.min(NB - 1, Math.floor((tp - lo) / st))] += B[i].v; } let mx = 0, pk = 0, tot = 0; bin.forEach((v, k) => { tot += v; if (v > mx){ mx = v; pk = k; } }); let a = pk, b = pk, acc = bin[pk]; while (acc < tot * 0.7 && (a > 0 || b < NB - 1)){ const l1 = a > 0 ? bin[a - 1] : -1, r1 = b < NB - 1 ? bin[b + 1] : -1; if (l1 >= r1){ a--; acc += bin[a]; } else { b++; acc += bin[b]; } } const mw = plotW * 0.17;
+        bin.forEach((v, k) => { const y1 = this.yOf(lo + (k + 1) * st), y0 = this.yOf(lo + k * st), w = v / mx * mw; g.fillStyle = k === pk ? rgba('#f0b429', 0.45) : (k >= a && k <= b ? rgba('#58a6ff', 0.26) : rgba('#8393a7', 0.16)); g.fillRect(xr - w, y1 + 0.5, w, Math.max(1, y0 - y1 - 1)); });
+        const poc = lo + (pk + 0.5) * st, vah = lo + (b + 1) * st, val = lo + a * st; g.setLineDash([5, 4]); g.lineWidth = 1; for (const [pp, cc, ll] of [[poc, '#f0b429', 'POC'], [vah, '#58a6ff', 'VAH'], [val, '#58a6ff', 'VAL']]){ const y = Math.round(this.yOf(pp)) + 0.5; g.strokeStyle = rgba(cc, 0.65); g.beginPath(); g.moveTo(xr - mw - 30, y); g.lineTo(xr, y); g.stroke(); g.fillStyle = rgba(cc, 0.95); g.fillText(ll + ' ' + fmtP(pp), xr - mw - 96, y + 3); } g.setLineDash([]); } }
+  },
+  /* lines, labels and markers that sit on top of the candles */
+  smcFront(g, plotW, ff){
+    const p = this.pane, R = this.smcC, n = this.n, mh = this.L.mainH, xr = plotW, on = k => smcOn(p, k), B = this.bars; if (!R || R.key.split('|')[0] != n) return; g.font = '9px ' + ff;
+    const vis0 = Math.floor(this.v0) - 2, vis1 = Math.ceil(this.v0 + plotW / this.bw) + 2, inV = i => i >= vis0 && i <= vis1;
+    if (R.ev && (on('bos') || on('choch'))){ for (const e of R.ev.slice(-30)){ if ((e.type === 'BOS' && !on('bos')) || (e.type === 'CHoCH' && !on('choch'))) continue; if (e.to < vis0 || e.from > vis1) continue; const y = Math.round(this.yOf(e.p)) + 0.5, x0 = this.xOf(e.from), x1 = this.xOf(e.to), col = e.dir > 0 ? '#2fbf71' : '#f0616d'; g.strokeStyle = rgba(col, e.type === 'CHoCH' ? 0.95 : 0.6); g.lineWidth = 1; g.setLineDash(e.type === 'CHoCH' ? [] : [4, 3]); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.textAlign = 'center'; g.fillText(e.type, (x0 + x1) / 2, e.dir > 0 ? y - 3 : y + 10); g.textAlign = 'left'; } }
+    if (on('swing') && R.PH){ const lab = (arr, hi) => { let prev = null; for (const q of arr){ if (prev !== null && inV(q.i)){ const t = hi ? (q.p > prev ? 'HH' : 'LH') : (q.p > prev ? 'HL' : 'LL'), col = (t === 'HH' || t === 'HL') ? '#2fbf71' : '#f0616d'; g.fillStyle = col; g.textAlign = 'center'; g.fillText(t, this.xOf(q.i), this.yOf(q.p) + (hi ? -6 : 13)); g.textAlign = 'left'; } prev = q.p; } }; lab(R.PH, true); lab(R.PL, false); }
+    if (on('eq') && R.PH){ const tol = (a, b) => Math.abs(a - b) <= Math.max(a, b) * 0.0006; for (const [arr, lab, col] of [[R.PH.slice(-40), 'EQH', '#f0616d'], [R.PL.slice(-40), 'EQL', '#2fbf71']]){ for (let a = 0; a < arr.length; a++) for (let b = a + 1; b < arr.length; b++){ if (!tol(arr[a].p, arr[b].p) || arr[b].i - arr[a].i < 4) continue; if (arr[b].i < vis0 || arr[a].i > vis1) continue; const y = Math.round(this.yOf((arr[a].p + arr[b].p) / 2)) + 0.5, x0 = this.xOf(arr[a].i), x1 = this.xOf(arr[b].i); g.strokeStyle = rgba(col, 0.85); g.lineWidth = 1; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.textAlign = 'center'; g.fillText(lab, (x0 + x1) / 2, lab === 'EQH' ? y - 3 : y + 10); g.textAlign = 'left'; break; } } }
+    if (R.sw && on('sweep')){ for (const s of R.sw.slice(-14)){ if (!inV(s.i)) continue; const x = this.xOf(s.i), col = s.up ? '#f0616d' : '#2fbf71', y = this.yOf(s.p); g.strokeStyle = rgba(col, 0.45); g.setLineDash([2, 3]); g.beginPath(); g.moveTo(this.xOf(s.from), y); g.lineTo(x, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.textAlign = 'center'; g.fillText('SWEEP', x, s.up ? this.yOf(B[s.i].h) - 7 : this.yOf(B[s.i].l) + 15); g.textAlign = 'left'; } }
+    if (R.marks){ for (const m of R.marks){ if (!inV(m.i)) continue; const k = B[m.i], x = this.xOf(m.i), yh = this.yOf(k.h), yl = this.yOf(k.l), sz = Math.max(3, Math.min(5, this.bw * 0.45)); let above = 0, below = 0;
+        for (const t of m.tag){ if (t === 'iu'){ tri(g, x, yl + 7 + below * 9, true, sz, '#2fbf71'); below++; } else if (t === 'id'){ tri(g, x, yh - 7 - above * 9, false, sz, '#f0616d'); above++; }
+          else if (t === 'L'){ g.fillStyle = '#2fbf71'; g.font = 'bold 10px ' + ff; g.textAlign = 'center'; g.fillText('L', x, yl + 12 + below * 10); below++; g.font = '9px ' + ff; g.textAlign = 'left'; } else if (t === 'S'){ g.fillStyle = '#f0616d'; g.font = 'bold 10px ' + ff; g.textAlign = 'center'; g.fillText('S', x, yh - 5 - above * 10); above++; g.font = '9px ' + ff; g.textAlign = 'left'; }
+          else if (t === 'du' || t === 'dd'){ g.strokeStyle = t === 'du' ? '#22d3ee' : '#fb923c'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x - this.bw * 0.5 - 1, this.yOf(k.o)); g.lineTo(x + this.bw * 0.5 + 1, this.yOf(k.o)); g.moveTo(x - this.bw * 0.5 - 1, this.yOf(k.c)); g.lineTo(x + this.bw * 0.5 + 1, this.yOf(k.c)); g.stroke(); }
+          else if (t === 'A'){ g.strokeStyle = '#a78bfa'; g.lineWidth = 1.4; g.beginPath(); g.arc(x, (yh + yl) / 2, Math.max(4, this.bw * 0.6), 0, 6.2832); g.stroke(); }
+          else if (t === 'wu'){ g.fillStyle = '#f0b429'; g.beginPath(); g.arc(x, yh - 5 - above * 8, 2.2, 0, 6.2832); g.fill(); above++; } else if (t === 'wd'){ g.fillStyle = '#f0b429'; g.beginPath(); g.arc(x, yl + 5 + below * 8, 2.2, 0, 6.2832); g.fill(); below++; } } } }
+    if (R.fr){ for (const f of R.fr){ if (!inV(f.i)) continue; g.fillStyle = f.up ? rgba('#f0616d', 0.8) : rgba('#2fbf71', 0.8); g.beginPath(); g.arc(this.xOf(f.i), f.up ? this.yOf(B[f.i].h) - 4 : this.yOf(B[f.i].l) + 4, 1.6, 0, 6.2832); g.fill(); } }
+    if (R.av){ g.strokeStyle = R.av.up ? '#2fbf71' : '#f0616d'; g.lineWidth = 1.6; g.beginPath(); let st = false; for (let i = Math.max(R.av.from, vis0); i <= Math.min(n - 1, vis1); i++){ if (!isN(R.av.d[i])) continue; const x = this.xOf(i), y = this.yOf(R.av.d[i]); if (st) g.lineTo(x, y); else { g.moveTo(x, y); st = true; } } g.stroke(); g.fillStyle = R.av.up ? '#2fbf71' : '#f0616d'; g.fillText('AVWAP', Math.max(4, this.xOf(Math.max(R.av.from, vis0))) + 3, this.yOf(R.av.d[Math.max(R.av.from, vis0)] || R.av.d[R.av.from]) - 4); }
+    if (R.asia){ for (const a of R.asia){ const x0 = this.xOf(a.a), x1 = a.e >= n - 1 ? xr : this.xOf(a.e); for (const [pp, ll] of [[a.hi, 'Asia H'], [a.lo, 'Asia L']]){ const y = Math.round(this.yOf(pp)) + 0.5; g.strokeStyle = rgba('#a78bfa', 0.85); g.lineWidth = 1; g.setLineDash([5, 3]); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#a78bfa'; g.fillText(ll, Math.max(2, x0) + 3, y - 3); } } }
+    for (const lv of R.lv || []){ const y = Math.round(this.yOf(lv.p)) + 0.5, x0 = lv.from != null ? Math.max(0, this.xOf(lv.from)) : 0; g.strokeStyle = rgba(lv.col, 0.7); g.lineWidth = 1; g.setLineDash([6, 4]); g.beginPath(); g.moveTo(x0, y); g.lineTo(xr, y); g.stroke(); g.setLineDash([]); g.fillStyle = lv.col; g.textAlign = 'right'; g.fillText(lv.l + ' ' + fmtP(lv.p), xr - 4, y - 3); g.textAlign = 'left'; }
+    if (on('round') && this.ym){ const lo = this.pOf(mh), hi = this.pOf(0), rg = hi - lo; if (rg > 0){ const mag = Math.pow(10, Math.floor(Math.log10(rg / 3))); let st = mag; for (const f of [1, 2, 5, 10]){ if (rg / (mag * f) <= 6){ st = mag * f; break; } } for (let v = Math.ceil(lo / st) * st; v <= hi; v += st){ const y = Math.round(this.yOf(v)) + 0.5; g.strokeStyle = rgba('#f0b429', 0.4); g.lineWidth = 1; g.setLineDash([1, 4]); g.beginPath(); g.moveTo(0, y); g.lineTo(xr, y); g.stroke(); g.setLineDash([]); g.fillStyle = rgba('#f0b429', 0.9); g.fillText(fmtP(v), 4, y - 2); } } }
+  }
+});
+
 /* ---------- workspace UI ---------- */
 const CSS = `
 .ta-wrap{display:flex;flex-direction:column;gap:8px}
@@ -13213,6 +13326,13 @@ const CSS = `
 .ta-top select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:2px 4px;font:inherit;font-size:12px}
 .ta-star{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 3px;line-height:1}.ta-star.on{color:var(--warn)}
 .ta-spc{flex:1}
+.ta-smc{display:flex;flex-wrap:wrap;gap:3px 12px;padding:3px 6px;border-bottom:1px solid var(--line);background:var(--surface2);align-items:center}
+.ta-smc[hidden]{display:none!important}
+.ta-smc .g{display:inline-flex;flex-wrap:wrap;gap:3px;align-items:center}
+.ta-smc i{font-style:normal;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:1px}
+.ta-smc .c{font:inherit;font-size:10px;line-height:16px;padding:0 6px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.ta-smc .c:hover{border-color:var(--accent)}.ta-smc .c.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.ta-smc .c.pre{border-style:dashed}
 .ta-badge{font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .ta-badge.up{color:var(--up);border-color:var(--up)}.ta-badge.dn{color:var(--down);border-color:var(--down)}
 .ta-body{display:flex;flex:1;min-height:0}
@@ -13295,6 +13415,11 @@ function camMenu(c, btn){
     });
   });
 }
+
+function smcStrip(){
+  const groups = []; SMC.forEach(q => { let g = groups.find(x => x.n === q[2]); if (!g){ g = {n:q[2], a:[]}; groups.push(g); } g.a.push(q); });
+  return '<div class="ta-smc"><span class="g"><i>Presets</i><button class="c pre" data-a="smcp" data-p="ict" title="Structure, order blocks, FVG, liquidity, premium/discount">ICT core</button><button class="c pre" data-a="smcp" data-p="volume" title="Institutional candles, volume entries, absorption, volume profile">Volume</button><button class="c pre" data-a="smcp" data-p="sessions" title="Kill zones, Asia range, previous day levels, opens">Sessions</button><button class="c pre" data-a="smcp" data-p="off" title="Turn all SMC items off for a clean chart">Clear</button></span>' + groups.map(g => '<span class="g"><i>' + esc(g.n) + '</i>' + g.a.map(q => '<button class="c" data-a="smc" data-k="' + q[0] + '" title="' + esc(q[3]) + '">' + esc(q[1]) + '</button>').join('') + '</span>').join('') + '</div>';
+}
 function cellHtml(i){
   return '<div class="ta-top">' +
     '<button class="ta-star" data-a="star" title="Star this coin (adds it to your favourites bar)">☆</button>' +
@@ -13304,13 +13429,12 @@ function cellHtml(i){
     '<select class="ta-type" title="Chart type">' + TYPES.map(t => '<option value="' + t[0] + '">' + t[1] + '</option>').join('') + '</select>' +
     '<button class="ta-b" data-a="ind" title="Add indicators">ƒx Indicators</button>' +
     '<button class="ta-b" data-a="vol" title="Volume bars">Vol</button><button class="ta-b" data-a="log" title="Log price scale">Log</button>' +
-    '<button class="ta-b" data-a="liq" title="Auto liquidity: unswept swing highs (BSL) and lows (SSL), and swept ones faded">Liquidity</button>' +
-    '<button class="ta-b" data-a="fvg" title="Auto fair-value gaps that price has not filled yet">FVG</button>' +
     '<button class="ta-b" data-a="plan" title="Draw the scanner\'s own entry, stop and targets for this coin on the chart">Scanner plan</button>' +
+    '<button class="ta-b" data-a="smcs" title="Show or hide the institutional / smart-money (SMC) buttons">SMC ▾</button>' +
     '<button class="ta-b" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
     '<span class="ta-badge" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
     '<button class="ta-b" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
-    '<div class="ta-body"><div class="ta-tools">' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
+    smcStrip() + '<div class="ta-body"><div class="ta-tools">' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
     '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
     '<div class="ta-rp" hidden><button class="ta-b" data-a="rp-play">▶</button><button class="ta-b" data-a="rp-step" title="Next candle (→)">⏭</button><select data-a="rp-speed"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option></select>' +
     '<button class="ta-b" data-a="rp-long" style="color:var(--up)">▲ Long</button><button class="ta-b" data-a="rp-short" style="color:var(--down)">▼ Short</button><button class="ta-b" data-a="rp-close">Close</button><label>SL×ATR <input type="number" step="0.1" min="0.2" data-a="rp-slx" value="1.5"></label><label>R:R <input type="number" step="0.5" min="0.5" data-a="rp-rr" value="2"></label>' +
@@ -13319,7 +13443,7 @@ function cellHtml(i){
 function refresh(c){
   const cell = c.cell; if (!cell) return; const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
   cell.querySelectorAll('[data-a=tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === p.tf)); const m = $q('.ta-tfm', cell); m.value = p.tf; $q('.ta-type', cell).value = p.type;
-  const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('liq', p.liq); on('fvg', p.fvg); on('plan', p.plan); on('rep', c.rep.on); on('mag', S.magnet);
+  const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('plan', p.plan); { let cnt = 0; cell.querySelectorAll('[data-a=smc]').forEach(b => { const v = smcOn(p, b.dataset.k); if (v) cnt++; b.classList.toggle('on', v); }); const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; $q('.ta-smc', cell).hidden = !open; const sb = $q('[data-a=smcs]', cell); sb.textContent = 'SMC' + (cnt ? ' (' + cnt + ')' : '') + (open ? ' ▴' : ' ▾'); sb.classList.toggle('on', cnt > 0); } on('rep', c.rep.on); on('mag', S.magnet);
   cell.querySelectorAll('[data-a=tool]').forEach(b => b.classList.toggle('on', b.dataset.t === c.tool)); const st = $q('.ta-star', cell); st.classList.toggle('on', S.stars.includes(p.sym)); st.textContent = S.stars.includes(p.sym) ? '★' : '☆';
   cell.classList.toggle('act', S.active === c.i);
   const db = $q('.ta-db', cell), d = c.sel && c.draws().find(q => q.id === c.sel); db.hidden = !d; if (d){ db.innerHTML = DCOL.map(k => '<button class="sw' + ((d.color || '#58a6ff') === k ? ' on' : '') + '" data-a="dcol" data-c="' + k + '" style="background:' + k + '"></button>').join('') + '<button class="ta-b" data-a="dlock" title="Lock so it cannot be moved">' + (d.lock ? '🔒' : '🔓') + '</button><button class="ta-b" data-a="ddel" title="Delete (Del key)">🗑</button>'; }
@@ -13362,6 +13486,9 @@ function build(){
     if (a === 'star'){ const i = S.stars.indexOf(p.sym); if (i >= 0) S.stars.splice(i, 1); else S.stars.push(p.sym); save(); if (i < 0){ try { const h = HOOK(); if (h.watch) h.watch(p.sym); } catch(_){} } charts.forEach(refresh); return; }
     if (a === 'tf'){ setTf(c.i, b.dataset.tf); return; }
     if (a === 'ind'){ indMenu(c, b); return; }
+    if (a === 'smcs'){ const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; S.smcOpen = !open; save(); charts.forEach(x => { refresh(x); x.dirty = true; }); return; }
+    if (a === 'smc'){ const k = b.dataset.k; if (k === 'liq' || k === 'fvg') p[k] = !p[k]; else { p.smc = p.smc || {}; p.smc[k] = !p.smc[k]; } c.zones.key = ''; c.smcC = null; c.dirty = true; save(); refresh(c); return; }
+    if (a === 'smcp'){ const set = SMC_PRESETS[b.dataset.p] || []; p.smc = {}; p.liq = false; p.fvg = false; set.forEach(k => { if (k === 'liq' || k === 'fvg') p[k] = true; else p.smc[k] = true; }); c.zones.key = ''; c.smcC = null; c.dirty = true; save(); refresh(c); return; }
     if (a === 'vol' || a === 'log' || a === 'liq' || a === 'fvg' || a === 'plan'){ p[a] = !p[a]; if (a === 'plan' && p.plan) pollPlan(); c.zones.key = ''; if (a === 'log') c.yz = 1; c.dirty = true; save(); refresh(c); return; }
     if (a === 'rep'){ if (c.rep.on) c.exitReplay(); else c.enterReplay(); return; }
     if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
