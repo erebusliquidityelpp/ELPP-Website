@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.88</title>
+<title>ELPP CRYPTO SCANNER PRO V4.89</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -791,7 +791,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.88</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.89</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11361,7 +11361,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.88: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.89: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11409,7 +11409,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.88: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.89: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11621,7 +11621,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.88: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.89: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11635,7 +11635,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.88: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.89: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11753,9 +11753,10 @@ function prDetail(r){
     <div class="cwr"><span>Likely liquidity target</span><span>${tg}</span></div><div class="cwr"><span>Call is wrong if price reaches</span><span>${iv}</span></div>
     <div style="overflow:auto;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Factor</th><th>Reading (-100 bearish to +100 bullish)</th><th>Weight</th><th style="text-align:left">What it says</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
+const PR_THR = [['Probability up', 'Above 60% lean up, below 40% lean down, 40-60% no edge.'], ['Confidence', '70+ high, 45-70 medium, under 45 low. Under 45: skip.'], ['Institutional / Retail / Structure score', '+10 or more bullish, -10 or less bearish, in between neutral. Beyond +-40 is strong.'], ['Agreement', 'Smart money and crowd agree = +15 confidence. They disagree = -10 (the crowd is often the trap).'], ['Retail psychology', 'The crowd is read as a contrarian: crowded long, high funding, late hype, greed and FOMO push the score negative; crowded short, panic and fear push it positive.'], ['Expected range', 'About one standard deviation from the coin\'s own ATR over the horizon (68% of the time price stays inside).'], ['Hit rate (track record)', 'Judge only after 30 or more scored calls. 55%+ with 1.5R targets is useful; 50% is coin-flip.']];
 function prGuideHtml(){
   const steps = ['Choose the horizon (1h, 4h or 12h). The clocks above show when each candle closes.', 'Read the call: probability up, confidence and the agreement tag. High confidence with smart money and the crowd psychology agreeing is the cleanest.', 'Look at the three scores: Institutional (what big players do), Retail psychology (what the crowd does, read as a contrarian) and Structure (liquidity magnets).', 'Open ▸ for every factor, the psychology story, trap warnings, the likely liquidity target and where the call is wrong.', 'Never trade the prediction alone. Wait for a sweep and reclaim on 15m or 1h, then use the trade plan (stop beyond the wick, TP at the next pool).', 'Check the track record panel: it logs strong calls and scores them when their horizon ends, so you see the real hit rate.'];
-  const thr = [['Probability up', 'Above 60% lean up, below 40% lean down, 40-60% no edge.'], ['Confidence', '70+ high, 45-70 medium, under 45 low. Under 45: skip.'], ['Institutional / Retail / Structure score', '+10 or more bullish, -10 or less bearish, in between neutral. Beyond +-40 is strong.'], ['Agreement', 'Smart money and crowd agree = +15 confidence. They disagree = -10 (the crowd is often the trap).'], ['Retail psychology', 'The crowd is read as a contrarian: crowded long, high funding, late hype, greed and FOMO push the score negative; crowded short, panic and fear push it positive.'], ['Expected range', 'About one standard deviation from the coin\'s own ATR over the horizon (68% of the time price stays inside).'], ['Hit rate (track record)', 'Judge only after 30 or more scored calls. 55%+ with 1.5R targets is useful; 50% is coin-flip.']];
+  const thr = PR_THR;
   return `<details class="ovd" style="margin:6px 0"><summary><b>How to use this page + how the prediction is built + thresholds</b></summary><ol class="ovstory">${steps.map(x => '<li>' + esc(x) + '</li>').join('')}</ol>
     <h4 style="margin:6px 0 2px">How the score is built</h4><p class="hint">Three groups, 33 factors. <b>Institutional (62%)</b>: institutional flow, big-volume bars, net money flow, buy/sell pressure, CVD divergence, tracked and whale wallets, open interest vs price, order-book imbalance, taker flow, on-chain exchange flow, options / ETF / Coinbase / CME, trend on 4 timeframes, sweep + reclaim, chart pattern, timeframe agreement. <b>Retail psychology (26%)</b>: long/short crowd, share of accounts long, funding and its history, hype timing, fear and greed, liquidation flushes, FOMO or panic after a big move, retail stop clusters, public attention. These are read as a contrarian, because the crowd is usually wrong at extremes. <b>Structure (12%)</b>: where the resting liquidity sits, VWAP and range position. Confidence also rises with data coverage, agreement between groups and data quality, and falls near macro events and in choppy regimes.</p>
     <div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Item</th><th style="text-align:left">Threshold</th></tr></thead><tbody>${thr.map(x => `<tr><td style="text-align:left"><b>${esc(x[0])}</b></td><td style="text-align:left">${esc(x[1])}</td></tr>`).join('')}</tbody></table></div>
@@ -11830,7 +11831,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.88: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.89: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
@@ -12785,11 +12786,41 @@ function sugText(metric){
   if (state.mode === 'perp'){ const a = g.perp; if (!a) return ''; const i = {mega:0, mid:1, micro:2}[state.scope]; return (state.scope === 'mega' || state.scope === 'mid' || state.scope === 'micro' ? '' : 'mid-size coins: ') + a[i === undefined ? 1 : i]; }
   return g[state.mode === 'position' ? 'pos' : state.mode] || '';
 }
-function buildGuide(){
+const GD = {tab:'pages'};
+function guideFilters(){
   const rows = Object.keys(GUIDE).filter(k => METRICS[k]).map(k => { const g = GUIDE[k], P = g.perp || [];
     const td = v => `<td>${v ? esc(v) : '<span class="hint">–</span>'}</td>`;
-    return `<tr><th scope="row">${esc(METRICS[k].label)}<small>${esc(g.say)}</small></th>${td(P[0])}${td(P[1])}${td(P[2])}${td(g.spot)}${td(g.swing)}${td(g.pos)}${td(g.hype)}</tr>`; }).join('');
-  $('guideBody').innerHTML = `<p class="hint">Starting values, not rules. Markets change, so test them on your journal before you trust them. Pick the column that matches your trade: scalp (minutes to a day, with leverage), spot (buy and hold weeks), swing (days to weeks), positional (months).</p><div class="gwrap"><table class="gtab"><thead><tr><th>Filter, in plain words</th><th>Scalp: mega caps</th><th>Scalp: mid caps</th><th>Scalp: micro caps</th><th>Spot</th><th>Swing</th><th>Positional</th><th>Hype</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<tr class="gdr"><th scope="row">${esc(METRICS[k].label)}<small>${esc(g.say)}</small></th>${td(P[0])}${td(P[1])}${td(P[2])}${td(g.spot)}${td(g.swing)}${td(g.pos)}${td(g.hype)}</tr>`; }).join('');
+  return `<p class="hint">Starting values, not rules. Markets change, so test them on your journal before you trust them. Pick the column that matches your trade: scalp (minutes to a day, with leverage), spot (buy and hold weeks), swing (days to weeks), positional (months).</p><div class="gwrap"><table class="gtab"><thead><tr><th>Filter, in plain words</th><th>Scalp: mega caps</th><th>Scalp: mid caps</th><th>Scalp: micro caps</th><th>Spot</th><th>Swing</th><th>Positional</th><th>Hype</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function guidePageList(){
+  const out = [], seen = new Set(), add = (k, n) => { if (seen.has(k)) return; seen.add(k); out.push([k, n]); };
+  document.querySelectorAll('.nv[data-mode]').forEach(b => add('table:' + b.dataset.mode, b.textContent.replace(/\s+/g, ' ').trim() + ' (scanner table)'));
+  document.querySelectorAll('.nv[data-view]').forEach(b => add(b.dataset.view, b.textContent.replace(/\s+/g, ' ').trim()));
+  return out;
+}
+function guideRowsFor(k){
+  if (k.startsWith('table:')) return vgTableRows();
+  if (k === 'power'){ let lab = {}; try { for (const [id, c] of psCols()) lab[id] = c.label; } catch(e){} return Object.keys(PS_THR).map(id => [lab[id] || id, PS_THR[id][1], PS_THR[id][0]]); }
+  if (k === 'predict') return PR_THR.map(x => [x[0], x[1], '']);
+  return VIEW_GUIDE[k] || [];
+}
+function guidePagesHtml(){
+  const items = guidePageList().map(([k, name]) => {
+    const how = VIEW_HOW[k] || [], rows = guideRowsFor(k); if (!how.length && !rows.length) return '';
+    const hh = how.length ? '<h4 style="margin:6px 0 2px">How to use this page</h4><ol class="ovstory">' + how.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>' : '';
+    const tb = rows.length ? `<h4 style="margin:8px 0 2px">What each number means and where good and bad begin</h4><div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">What it is</th><th style="text-align:left">Thresholds</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left;vertical-align:top"><b>${esc(r[0])}</b></td><td style="text-align:left;vertical-align:top">${esc(r[1])}</td><td style="text-align:left;vertical-align:top">${esc(r[2] || '')}</td></tr>`).join('')}</tbody></table></div>` : '';
+    return `<details class="ovd gdp" style="margin:6px 0"><summary><b>${esc(name)}</b> <small class="dim">${how.length ? how.length + ' steps' : ''}${how.length && rows.length ? ' · ' : ''}${rows.length ? rows.length + ' data points' : ''}</small></summary>${hh}${tb}</details>`;
+  }).join('');
+  return `<p class="hint">One guide for every page: how to use it step by step, what each number means and where good and bad begin. The same guide also sits at the top of each page. Starting values, not promises: test them on your journal and the Backtest page.</p><div class="row" style="gap:8px;margin-bottom:6px"><input id="gdQ" type="text" placeholder="Search any page or number…" style="flex:1;min-width:180px"><button class="btn sm" type="button" id="gdAll">Open / close all</button></div><div id="gdList">${items}</div>`;
+}
+function buildGuide(){
+  const tab = GD.tab, tb = (k, l) => `<button class="btn sm${tab === k ? ' primary' : ''}" type="button" data-gdt="${k}">${l}</button>`;
+  $('guideBody').innerHTML = `<div class="row" style="gap:6px;margin-bottom:8px">${tb('pages', 'All pages: how to use + thresholds')}${tb('filters', 'Filter thresholds (scalp / spot / swing)')}</div>` + (tab === 'pages' ? guidePagesHtml() : guideFilters());
+  if (!$('guideBody')._b){ $('guideBody')._b = 1;
+    $('guideBody').addEventListener('click', e => { const t = e.target.closest('[data-gdt]'); if (t){ GD.tab = t.dataset.gdt; buildGuide(); return; } if (e.target.id === 'gdAll'){ const ds = [...document.querySelectorAll('#gdList details.gdp')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); } });
+    $('guideBody').addEventListener('input', e => { if (e.target.id !== 'gdQ') return; const q = e.target.value.trim().toLowerCase(); document.querySelectorAll('#gdList details.gdp').forEach(d => { const hit = !q || d.textContent.toLowerCase().includes(q); d.style.display = hit ? '' : 'none'; if (q && hit) d.open = true; }); });
+  }
 }
 const TV_HOSTS = [['HYPERLIQUID','perp','Hyperliquid perp'],['MEXC','perp','MEXC perp'],['MEXC','spot','MEXC spot'],['BINANCE','perp','Binance perp'],['BINANCE','spot','Binance spot'],['BYBIT','perp','Bybit perp'],['OKX','perp','OKX perp'],['BITGET','perp','Bitget perp'],['GATEIO','perp','Gate perp'],['COINBASE','usd','Coinbase spot']];
 function tvSymbol(venue, c){
