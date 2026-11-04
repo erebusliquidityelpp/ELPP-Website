@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.73</title>
+<title>ELPP CRYPTO SCANNER PRO V4.74</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.73</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.74</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11349,7 +11349,8 @@ window.__elppTaHook = {
   coins: () => { try { return [...snapshot.keys()].filter(n => !/^xyz:/.test(n)).slice(0, 400); } catch(e){ return []; } },
   verdict: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c || !c.m) return null; const m = c.m, v = m.verdict, LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG']; if (v == null || !LAB[v]) return null; return {label:LAB[v], score:m.verdictScore, dir:(v === 4 || v === 5) ? 'long' : (v === 2 || v === 3) ? 'short' : null}; } catch(e){ return null; } },
   plan: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c) return null; const q = planFor(c); return q && isNum(q.entry) ? {dir:q.dir, entry:q.entry, sl:q.sl, tp1:q.tp1, tp2:q.tp2} : null; } catch(e){ return null; } },
-  watch: n => { try { if (!wlGet(n)) wlAdd(n); } catch(e){} }
+  watch: n => { try { if (!(snapshot.get(n) || state.coins.get(n))){ toast(n + ' is not in the scanner list, so it was starred here only'); return false; } if (wlGet(n)) toast(n + ' is already in your watchlist'); else { wlAdd(n); toast('★ ' + n + ' added to your Watchlist'); if (state.view === 'watch') { try { renderWatch(); } catch(e){} } } return true; } catch(e){ return false; } },
+  toast: m => { try { toast(m); } catch(e){} }
 };
 function ptHtml(){
   ptLoad(); const B = ptBackdrop(), D = ptBuild(), list = D.list; if (list[0]) list[0].first = true; try { x9Want(list.filter(r => r.c).map(r => r.c.name).slice(0, 20)); } catch(e){}
@@ -13267,6 +13268,32 @@ function cfgMenu(c, id, btn){
     p.addEventListener('click', e => { if (!e.target.closest('[data-ok]')) return; p.querySelectorAll('[data-p]').forEach(inp => { const v = parseFloat(inp.value); if (isN(v) && v > 0) x.p[+inp.dataset.p] = v; }); p.querySelectorAll('[data-c]').forEach(inp => { x.c[+inp.dataset.c] = inp.value; }); c.recalc(); c.sig = ''; c.dirty = true; save(); closePop(); refresh(c); });
   });
 }
+
+function shotCanvas(c){
+  const cv = c.cv, dpr = window.devicePixelRatio || 1, top = Math.round(40 * dpr), o = document.createElement('canvas'); o.width = cv.width; o.height = cv.height + top; const g = o.getContext('2d'), P = c.P || pal();
+  g.fillStyle = P.bg; g.fillRect(0, 0, o.width, o.height); g.drawImage(cv, 0, top); const p = c.pane, ff = getComputedStyle(document.body).fontFamily;
+  g.fillStyle = P.fg; g.font = 'bold ' + Math.round(15 * dpr) + 'px ' + ff; g.fillText('ELPP TA Lab  ·  ' + p.sym + '  ·  ' + p.tf + (c.feed && c.feed.src ? '  ·  ' + ({bn:'Binance', by:'Bybit', hl:'Hyperliquid'}[c.feed.src.src]) : ''), 12 * dpr, 17 * dpr);
+  g.fillStyle = P.mut; g.font = Math.round(11 * dpr) + 'px ' + ff; const ind = p.ind.filter(x => x.on !== false).map(x => IND[x.k].n + (x.p.length ? ' ' + x.p.join(',') : '')).join('  ·  ');
+  g.fillText(fmtT(Date.now(), 'full') + ' ' + S.tz + (ind ? '   |   ' + ind : ''), 12 * dpr, 34 * dpr);
+  return o;
+}
+function camMenu(c, btn){
+  openPop(btn, '<button class="it" data-s="dl">⬇ Download image (PNG)</button><button class="it" data-s="copy">📋 Copy image to clipboard</button><button class="it" data-s="open">↗ Open image in a new tab</button><button class="it" data-s="csv">⬇ Download candles (CSV)</button><button class="it" data-s="link">🔗 Copy chart summary (text)</button>', p => {
+    p.addEventListener('click', e => {
+      const b = e.target.closest('.it'); if (!b) return; const k = b.dataset.s, name = 'ELPP-' + c.pane.sym.replace(/[^a-z0-9]/gi, '_') + '-' + c.pane.tf; closePop();
+      const say = m => { try { const h = HOOK(); if (h.toast) h.toast(m); } catch(_){} };
+      if (k === 'csv'){ const rows = ['time_utc,open,high,low,close,volume'].concat(c.bars.map(x => new Date(x.t).toISOString() + ',' + x.o + ',' + x.h + ',' + x.l + ',' + x.c + ',' + x.v)); const u = URL.createObjectURL(new Blob([rows.join('\n')], {type:'text/csv'})), l = document.createElement('a'); l.href = u; l.download = name + '.csv'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 3000); say('Candles saved as CSV'); return; }
+      if (k === 'link'){ const bars = c.bars, l = bars[bars.length - 1], q = c.plan; const t = 'ELPP ' + c.pane.sym + ' ' + c.pane.tf + ' · last ' + (l ? fmtP(l.c) : '–') + ' · ' + c.pane.ind.filter(x => x.on !== false).map(x => IND[x.k].n + ' ' + x.p.join(',')).join(', ') + (q ? ' · scanner plan ' + q.dir + ' entry ' + fmtP(q.entry) + ' SL ' + fmtP(q.sl) + ' TP ' + fmtP(q.tp2 || q.tp1) : '') + ' · ' + fmtT(Date.now(), 'full') + ' ' + S.tz; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => say('Chart summary copied'), () => say('Could not copy')); return; }
+      c.draw(); const o = shotCanvas(c);
+      o.toBlob(bl => {
+        if (!bl){ say('Could not make the image'); return; }
+        if (k === 'dl'){ const u = URL.createObjectURL(bl), l = document.createElement('a'); l.href = u; l.download = name + '.png'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 3000); say('Chart image downloaded'); }
+        else if (k === 'open'){ const u = URL.createObjectURL(bl); window.open(u, '_blank'); setTimeout(() => URL.revokeObjectURL(u), 60000); }
+        else { try { navigator.clipboard.write([new ClipboardItem({'image/png':bl})]).then(() => say('Chart image copied. Paste it anywhere'), () => say('Your browser blocked copying the image. Use Download instead.')); } catch(_){ say('Your browser cannot copy images. Use Download instead.'); } }
+      });
+    });
+  });
+}
 function cellHtml(i){
   return '<div class="ta-top">' +
     '<button class="ta-star" data-a="star" title="Star this coin (adds it to your favourites bar)">☆</button>' +
@@ -13281,7 +13308,7 @@ function cellHtml(i){
     '<button class="ta-b" data-a="plan" title="Draw the scanner\'s own entry, stop and targets for this coin on the chart">Scanner plan</button>' +
     '<button class="ta-b" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
     '<span class="ta-badge" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
-    '<button class="ta-b" data-a="png" title="Save a picture of this chart">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
+    '<button class="ta-b" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
     '<div class="ta-body"><div class="ta-tools">' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
     '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
     '<div class="ta-rp" hidden><button class="ta-b" data-a="rp-play">▶</button><button class="ta-b" data-a="rp-step" title="Next candle (→)">⏭</button><select data-a="rp-speed"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option></select>' +
@@ -13330,13 +13357,13 @@ function build(){
     const cell = e.target.closest('.ta-cell'); if (!cell) return; const c = charts[+cell.dataset.i]; TA.setActive(c.i);
     const chip = e.target.closest('.ta-chip button'); if (chip){ const cid = chip.closest('.ta-chip').dataset.id, x = c.pane.ind.find(q => q.id === cid), a = chip.dataset.a; if (a === 'eye' && x){ x.on = x.on === false; c.sig = ''; c.dirty = true; save(); } else if (a === 'x'){ c.pane.ind = c.pane.ind.filter(q => q.id !== cid); c.sig = ''; c.dirty = true; save(); } else if (a === 'cfg') cfgMenu(c, cid, chip); return; }
     const b = e.target.closest('[data-a]'); if (!b || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.a, p = c.pane;
-    if (a === 'star'){ const i = S.stars.indexOf(p.sym); if (i >= 0) S.stars.splice(i, 1); else S.stars.push(p.sym); save(); charts.forEach(refresh); return; }
+    if (a === 'star'){ const i = S.stars.indexOf(p.sym); if (i >= 0) S.stars.splice(i, 1); else S.stars.push(p.sym); save(); if (i < 0){ try { const h = HOOK(); if (h.watch) h.watch(p.sym); } catch(_){} } charts.forEach(refresh); return; }
     if (a === 'tf'){ setTf(c.i, b.dataset.tf); return; }
     if (a === 'ind'){ indMenu(c, b); return; }
     if (a === 'vol' || a === 'log' || a === 'liq' || a === 'fvg' || a === 'plan'){ p[a] = !p[a]; if (a === 'plan' && p.plan) pollPlan(); c.zones.key = ''; if (a === 'log') c.yz = 1; c.dirty = true; save(); refresh(c); return; }
     if (a === 'rep'){ if (c.rep.on) c.exitReplay(); else c.enterReplay(); return; }
     if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
-    if (a === 'png'){ try { c.cv.toBlob(bl => { const u = URL.createObjectURL(bl), l = document.createElement('a'); l.href = u; l.download = 'ELPP-' + p.sym.replace(/[^a-z0-9]/gi, '_') + '-' + p.tf + '.png'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 3000); }); } catch(_){} return; }
+    if (a === 'png'){ camMenu(c, b); return; }
     if (a === 'fit'){ c.fit(); c.dirty = true; return; }
     if (a === 'fs'){ cell.classList.toggle('ta-full'); setTimeout(() => { c.dirty = true; }, 30); return; }
     if (a === 'tool'){ c.tool = b.dataset.t; c.pend = []; c.sel = null; c.dirty = true; refresh(c); c.cv.focus(); return; }
