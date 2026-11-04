@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.80</title>
+<title>ELPP CRYPTO SCANNER PRO V4.81</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.80</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.81</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5696,7 +5696,7 @@ const CS = {panes:[], maxIdx:null};
 const HLU = {set:new Set(), at:0, busy:false};
 function hluLoad(){ if (HLU.busy || (HLU.set.size && Date.now() - HLU.at < 3600000)) return; HLU.busy = true; fetch('https://api.hyperliquid.xyz/info', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'meta'})}).then(r => r.json()).then(j => { (j.universe || []).forEach(u => { if (u && u.name && !u.isDelisted) HLU.set.add(u.name); }); HLU.at = Date.now(); HLU.busy = false; }).catch(() => { HLU.busy = false; }); }
 function csCoin(name){ if (!name) return null; return state.coins.get(name) || X.cgObj.get(name) || (HLU.set.has(name) ? {name, hlOnly:true} : null); }
-function csPool(){ hluLoad(); const s = new Set([...state.coins.values()].filter(c => c.ctx).map(c => c.name)); HLU.set.forEach(n => s.add(n)); return [...s]; }
+function csPool(){ hluLoad(); const s = new Set([...state.coins.values()].filter(c => c.ctx).map(c => c.name)); const have = new Set([...s].map(n => n.toUpperCase())); HLU.set.forEach(n => { if (!have.has(n.toUpperCase())) s.add(n); }); return [...s]; }
 function csFindSug(q){
   const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
   const pool = csPool();
