@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.86</title>
+<title>ELPP CRYPTO SCANNER PRO V4.87</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -790,7 +790,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.86</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.87</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11357,7 +11357,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.86: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.87: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11405,7 +11405,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.86: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.87: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11617,7 +11617,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.86: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.87: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
@@ -14370,6 +14370,7 @@ body.ta-wsb{overflow:hidden}
 .ta-mkt .reg{padding:1px 8px;border-radius:10px;border:1px solid var(--line);font-weight:700}
 .ta-how{margin-top:6px;border-top:1px solid var(--line);padding-top:6px}
 .ta-how ol{margin:4px 0 4px 18px;padding:0;font-size:12px;line-height:1.55}
+.ta-cell.hc1 .ta-x,.ta-cell.hc1 .ta-ana,.ta-cell.hc1 .ta-smc{display:none!important}.ta-cell.hc2 .ta-x,.ta-cell.hc2 .ta-ana,.ta-cell.hc2 .ta-smc,.ta-cell.hc2 .ta-tfs,.ta-cell.hc2 [data-a=ven],.ta-cell.hc2 [data-a=fit]{display:none!important}.ta-hc{margin-left:auto}.ta-hc span{font-size:10px;opacity:.8}
 .ta-top{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px 6px;border-bottom:1px solid var(--line);background:var(--surface2)}
 .ta-top input.ta-sym{width:104px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 7px;font:inherit;font-weight:700;font-size:13px;text-transform:none}
 .ta-top select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:2px 4px;font:inherit;font-size:12px}
@@ -14477,14 +14478,14 @@ function cellHtml(i){
     '<button class="ta-b" data-a="ven" title="Choose exchange / search every CEX and DEX coin">🌐 <span class="ta-vl2">Auto</span></button>' +
     '<span class="ta-tfs">' + TFQUICK.map(t => '<button class="ta-b" data-a="tf" data-tf="' + t + '">' + (t === '1d' ? '1D' : t) + '</button>').join('') + '</span>' +
     '<select class="ta-tfm" title="More timeframes">' + Object.keys(TFSEC).map(t => '<option value="' + t + '">' + t + '</option>').join('') + '</select>' +
-    '<select class="ta-type" title="Chart type">' + TYPES.map(t => '<option value="' + t[0] + '">' + t[1] + '</option>').join('') + '</select>' +
-    '<button class="ta-b" data-a="ind" title="Add indicators">ƒx Indicators</button>' +
-    '<button class="ta-b" data-a="vol" title="Volume bars">Vol</button><button class="ta-b" data-a="log" title="Log price scale">Log</button>' +
-    '<button class="ta-b" data-a="plan" title="Draw the scanner\'s own entry, stop and targets for this coin on the chart">Scanner plan</button>' +
-    '<button class="ta-b" data-a="smcs" title="Show or hide the institutional / smart-money (SMC) buttons">SMC ▾</button>' +
-    '<button class="ta-b" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
-    '<span class="ta-badge" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
-    '<button class="ta-b" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
+    '<select class="ta-type ta-x" title="Chart type">' + TYPES.map(t => '<option value="' + t[0] + '">' + t[1] + '</option>').join('') + '</select>' +
+    '<button class="ta-b ta-x" data-a="ind" title="Add indicators">ƒx Indicators</button>' +
+    '<button class="ta-b ta-x" data-a="vol" title="Volume bars">Vol</button><button class="ta-b ta-x" data-a="log" title="Log price scale">Log</button>' +
+    '<button class="ta-b ta-x" data-a="plan" title="Draw the scanner\'s own entry, stop and targets for this coin on the chart">Scanner plan</button>' +
+    '<button class="ta-b ta-x" data-a="smcs" title="Show or hide the institutional / smart-money (SMC) buttons">SMC ▾</button>' +
+    '<button class="ta-b ta-x" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
+    '<span class="ta-badge ta-x" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
+    '<button class="ta-b ta-x" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button><button class="ta-b ta-hc" data-a="hc" title="Show more or fewer controls on this chart: Full, Compact, Mini">☰ <span>Full</span></button></div>' +
     '<div class="ta-ana"><button class="ta-conf" data-a="plan2" title="How many smart-money signals line up right now. Click to build a full trade plan from them.">Confluence…</button><button class="ta-b" data-a="plan2" title="Entry, stop, targets, leverage, margin and risk built from the signals">📋 Trade plan</button><span class="ta-mtf" title="Trend bias on 15m, 1h, 4h and Daily (green up, red down, amber mixed). Hover a light for the phase and institutional status"></span><span class="ta-phase" title="Market phase on this timeframe"></span><span class="ta-inst" title="Latest institutional entry on this timeframe"></span><button class="ta-b" data-a="stats" title="What usually happens on this coin after a sweep, break of structure, volume spike or Asia-low sweep">📈 Stats</button><button class="ta-b" data-a="alert" title="Alerts: price, sweep, CHoCH, OB/FVG tap, confluence score">🔔 Alerts</button><button class="ta-b" data-a="cmp" title="Compare with BTC or any coin">⚖ Compare</button><button class="ta-b" data-a="data" title="Open interest, funding, long/short, order-book walls, liquidation map, scanner pools, signal history, events">🗂 Data</button><button class="ta-b" data-a="score" title="Your replay win rate and average R by setup">🏆 Scorecard</button><span class="ta-cmps"></span></div>' +
     smcStrip() + '<div class="ta-body"><div class="ta-tools"><button class="ta-b" data-a="tbar" title="Shrink or expand the drawing toolbar">«</button>' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
     '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
@@ -14492,8 +14493,9 @@ function cellHtml(i){
     '<select data-a="rp-tag" title="Tag this trade with its setup so the scorecard can rank your edges">' + TAGS.map(t => '<option>' + t + '</option>').join('') + '</select><button class="ta-b" data-a="rp-long" style="color:var(--up)">▲ Long</button><button class="ta-b" data-a="rp-short" style="color:var(--down)">▼ Short</button><button class="ta-b" data-a="rp-close">Close</button><label>SL×ATR <input type="number" step="0.1" min="0.2" data-a="rp-slx" value="1.5"></label><label>R:R <input type="number" step="0.5" min="0.5" data-a="rp-rr" value="2"></label>' +
     '<span class="ta-rs"></span><button class="ta-b" data-a="rp-pick">Pick bar</button><button class="ta-b" data-a="rp-exit">Exit</button></div></div></div>';
 }
+function hcOf(p){ return p.hc != null ? p.hc : (S.hc != null ? S.hc : (LAYOUTS[S.layout].n > 2 ? 1 : 0)); }
 function refresh(c){
-  const cell = c.cell; if (!cell) return; { const tb = $q('.ta-tools', cell); if (tb){ tb.classList.toggle('min', !!S.tbMin); const b0 = $q('[data-a=tbar]', tb); if (b0) b0.textContent = S.tbMin ? '»' : '«'; } } { const vl = $q('.ta-vl2', cell); if (vl){ const f = c.feed, v = c.pane.ven || 'auto'; vl.textContent = f && f.src ? VEN[f.src.src].tag + (v === 'auto' ? '·auto' : '') : (v === 'auto' ? 'Auto' : VEN[v].tag); } } const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
+  const cell = c.cell; if (!cell) return; { const h = hcOf(c.pane); cell.classList.toggle('hc1', h === 1); cell.classList.toggle('hc2', h === 2); const hb = $q('.ta-hc span', cell); if (hb) hb.textContent = ['Full', 'Compact', 'Mini'][h]; } { const tb = $q('.ta-tools', cell); if (tb){ tb.classList.toggle('min', !!S.tbMin); const b0 = $q('[data-a=tbar]', tb); if (b0) b0.textContent = S.tbMin ? '»' : '«'; } } { const vl = $q('.ta-vl2', cell); if (vl){ const f = c.feed, v = c.pane.ven || 'auto'; vl.textContent = f && f.src ? VEN[f.src.src].tag + (v === 'auto' ? '·auto' : '') : (v === 'auto' ? 'Auto' : VEN[v].tag); } } const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
   cell.querySelectorAll('[data-a=tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === p.tf)); const m = $q('.ta-tfm', cell); m.value = p.tf; $q('.ta-type', cell).value = p.type;
   const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('plan', p.plan); { let cnt = 0; cell.querySelectorAll('[data-a=smc]').forEach(b => { const v = smcOn(p, b.dataset.k); if (v) cnt++; b.classList.toggle('on', v); }); const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; $q('.ta-smc', cell).hidden = !open; const sb = $q('[data-a=smcs]', cell); sb.textContent = 'SMC' + (cnt ? ' (' + cnt + ')' : '') + (open ? ' ▴' : ' ▾'); sb.classList.toggle('on', cnt > 0); } on('rep', c.rep.on); on('mag', S.magnet);
   cell.querySelectorAll('[data-a=tool]').forEach(b => b.classList.toggle('on', b.dataset.t === c.tool)); const st = $q('.ta-star', cell); st.classList.toggle('on', S.stars.includes(p.sym)); st.textContent = S.stars.includes(p.sym) ? '★' : '☆';
@@ -14511,7 +14513,7 @@ function build(){ try { uniLoad(); } catch(e){}
     '<span class="sep"></span><label title="Show the same time on the crosshair in every chart"><input type="checkbox" id="taSync"> Sync crosshair</label><label title="Changing the coin or timeframe in one chart changes all of them"><input type="checkbox" id="taLink"> Link all charts</label>' +
     '<span class="sep"></span><select id="taTz" title="Time zone for the time axis" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px">' + TZS.map(z => '<option>' + z + '</option>').join('') + '</select>' +
     '<span class="sep"></span><select id="taTpl" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px;max-width:150px"></select><button class="ta-b" id="taTplLoad" title="Load the chosen saved layout">Load</button><button class="ta-b" id="taTplSave" title="Save the current layout, coins and indicators as a template">Save layout…</button><button class="ta-b" id="taTplDel" title="Delete the chosen template">🗑</button>' +
-    '<span class="sep"></span><button class="ta-b" id="taWs" title="Enlarge the whole TA Lab to fill the window. Add or change panes there with the Layout buttons (up to 12).">⛶ Workspace</button><button class="ta-b" id="taNew" title="Open a clean analysis-only screen in a new browser tab, with its own panes. Open as many tabs as you like.">↗ New analysis tab</button><label title="Show the market-now strip: regime, BTC / ETH verdict, how many coins lean long or short"><input type="checkbox" id="taMkt"> Market now</label>' + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)" title="Squeeze the panes horizontally: the narrower the width, the more panes fit side by side">Pane width</span>' + [['Auto', 0], ['XS', 240], ['S', 320], ['M', 440], ['L', 620]].map(q => '<button class="ta-b" data-pw="' + q[1] + '" title="' + (q[1] ? 'Panes at least ' + q[1] + 'px wide, as many per row as fit' : 'Use the layout as chosen') + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
+    '<span class="sep"></span><button class="ta-b" id="taWs" title="Enlarge the whole TA Lab to fill the window. Add or change panes there with the Layout buttons (up to 12).">⛶ Workspace</button><button class="ta-b" id="taNew" title="Open a clean analysis-only screen in a new browser tab, with its own panes. Open as many tabs as you like.">↗ New analysis tab</button><label title="Show the market-now strip: regime, BTC / ETH verdict, how many coins lean long or short"><input type="checkbox" id="taMkt"> Market now</label>' + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)" title="How many controls each chart header shows. Compact and Mini keep many panes tidy; the ☰ button on a chart changes just that chart">Controls</span>' + [['Full', 0], ['Compact', 1], ['Mini', 2]].map(q => '<button class="ta-b" data-hca="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)" title="Squeeze the panes horizontally: the narrower the width, the more panes fit side by side">Pane width</span>' + [['Auto', 0], ['XS', 240], ['S', 320], ['M', 440], ['L', 620]].map(q => '<button class="ta-b" data-pw="' + q[1] + '" title="' + (q[1] ? 'Panes at least ' + q[1] + 'px wide, as many per row as fit' : 'Use the layout as chosen') + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
     '<div class="ta-bar" style="padding:4px 8px"><span style="font-size:12px;color:var(--warn)">★ Favourites</span><span class="ta-favs" style="display:flex;flex-wrap:wrap;gap:5px"></span></div>' +
     '<div class="ta-help" id="taHelpBox" hidden><b>Where is everything?</b> Second row of every chart: <b>Confluence badge / 📋 Trade plan</b> (plan builder, add to Watchlist) · coloured dots = 15m/1h/4h/D bias (hover for phase and institutional status) · <b>Phase</b> and <b>Inst</b> chips · <b>📈 Stats</b> · <b>🔔 Alerts</b> · <b>⚖ Compare</b> · <b>🗂 Data</b> (liquidation map, order-book walls, scanner pools, signal and journal history, events, open interest, funding, long/short, delta) · <b>🏆 Scorecard</b> (replay stats) · the <b>Favourites</b> bar has the mini-charts · the SMC strip has <i>Market phases</i> and <i>Institutional entry</i> chips · the drawing toolbar shrinks with «.<br><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
     '<div class="ta-mkt" id="taMktBox" hidden></div><div class="ta-grid" id="taGrid"></div></div><datalist id="taList"></datalist>';
@@ -14526,6 +14528,7 @@ function build(){ try { uniLoad(); } catch(e){}
   root.addEventListener('focusin', e => { const cell = e.target.closest && e.target.closest('.ta-cell'); if (cell) TA.setActive(+cell.dataset.i); });
   root.addEventListener('click', e => {
     const lay = e.target.closest('[data-lay]'); if (lay){ setLayout(lay.dataset.lay); return; }
+    const hca = e.target.closest('[data-hca]'); if (hca){ S.hc = +hca.dataset.hca; S.panes.forEach(q => { delete q.hc; }); save(); charts.forEach(c => { refresh(c); c.dirty = true; }); root.querySelectorAll('[data-hca]').forEach(b => b.classList.toggle('on', +b.dataset.hca === S.hc)); return; }
     const pwb = e.target.closest('[data-pw]'); if (pwb){ S.pw = +pwb.dataset.pw; save(); buildGrid(); return; }
     const hsb = e.target.closest('[data-hs]'); if (hsb){ S.hs = +hsb.dataset.hs; save(); buildGrid(); return; }
     const fav = e.target.closest('.ta-fav'); if (fav){ const un = e.target.closest('[data-un]'); if (un){ S.stars = S.stars.filter(x => x !== un.dataset.un); save(); charts.forEach(refresh); return; } const a = Math.min(S.active, charts.length - 1); setSym(a, fav.dataset.sym); return; }
@@ -14552,6 +14555,7 @@ function build(){ try { uniLoad(); } catch(e){}
     if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
     if (a === 'png'){ camMenu(c, b); return; }
     if (a === 'fit'){ c.fit(); c.dirty = true; return; }
+    if (a === 'hc'){ const p = c.pane; p.hc = (hcOf(p) + 1) % 3; save(); refresh(c); setTimeout(() => { c.dirty = true; }, 30); return; }
     if (a === 'fs'){ cell.classList.toggle('ta-full'); setTimeout(() => { c.dirty = true; }, 30); return; }
     if (a === 'tbar'){ S.tbMin = !S.tbMin; save(); charts.forEach(refresh); return; }
     if (a === 'tool'){ c.tool = b.dataset.t; c.pend = []; c.sel = null; c.dirty = true; refresh(c); c.cv.focus(); return; }
@@ -14578,7 +14582,7 @@ function buildGrid(){
   if (S.pw > 0 && window.innerWidth >= 760){ grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + S.pw + 'px, 1fr))'; }
   if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(520px, ' + Math.round(80 * (S.hs || 1.2)) + 'vh)'; }
   S.panes.forEach((p, i) => { const cell = mk('div', 'ta-cell', cellHtml(i)); cell.dataset.i = i; grid.appendChild(cell); const c = new Chart(i); c.attach(cell); charts.push(c); c.setFeed(); c.bind(); c.ro = new ResizeObserver(() => { c.dirty = true; if (!c.fitted2 && c.cv.clientWidth > 100){ c.fitted2 = true; if (c.bars.length) c.fit(); } }); c.ro.observe(c.cv); refresh(c); });
-  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.2)) < 0.01)); root.querySelectorAll('[data-pw]').forEach(b => b.classList.toggle('on', +b.dataset.pw === (S.pw || 0))); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
+  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.2)) < 0.01)); root.querySelectorAll('[data-pw]').forEach(b => b.classList.toggle('on', +b.dataset.pw === (S.pw || 0))); root.querySelectorAll('[data-hca]').forEach(b => b.classList.toggle('on', S.hc != null && +b.dataset.hca === S.hc)); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
 }
 function fillList(){ const dl = $q('#taList', root); if (dl) dl.innerHTML = coinNames().map(n => '<option value="' + esc(n) + '">').join(''); }
 function pollPlan(){
