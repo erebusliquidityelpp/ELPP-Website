@@ -10539,9 +10539,10 @@ function vgTableRows(){
 function renderViewGuide(){
   let box = $('viewGuide'); const hint = $('modeHint'); if (!hint) return;
   if (!box){ box = document.createElement('details'); box.id = 'viewGuide'; box.className = 'ovd'; box.style.margin = '6px 0'; hint.insertAdjacentElement('afterend', box); box.addEventListener('toggle', () => { try { localStorage.setItem('elpp_vg_open', box.open ? '1' : '0'); } catch(e){} }); try { box.open = localStorage.getItem('elpp_vg_open') === '1'; } catch(e){} }
-  const key = state.view + '|' + (state.view === 'table' ? state.mode + '|' + state.scope : ''); if (box._k === key) return; box._k = key;
-  const rows = state.view === 'table' ? vgTableRows() : (VIEW_GUIDE[state.view] || []), how = VIEW_HOW[state.view === 'table' ? 'table:' + state.mode : state.view] || []; if (!rows.length && !how.length){ box.hidden = true; return; } box.hidden = false;
+  const key = state.view + '|' + (state.view === 'table' ? state.mode + '|' + state.scope : ''); if (box._k === key) return;
+  const rows = state.view === 'table' ? vgTableRows() : (VIEW_GUIDE[state.view] || []), how = VIEW_HOW[state.view === 'table' ? 'table:' + state.mode : state.view] || []; if (!rows.length && !how.length){ box.hidden = true; box._k = key; return; } box.hidden = false;
   box.innerHTML = `<summary>Beginner guide: how to use this page${rows.length ? ' + what each number means and where good and bad begin (' + rows.length + ')' : ''}</summary>${how.length ? '<h4 style="margin:6px 0 2px">How to use this page, step by step</h4><ol class="ovstory">' + how.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol><p class="hint">More: open <b>📚 Vocabulary &amp; Academy</b> for words, set-ups and how to build your own signal.</p>' : ''}${rows.length ? `<div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">What it is</th><th style="text-align:left">Thresholds</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left;vertical-align:top"><b>${esc(r[0])}</b></td><td style="text-align:left;vertical-align:top">${esc(r[1])}</td><td style="text-align:left;vertical-align:top">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>` : ''}<p class="hint">Starting values from the scanner's own rules and common practice, not promises. Test them on your journal and the Backtest page before trusting them. The full list of every filter is under the Guide button.</p>`;
+  box._k = key;
 }
 
 function elppDump(){
@@ -11631,7 +11632,8 @@ const PS_PRESETS = {
   mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
 };
-function psSt(){ const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
+function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && state.ps.cols.includes('vol') && !state.ps.cols.includes('pV1h')){ state.ps.cols = state.ps.cols.flatMap(x => x === 'vol' ? ['pV1h', 'pV4h', 'pV24'] : [x]); }
+  const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
 function psStrip(h){ return String(h == null ? '' : h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim(); }
 function psElite(c, mk){
   const m = c.m, v = m.verdict, hasV = isNum(v), o = {dir:'', rank:null};
