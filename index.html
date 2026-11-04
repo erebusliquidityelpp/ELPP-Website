@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.82</title>
+<title>ELPP CRYPTO SCANNER PRO V4.83</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -115,7 +115,7 @@ header.top .chips .chip-pop b{color:var(--fg);font-weight:500;font-family:var(--
 .cw-side h4,.cw-grid h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .cw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;margin-top:6px}
 .cw-grid>section{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
-.psw{overflow:auto;max-height:78vh;border:1px solid var(--line);border-radius:8px}.pst{border-collapse:separate;border-spacing:0;font-size:12px;width:max-content;min-width:100%}.pst th,.pst td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.pst thead th{position:sticky;background:var(--panel,var(--bg));z-index:3}.pst thead tr:first-child th{top:0}.pst thead tr:nth-child(2) th{top:27px;cursor:pointer;color:var(--muted);font-weight:600}.pst .psg{cursor:pointer;text-align:center;color:var(--accent);border-left:1px solid var(--line);font-weight:700}.pst .psg.shut{opacity:.7;font-weight:500;max-width:90px}.pst .pss.on{color:var(--accent)}.pst td:first-child,.pst th.psh0{position:sticky;left:0;background:var(--panel,var(--bg));z-index:2;text-align:left}.pst thead th.psh0{z-index:4}.pst .psx{width:28px;padding:2px 4px;text-align:center}.pst .psgz{text-align:center;opacity:.4}.pst tr.psr:hover td{background:rgba(127,127,127,.08)}.pst tr.psr.open td{background:rgba(127,127,127,.12)}.pst .psdr>td{white-space:normal;text-align:left;padding:8px 12px;background:rgba(127,127,127,.05)}.psdet{max-width:1100px;position:sticky;left:8px}.psdet details.psd{margin:4px 0;border:1px solid var(--line);border-radius:6px;padding:4px 8px}.psdet details.psd>summary{cursor:pointer;font-weight:600;font-size:12px}.psdet details.psd>div{margin-top:4px}.pspl{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}.pspl .psgb{display:flex;gap:4px}.pspg{margin:3px 0}
+.acstep{border-left:3px solid var(--accent);padding:2px 10px;margin:8px 0}.acstep p{margin:2px 0;font-size:13px;line-height:1.5}.acv{display:flex;gap:10px;padding:3px 0;border-bottom:1px solid var(--line)}.acv b{flex:0 0 190px}.acd>summary{cursor:pointer}@media(max-width:600px){.acv{flex-direction:column;gap:0}.acv b{flex:none}}.psw{overflow:auto;max-height:78vh;border:1px solid var(--line);border-radius:8px}.pst{border-collapse:separate;border-spacing:0;font-size:12px;width:max-content;min-width:100%}.pst th,.pst td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.pst thead th{position:sticky;background:var(--panel,var(--bg));z-index:3}.pst thead tr:first-child th{top:0}.pst thead tr:nth-child(2) th{top:27px;cursor:pointer;color:var(--muted);font-weight:600}.pst thead tr:nth-child(3) th{top:54px;font-weight:400;font-size:10px;color:var(--muted);white-space:normal;max-width:140px;min-width:80px;text-align:center;cursor:default}.pst .psg{cursor:pointer;text-align:center;color:var(--accent);border-left:1px solid var(--line);font-weight:700}.pst .psg.shut{opacity:.7;font-weight:500;max-width:90px}.pst .pss.on{color:var(--accent)}.pst td:first-child,.pst th.psh0{position:sticky;left:0;background:var(--panel,var(--bg));z-index:2;text-align:left}.pst thead th.psh0{z-index:4}.pst .psx{width:28px;padding:2px 4px;text-align:center}.pst .psgz{text-align:center;opacity:.4}.pst tr.psr:hover td{background:rgba(127,127,127,.08)}.pst tr.psr.open td{background:rgba(127,127,127,.12)}.pst .psdr>td{white-space:normal;text-align:left;padding:8px 12px;background:rgba(127,127,127,.05)}.psdet{max-width:1100px;position:sticky;left:8px}.psdet details.psd{margin:4px 0;border:1px solid var(--line);border-radius:6px;padding:4px 8px}.psdet details.psd>summary{cursor:pointer;font-weight:600;font-size:12px}.psdet details.psd>div{margin-top:4px}.pspl{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}.pspl .psgb{display:flex;gap:4px}.pspg{margin:3px 0}
 .cwr{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:3px 0;font-size:12px}.cwr>span:first-child{color:var(--muted);flex:0 0 42%}.cwr>span:last-child{text-align:right;white-space:normal;word-break:break-word}
 .fp{display:grid;grid-template-columns:70px 1fr 1fr;gap:1px 4px;font-size:11px;font-family:var(--mono)}
 .fp .s{text-align:right;color:var(--down)}.fp .b{color:var(--up)}.fp .poc{outline:1px solid var(--accent)}
@@ -789,7 +789,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.82</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.83</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -827,6 +827,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-mode="hype">Hype &amp; News</button>
     <button class="nv" type="button" data-view="screener">Screener (Hyperliquid + Binance)</button>
     <button class="nv" type="button" data-view="power" style="font-weight:700">⚡ Power Scanner</button>
+    <button class="nv" type="button" data-view="academy" style="font-weight:700">📚 Vocabulary &amp; Academy</button>
     <button class="nv" type="button" data-view="inst">Perpetual Institutional Radar</button>
     <button class="nv" type="button" data-view="instspot">Spot Institutional Radar</button>
     <button class="nv" type="button" data-view="listings">All coins &amp; where they are listed</button>
@@ -1044,6 +1045,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewWatch" class="vcol" hidden></div>
     <div id="viewScreener" class="vcol" hidden></div>
     <div id="viewPower" class="vcol" hidden></div>
+    <div id="viewAcademy" class="vcol" hidden></div>
     <div id="viewInst" class="vcol" hidden></div>
     <div id="viewInstSpot" class="vcol" hidden></div>
     <div id="viewOverview" class="vcol" hidden></div>
@@ -1929,7 +1931,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['power','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['power','academy','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -5121,7 +5123,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'power') renderPower(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'power') renderPower(); else if (state.view === 'academy') renderAcademy(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -8798,7 +8800,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; }
+  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
@@ -10538,8 +10540,8 @@ function renderViewGuide(){
   let box = $('viewGuide'); const hint = $('modeHint'); if (!hint) return;
   if (!box){ box = document.createElement('details'); box.id = 'viewGuide'; box.className = 'ovd'; box.style.margin = '6px 0'; hint.insertAdjacentElement('afterend', box); box.addEventListener('toggle', () => { try { localStorage.setItem('elpp_vg_open', box.open ? '1' : '0'); } catch(e){} }); try { box.open = localStorage.getItem('elpp_vg_open') === '1'; } catch(e){} }
   const key = state.view + '|' + (state.view === 'table' ? state.mode + '|' + state.scope : ''); if (box._k === key) return; box._k = key;
-  const rows = state.view === 'table' ? vgTableRows() : (VIEW_GUIDE[state.view] || []); if (!rows.length){ box.hidden = true; return; } box.hidden = false;
-  box.innerHTML = `<summary>Beginner guide: what each number means and where good and bad begin (${rows.length})</summary><div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">What it is</th><th style="text-align:left">Thresholds</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left;vertical-align:top"><b>${esc(r[0])}</b></td><td style="text-align:left;vertical-align:top">${esc(r[1])}</td><td style="text-align:left;vertical-align:top">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div><p class="hint">Starting values from the scanner's own rules and common practice, not promises. Test them on your journal and the Backtest page before trusting them. The full list of every filter is under the Guide button.</p>`;
+  const rows = state.view === 'table' ? vgTableRows() : (VIEW_GUIDE[state.view] || []), how = VIEW_HOW[state.view === 'table' ? 'table:' + state.mode : state.view] || []; if (!rows.length && !how.length){ box.hidden = true; return; } box.hidden = false;
+  box.innerHTML = `<summary>Beginner guide: how to use this page${rows.length ? ' + what each number means and where good and bad begin (' + rows.length + ')' : ''}</summary>${how.length ? '<h4 style="margin:6px 0 2px">How to use this page, step by step</h4><ol class="ovstory">' + how.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol><p class="hint">More: open <b>📚 Vocabulary &amp; Academy</b> for words, set-ups and how to build your own signal.</p>' : ''}${rows.length ? `<div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">What it is</th><th style="text-align:left">Thresholds</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left;vertical-align:top"><b>${esc(r[0])}</b></td><td style="text-align:left;vertical-align:top">${esc(r[1])}</td><td style="text-align:left;vertical-align:top">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>` : ''}<p class="hint">Starting values from the scanner's own rules and common practice, not promises. Test them on your journal and the Backtest page before trusting them. The full list of every filter is under the Guide button.</p>`;
 }
 
 function elppDump(){
@@ -11352,21 +11354,281 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.82: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.83: step-by-step "how to use this page" for every page ---------- */
+const VIEW_HOW = {
+  'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
+  'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
+  'table:swing':['Swing mode looks for moves that last days to weeks.','Favour coins with 4h and Daily trend agreement and rising volume.','Use wider stops (below the last swing low) and smaller size.','Check the macro calendar before holding over events.'],
+  'table:position':['Positional mode is for months: trend, market cap, supply and fundamentals matter most.','Look for coins in Recovery or Uptrend phases with growing activity.','Never use leverage for positional holds.'],
+  'table:hype':['Hype & News mode finds coins that are being talked about.','Read Hype timing: Early is best, Mid-move is late, Late / overheated is where retail gets trapped.','Check the news tone and risk flags before touching it.','Hype is a contrarian gate: when everyone is excited, wait for the sweep.'],
+  power:['Choose a preset or tick your own columns under "Choose columns".','Sort by Power rank and set Quality to Tradeable only.','Check Side, Status, Grade and Blockers. Any blocker means wait.','Open ▸ on a row for reasons, plan, checklist, cautions and exchanges.','Judge each number with the thresholds row. Export CSV to keep a record.'],
+  today:['Read the market regime banner first: it tells you whether to trade big, small or not at all.','Look at the best set-ups of the day and the events coming up.','Pick at most 1 to 3 coins and write the plan before entering.','Respect the daily risk guard if you enabled it.'],
+  overview:['Read Market mood to see risk-on or risk-off.','Compare what institutions and retail are doing in the two tables.','Use the Words explained box if a term is new.','Then go to the Power Scanner or Perp scalp page to pick coins that fit the mood.'],
+  screener:['Choose the venue (Hyperliquid or Binance) and the timeframe.','Sort by change % or volume to find movers.','Click a coin to open its chart and check structure before acting.'],
+  inst:['Show accumulating and distributing coins on the 15m, 1h and 4h reads.','Tick "Only READY" to see coins where 15m/1h are ready with the 4h behind them.','Open a coin for the confirmation checklist and score breakdown.','Longs: accumulating. Shorts: distributing.'],
+  instspot:['Same as the perpetual radar but for spot buying.','Accumulating = buy candidates. Distributing = avoid or take profit.'],
+  listings:['Search a coin to see every exchange that lists it.','Use it to find where to trade a coin that is not on Hyperliquid.'],
+  prep:['Pick a coin and a side.','Read the 30 pre-trade checks and the evidence groups. You want Go with no hard blocker.','Copy the entry, stop, targets and size, then double check them on the chart.'],
+  ei:['Check ETF flows, CFTC positioning and macro data once a day.','Use them as background: tailwind or headwind for your trade, not a trigger.'],
+  api:['Paste free API keys to unlock extra data (optional).','Check Data health: failing feeds add nothing to verdicts.'],
+  bt:['Choose a rule set and a period.','Judge by win rate with its confidence range, average R and profit factor after costs.','Ignore results with fewer than 30 trades.'],
+  decide:['Read how the scanner decides: each group of evidence and how much weight it carries.','Use it to understand why a coin got its verdict and to test your own reasoning.'],
+  proof:['Shows verified, logged results of the scanner calls.','Use it to judge honestly whether the system has an edge before trusting it.'],
+  sdesk:['Review the set-up list: best current set-ups ranked.','Open a set-up for entry, stop and targets.','Log the ones you take in the Journal.'],
+  signals:['See signals the scanner logged, alerts and portfolio exposure.','Check win rate and average R only after 30+ closed signals.'],
+  journal:['Log every trade: entry, stop, targets, reason and result.','Review profit factor and drawdown weekly.','Find your own mistakes (late entries, moved stops) and fix one at a time.'],
+  watch:['Star a coin to add it to your watchlist.','Set alerts at liquidity levels, not round numbers.','Keep the list under 15 coins.'],
+  map:['Colours show price change. Size shows market cap or volume.','Look for a whole sector moving while BTC is flat: that is rotation.'],
+  movers:['See the biggest gainers and losers.','Use a minimum volume filter to hide illiquid coins.','Above +30% is extended: wait for a pullback or sweep, do not chase.'],
+  flows:['Check stablecoin supply and money flow into or out of crypto.','Growing stablecoin supply = dry powder, supportive. Shrinking = cash leaving.'],
+  orderflow:['Watch live delta, big prints and the footprint.','Delta above 15% of volume = clear imbalance.','Absorption (heavy selling that does not push price down) is a reversal clue.'],
+  options:['Read put/call ratio, skew, max pain and implied volatility.','Use them as context: fear, greed and magnet levels.'],
+  whales:['See large wallet positions and which side they are on.','Many whales on one side = lean. One trade is noise.'],
+  memes:['Check top-10 holder share: above 70% is risky.','Never size up on a memecoin. Trade the sweep, not the hype.'],
+  drops:['Check unlock dates and sizes before holding.','Unlocks within 7 days add selling pressure: avoid longs or take profit early.'],
+  elite:['Open the Elite Coin Terminal for the top coins ranked with a full plan.','Read the plan: entry, stop, TP1, TP2, R:R and leverage.','Verify on the chart that the stop is beyond a real liquidity sweep.'],
+  lookup:['Type a symbol to see its verdict, score and full data.','Open the chart and plan from there.'],
+  charts:['Type a coin (Hyperliquid coins included) and pick the exchange venue.','Use 15m, 1h and 4h. Daily is only the bias.','Switch on liquidity pools, order blocks and fair value gaps.','Use the trade-plan box to get position size from your risk %.'],
+  ta:['Pick a coin and venue in a pane. Add indicators and smart-money layers.','Use the toolbar to draw levels, then the Plan button for entry, stop and targets.','Practise in Replay mode and check the Scorecard before risking money.','Follow the Academy page to learn the logic.'],
+  news:['Read tags: investment, listing, upgrade, unlock, risk.','Positive news is already priced in after a few hours. Check the price reaction first.'],
+  academy:['Use the search box to find any word or topic.','Read "How the scanner picks coins" first, then "Build your own signal".','Practise in the TA Lab with Replay before using money.']
+};
+
+Object.assign(VIEW_GUIDE, {
+  elite: [['Rank / score', 'Order of the best coins right now.', 'Higher is better. 70+ with no blockers is a candidate.'], ['Entry / Stop / TP1 / TP2', 'Prepared plan for the lean side.', 'Stop beyond swept liquidity; TP1 at 1.5R or more.'], ['R:R', 'Reward divided by risk.', '1.5+ ok, 2+ good, under 1.2 skip.']],
+  ta: [['Phase chips', 'Accumulation, distribution, manipulation, choppy, real / fake breakout.', 'Trade real breakouts and springs; avoid choppy zones.'], ['Confluence badge', 'How many signals agree on this timeframe.', 'High confluence = better quality. Low = wait.'], ['Trade plan', 'Entry, stop, targets from the chart.', 'Stop beyond the sweep wick; R:R 1.5 or more.']],
+  today: [['Market regime', 'Overall condition of the market today.', 'Risk-off: trade smaller or not at all.'], ['Best set-ups', 'Top coins right now.', 'Take at most 1 to 3.'], ['Events', 'High-impact data coming.', 'No new trades 30 minutes before.']],
+  proof: [['Win rate', 'Share of logged calls that hit target.', 'Needs 30+ closed calls to mean anything.'], ['Average R', 'Average result in risk units.', 'Above +0.2R promising.']],
+  decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
+  academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
+});
+/* ---------- V4.83: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+const AC_PICK = [
+  ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
+  ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
+  ['Step 3: Metrics', 'From raw data it builds about 280 metrics: percent change, relative volume, volume change, buy/sell pressure, net money flow, CVD, OI change, funding, liquidity pools (equal highs/lows, day highs/lows), sweeps and reclaims, order blocks, fair value gaps, trend and regime, ATR and more. Each has a threshold (see the thresholds table in this page).'],
+  ['Step 4: Take-off score', 'Two scores from 0 to 100: ready to go LONG and ready to go SHORT. They add points for things that must be true before a scalp works: a liquidity sweep and reclaim, volume above normal, buy or sell pressure, flow, trend agreement across 15m / 1h / 4h, OI and CVD agreeing, funding not crowded against you.'],
+  ['Step 5: The verdict', 'The verdict is a score from -100 to +100: take-off difference x 0.45, plus 4h/12h trend, big-player flow (accumulation vs distribution), big-volume bars, chart patterns (spring, upthrust, change of character), news, on-chain flows, unlocks, thin trading and more. +15 = lean long, +35 = strong long, -15 = lean short, -35 = strong short. A risk story (hack, ban, delisting), thin trading or an event blackout forces AVOID.'],
+  ['Step 6: Institutional read', 'Separately it checks whether big players are accumulating (buying quietly while small traders sell) or distributing on 15m, 1h, 4h and Daily. The Institutional score (0-100) rises when flow, volume, candles and pressure agree. FINAL means 15m/1h are ready with the 4h behind them.'],
+  ['Step 7: Confirmation checklist and grade', 'About 14 to 27 weighted checks (4h/1h/15m agree, net flow, volume, institutional candle, sweep and reclaim, 2nd test held, real breakout, spot volume, OI, CVD, pressure, wallets, funding...). The share met gives a grade: A 82%+, B 68%+, C 52%+, D below. Hard blockers stop a trade call whatever the grade.'],
+  ['Step 8: Power rank (how coins are ordered)', 'Power rank = institutional score x 0.6 + grade % x 40 + 15 if FINAL (5 if building) + verdict strength x 0.2 + 8 if strong - 15 per blocker + data quality adjustment (+5 good, -20 poor) + 5 if R:R at TP1 is 1.5 or more. The Power Scanner and the Best top 10 sort by this.'],
+  ['Step 9: Trade plan', 'Stop goes beyond the nearest swept liquidity with room for a wick (0.75 to 3 ATR). TP1 is the nearest liquidity pool at least 1.5R away; TP2 a further pool. Leverage is capped so liquidation sits about 3 times further than the stop.'],
+  ['Step 10: What the scanner cannot know', 'It cannot see the future, hidden orders or sudden news. It gives you a prepared, evidence-based plan. You still decide, size the risk and place the order.']
+];
+const AC_BUILD = [
+  ['Step 1: Set your rules before looking at charts', 'Write down: account size, risk per trade (1% is a good start), maximum trades per day (1 to 3), and the timeframes you use (15m entries, 1h and 4h for context, Daily only as bias). A signal without risk rules is just a guess.'],
+  ['Step 2: Read the market first (Daily and 4h bias)', 'Open Overview and Today. Is the market risk-on or risk-off? Is BTC trending, ranging or reversing? Trade with the bigger trend. In a downtrend prefer shorts or sit out; in an uptrend prefer longs. Check the macro calendar: avoid new trades 30 minutes before big USD events.'],
+  ['Step 3: Pick the coin (what the scanner does)', 'Use the Power Scanner: sort by Power rank, set Quality to Tradeable only. Prefer coins with volume above its tier, 3 or more exchanges, a data quality over 60 and no blockers. Skip coins with an unlock within 7 days or a risk story.'],
+  ['Step 4: Mark the liquidity', 'Open the chart (Charts or TA Lab). Mark equal highs, equal lows, day high/low, last swing high/low and round numbers. These are where stops sit. Price is drawn to them. Ask: which side has been swept already, which side is untested?'],
+  ['Step 5: Wait for the sweep and reclaim', 'The core set-up: price pokes below a low (or above a high), grabs the stops, then closes back inside the range. On 15m or 1h, wait for the candle to close back above the swept level (long) or below it (short). No reclaim = no trade.'],
+  ['Step 6: Confirm with flow and volume', 'You want the sweep candle on above-normal volume (relative volume 1.5x or more), buy pressure rising (for longs), CVD turning up or showing hidden buying, open interest not collapsing, and funding not crowded against you. The scanner checklist shows each of these as ready or not ready.'],
+  ['Step 7: Enter on the 2nd test or the breakout', 'Safer entry: the second test. Price comes back to the swept level and holds (higher low for longs). Alternative: the real breakout, a close above the range high on strong volume after the reclaim. Do not enter in the middle of the move.'],
+  ['Step 8: Place the stop where the idea is wrong', 'Put the stop just beyond the swept wick (long: below the sweep low; short: above the sweep high), with room for a small second wick (about 0.5 ATR). If the price returns there, the sweep story failed. Never widen a stop after entry.'],
+  ['Step 9: Set targets on the next liquidity', 'TP1 at the first liquidity pool in the direction of the trade (at least 1.5R). TP2 at the next. Take half off at TP1 and move the stop to break-even. Scalps should close the same or next day.'],
+  ['Step 10: Size the position from the risk', 'Position size = (account x risk %) / distance from entry to stop. Example: account $1,000, risk 1% = $10. Stop 0.8% away means position about $1,250. Leverage is then just the margin you post: it does not change the risk.'],
+  ['Step 11: Check the Caution list', 'Before pressing buy: any event in the next hour? Funding crowded? Spread or depth poor for your size? Price gap between exchanges? Coin on only one exchange? Correlated with a trade you already hold? If two or more cautions, skip or halve the size.'],
+  ['Step 12: Execute, manage and log', 'Place entry, stop and targets together. Do not move the stop away. After the trade, log it in the Journal: reason, screenshots, result in R. Review weekly: win rate, average R, profit factor. Fix one mistake at a time.'],
+  ['Worked example (long)', 'BTC 4h uptrend. Coin X on the Power Scanner: LONG, TRADEABLE, grade A 11/14, inst score 62. On 15m the price swept yesterday\'s low at 1.295, closed back above at 1.302 on 2x volume, buy pressure +18, funding neutral. Entry 1.316 after the 2nd test held. Stop 1.295 (below the wick, 1.6%). TP1 1.348 (R:R 1.5), TP2 higher. Risk $10 on $1,000: size = $10 / 1.6% = $625. Half off at TP1, stop to entry, rest at TP2. Close same day.'],
+  ['Worked example (short)', 'Coin Y pumped +25% on a news hype. Hype timing: Late / overheated. Price swept the day high, closed back below on a long upper wick, volume surge, funding very high (crowded longs), institutions distributing. Entry on the retest of the reclaimed high from below, stop above the wick high, TP1 at the previous range low.'],
+  ['Practise before you risk money', 'Use the TA Lab: open Replay, step candle by candle, take trades on paper and check the Scorecard. Aim for 30 or more practice trades with average R above 0 before using real money.']
+];
+const AC_SETUPS = [
+  ['Liquidity sweep and reclaim (spring / upthrust)', 'Price breaks below a low (or above a high) where stops sit, then closes back inside. The stops fuel a reversal.', 'Sweep + reclaim, Pattern, Breakout confirm columns; chart marks pools.', 'After a close back above the swept low (long) or below the swept high (short), ideally on the 2nd test.', 'Beyond the sweep wick plus 0.5 ATR.', 'Next liquidity pool at 1.5R, then 2.5R+.', 'Entering before the candle closes back inside. Chasing a sweep that keeps going.'],
+  ['2nd test (retest) of the swept level', 'After the reclaim, price returns to the level and holds. Safer than buying the first spike.', '"2nd test held" check, Sweep + reclaim and 2nd test column.', 'On the hold: higher low (long) or lower high (short) on 15m.', 'Under the retest low / above the retest high.', 'Same as above.', 'Missing the move because you waited. That is acceptable.'],
+  ['Real breakout vs fake breakout', 'Real: close beyond the range on strong volume, retest holds. Fake: poke beyond, no volume, quickly back inside.', 'Breakout confirm after sweep + reclaim; Volume; CVD.', 'On the retest of the broken level after a real breakout.', 'Back inside the range.', 'Range height projected, nearest pool.', 'Buying every break. Ignoring volume.'],
+  ['Accumulation', 'Quiet buying inside a range after a fall. Volume dries on dips, OI stable, price holds lows. Ends with a sweep of the low and a spring.', 'Institutional radar: Accumulating; TA Lab phase chips; Regime = Accumulation.', 'On the spring + reclaim at the bottom of the range.', 'Below the spring low.', 'Range high, then breakout target.', 'Buying in the middle of the range. Expecting an instant breakout.'],
+  ['Distribution', 'Quiet selling inside a range after a rise. Upthrust above the high, then failure. Funding high, retail buying.', 'Institutional radar: Distributing; Regime = Distribution; Hype Late.', 'On the upthrust rejection / retest from below.', 'Above the upthrust high.', 'Range low, then below.', 'Shorting a strong uptrend with no sweep. No stop.'],
+  ['Manipulation (stop hunt)', 'Fast wicks both ways around obvious levels to trigger stops, with no real trend. Regime = Manipulation.', 'Regime column, Sweep columns, TA Lab manipulation chip.', 'Wait for the wick to finish and the close back inside; trade the reversal.', 'Beyond the manipulation wick.', 'Opposite side of the range.', 'Trading inside it with tight stops: you become the liquidity.'],
+  ['Choppy range', 'No trend, small candles, repeated rejections. Scanner Regime = Chopping; Take-off low.', 'Regime, ER (efficiency ratio) under 0.3, ATR compressed.', 'Only fade the edges with small size, or sit out.', 'Outside the range.', 'Middle then other edge.', 'Trading breakouts in chop: most fail.'],
+  ['Order block (OB)', 'The last opposite candle before a strong move. Big players left orders there; price often returns.', 'OB column; TA Lab order block layer.', 'On the retest of the block with a reaction candle.', 'Beyond the block.', 'Previous high / low.', 'Taking an old block that has been tested several times.'],
+  ['Fair value gap (FVG)', 'A 3-candle gap where price moved too fast. Price tends to come back and fill part of it.', 'FVG column; TA Lab FVG layer.', 'Entry inside the gap on the pullback (50% is common).', 'Beyond the far side of the gap.', 'Origin of the move.', 'Trading a gap against the higher-timeframe trend.'],
+  ['Optimal trade entry (OTE)', 'After an impulse, price retraces 62% to 79% of the move before continuing.', 'OTE column; TA Lab fib tools.', 'Between 0.62 and 0.79 retracement with a reclaim.', 'Beyond the 100% of the retrace (the swing).', 'Previous extreme and extension.', 'Using it without a trend.'],
+  ['Institutional entry (volume candle)', 'A candle with outsized volume and a strong body shows big players entering. Confirm with a 2nd test and reclaim hunt wick.', 'Inst. candle column; TA Lab Institutional chips.', 'On the 2nd test of the institutional candle low/high.', 'Beyond the institutional candle.', 'Next pools.', 'Mistaking a news spike for institutions.'],
+  ['Funding flip / crowded side', 'Funding very positive = crowded longs paying shorts; very negative = crowded shorts. Crowded sides get flushed.', 'Funding % per 8h, Funding gap, Long/short ratio, Liquidation columns.', 'Trade against the crowd after a sweep of their stops.', 'Beyond the flush wick.', 'Back to the range mid.', 'Fading funding alone. It needs a sweep.'],
+  ['Short squeeze / long squeeze', 'OI jumps 5% or more while price is flat, then price breaks and forces the crowd out.', 'OI change with price, Liquidation map, Squeeze set-up.', 'After the first break and retest.', 'Back inside the range.', 'Next liquidation cluster.', 'Entering after the squeeze already ran 3 ATR.']
+];
+const AC_RISK = [
+  'Risk 1% per trade to start. Never more than 2% until you have 100 logged trades with positive average R.',
+  'Stops are not optional. If the idea is wrong, you leave. Never move a stop away from price.',
+  'Leverage does not change your risk if you size from the stop. High leverage only makes liquidation closer: keep liquidation at least 3x the stop distance away.',
+  'Maximum daily loss: stop trading after 2 losses in a row or -3% on the day.',
+  'Do not trade the 30 minutes before and 15 minutes after FOMC, CPI or jobs data.',
+  'One trade at a time per sector. Correlated trades double the same risk.',
+  'Scalps close the same or next day. If it is still open after 24h with no progress, the thesis is stale.',
+  'Do not chase. If you missed the entry, wait for the next sweep. There is always another set-up.',
+  'Journal every trade. What is not measured does not improve.',
+  'This scanner prepares information. It is not financial advice and not a promise of profit.'
+];
+const AC_VOCAB = [
+  ['ATR', 'Average True Range: the typical size of one candle. Used for stop distance and range checks. A stop under 0.75 ATR is usually too tight.', 'Indicators'],
+  ['ADX', 'Average Directional Index: trend strength. Above 25 = trending, below 20 = ranging.', 'Indicators'],
+  ['Accumulation', 'Big players quietly buying inside a range, usually after a fall, before a rise.', 'Market phases'],
+  ['Distribution', 'Big players quietly selling inside a range, usually after a rise, before a fall.', 'Market phases'],
+  ['Absorption', 'Heavy selling that does not push price lower (or buying that does not push it higher): someone big is taking the other side.', 'Order flow'],
+  ['Altcoin / Alt', 'Any coin other than Bitcoin.', 'Basics'],
+  ['Ask / Bid', 'Ask = lowest price sellers want. Bid = highest price buyers offer. The gap is the spread.', 'Basics'],
+  ['ATH / ATL', 'All-time high / all-time low.', 'Basics'],
+  ['Basis (perp basis)', 'Perp price minus spot price. High positive basis means leveraged longs are paying a premium.', 'Derivatives'],
+  ['Beta', 'How much a coin moves per 1% move in BTC. Above 1 amplifies BTC.', 'Correlation'],
+  ['Bearish / Bullish', 'Expecting price to fall / rise.', 'Basics'],
+  ['Blow-off top', 'A vertical, high-volume spike that ends the move.', 'Patterns'],
+  ['BOS (break of structure)', 'Price breaks the last swing high (up) or low (down): trend continuation.', 'Smart money'],
+  ['Breakout', 'Price closes beyond a range or level. Real breakouts have volume and a held retest.', 'Patterns'],
+  ['BSLS', 'Big Screen Logic Scanner: Erebus\'s scalp analysis layers (flow, volume, CVD, funding, SMC, sweeps, news).', 'ELPP'],
+  ['BTC dominance', 'Bitcoin\'s share of total crypto market cap. Falling dominance with BTC flat suggests alt rotation.', 'Market'],
+  ['Candle close', 'The final price of a candle. Signals confirm on close, not during the candle.', 'Basics'],
+  ['CEX / DEX', 'Centralized exchange (Binance, Bybit) / decentralized exchange (Uniswap, Raydium, Hyperliquid DEX liquidity).', 'Basics'],
+  ['CHoCH (change of character)', 'The first break against the trend: first sign of reversal.', 'Smart money'],
+  ['Choppy', 'Sideways, noisy price with no trend. Most breakouts fail here.', 'Market phases'],
+  ['Confluence', 'Several independent signals agreeing (sweep + volume + flow + level). More confluence = higher quality.', 'Strategy'],
+  ['Contrarian', 'Trading against the crowd (for example shorting extreme hype).', 'Strategy'],
+  ['Correlation', 'How closely two assets move together (-1 to +1). Two correlated trades double the same risk.', 'Correlation'],
+  ['CVD', 'Cumulative Volume Delta: running total of aggressive buying minus aggressive selling. Rising CVD with flat price = hidden buying.', 'Order flow'],
+  ['CVD divergence', 'Price makes a lower low but CVD makes a higher low (bullish), or the reverse (bearish).', 'Order flow'],
+  ['Daily bias', 'The direction of the Daily chart. Used for context only, not for entries.', 'Strategy'],
+  ['Data quality score', 'Scanner score 0 to 100 on how complete and consistent a coin\'s data is. Under 45: do not trade.', 'ELPP'],
+  ['Delta', 'Aggressive buy volume minus aggressive sell volume.', 'Order flow'],
+  ['Depth / order book', 'Resting buy and sell orders at each price. Thin depth = high slippage.', 'Order flow'],
+  ['Dominance', 'See BTC dominance.', 'Market'],
+  ['Drawdown', 'Fall from an equity peak. Max drawdown shows the worst losing stretch.', 'Risk'],
+  ['DXY', 'US dollar index. Rising dollar is usually a headwind for crypto.', 'Macro'],
+  ['Elite call / Power rank', 'ELPP combined ranking of a coin: institutional score, grade, take-off, verdict strength and R:R.', 'ELPP'],
+  ['Entry', 'The price where you open the trade.', 'Basics'],
+  ['EMA', 'Exponential moving average: trend line that reacts faster than SMA.', 'Indicators'],
+  ['ER (efficiency ratio)', 'Net price move divided by total path travelled. Near 1 = clean trend, near 0 = chop.', 'Indicators'],
+  ['Equal highs / lows', 'Two or more highs (lows) at nearly the same price: obvious stop clusters, targets for a sweep.', 'Liquidity'],
+  ['ETF flows', 'Money into or out of US spot Bitcoin/Ether ETFs. Inflows are a tailwind.', 'Macro'],
+  ['Expansion / Compression', 'Volatility rising (big candles) / falling (coiling). Compression often precedes expansion.', 'Volatility'],
+  ['Fake breakout', 'A break beyond a level that quickly returns inside. Usually a liquidity grab.', 'Patterns'],
+  ['Fibonacci (fib)', 'Retracement levels (0.382, 0.5, 0.618, 0.786) used to find pullback entries.', 'Indicators'],
+  ['FOMC / CPI', 'US central-bank meeting / inflation data: high-impact events. Avoid trading around them.', 'Macro'],
+  ['FVG (fair value gap)', 'Three-candle gap left by a fast move that price often revisits.', 'Smart money'],
+  ['Fear & Greed', 'Market mood index 0 to 100. Extreme greed warns of tops, extreme fear of bottoms.', 'Market'],
+  ['Funding rate', 'Periodic payment between longs and shorts on perpetual futures. Positive = longs pay shorts (crowded longs).', 'Derivatives'],
+  ['Funding flip', 'Funding changing sign. Shows the crowd switching sides.', 'Derivatives'],
+  ['Hard blocker', 'A check that stops a trade call no matter how good the rest looks (event blackout, data quality, no liquidity).', 'ELPP'],
+  ['HIP-3', 'Hyperliquid builder-deployed markets (xyz:...). Thinner liquidity: use smaller size.', 'Hyperliquid'],
+  ['HLP vault', 'Hyperliquid\'s liquidity vault. Its directional exposure and health are venue risk.', 'Hyperliquid'],
+  ['Hunt wick', 'A wick that sweeps a level then closes back: the stop hunt.', 'Liquidity'],
+  ['Hype score', 'Scanner score 0-100 for social and news attention. Early is better, Late / overheated is a trap.', 'ELPP'],
+  ['Institutional candle', 'A candle with outsized volume and body showing big-player entry.', 'Smart money'],
+  ['Isolated / Cross margin', 'Isolated: only the margin you put in the trade can be lost. Cross: the whole account backs the trade.', 'Derivatives'],
+  ['Kill zone', 'Session windows with the most volume (London open, New York open) where sweeps often happen.', 'Sessions'],
+  ['Lean', 'Verdict level: leaning long or short but not strong. Wait for confirmation.', 'ELPP'],
+  ['Leverage', 'Multiplier on position size. It does not change risk if you size from the stop, but it moves liquidation closer.', 'Derivatives'],
+  ['Liquidation', 'Forced closing of a leveraged position when margin runs out.', 'Derivatives'],
+  ['Liquidation map / heatmap', 'Estimate of where many leveraged positions would be liquidated. Price is often drawn there.', 'Liquidity'],
+  ['Liquidity', 'Resting orders and stops at a price. "Taking liquidity" means pushing price to trigger them.', 'Liquidity'],
+  ['Liquidity pool', 'A cluster of stops: above equal highs, below equal lows, day highs and lows.', 'Liquidity'],
+  ['Liquidity sweep', 'Price breaks a pool to trigger stops, then reverses.', 'Liquidity'],
+  ['Long / Short', 'Betting on price rising / falling.', 'Basics'],
+  ['Long/short ratio', 'Share of accounts or positions long vs short. Crowded side is often wrong.', 'Derivatives'],
+  ['Mark price', 'Fair price used for margin and liquidations (not the last trade).', 'Derivatives'],
+  ['Market cap (mcap)', 'Price x circulating supply. Small caps move more and are riskier.', 'Basics'],
+  ['Max pain', 'Options strike where the most options expire worthless. Price can be pulled to it.', 'Options'],
+  ['MSS', 'Market structure shift: same idea as CHoCH.', 'Smart money'],
+  ['MTF', 'Multi-timeframe: reading 15m, 1h and 4h together. Agreement raises quality.', 'Strategy'],
+  ['Net money flow', 'Estimated money entering minus leaving a coin from candle shape and volume.', 'Order flow'],
+  ['OB (order block)', 'The last opposite candle before an impulse. Price often returns to it.', 'Smart money'],
+  ['OBI', 'Order book imbalance: bids vs asks near price. Positive = more bids.', 'Order flow'],
+  ['OI (open interest)', 'Total value of open futures positions. OI up with price up = new longs. OI down with price up = short covering.', 'Derivatives'],
+  ['Options PCR', 'Put/call ratio. Below 0.6 bullish bets, above 1.0 hedging/bearish.', 'Options'],
+  ['OTE', 'Optimal trade entry: 62% to 79% retracement of an impulse.', 'Smart money'],
+  ['Perp / Perpetual', 'Futures contract with no expiry; funding keeps price near spot.', 'Derivatives'],
+  ['POC / VAH / VAL', 'Point of control (most volume), value area high and low (zone with 70% of volume).', 'Volume profile'],
+  ['Premium / Discount', 'Upper half of a range (premium: look to sell) vs lower half (discount: look to buy).', 'Smart money'],
+  ['Pressure (buy/sell)', 'Share of aggressive buying vs selling. Plus or minus 15% or more is a clear imbalance.', 'Order flow'],
+  ['Priced in', 'News already reflected in the price. Check the reaction before trading news.', 'Strategy'],
+  ['Pump and dump', 'Rapid rise on hype followed by a crash. Retail is the exit liquidity.', 'Patterns'],
+  ['R / R multiple', 'Result measured in units of risk. +2R = you made twice what you risked.', 'Risk'],
+  ['R:R (reward-to-risk)', 'Distance to target divided by distance to stop. Needed win rate to break even = 1 / (1 + R:R).', 'Risk'],
+  ['Range', 'Price moving sideways between support and resistance.', 'Market phases'],
+  ['Reclaim', 'Closing back above (below) a level that was broken: confirms a sweep.', 'Liquidity'],
+  ['Regime', 'Scanner state of the coin: Chopping, Accumulation, Distribution, Manipulation or Trending.', 'ELPP'],
+  ['Relative volume (rvol)', 'Current volume divided by average. 1.5x or more = busy, under 0.7x = quiet.', 'Volume'],
+  ['Replay', 'Practice mode in the TA Lab that steps through past candles.', 'ELPP'],
+  ['Retail', 'Small traders. Their obvious stops are the liquidity big players use.', 'Basics'],
+  ['Risk-on / Risk-off', 'Market mood: investors buying risk assets (stocks, crypto) vs fleeing to safety.', 'Macro'],
+  ['RSI', 'Relative strength index: momentum 0-100. Above 70 stretched, below 30 oversold. Not a signal alone.', 'Indicators'],
+  ['Scalp', 'Short trade closed within minutes to a day.', 'Basics'],
+  ['Sentiment', 'Crowd mood from news, social, funding and positioning.', 'Market'],
+  ['SL (stop loss)', 'Order that closes the trade at a set loss.', 'Risk'],
+  ['SMC', 'Smart Money Concepts: reading liquidity, order blocks, FVG, structure and sweeps.', 'Smart money'],
+  ['Slippage', 'Difference between expected and actual fill price. Worse in thin books.', 'Execution'],
+  ['Spot', 'Buying the actual coin (no leverage, no funding).', 'Basics'],
+  ['Spread', 'Gap between best bid and ask.', 'Execution'],
+  ['Spring / Upthrust', 'Sweep below a range then reversal up (spring) / sweep above a range then reversal down (upthrust).', 'Market phases'],
+  ['Squeeze (short / long)', 'Forced covering or liquidation that accelerates a move against the crowded side.', 'Derivatives'],
+  ['Stablecoin supply', 'USDT/USDC minted. Growth = dry powder entering crypto.', 'Macro'],
+  ['Strong / Lean / Wait / Avoid', 'Verdict levels: Strong LONG/SHORT (score beyond +-35), Lean (beyond +-15), Wait (neutral), Avoid (risk story, thin or event).', 'ELPP'],
+  ['Structure (market structure)', 'Pattern of highs and lows. Higher highs and lows = uptrend.', 'Smart money'],
+  ['Support / Resistance', 'Price zones where buyers / sellers have stepped in before.', 'Basics'],
+  ['Take-off score', 'Scanner 0-100 score for how ready a coin is to move long or short.', 'ELPP'],
+  ['Taker volume', 'Volume of aggressive orders (market orders). Taker buy % above 55% = buyers aggressive.', 'Order flow'],
+  ['Tape', 'Live stream of trades.', 'Order flow'],
+  ['TP (take profit)', 'Order that closes the trade at a target.', 'Risk'],
+  ['TVL', 'Total value locked in a protocol. Rising TVL supports a token.', 'On-chain'],
+  ['Unlock (vesting)', 'Scheduled release of locked tokens. Adds sell pressure, especially within 7 days.', 'On-chain'],
+  ['VWAP', 'Volume-weighted average price. Above = buyers control the day, below = sellers.', 'Indicators'],
+  ['Verdict', 'Scanner call from -100 to +100: Strong Short, Lean Short, Wait, Lean Long, Strong Long, or Avoid.', 'ELPP'],
+  ['Volatility', 'How much price moves. Measured by ATR.', 'Volatility'],
+  ['Volume', 'Amount traded in a period. Moves without volume often fail.', 'Volume'],
+  ['Volume Δ', 'Change of volume vs the previous period (1h vs previous 1h, 4h vs previous 4h).', 'Volume'],
+  ['Wallet tracking', 'Following about 100 tracked wallets to see if smart money is long or short.', 'On-chain'],
+  ['Whale', 'A wallet or trader with a very large position.', 'On-chain'],
+  ['Wick', 'The thin line of a candle showing a rejected price.', 'Basics'],
+  ['Wyckoff', 'Method describing accumulation and distribution phases (spring, upthrust, sign of strength).', 'Market phases']
+];
+function acSec(id, title, body, open){ return `<details class="ovd acd" id="ac_${id}"${open ? ' open' : ''} style="margin:8px 0"><summary style="font-size:14px;font-weight:700">${title}</summary><div style="margin-top:8px">${body}</div></details>`; }
+function acSteps(a){ return a.map(x => `<div class="acstep"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''); }
+function acManual(){
+  const out = []; document.querySelectorAll('#nav [data-view], nav [data-view], .nv[data-view]').forEach(b => { const v = b.dataset.view; if (out.some(x => x[0] === v)) return; out.push([v, b.textContent.replace(/\s+/g, ' ').trim()]); });
+  const modes = [['table:perp', 'Perp scalp'], ['table:spot', 'Spot'], ['table:swing', 'Swing'], ['table:position', 'Positional'], ['table:hype', 'Hype & News']];
+  return modes.concat(out.map(x => [x[0], x[1]])).filter(x => VIEW_HOW[x[0]]).map(x => `<details class="ovd psd"><summary>${esc(x[1])}</summary><ol class="ovstory">${VIEW_HOW[x[0]].map(s => '<li>' + esc(s) + '</li>').join('')}</ol></details>`).join('');
+}
+function acThrTable(){
+  const rows = Object.keys(GUIDE).filter(k => METRICS[k]).map(k => { const g = GUIDE[k], P = g.perp || []; return `<tr class="acthr"><td style="text-align:left;vertical-align:top"><b>${esc(METRICS[k].label)}</b><br><small class="dim">${esc(g.say)}</small></td><td style="text-align:left;vertical-align:top">${esc(P[0] || '–')}</td><td style="text-align:left;vertical-align:top">${esc(P[1] || '–')}</td><td style="text-align:left;vertical-align:top">${esc(P[2] || '–')}</td><td style="text-align:left;vertical-align:top">${esc(g.spot || '–')}</td><td style="text-align:left;vertical-align:top">${esc(g.swing || '–')}</td></tr>`; }).join('');
+  return `<p class="hint">Every filter the scanner uses with its starting threshold for scalp (mega / mid / micro coins), spot and swing. These are starting values, not rules: test them on your journal and the Backtest page.</p><div style="overflow:auto;max-height:480px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Data</th><th>Scalp mega</th><th>Scalp mid</th><th>Scalp micro</th><th>Spot</th><th>Swing</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderAcademy(force){
+  const el = $('viewAcademy'); if (!el) return; if (el._built && !force) return; el._built = true;
+  const cats = [...new Set(AC_VOCAB.map(x => x[2]))].sort();
+  const vocab = `<div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:6px"><label class="hint">Category <select id="acCat"><option value="">All</option>${cats.map(c => '<option>' + esc(c) + '</option>').join('')}</select></label><span class="hint">${AC_VOCAB.length} terms, A to Z</span></div><div class="ovgl" id="acVocab">${AC_VOCAB.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([k, v, c]) => `<div class="acv" data-cat="${esc(c)}"><b>${esc(k)}</b><span>${esc(v)} <small class="dim">[${esc(c)}]</small></span></div>`).join('')}</div>`;
+  const setups = AC_SETUPS.map(s => `<details class="ovd psd"><summary>${esc(s[0])}</summary><div><p><b>What it is:</b> ${esc(s[1])}</p><p><b>Where to see it in the scanner:</b> ${esc(s[2])}</p><p><b>Entry:</b> ${esc(s[3])}</p><p><b>Stop:</b> ${esc(s[4])}</p><p><b>Targets:</b> ${esc(s[5])}</p><p><b class="warn">Common mistakes:</b> ${esc(s[6])}</p></div></details>`).join('');
+  el.innerHTML = `<div class="nsec"><h3>📚 Vocabulary &amp; Academy</h3>
+    <p class="hint">Everything you need to understand this scanner and make your own trade signals: words, set-ups, a step-by-step guide to every page, how the scanner picks coins, and how to build a signal yourself. Educational content, not financial advice.</p>
+    <div class="row" style="gap:8px;margin:6px 0"><input id="acQ" type="text" placeholder="Search every word, set-up and guide…" style="flex:1;min-width:200px"><button class="btn sm" type="button" id="acAll">Open / close all</button></div>
+    <div id="acBody">
+    ${acSec('start', '1. Start here: your first 10 minutes', `<ol class="ovstory"><li>Open <b>Today</b> and <b>Overview</b> to see the market mood.</li><li>Open <b>⚡ Power Scanner</b>. Sort by Power rank. Set Quality to "Tradeable only".</li><li>Tap ▸ on the top coin. Read the reasons, the checklist and the Caution list.</li><li>Open <b>Charts</b> or <b>📈 TA Lab</b> and check the stop sits beyond real liquidity.</li><li>Size the trade from your risk (1%) and the stop distance. Place entry, stop and targets together.</li><li>Log it in the <b>Trading journal</b>. Review weekly.</li><li>Practise in the TA Lab Replay before using real money.</li></ol>`, true)}
+    ${acSec('pick', '2. How the scanner picks coins (10 steps)', acSteps(AC_PICK))}
+    ${acSec('build', '3. Build your own trade signal, step by step', acSteps(AC_BUILD))}
+    ${acSec('setups', '4. Trade set-ups library (what, where to see it, entry, stop, targets, mistakes)', setups)}
+    ${acSec('manual', '5. How to use every page, step by step', acManual())}
+    ${acSec('vocab', '6. Vocabulary A to Z (abbreviations and terms)', vocab)}
+    ${acSec('thr', '7. Thresholds for every feature', acThrTable())}
+    ${acSec('risk', '8. Risk management and discipline', '<ul class="ovstory">' + AC_RISK.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>')}
+    </div></div>`;
+  const q = $('acQ'), body = $('acBody');
+  q.addEventListener('input', () => { const t = q.value.trim().toLowerCase(); body.querySelectorAll('.acv, .acstep, details.psd, tr.acthr').forEach(n => { n.style.display = !t || n.textContent.toLowerCase().includes(t) ? '' : 'none'; }); if (t){ body.querySelectorAll('details.acd').forEach(d => { d.open = [...d.querySelectorAll('.acv, .acstep, details.psd, tr.acthr')].some(n => n.style.display !== 'none') || d.textContent.toLowerCase().includes(t); }); } });
+  $('acCat').addEventListener('change', e => { const v = e.target.value; body.querySelectorAll('.acv').forEach(n => { n.style.display = !v || n.dataset.cat === v ? '' : 'none'; }); });
+  $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
+}
+
+/* ---------- V4.83: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
   ['🏦 Exchanges', ['pVen','pHL','pGap']],
-  ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','vol','oiUsd','fund8','dqScore']]
+  ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','vol','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
-  trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','vol','fund8']},
+  trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','pV1h','pV4h','pV24','fund8']},
   smart:{n:'Smart money', c:['pRank','pSide','pInst','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
   crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
-  mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','vol']},
+  mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
 };
 function psSt(){ const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
@@ -11404,6 +11666,12 @@ function psCols(){
   add('pInst', 'Inst. score', 'Institutional score 0 to 100 (accumulation / distribution read across 15m, 1h, 4h, D).', c => el(c).is, c => { const s = el(c).is; return [isNum(s) ? s + '' : '—', isNum(s) ? (s >= 70 ? 'up' : s >= 45 ? '' : 'dim') : 'dim']; });
   add('pFinal', 'Take-off', 'FINAL = the scanner calls it ready. building = forming.', c => ({FINAL:2, building:1})[el(c).final] || 0, c => { const f = el(c).final; return [f || '—', f === 'FINAL' ? 'up' : f ? 'warn' : 'dim']; });
   add('pBlock', 'Blockers', 'Hard blockers from the confirmation checklist. Empty means none.', c => el(c).hard ? el(c).hard.length : 0, c => { const h = el(c).hard || []; return [h.length ? '<span title="' + esc(h.join('; ')) + '">' + h.length + ': ' + esc(h[0]) + (h.length > 1 ? '…' : '') + '</span>' : 'none', h.length ? 'dn' : 'dim']; });
+  const vv = (c, k) => { const v = (c.m.vol || {})[k]; return isNum(v) ? v : null; }, vdv = (c, k) => { const v = (c.m.volD || {})[k]; return isNum(v) ? v : null; };
+  add('pV1h', 'Vol 1h', 'Money traded in the last hour (USD, Hyperliquid perp).', c => vv(c, '1h'), c => { const v = vv(c, '1h'), r = (c.m.rvol || {})['1h']; return [isNum(v) ? fmtUsd(v) : '—', isNum(r) && r >= 1.5 ? 'up' : isNum(v) ? '' : 'dim']; });
+  add('pV4h', 'Vol 4h', 'Money traded in the last 4 hours (USD).', c => vv(c, '4h'), c => { const v = vv(c, '4h'), r = (c.m.rvol || {})['4h']; return [isNum(v) ? fmtUsd(v) : '—', isNum(r) && r >= 1.5 ? 'up' : isNum(v) ? '' : 'dim']; });
+  add('pV24', 'Vol 24h', 'Money traded in the last 24 hours (USD).', c => isNum(c.m.vol24) ? c.m.vol24 : vv(c, '1d'), c => { const v = isNum(c.m.vol24) ? c.m.vol24 : vv(c, '1d'); return [isNum(v) ? fmtUsd(v) : '—', isNum(v) ? '' : 'dim']; });
+  add('pV1hD', 'Vol Δ 1h', 'Volume of the last hour compared with the hour before.', c => vdv(c, '1h'), c => { const v = vdv(c, '1h'); return [isNum(v) ? fmtPct(v, 0) : '—', isNum(v) ? (v >= 50 ? 'up' : v <= -30 ? 'dn' : '') : 'dim']; });
+  add('pV4hD', 'Vol Δ 4h', 'Volume of the last 4 hours compared with the 4 hours before.', c => vdv(c, '4h'), c => { const v = vdv(c, '4h'); return [isNum(v) ? fmtPct(v, 0) : '—', isNum(v) ? (v >= 50 ? 'up' : v <= -30 ? 'dn' : '') : 'dim']; });
   add('pEntry', 'Entry', 'Planned entry (current price) for the lean side.', c => (el(c).pl || {}).entry, c => [el(c).pl ? P(el(c).pl.entry) : '—', el(c).pl ? '' : 'dim']);
   add('pSL', 'Stop', 'Stop loss: beyond the nearest liquidity sweep or 0.75 to 1.5 ATR.', c => (el(c).pl || {}).sl, c => [el(c).pl ? P(el(c).pl.sl) : '—', el(c).pl ? 'dn' : 'dim']);
   add('pSLp', 'Stop %', 'Distance from entry to the stop, in percent.', c => el(c).pl ? el(c).pl.slPct * 100 : null, c => [el(c).pl ? (el(c).pl.slPct * 100).toFixed(2) + '%' : '—', 'dim']);
@@ -11417,6 +11685,42 @@ function psCols(){
   const cols = new Map(); E.forEach(x => cols.set(x.id, x));
   for (const [id, col] of cw){ if (!cols.has(id)) cols.set(id, {id, label:col.label, tip:COLNAMES[id] || col.label, val:col.val, cell:col.cell, gen:true}); }
   return cols;
+}
+const PS_THR = {
+  pRank:['70+ strong · 50-70 ok · under 50 weak', 'Power rank combines institutional score (60%), signal grade, FINAL/building bonus, verdict strength, minus blockers, plus data quality and R:R. Look first at 70 and above with no blockers.'],
+  pSide:['LONG / SHORT = verdict side', 'From the coin verdict: score +15 lean long, +35 strong long; -15 lean short, -35 strong short. Neutral verdict falls back to the institutional lean.'],
+  pTag:['TRADEABLE needs strong + grade A/B + 0 blockers', 'TRADEABLE = strong verdict, grade A or B, no hard blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.'],
+  pGrade:['A 82%+ · B 68%+ · C 52%+ · D below', 'Share of weighted confirmation checks met. Trade A or B. C only with small size. D = wait.'],
+  pInst:['70+ high · 45-70 medium · under 45 low', 'Institutional score 0-100 from accumulation/distribution reads on 15m, 1h, 4h and Daily, flow, volume and candles.'],
+  pFinal:['FINAL = ready · building = forming', 'FINAL means the scanner calls take-off ready (15m/1h ready with 4h behind it).'],
+  pBlock:['0 = clean · any blocker = wait', 'A hard blocker (for example event blackout, no liquidity, data quality too low) stops a trade call whatever the score.'],
+  pEntry:['now (market price)', 'Planned entry is the current price. A better plan waits for the sweep-and-reclaim retest.'],
+  pSL:['beyond sweep wick, 0.75-3 ATR', 'Stop sits beyond the swept liquidity with room for a wick. Never move it away from price.'],
+  pSLp:['under 1.5% scalp · over 3% too wide', 'Wide stops cut the allowed leverage. If over 3% for a scalp, wait for a closer entry.'],
+  pTP1:['1.5R or more away', 'TP1 is the nearest liquidity pool at least 1.5 times the risk away. Take half off here.'],
+  pTP2:['2.5R+ runner', 'TP2 is further liquidity. Move the stop to entry after TP1.'],
+  pRR:['1.5+ ok · 2+ good · under 1.2 skip', 'Reward-to-risk at TP1 / TP2. Need win rate above 1 / (1 + R:R) to break even.'],
+  pLev:['liquidation about 3x past the stop', 'Maximum leverage that keeps liquidation about three times further than your stop. Lower is safer.'],
+  pVen:['3+ exchanges good · 1 thin', 'Number of exchanges quoting the perp. One exchange only = thin, use smaller size.'],
+  pHL:['✔ you can trade it on Hyperliquid', 'Whether the coin is listed on Hyperliquid (your trading venue).'],
+  pGap:['under 0.3% normal · over 0.5% warn', 'Highest vs lowest exchange price. A wide gap = thin books or fast move.'],
+  pV1h:['$1M+ liquid · Δ +20% rising · +50% surge', 'Hourly volume. Compare with Vol Δ 1h and relative volume (1.5x or more = busy, under 0.7x = quiet). Moves on low volume often fail.'],
+  pV4h:['$4M+ liquid · Δ +20% rising · +50% surge', '4-hour volume. Rising 4h volume with price moving = real participation.'],
+  pV24:['mega $500M+ · mid $50M+ · micro below', 'Daily volume tiers (set under Filters panel). Micro caps are thin: smaller size and wider stop.'],
+  pV1hD:['+20% rising · +50% surge · -30% fading', 'Change in hourly volume vs the hour before. A breakout needs a surge.'],
+  pV4hD:['+20% rising · +50% surge · -30% fading', 'Change in 4h volume vs the previous 4h.']
+};
+function psThrKey(id){ if (GUIDE[id]) return id; const b = id.replace(/_[0-9a-z]+$/, ''); if (GUIDE[b]) return b; if (/^chg_/.test(id) && GUIDE.chg) return 'chg'; return null; }
+function psThr(id, cols){
+  if (PS_THR[id]) return PS_THR[id];
+  const k = psThrKey(id), g = k && GUIDE[k]; if (!g) return ['', ''];
+  const P = g.perp || [], one = P[1] || P[0] || g.spot || g.swing || '', full = g.say + (P.length ? ' | Scalp mega: ' + P[0] + ' | mid: ' + P[1] + ' | micro: ' + P[2] : '') + (g.spot ? ' | Spot: ' + g.spot : '') + (g.swing ? ' | Swing: ' + g.swing : '');
+  return [one, full];
+}
+function psGuideHtml(vis, cols){
+  const steps = ['Pick a preset (Elite is the default) or tick your own columns under "Choose columns".', 'Sort by Power rank. Set Quality to "Tradeable only" to see coins that pass every check.', 'Read the row: Side, Status, Grade and Blockers first. If there are blockers, wait.', 'Tap ▸ to open the detail: reasons, trade plan, checklist (what is ready and what to wait for), cautions, exchanges.', 'Check the Stop and TP columns against the chart (Charts or TA Lab page). Only take it if the stop sits beyond real liquidity and R:R is 1.5 or more.', 'Use the thresholds row under the headers to judge every number: green zone, warning zone.', 'Export CSV or Copy to ask an AI for a second opinion, and log the trade in the Journal.'];
+  let rows = ''; vis.forEach(([g, l]) => l.forEach(id => { const t = psThr(id, cols); rows += `<tr><td style="text-align:left;vertical-align:top"><b>${esc(cols.get(id).label)}</b><br><small class="dim">${esc(g)}</small></td><td style="text-align:left;vertical-align:top">${esc(t[1] || (cols.get(id).tip || ''))}</td><td style="text-align:left;vertical-align:top">${esc(t[0] || '—')}</td></tr>`; }));
+  return `<details class="ovd" id="psGuide" style="margin:6px 0"><summary><b>How to use this page + thresholds for your chosen columns</b></summary><ol class="ovstory">${steps.map(x => '<li>' + esc(x) + '</li>').join('')}</ol><div style="overflow:auto;max-height:340px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Column</th><th style="text-align:left">What it means</th><th style="text-align:left">Threshold</th></tr></thead><tbody>${rows}</tbody></table></div><p class="hint">Starting values, not promises. Learn how to read and build signals in the Vocabulary &amp; Academy page.</p></details>`;
 }
 function psGroups(cols){
   const used = new Set(), out = [];
@@ -11460,6 +11764,7 @@ function psCsv(D, cols, vis, rows){
   add(['ELPP Crypto Scanner Pro export']); add(['Page', 'Power Scanner']); add(['Exported (UTC)', now.toISOString()]); add(['Exported (Pakistan time)', now.toLocaleString('en-GB', {timeZone:'Asia/Karachi', hour12:false}) + ' PKT']); add(['Version', (document.querySelector('.v4b') || {}).textContent || '']); add(['Coins in table', rows.length + ' of ' + D.live.length]); add([]);
   const ids = []; vis.forEach(([g, l]) => l.forEach(id => ids.push(id)));
   add(['Coin'].concat(ids.map(id => (cols.get(id).label || id))));
+  add(['Threshold'].concat(ids.map(id => psThr(id, cols)[0] || '')));
   rows.forEach(c => add([c.name].concat(ids.map(id => { try { const x = cols.get(id).cell(c); return psStrip(x[0]); } catch(e){ return ''; } }))));
   return '﻿' + r.join('\r\n');
 }
@@ -11479,7 +11784,7 @@ function renderPower(force){
       <p class="hint">Every scanner merged into one table: the Elite call (verdict + institutional score + checklist grade), the trade plan, all exchanges, and every data column from the other pages. Pick exactly the columns you want, shrink any group with its header, and tap ▸ on a row for the full detail.</p>
       <div class="row" id="psBar" style="gap:8px;flex-wrap:wrap;align-items:center"></div>
       <details class="ovd" id="psPick" style="margin:6px 0"><summary><b>Choose columns</b> <small class="dim" id="psPickN"></small></summary><div id="psPickBody" style="margin-top:6px"></div></details>
-      <p class="hint" id="psNote"></p>
+      <div id="psGuideBox"></div><p class="hint" id="psNote"></p>
       <div class="psw" id="psWrap"></div></div>`;
     el.addEventListener('click', psClick); el.addEventListener('change', psChange); el.addEventListener('input', e => { if (e.target.id === 'psQ'){ st.q = e.target.value; saveState(); psDraw(true); const q = $('psQ'); if (q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } });
   }
@@ -11494,6 +11799,7 @@ function psBar(st, cols){
     <label class="hint">Show ${sel('psSide', [['all', 'Long and short'], ['long', 'Longs only'], ['short', 'Shorts only']], st.side)}</label>
     <label class="hint">Quality ${sel('psMin', [['all', 'All coins'], ['side', 'Has a side'], ['watch', 'Watch or better'], ['trade', 'Tradeable only']], st.min)}</label>
     <label class="hint"><input type="checkbox" id="psHL"${st.hl ? ' checked' : ''}> Hyperliquid only</label>
+    <label class="hint"><input type="checkbox" id="psThr"${st.thr === false ? '' : ' checked'}> Thresholds row</label>
     <label class="hint"><input type="checkbox" id="psPlan"${st.plan ? ' checked' : ''}> Has trade plan</label>
     <label class="hint">Min 24h vol $M <input id="psVol" type="number" min="0" value="${+st.vol || 0}" style="width:60px"></label>
     <label class="hint">Rows ${sel('psN', [[25, '25'], [50, '50'], [100, '100'], [150, '150'], [250, '250']], st.n)}</label>
@@ -11510,6 +11816,7 @@ function psDraw(keepBar){
   const vis = psVisible(cols, groups, st), rows = psRows(D, cols, st), shut = new Set(st.shut); X.vis = vis; X.rows = rows; X.shut = shut; PS.shown = rows;
   const head1 = '<th class="psh0" rowspan="2" title="Coin">Coin</th><th rowspan="2" class="psx" title="Open or close the detail"></th>' + vis.map(([g, l]) => shut.has(g) ? `<th class="psg shut" data-psgh="${esc(g)}" title="Open group: ${esc(g)} (${l.length} columns)">▸ ${esc(g.replace(/^[^\w]+/, '').slice(0, 10))}…</th>` : `<th class="psg" colspan="${l.length}" data-psgh="${esc(g)}" title="Shrink this group">▾ ${esc(g)}</th>`).join('');
   const head2 = vis.map(([g, l]) => shut.has(g) ? '' : l.map(id => { const col = cols.get(id), on = st.sort.id === id; return `<th class="pss${on ? ' on' : ''}" data-pssort="${esc(id)}" title="${esc((col.tip || col.label) + ' (click to sort)')}">${esc(col.label)}${on ? (st.sort.dir < 0 ? ' ▼' : ' ▲') : ''}</th>`; }).join('')).join('');
+  const head3 = vis.map(([g, l]) => shut.has(g) ? '' : l.map(id => { const t = psThr(id, cols); return `<th class="pst3" title="${esc(t[1] || '')}">${esc(String(t[0] || '').slice(0, 44))}</th>`; }).join('')).join('');
   const span = 2 + vis.reduce((a, [g, l]) => a + (shut.has(g) ? 1 : l.length), 0);
   const body = rows.map(c => {
     const open = PS.open.has(c.name), e = D.E.get(c.name) || {};
@@ -11517,8 +11824,9 @@ function psDraw(keepBar){
     let sym; try { sym = cwCols().get('sym').cell(c)[0]; } catch(er){ sym = esc(c.name); }
     return `<tr class="psr${open ? ' open' : ''}" data-psn="${esc(c.name)}"><td class="psc0">${sym}</td><td class="psx"><button class="btn sm" type="button" data-psx="${esc(c.name)}" title="${open ? 'Close' : 'Open'} detail">${open ? '▾' : '▸'}</button></td>${cells}</tr>` + (open ? `<tr class="psdr"><td colspan="${span}">${psDetail(c, D)}</td></tr>` : '');
   }).join('');
-  $('psWrap').innerHTML = `<table class="pst"><thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>${body || `<tr><td colspan="${span}" class="dim" style="text-align:center;padding:14px">No coin matches these filters.</td></tr>`}</tbody></table>`;
+  $('psWrap').innerHTML = `<table class="pst"><thead><tr>${head1}</tr><tr>${head2}</tr>${st.thr === false ? '' : '<tr>' + head3 + '</tr>'}</thead><tbody>${body || `<tr><td colspan="${span}" class="dim" style="text-align:center;padding:14px">No coin matches these filters.</td></tr>`}</tbody></table>`;
   const nT = D.live.filter(c => (D.E.get(c.name) || {}).tag === 'trade').length, nS = D.live.filter(c => (D.E.get(c.name) || {}).dir).length;
+  { const gb = $('psGuideBox'); if (gb){ const was = gb.querySelector('details') && gb.querySelector('details').open; gb.innerHTML = psGuideHtml(vis, cols); if (was) gb.querySelector('details').open = true; } }
   $('psNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.live.length} coins with live data (${D.total} in the scanner) · <b class="up">${nT}</b> tradeable now · ${nS} with a long/short lean · sorted by <b>${esc((cols.get(st.sort.id) || {}).label || '')}</b>.` + (D.errs && D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
 }
 function psClick(e){
@@ -11541,7 +11849,7 @@ function psChange(e){
   const st = psSt(), t = e.target, id = t.id;
   if (t.dataset && t.dataset.pscol){ const s = new Set(st.cols); if (t.checked) s.add(t.dataset.pscol); else s.delete(t.dataset.pscol); st.cols = [...s]; PS.pre = ''; saveState(); const open = [...document.querySelectorAll('#psPickBody details')].map(d => d.open); renderPower(true); [...document.querySelectorAll('#psPickBody details')].forEach((d, i) => { if (open[i] != null) d.open = open[i]; }); return; }
   if (id === 'psPre'){ const p = PS_PRESETS[t.value]; PS.pre = t.value; if (p){ st.cols = p.c ? p.c.slice() : [...psCols().keys()].filter(x => x !== 'sym' && x !== 'score'); st.shut = []; saveState(); renderPower(true); } return; }
-  if (id === 'psSide') st.side = t.value; else if (id === 'psMin') st.min = t.value; else if (id === 'psHL') st.hl = t.checked; else if (id === 'psPlan') st.plan = t.checked; else if (id === 'psVol') st.vol = +t.value || 0; else if (id === 'psN') st.n = +t.value || 100; else return;
+  if (id === 'psSide') st.side = t.value; else if (id === 'psMin') st.min = t.value; else if (id === 'psHL') st.hl = t.checked; else if (id === 'psPlan') st.plan = t.checked; else if (id === 'psThr') st.thr = t.checked; else if (id === 'psVol') st.vol = +t.value || 0; else if (id === 'psN') st.n = +t.value || 100; else return;
   saveState(); psDraw();
 }
 
