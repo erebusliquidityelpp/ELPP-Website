@@ -11716,7 +11716,7 @@ function psThrKey(id){ if (GUIDE[id]) return id; const b = id.replace(/_[0-9a-z]
 function psThr(id, cols){
   if (PS_THR[id]) return PS_THR[id];
   const k = psThrKey(id), g = k && GUIDE[k]; if (!g) return ['', ''];
-  const P = g.perp || [], one = P[1] || P[0] || g.spot || g.swing || '', full = g.say + (P.length ? ' | Scalp mega: ' + P[0] + ' | mid: ' + P[1] + ' | micro: ' + P[2] : '') + (g.spot ? ' | Spot: ' + g.spot : '') + (g.swing ? ' | Swing: ' + g.swing : '');
+  const P = g.perp || [], one = (P[1] && P[1] !== 'Same' ? P[1] : P[0]) || g.spot || g.swing || '', full = g.say + (P.length ? ' | Scalp mega: ' + P[0] + ' | mid: ' + P[1] + ' | micro: ' + P[2] : '') + (g.spot ? ' | Spot: ' + g.spot : '') + (g.swing ? ' | Swing: ' + g.swing : '');
   return [one, full];
 }
 function psGuideHtml(vis, cols){
