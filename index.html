@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.72</title>
+<title>ELPP CRYPTO SCANNER PRO V4.73</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.72</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.73</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -855,6 +855,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-view="elite" style="font-weight:700">⭐ Elite Coin Terminal</button>
     <button class="nv" type="button" data-view="lookup">Coin lookup: type a symbol</button>
     <button class="nv" type="button" data-view="charts">Charts: full technical analysis</button>
+    <button class="nv" type="button" data-view="ta" style="font-weight:700">📈 TA Lab: practise technical analysis</button>
     <button class="nv" type="button" data-view="news">News &amp; big names</button>
     </details>
   <details class="ng" data-g="tools" open><summary>Tools</summary>
@@ -1030,6 +1031,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewLookup" class="vcol" hidden></div>
     <div id="viewElite" class="vcol" hidden></div>
     <div id="viewCharts" class="vcol" hidden></div>
+    <div id="viewTa" class="vcol" hidden></div>
     <div id="viewMovers" class="vcol" hidden></div>
     <div id="viewMap" class="vcol" hidden></div>
     <div id="viewSdesk" class="vcol" hidden></div>
@@ -1924,7 +1926,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','elite','charts','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -5116,7 +5118,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -8789,7 +8791,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
-  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
+  $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
@@ -11342,6 +11344,13 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
+/* V4.73: TA Lab gets its coin list, scanner verdict and trade plan from here */
+window.__elppTaHook = {
+  coins: () => { try { return [...snapshot.keys()].filter(n => !/^xyz:/.test(n)).slice(0, 400); } catch(e){ return []; } },
+  verdict: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c || !c.m) return null; const m = c.m, v = m.verdict, LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG']; if (v == null || !LAB[v]) return null; return {label:LAB[v], score:m.verdictScore, dir:(v === 4 || v === 5) ? 'long' : (v === 2 || v === 3) ? 'short' : null}; } catch(e){ return null; } },
+  plan: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c) return null; const q = planFor(c); return q && isNum(q.entry) ? {dir:q.dir, entry:q.entry, sl:q.sl, tp1:q.tp1, tp2:q.tp2} : null; } catch(e){ return null; } },
+  watch: n => { try { if (!wlGet(n)) wlAdd(n); } catch(e){} }
+};
 function ptHtml(){
   ptLoad(); const B = ptBackdrop(), D = ptBuild(), list = D.list; if (list[0]) list[0].first = true; try { x9Want(list.filter(r => r.c).map(r => r.c.name).slice(0, 20)); } catch(e){}
   const bd = B.length ? `<div class="nsec"><h3>1. Read the backdrop first</h3><p class="hint">Before looking at any coin, know what the market around it is doing.</p><ul class="ovstory">${B.map(b => `<li class="${b.k === 'up' ? 'up' : b.k === 'dn' ? 'dn' : ''}"><b>${esc(b.t)}</b><br><span class="hint">${esc(b.why)}</span></li>`).join('')}</ul></div>` : '';
@@ -12735,6 +12744,636 @@ loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(l
     bell.innerHTML = live ? '&#128276;' : '&#128277;'; bell.classList.toggle('on', live);
     bell.title = live ? 'Notifications on (tap to turn off)' : (s.on ? 'Notifications are on but blocked: allow them in phone/browser settings' : 'Notifications off (tap to turn on)');
   }, 1000);
+})();
+</script>
+<script>
+/* ===== ELPP TA LAB: native technical-analysis workspace (V4.73). Own canvas engine, no external chart library. ===== */
+(function(){
+'use strict';
+if (window.TA) return;
+const $q = (s, r) => (r || document).querySelector(s);
+const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isN = v => typeof v === 'number' && isFinite(v);
+const LSK = 'elpp_ta_v1';
+const HOOK = () => window.__elppTaHook || {};
+const TFSEC = {'1m':60,'3m':180,'5m':300,'15m':900,'30m':1800,'1h':3600,'2h':7200,'4h':14400,'1d':86400,'1w':604800};
+const TFQUICK = ['1m','5m','15m','1h','4h','1d'];
+const MAXPANES = 6;
+const LAYOUTS = {'1':{n:1,cols:'1fr',rows:1,lab:'1'},'2':{n:2,cols:'1fr 1fr',rows:1,lab:'2'},'2v':{n:2,cols:'1fr',rows:2,lab:'2↕'},'3':{n:3,cols:'1fr 1fr 1fr',rows:1,lab:'3'},'4':{n:4,cols:'1fr 1fr',rows:2,lab:'4'},'6':{n:6,cols:'1fr 1fr 1fr',rows:2,lab:'6'}};
+const DEFSYMS = ['BTC','ETH','SOL','XRP','BNB','TAO','DOGE','SUI','AVAX','LINK','INJ','WLD','ONDO','AAVE','HYPE','PEPE','kPEPE','CL','BZ','XAU','XAG','NVDA','TSLA','SKHY'];
+function mkPane(sym, tf){ return {sym, tf, type:'candle', log:false, vol:true, plan:false, liq:false, fvg:false, ind:[]}; }
+function defState(){ return {layout:'2', sync:true, link:false, magnet:true, tz:'Asia/Karachi', stars:['BTC','ETH','SOL','TAO','BNB','XRP','CL','BZ'], draws:{}, active:0, panes:[mkPane('BTC','15m'), mkPane('BTC','1h')], tpl:{}}; }
+let S = (function(){ try { const j = JSON.parse(localStorage.getItem(LSK)); if (j && Array.isArray(j.panes) && j.panes.length) { const d = defState(); for (const k in d) if (!(k in j)) j[k] = d[k]; return j; } } catch(e){} return defState(); })();
+let saveT = 0;
+function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(LSK, JSON.stringify(S)); } catch(e){} }, 250); }
+let uid = Date.now() % 1e9; const nid = () => 'd' + (++uid).toString(36);
+
+/* ---------- number formats ---------- */
+function fmtP(p){ if (!isN(p)) return '–'; const a = Math.abs(p); const d = a >= 1000 ? 2 : a >= 100 ? 2 : a >= 10 ? 3 : a >= 1 ? 4 : a >= 0.1 ? 5 : a >= 0.01 ? 6 : a >= 0.0001 ? 7 : 9; return p.toFixed(d); }
+function fmtV(v){ if (!isN(v)) return '–'; const a = Math.abs(v); return a >= 1e9 ? (v / 1e9).toFixed(2) + 'B' : a >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : a >= 1e3 ? (v / 1e3).toFixed(2) + 'K' : v.toFixed(2); }
+function tzOff(tz){ try { const d = new Date(), f = new Intl.DateTimeFormat('en-US', {timeZone:tz, hourCycle:'h23', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'}).formatToParts(d), g = {}; f.forEach(x => g[x.type] = +x.value); return Date.UTC(g.year, g.month - 1, g.day, g.hour, g.minute, g.second) - Math.floor(d.getTime() / 1000) * 1000; } catch(e){ return 0; } }
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const p2 = n => (n < 10 ? '0' : '') + n;
+function fmtT(ms, mode){ const d = new Date(ms + tzOff(S.tz)); const Y = d.getUTCFullYear(), M = d.getUTCMonth(), D = d.getUTCDate(), h = d.getUTCHours(), m = d.getUTCMinutes(); if (mode === 'full') return D + ' ' + MON[M] + " '" + String(Y).slice(2) + '  ' + p2(h) + ':' + p2(m); if (mode === 'date') return D + ' ' + MON[M]; if (mode === 'month') return MON[M] + (M === 0 ? ' ' + Y : ''); if (mode === 'year') return String(Y); return p2(h) + ':' + p2(m); }
+
+/* ---------- symbols and exchanges ---------- */
+function symVariants(sym){
+  const raw = String(sym).trim(); if (/^xyz:/i.test(raw)) return [['hl', raw]];
+  const up = raw.toUpperCase().replace(/[-_/]?(USDT|USD|PERP)$/, ''), k1 = /^k[A-Z0-9]{2,}$/.test(raw) ? raw.slice(1).toUpperCase() : null, base = k1 || up;
+  const out = [['bn', base + 'USDT'], ['bn', '1000' + base + 'USDT'], ['by', base + 'USDT'], ['by', '1000' + base + 'USDT'], ['hl', k1 ? raw : (up === 'PEPE' || up === 'BONK' || up === 'SHIB' || up === 'FLOKI' ? 'k' + up : up)]];
+  return out;
+}
+const bad = {};
+async function jget(url, opt){ const ac = new AbortController(), to = setTimeout(() => ac.abort(), 9000); try { const r = await fetch(url, Object.assign({signal:ac.signal}, opt || {})); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); } finally { clearTimeout(to); } }
+const BNI = {'1m':'1m','3m':'3m','5m':'5m','15m':'15m','30m':'30m','1h':'1h','2h':'2h','4h':'4h','1d':'1d','1w':'1w'};
+const BYI = {'1m':'1','3m':'3','5m':'5','15m':'15','30m':'30','1h':'60','2h':'120','4h':'240','1d':'D','1w':'W'};
+async function pull(src, sym, tf, limit, endMs){
+  const step = TFSEC[tf] * 1000;
+  if (src === 'bn'){ const j = await jget('https://fapi.binance.com/fapi/v1/klines?symbol=' + encodeURIComponent(sym) + '&interval=' + BNI[tf] + '&limit=' + limit + (endMs ? '&endTime=' + endMs : '')); if (!Array.isArray(j)) throw new Error('no data'); return j.map(k => ({t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]})); }
+  if (src === 'by'){ const j = await jget('https://api.bybit.com/v5/market/kline?category=linear&symbol=' + encodeURIComponent(sym) + '&interval=' + BYI[tf] + '&limit=' + Math.min(limit, 1000) + (endMs ? '&end=' + endMs : '')); const l = j && j.result && j.result.list; if (!l || !l.length) throw new Error('no data'); return l.map(k => ({t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]})).reverse(); }
+  const end = endMs || Date.now() + step, j = await jget('https://api.hyperliquid.xyz/info', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'candleSnapshot', req:{coin:sym, interval:tf, startTime:end - limit * step, endTime:end}})}); if (!Array.isArray(j) || !j.length) throw new Error('no data'); return j.map(k => ({t:+k.t, o:+k.o, h:+k.h, l:+k.l, c:+k.c, v:+k.v}));
+}
+const feeds = new Map();
+class Feed {
+  constructor(sym, tf){ this.sym = sym; this.tf = tf; this.bars = []; this.src = null; this.ver = 0; this.loading = false; this.err = ''; this.done = false; this.subs = 0; this.busy = false; }
+  async load(){
+    if (this.loading) return; this.loading = true; this.err = ''; let last = '';
+    for (const [src, s] of symVariants(this.sym)){
+      if (bad[src + s] && Date.now() < bad[src + s]) continue;
+      try { const b = await pull(src, s, this.tf, 1000); if (b.length < 5) throw new Error('too few bars'); this.bars = this.clean(b); this.src = {src, s}; this.ver++; this.loading = false; return; }
+      catch(e){ bad[src + s] = Date.now() + 120000; last = e.message || String(e); }
+    }
+    this.loading = false; this.errAt = Date.now(); this.err = 'No data for ' + this.sym + ' (' + last + '). Try another coin name, e.g. BTC, CL, BZ, kPEPE.'; this.ver++;
+  }
+  clean(b){ const m = new Map(); for (const k of b) if (isN(k.t) && isN(k.c) && isN(k.o) && isN(k.h) && isN(k.l)) m.set(k.t, k); return [...m.values()].sort((a, c) => a.t - c.t); }
+  async older(){
+    if (this.busy || this.done || !this.src || !this.bars.length || this.bars.length > 25000) return; this.busy = true;
+    try { const b = await pull(this.src.src, this.src.s, this.tf, 1000, this.bars[0].t - 1); const before = this.bars.length; this.bars = this.clean(b.concat(this.bars)); if (this.bars.length - before < 5) this.done = true; this.ver++; this.shift = this.bars.length - before; }
+    catch(e){ this.done = true; }
+    this.busy = false;
+  }
+  async tick(){
+    if (!this.src || this.busy || this.loading) return; this.busy = true;
+    try { const b = await pull(this.src.src, this.src.s, this.tf, 3); const m = new Map(this.bars.map(k => [k.t, k])); let ch = false; for (const k of b){ const o = m.get(k.t); if (!o || o.c !== k.c || o.h !== k.h || o.l !== k.l || o.v !== k.v){ m.set(k.t, k); ch = true; } } if (ch){ this.bars = [...m.values()].sort((a, c) => a.t - c.t); this.ver++; this.live = true; } } catch(e){}
+    this.busy = false;
+  }
+}
+function getFeed(sym, tf){ const k = sym + '|' + tf; let f = feeds.get(k); if (!f){ f = new Feed(sym, tf); feeds.set(k, f); f.load(); } else if (f.err && !f.loading && !f.bars.length && Date.now() - (f.errAt || 0) > 4000){ for (const kk in bad) delete bad[kk]; f.load(); } return f; }
+setInterval(() => { for (const f of feeds.values()) if (f.subs > 0 && !document.hidden && window.TA && TA.visible) f.tick(); }, 4000);
+
+/* ---------- indicator maths ---------- */
+const NaNs = n => new Array(n).fill(NaN);
+function firstV(a){ for (let i = 0; i < a.length; i++) if (isN(a[i])) return i; return a.length; }
+function sub(a, fn){ const s = firstV(a), r = fn(a.slice(s)), o = NaNs(a.length); for (let i = 0; i < r.length; i++) o[i + s] = r[i]; return o; }
+function SMA(a, n){ return sub(a, x => { const o = NaNs(x.length); let s = 0; for (let i = 0; i < x.length; i++){ s += x[i]; if (i >= n) s -= x[i - n]; if (i >= n - 1) o[i] = s / n; } return o; }); }
+function EMA(a, n){ return sub(a, x => { const o = NaNs(x.length), k = 2 / (n + 1); if (x.length < n) return o; let s = 0; for (let i = 0; i < n; i++) s += x[i]; o[n - 1] = s / n; for (let i = n; i < x.length; i++) o[i] = x[i] * k + o[i - 1] * (1 - k); return o; }); }
+function RMA(a, n){ return sub(a, x => { const o = NaNs(x.length); if (x.length < n) return o; let s = 0; for (let i = 0; i < n; i++) s += x[i]; o[n - 1] = s / n; for (let i = n; i < x.length; i++) o[i] = (o[i - 1] * (n - 1) + x[i]) / n; return o; }); }
+function WMA(a, n){ return sub(a, x => { const o = NaNs(x.length), d = n * (n + 1) / 2; for (let i = n - 1; i < x.length; i++){ let s = 0; for (let j = 0; j < n; j++) s += x[i - n + 1 + j] * (j + 1); o[i] = s / d; } return o; }); }
+function HHLL(h, l, n){ const H = NaNs(h.length), L = NaNs(h.length); for (let i = n - 1; i < h.length; i++){ let a = -Infinity, b = Infinity; for (let j = i - n + 1; j <= i; j++){ if (h[j] > a) a = h[j]; if (l[j] < b) b = l[j]; } H[i] = a; L[i] = b; } return [H, L]; }
+function TRs(B){ return B.map((k, i) => i ? Math.max(k.h - k.l, Math.abs(k.h - B[i - 1].c), Math.abs(k.l - B[i - 1].c)) : k.h - k.l); }
+function ATRs(B, n){ return RMA(TRs(B), n); }
+const IND = {
+  sma:{n:'SMA', ov:1, P:[['Length',20]], C:['#f0b429']},
+  ema:{n:'EMA', ov:1, P:[['Length',50]], C:['#58a6ff']},
+  wma:{n:'WMA', ov:1, P:[['Length',21]], C:['#e879f9']},
+  bb:{n:'Bollinger Bands', ov:1, P:[['Length',20],['StdDev',2]], C:['#a78bfa','#a78bfa','#a78bfa']},
+  vwap:{n:'VWAP (daily)', ov:1, P:[], C:['#22d3ee']},
+  st:{n:'Supertrend', ov:1, P:[['ATR',10],['Mult',3]], C:['#2fbf71','#f0616d']},
+  ichi:{n:'Ichimoku Cloud', ov:1, P:[['Tenkan',9],['Kijun',26],['Senkou B',52]], C:['#58a6ff','#f0616d','#2fbf71','#f0616d']},
+  don:{n:'Donchian Channel', ov:1, P:[['Length',20]], C:['#60a5fa','#60a5fa','#60a5fa']},
+  kel:{n:'Keltner Channel', ov:1, P:[['Length',20],['Mult',2]], C:['#fb923c','#fb923c','#fb923c']},
+  psar:{n:'Parabolic SAR', ov:1, P:[['Step',0.02],['Max',0.2]], C:['#e5e7eb']},
+  rsi:{n:'RSI', P:[['Length',14]], C:['#a78bfa']},
+  macd:{n:'MACD', P:[['Fast',12],['Slow',26],['Signal',9]], C:['#58a6ff','#f0b429','#8393a7']},
+  stoch:{n:'Stochastic', P:[['%K',14],['Smooth',3],['%D',3]], C:['#58a6ff','#f0b429']},
+  atr:{n:'ATR', P:[['Length',14]], C:['#f0b429']},
+  cci:{n:'CCI', P:[['Length',20]], C:['#22d3ee']},
+  adx:{n:'ADX / DI', P:[['Length',14]], C:['#f0b429','#2fbf71','#f0616d']},
+  obv:{n:'OBV', P:[], C:['#58a6ff']},
+  mfi:{n:'MFI', P:[['Length',14]], C:['#e879f9']},
+  willr:{n:'Williams %R', P:[['Length',14]], C:['#fb923c']},
+  roc:{n:'ROC %', P:[['Length',12]], C:['#2dd4bf']},
+  cvd:{n:'CVD (estimated from candles)', P:[], C:['#2fbf71']}
+};
+function calc(k, p, B, tf){
+  const c = B.map(x => x.c), h = B.map(x => x.h), l = B.map(x => x.l), v = B.map(x => x.v), n = B.length;
+  if (k === 'sma') return {lines:[{d:SMA(c, p[0])}]};
+  if (k === 'ema') return {lines:[{d:EMA(c, p[0])}]};
+  if (k === 'wma') return {lines:[{d:WMA(c, p[0])}]};
+  if (k === 'bb'){ const m = SMA(c, p[0]), u = NaNs(n), d = NaNs(n); for (let i = p[0] - 1; i < n; i++){ let s = 0; for (let j = i - p[0] + 1; j <= i; j++) s += (c[j] - m[i]) ** 2; const sd = Math.sqrt(s / p[0]); u[i] = m[i] + p[1] * sd; d[i] = m[i] - p[1] * sd; } return {lines:[{d:u}, {d:m, dash:1}, {d:d}], fills:[{a:u, b:d, ci:0}]}; }
+  if (k === 'vwap'){ const o = NaNs(n), day = TFSEC[tf] >= 86400 ? 1e18 : 86400000; let pv = 0, vv = 0, cur = -1; for (let i = 0; i < n; i++){ const dk = Math.floor(B[i].t / day); if (dk !== cur){ cur = dk; pv = 0; vv = 0; } const tp = (h[i] + l[i] + c[i]) / 3; pv += tp * v[i]; vv += v[i]; o[i] = vv > 0 ? pv / vv : tp; } return {lines:[{d:o}]}; }
+  if (k === 'st'){ const a = ATRs(B, p[0]), up = NaNs(n), dn = NaNs(n), line = NaNs(n), dir = NaNs(n); let d = 1; for (let i = 0; i < n; i++){ if (!isN(a[i])) continue; const hl = (h[i] + l[i]) / 2; let u = hl + p[1] * a[i], lo = hl - p[1] * a[i]; if (i > 0 && isN(up[i - 1])){ if (!(u < up[i - 1] || c[i - 1] > up[i - 1])) u = up[i - 1]; if (!(lo > dn[i - 1] || c[i - 1] < dn[i - 1])) lo = dn[i - 1]; } up[i] = u; dn[i] = lo; if (i > 0 && isN(line[i - 1])){ if (d === 1 && c[i] < dn[i]) d = -1; else if (d === -1 && c[i] > up[i]) d = 1; } dir[i] = d; line[i] = d === 1 ? dn[i] : up[i]; } return {lines:[{d:line, dir, st:1}]}; }
+  if (k === 'ichi'){ const [h1, l1] = HHLL(h, l, p[0]), [h2, l2] = HHLL(h, l, p[1]), [h3, l3] = HHLL(h, l, p[2]), sh = p[1], T = NaNs(n), K = NaNs(n), A = NaNs(n + sh), Bb = NaNs(n + sh); for (let i = 0; i < n; i++){ T[i] = (h1[i] + l1[i]) / 2; K[i] = (h2[i] + l2[i]) / 2; const a = (T[i] + K[i]) / 2, b = (h3[i] + l3[i]) / 2; A[i + sh] = a; Bb[i + sh] = b; } return {lines:[{d:T}, {d:K}, {d:A, w:.8}, {d:Bb, w:.8}], fills:[{a:A, b:Bb, cloud:1}]}; }
+  if (k === 'don'){ const [H, L] = HHLL(h, l, p[0]); return {lines:[{d:H}, {d:H.map((x, i) => (x + L[i]) / 2), dash:1}, {d:L}], fills:[{a:H, b:L, ci:0}]}; }
+  if (k === 'kel'){ const m = EMA(c, p[0]), a = ATRs(B, 10); return {lines:[{d:m.map((x, i) => x + p[1] * a[i])}, {d:m, dash:1}, {d:m.map((x, i) => x - p[1] * a[i])}], fills:[{a:m.map((x, i) => x + p[1] * a[i]), b:m.map((x, i) => x - p[1] * a[i]), ci:0}]}; }
+  if (k === 'psar'){ const o = NaNs(n); if (n < 3) return {lines:[{d:o, dots:1}]}; let up = c[1] >= c[0], af = p[0], ep = up ? h[0] : l[0], sar = up ? l[0] : h[0]; o[0] = sar; for (let i = 1; i < n; i++){ sar = sar + af * (ep - sar); if (up){ sar = Math.min(sar, l[i - 1], i > 1 ? l[i - 2] : l[i - 1]); if (l[i] < sar){ up = false; sar = ep; ep = l[i]; af = p[0]; } else if (h[i] > ep){ ep = h[i]; af = Math.min(af + p[0], p[1]); } } else { sar = Math.max(sar, h[i - 1], i > 1 ? h[i - 2] : h[i - 1]); if (h[i] > sar){ up = true; sar = ep; ep = h[i]; af = p[0]; } else if (l[i] < ep){ ep = l[i]; af = Math.min(af + p[0], p[1]); } } o[i] = sar; } return {lines:[{d:o, dots:1}]}; }
+  if (k === 'rsi'){ const g = NaNs(n), ls = NaNs(n); for (let i = 1; i < n; i++){ const d = c[i] - c[i - 1]; g[i] = d > 0 ? d : 0; ls[i] = d < 0 ? -d : 0; } const ag = RMA(g, p[0]), al = RMA(ls, p[0]); return {lines:[{d:ag.map((x, i) => al[i] === 0 ? 100 : 100 - 100 / (1 + x / al[i]))}], lev:[30, 50, 70], rng:[0, 100]}; }
+  if (k === 'macd'){ const f = EMA(c, p[0]), s = EMA(c, p[1]), m = f.map((x, i) => x - s[i]), sg = EMA(m, p[2]); return {lines:[{d:m}, {d:sg}, {d:m.map((x, i) => x - sg[i]), hist:1}], lev:[0]}; }
+  if (k === 'stoch'){ const [H, L] = HHLL(h, l, p[0]), raw = c.map((x, i) => (x - L[i]) / (H[i] - L[i]) * 100), K = SMA(raw, p[1]), D = SMA(K, p[2]); return {lines:[{d:K}, {d:D}], lev:[20, 80], rng:[0, 100]}; }
+  if (k === 'atr') return {lines:[{d:ATRs(B, p[0])}]};
+  if (k === 'cci'){ const tp = B.map(x => (x.h + x.l + x.c) / 3), m = SMA(tp, p[0]), o = NaNs(n); for (let i = p[0] - 1; i < n; i++){ let s = 0; for (let j = i - p[0] + 1; j <= i; j++) s += Math.abs(tp[j] - m[i]); const md = s / p[0]; o[i] = md ? (tp[i] - m[i]) / (0.015 * md) : 0; } return {lines:[{d:o}], lev:[-100, 0, 100]}; }
+  if (k === 'adx'){ const tr = TRs(B), pd = NaNs(n), nd = NaNs(n); for (let i = 1; i < n; i++){ const u = h[i] - h[i - 1], d = l[i - 1] - l[i]; pd[i] = u > d && u > 0 ? u : 0; nd[i] = d > u && d > 0 ? d : 0; } const a = RMA(tr, p[0]), P = RMA(pd, p[0]).map((x, i) => 100 * x / a[i]), N = RMA(nd, p[0]).map((x, i) => 100 * x / a[i]), dx = P.map((x, i) => 100 * Math.abs(x - N[i]) / (x + N[i])); return {lines:[{d:RMA(dx, p[0])}, {d:P}, {d:N}], lev:[20, 40], rng:[0, 60]}; }
+  if (k === 'obv'){ const o = NaNs(n); let s = 0; for (let i = 0; i < n; i++){ if (i) s += c[i] > c[i - 1] ? v[i] : c[i] < c[i - 1] ? -v[i] : 0; o[i] = s; } return {lines:[{d:o}]}; }
+  if (k === 'cvd'){ const o = NaNs(n); let s = 0; for (let i = 0; i < n; i++){ const r = h[i] - l[i]; s += r > 0 ? v[i] * ((c[i] - l[i]) - (h[i] - c[i])) / r : 0; o[i] = s; } return {lines:[{d:o}]}; }
+  if (k === 'mfi'){ const tp = B.map(x => (x.h + x.l + x.c) / 3), o = NaNs(n); for (let i = p[0]; i < n; i++){ let a = 0, b = 0; for (let j = i - p[0] + 1; j <= i; j++){ const f = tp[j] * v[j]; if (tp[j] > tp[j - 1]) a += f; else if (tp[j] < tp[j - 1]) b += f; } o[i] = b === 0 ? 100 : 100 - 100 / (1 + a / b); } return {lines:[{d:o}], lev:[20, 50, 80], rng:[0, 100]}; }
+  if (k === 'willr'){ const [H, L] = HHLL(h, l, p[0]); return {lines:[{d:c.map((x, i) => (H[i] - x) / (H[i] - L[i]) * -100)}], lev:[-80, -50, -20], rng:[-100, 0]}; }
+  if (k === 'roc'){ const o = NaNs(n); for (let i = p[0]; i < n; i++) o[i] = (c[i] / c[i - p[0]] - 1) * 100; return {lines:[{d:o}], lev:[0]}; }
+  return {lines:[]};
+}
+
+/* ---------- chart engine ---------- */
+function pal(){ const cs = getComputedStyle(document.documentElement), g = (n, d) => (cs.getPropertyValue(n) || '').trim() || d; return {bg:g('--surface', '#121820'), bg2:g('--bg', '#0b0f14'), fg:g('--fg', '#d6dee9'), mut:g('--muted', '#8393a7'), up:g('--up', '#2fbf71'), dn:g('--down', '#f0616d'), ac:g('--accent', '#58a6ff'), line:g('--line', '#243040'), warn:g('--warn', '#e3b341')}; }
+function niceTicks(lo, hi, cnt){ const r = hi - lo; if (!(r > 0)) return [lo]; const raw = r / Math.max(2, cnt), mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag, st = (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * mag, o = []; for (let v = Math.ceil(lo / st) * st; v <= hi + st * 1e-9; v += st) o.push(+v.toPrecision(12)); return o; }
+function rgba(hex, a){ const m = /^#?([0-9a-f]{6})$/i.exec(hex); if (!m) return hex; const n = parseInt(m[1], 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
+function bsearch(B, t){ let a = 0, b = B.length - 1; while (a < b){ const m = (a + b + 1) >> 1; if (B[m].t <= t) a = m; else b = m - 1; } return a; }
+function mkHA(B){ const o = []; for (let i = 0; i < B.length; i++){ const k = B[i], c = (k.o + k.h + k.l + k.c) / 4, op = i ? (o[i - 1].o + o[i - 1].c) / 2 : (k.o + k.c) / 2; o.push({t:k.t, o:op, c, h:Math.max(k.h, op, c), l:Math.min(k.l, op, c), v:k.v}); } return o; }
+const DCOL = ['#58a6ff', '#f0b429', '#2fbf71', '#f0616d', '#a78bfa', '#22d3ee', '#fb923c', '#e879f9', '#e5e7eb'];
+const FIBL = [[0, '#8393a7'], [0.236, '#f0616d'], [0.382, '#fb923c'], [0.5, '#f0b429'], [0.618, '#2fbf71'], [0.786, '#22d3ee'], [1, '#8393a7'], [1.272, '#a78bfa'], [1.618, '#e879f9']];
+
+class Chart {
+  constructor(i){ this.i = i; this.bw = 8; this.v0 = 0; this.yz = 1; this.yo = 0; this.ym = null; this.cx = null; this.sel = null; this.tool = 'cursor'; this.pend = []; this.rep = {on:false, pick:false, idx:0, play:false, speed:1, tm:0, pos:null, trades:[], slx:1.5, rr:2}; this.res = {}; this.ver = -1; this.bars = []; this.dirty = true; this.sig = ''; this.plan = null; this.sx = null; this.zones = {key:'', liq:null, fvg:null}; this.fitted = false; }
+  get pane(){ return S.panes[this.i]; }
+  get step(){ return TFSEC[this.pane.tf] * 1000; }
+  get n(){ const r = this.rep; return r.on ? Math.min(r.idx + 1, this.bars.length) : this.bars.length; }
+  attach(cell){ this.cell = cell; this.cv = $q('canvas', cell); this.lg = $q('.ta-lg', cell); this.rp = $q('.ta-rp', cell); this.msg = $q('.ta-msg', cell); }
+  setFeed(){ const p = this.pane; if (this.feed) this.feed.subs--; this.feed = getFeed(p.sym, p.tf); this.feed.subs++; this.ver = -1; this.fitted = false; this.bars = []; this.res = {}; this.yz = 1; this.yo = 0; this.rep.on = false; this.rep.pick = false; this.stopPlay(); this.plan = null; this.dirty = true; }
+  draws(){ const k = this.pane.sym; return S.draws[k] || (S.draws[k] = []); }
+  sync(){
+    const f = this.feed; if (!f || f.ver === this.ver) return; const old = this.bars.length ? this.bars[0].t : 0; this.ver = f.ver; this.bars = f.bars; this.ha = null;
+    if (old && this.bars.length && this.bars[0].t < old){ this.v0 += bsearch(this.bars, old); }
+    this.recalc(); if (!this.fitted && this.bars.length){ this.fit(); this.fitted = true; } this.dirty = true;
+  }
+  recalc(){ this.res = {}; for (const x of this.pane.ind){ try { this.res[x.id] = calc(x.k, x.p, this.bars, this.pane.tf); } catch(e){ this.res[x.id] = {lines:[]}; } } this.zones.key = ''; }
+  fit(){ const W = this.cv.clientWidth || 600, pw = W - 66; this.bw = Math.max(3, Math.min(14, pw / Math.min(120, Math.max(40, this.n)))); this.v0 = this.n - pw / this.bw + Math.max(6, Math.round(pw / this.bw * 0.08)); this.yz = 1; this.yo = 0; this.ymanual = false; }
+  xOf(i){ return (i - this.v0) * this.bw + this.bw / 2; }
+  iOf(x){ return (x - this.bw / 2) / this.bw + this.v0; }
+  tOfI(f){ const B = this.bars, n = B.length; if (!n) return 0; if (f <= 0) return B[0].t + f * this.step; if (f >= n - 1) return B[n - 1].t + (f - (n - 1)) * this.step; const a = Math.floor(f); return B[a].t + (f - a) * (B[a + 1].t - B[a].t); }
+  iOfT(t){ const B = this.bars, n = B.length; if (!n) return 0; if (t <= B[0].t) return (t - B[0].t) / this.step; if (t >= B[n - 1].t) return n - 1 + (t - B[n - 1].t) / this.step; const a = bsearch(B, t); return a + (t - B[a].t) / ((B[a + 1].t - B[a].t) || this.step); }
+  yOf(p){ const m = this.ym; if (!m) return 0; const v = m.log ? Math.log(Math.max(p, 1e-12)) : p; return (m.hi - v) / (m.hi - m.lo) * m.h; }
+  pOf(y){ const m = this.ym; if (!m) return 0; const v = m.hi - y / m.h * (m.hi - m.lo); return m.log ? Math.exp(v) : v; }
+  toXY(pt){ return [this.xOf(this.iOfT(pt.t)), this.yOf(pt.p)]; }
+  fromXY(x, y){ return {t:this.tOfI(this.iOf(x)), p:this.pOf(y)}; }
+  stopPlay(){ const r = this.rep; r.play = false; clearInterval(r.tm); r.tm = 0; }
+  disp(){ if (this.pane.type !== 'ha') return this.bars; return this.ha || (this.ha = mkHA(this.bars)); }
+
+  /* zones: unswept swing highs/lows (liquidity pools) and unfilled fair-value gaps, from the candles shown */
+  calcZones(){
+    const p = this.pane, n = this.n, key = n + '|' + this.ver + '|' + p.liq + p.fvg; if (this.zones.key === key) return; this.zones.key = key; const B = this.bars, L = 5, z = this.zones; z.liq = null; z.fvg = null;
+    if (p.liq && n > 2 * L + 2){ const hs = [], ls = []; for (let i = L; i < n - L; i++){ let ph = true, pl = true; for (let j = i - L; j <= i + L; j++){ if (j === i) continue; if (B[j].h >= B[i].h) ph = false; if (B[j].l <= B[i].l) pl = false; } if (ph){ let sw = -1; for (let j = i + 1; j < n; j++) if (B[j].h > B[i].h){ sw = j; break; } hs.push({i, p:B[i].h, sw}); } if (pl){ let sw = -1; for (let j = i + 1; j < n; j++) if (B[j].l < B[i].l){ sw = j; break; } ls.push({i, p:B[i].l, sw}); } }
+      const pick = a => { const un = a.filter(x => x.sw < 0).slice(-7), sw = a.filter(x => x.sw >= 0).slice(-5); return un.concat(sw); }; z.liq = {hi:pick(hs), lo:pick(ls)}; }
+    if (p.fvg && n > 3){ const o = []; for (let i = 2; i < n; i++){ if (B[i].l > B[i - 2].h){ const lo = B[i - 2].h, hi = B[i].l; let end = -1; for (let j = i + 1; j < n; j++) if (B[j].l <= lo){ end = j; break; } if (end < 0 && (hi - lo) > 0) o.push({i:i - 2, lo, hi, up:true, end}); } else if (B[i].h < B[i - 2].l){ const hi = B[i - 2].l, lo = B[i].h; let end = -1; for (let j = i + 1; j < n; j++) if (B[j].h >= hi){ end = j; break; } if (end < 0 && (hi - lo) > 0) o.push({i:i - 2, lo, hi, up:false, end}); } } z.fvg = o.slice(-9); }
+  }
+
+  draw(){
+    const cv = this.cv; if (!cv) return; const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (W < 40 || H < 40) return;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)){ cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); const P = this.P = pal(); g.fillStyle = P.bg; g.fillRect(0, 0, W, H);
+    this.sync(); const p = this.pane, f = this.feed, n = this.n;
+    if (!n){ g.fillStyle = P.mut; g.font = '13px ' + getComputedStyle(document.body).fontFamily; g.textAlign = 'center'; g.fillText(f && f.err ? f.err : 'Loading ' + p.sym + ' ' + p.tf + ' …', W / 2, H / 2); g.textAlign = 'left'; if (this.msg) this.msg.textContent = ''; return; }
+    const axisW = 66, timeH = 24, plotW = W - axisW, subs = p.ind.filter(x => !IND[x.k].ov && x.on !== false), subH = subs.length ? Math.max(44, Math.min(120, (H - timeH) * 0.5 / subs.length)) : 0, mainH = H - timeH - subs.length * subH;
+    this.L = {W, H, axisW, timeH, plotW, mainH, subs, subH}; this.calcZones();
+    const maxV0 = n - 5 + Math.max(8, plotW / this.bw * 0.5); if (this.v0 > maxV0) this.v0 = maxV0; if (this.v0 < -plotW / this.bw + 5) this.v0 = -plotW / this.bw + 5;
+    if (this.v0 < 30 && this.feed && !this.rep.on) this.feed.older();
+    const D = this.disp(), i0 = Math.max(0, Math.floor(this.v0) - 1), i1 = Math.min(n - 1, Math.ceil(this.v0 + plotW / this.bw) + 1);
+    let lo = Infinity, hi = -Infinity, vmax = 0; for (let i = i0; i <= i1; i++){ if (D[i].l < lo) lo = D[i].l; if (D[i].h > hi) hi = D[i].h; if (D[i].v > vmax) vmax = D[i].v; }
+    if (!isFinite(lo)){ lo = 0; hi = 1; } if (p.log){ lo = Math.log(Math.max(lo, 1e-12)); hi = Math.log(Math.max(hi, 1e-12)); }
+    let pad = (hi - lo) * 0.08 || Math.abs(hi) * 0.01 || 1; lo -= pad; hi += pad * 1.5; const mid = (hi + lo) / 2, half = (hi - lo) / 2 * this.yz, sh = this.yo * (hi - lo); lo = mid - half + sh; hi = mid + half + sh;
+    this.ym = {lo, hi, log:p.log, h:mainH};
+    const ff = getComputedStyle(document.body).fontFamily, mono = '11px ' + ff, step = this.step;
+    /* time ticks */
+    const ivs = [60, 300, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 172800, 604800, 2592000, 7776000, 31536000], tfs = TFSEC[p.tf]; let iv = ivs.find(x => x / tfs * this.bw >= 84) || ivs[ivs.length - 1]; const off = tzOff(S.tz) / 1000, ticks = []; let pk = null;
+    for (let i = Math.max(0, Math.floor(this.v0)); i <= Math.min(this.bars.length - 1, i1); i++){ const ts = this.bars[i].t / 1000 + off, key = iv >= 2592000 ? Math.floor(ts / 2592000) : Math.floor(ts / iv); if (pk !== null && key !== pk){ const dd = new Date(this.bars[i].t + off * 1000), mode = iv >= 31536000 ? 'year' : iv >= 2592000 ? 'month' : iv >= 86400 ? 'date' : (dd.getUTCHours() === 0 && dd.getUTCMinutes() === 0 ? 'date' : 'time'); ticks.push({x:this.xOf(i), t:this.bars[i].t, mode}); } pk = key; }
+    /* grid */
+    g.lineWidth = 1; g.strokeStyle = rgba('#8393a7', 0.13); g.beginPath(); for (const t of ticks){ const x = Math.round(t.x) + 0.5; g.moveTo(x, 0); g.lineTo(x, H - timeH); } g.stroke();
+    const vlo = p.log ? Math.exp(lo) : lo, vhi = p.log ? Math.exp(hi) : hi, yt = niceTicks(vlo, vhi, mainH / 56); g.beginPath(); for (const v of yt){ const y = Math.round(this.yOf(v)) + 0.5; if (y < 0 || y > mainH) continue; g.moveTo(0, y); g.lineTo(plotW, y); } g.stroke();
+    /* main clip */
+    g.save(); g.beginPath(); g.rect(0, 0, plotW, mainH); g.clip();
+    /* zones */
+    const z = this.zones, xr = plotW;
+    if (z.fvg) for (const q of z.fvg){ const x0 = this.xOf(q.i), y0 = this.yOf(q.hi), y1 = this.yOf(q.lo); g.fillStyle = rgba(q.up ? '#2fbf71' : '#f0616d', 0.13); g.fillRect(x0, y0, xr - x0, Math.max(1, y1 - y0)); g.fillStyle = rgba(q.up ? '#2fbf71' : '#f0616d', 0.7); g.font = '10px ' + ff; g.fillText('FVG', Math.max(x0, 2) + 3, y0 + 10); }
+    if (z.liq){ g.font = '10px ' + ff; for (const [arr, col, lab] of [[z.liq.hi, '#f0616d', 'BSL'], [z.liq.lo, '#2fbf71', 'SSL']]) for (const q of arr){ const y = Math.round(this.yOf(q.p)) + 0.5, x0 = this.xOf(q.i), x1 = q.sw >= 0 ? this.xOf(q.sw) : xr; g.strokeStyle = rgba(col, q.sw >= 0 ? 0.28 : 0.85); g.lineWidth = 1; g.setLineDash(q.sw >= 0 ? [2, 4] : [6, 3]); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.setLineDash([]); g.fillStyle = rgba(col, q.sw >= 0 ? 0.45 : 0.95); g.fillText(lab + (q.sw >= 0 ? ' swept' : ''), Math.max(x0, 4) + 2, y + (lab === 'BSL' ? -3 : 10)); } }
+    /* volume */
+    if (p.vol && vmax > 0){ const vh = mainH * 0.15; for (let i = i0; i <= i1; i++){ const k = D[i], x = this.xOf(i), h = k.v / vmax * vh; g.fillStyle = rgba(k.c >= k.o ? '#2fbf71' : '#f0616d', 0.28); g.fillRect(x - Math.max(1, this.bw * 0.35), mainH - h, Math.max(1, this.bw * 0.7), h); } }
+    /* overlay indicators: fills first */
+    const ovs = p.ind.filter(x => IND[x.k].ov && x.on !== false);
+    for (const x of ovs){ const r = this.res[x.id]; if (!r || !r.fills) continue; for (const fl of r.fills) this.fillBetween(g, fl, x, n); }
+    /* price */
+    this.drawPrice(g, D, i0, i1, p.type, P);
+    for (const x of ovs){ const r = this.res[x.id]; if (!r) continue; r.lines.forEach((ln, li) => this.strokeLine(g, ln, x.c[li] || x.c[0] || '#58a6ff', i0, i1, n)); }
+    /* plan, drawings, replay position */
+    if (p.plan && this.plan) this.drawPlan(g, plotW);
+    this.drawRepPos(g, plotW);
+    this.drawAll(g, plotW);
+    /* last price line */
+    const lk = D[n - 1], ly = this.yOf(lk.c); if (ly > -20 && ly < mainH + 20){ g.strokeStyle = lk.c >= lk.o ? P.up : P.dn; g.globalAlpha = 0.7; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(0, Math.round(ly) + 0.5); g.lineTo(plotW, Math.round(ly) + 0.5); g.stroke(); g.setLineDash([]); g.globalAlpha = 1; }
+    g.restore();
+    /* sub panes */
+    this.subRects = []; let sy = mainH; for (const x of subs){ this.drawSub(g, x, sy, subH, plotW, i0, i1, n, ticks, mono, ff); this.subRects.push({id:x.id, y0:sy, h:subH}); sy += subH; }
+    /* axes */
+    g.fillStyle = P.bg; g.fillRect(plotW, 0, axisW, H); g.fillRect(0, H - timeH, W, timeH); g.strokeStyle = P.line; g.lineWidth = 1; g.beginPath(); g.moveTo(plotW + 0.5, 0); g.lineTo(plotW + 0.5, H - timeH); g.moveTo(0, H - timeH + 0.5); g.lineTo(W, H - timeH + 0.5); g.stroke();
+    g.font = mono; g.fillStyle = P.mut; g.textAlign = 'left';
+    for (const v of yt){ const y = this.yOf(v); if (y < 8 || y > mainH - 6) continue; g.fillText(fmtP(v), plotW + 6, y + 4); }
+    g.textAlign = 'center'; for (const t of ticks){ if (t.x < 14 || t.x > plotW - 14) continue; g.fillStyle = (t.mode === 'date' || t.mode === 'month' || t.mode === 'year') ? P.fg : P.mut; g.fillText(fmtT(t.t, t.mode), t.x, H - 8); } g.textAlign = 'left';
+    /* plan/drawing price tags and last price tag */
+    g.font = 'bold 11px ' + ff; const tag = (y, txt, bg, fg) => { if (y < 6 || y > mainH - 6) return; g.fillStyle = bg; g.fillRect(plotW, y - 9, axisW, 18); g.fillStyle = fg || '#fff'; g.fillText(txt, plotW + 6, y + 4); };
+    tag(ly, fmtP(lk.c), lk.c >= lk.o ? P.up : P.dn, '#fff'); if (!this.rep.on && this.feed && this.feed.src && this.bars.length){ const rem = this.bars[this.bars.length - 1].t + step - Date.now(); if (rem > 0 && rem < step * 1.5 && ly > 12 && ly < mainH - 24){ const s = Math.floor(rem / 1000), tx = s >= 3600 ? Math.floor(s / 3600) + 'h ' + p2(Math.floor(s % 3600 / 60)) + 'm' : p2(Math.floor(s / 60)) + ':' + p2(s % 60); g.fillStyle = lk.c >= lk.o ? P.up : P.dn; g.fillRect(plotW, ly + 9, axisW, 15); g.fillStyle = '#fff'; g.font = '10px ' + ff; g.fillText(tx, plotW + 6, ly + 20); } }
+    if (p.plan && this.plan){ g.font = 'bold 11px ' + ff; for (const q of this.planLines()) tag(this.yOf(q.p), fmtP(q.p), q.col, '#fff'); }
+    for (const d of this.draws()) if (d.type === 'hline' && d.pts[0]) tag(this.yOf(d.pts[0].p), fmtP(d.pts[0].p), d.color || '#58a6ff', '#06111f');
+    /* crosshair */
+    this.drawCross(g, W, H, plotW, mainH, timeH, subs, subH, mono);
+    /* header text */
+    this.drawHead(g, n, ff);
+    this.fixLegend(subs, mainH, subH);
+    if (this.msg) this.msg.textContent = f && f.src ? ({bn:'Binance', by:'Bybit', hl:'Hyperliquid'}[f.src.src] + ' · ' + f.src.s + (f.live ? ' · live' : '')) : '';
+    this.updRep();
+  }
+  strokeLine(g, ln, col, i0, i1, n){
+    const d = ln.d, extra = d.length - this.bars.length, lim = this.rep.on ? this.n + extra - 1 : d.length - 1, a = Math.max(0, i0 - 1), b = Math.min(lim, Math.ceil(this.v0 + this.L.plotW / this.bw) + 1);
+    if (ln.dots){ g.fillStyle = col; for (let i = a; i <= b; i++){ if (!isN(d[i])) continue; g.beginPath(); g.arc(this.xOf(i), this.yOf(d[i]), 1.8, 0, 6.2832); g.fill(); } return; }
+    g.lineWidth = ln.w ? ln.w * 1.5 : 1.5; g.setLineDash(ln.dash ? [4, 3] : []);
+    if (ln.st){ const P = this.P, ups = this.pane.ind.find(x => this.res[x.id] && this.res[x.id].lines[0] === ln); const cu = ups && ups.c[0] || P.up, cd = ups && ups.c[1] || P.dn; for (let i = a + 1; i <= b; i++){ if (!isN(d[i]) || !isN(d[i - 1])) continue; g.strokeStyle = ln.dir[i] === 1 ? cu : cd; g.beginPath(); g.moveTo(this.xOf(i - 1), this.yOf(d[i - 1])); g.lineTo(this.xOf(i), this.yOf(d[i])); if (ln.dir[i] !== ln.dir[i - 1]) g.moveTo(this.xOf(i), this.yOf(d[i])); g.stroke(); } g.setLineDash([]); return; }
+    g.strokeStyle = col; g.beginPath(); let on = false; for (let i = a; i <= b; i++){ if (!isN(d[i])){ on = false; continue; } const x = this.xOf(i), y = this.yOf(d[i]); if (on) g.lineTo(x, y); else { g.moveTo(x, y); on = true; } } g.stroke(); g.setLineDash([]);
+  }
+  fillBetween(g, fl, x, n){
+    const A = fl.a, B2 = fl.b, extra = A.length - this.bars.length, lim = this.rep.on ? this.n + extra - 1 : A.length - 1, a = Math.max(0, Math.floor(this.v0) - 1), b = Math.min(lim, Math.ceil(this.v0 + this.L.plotW / this.bw) + 1);
+    for (let i = a + 1; i <= b; i++){ if (!isN(A[i]) || !isN(B2[i]) || !isN(A[i - 1]) || !isN(B2[i - 1])) continue; const col = fl.cloud ? (A[i] >= B2[i] ? '#2fbf71' : '#f0616d') : (x.c[fl.ci] || '#a78bfa'); g.fillStyle = rgba(col, fl.cloud ? 0.14 : 0.07); g.beginPath(); g.moveTo(this.xOf(i - 1), this.yOf(A[i - 1])); g.lineTo(this.xOf(i), this.yOf(A[i])); g.lineTo(this.xOf(i), this.yOf(B2[i])); g.lineTo(this.xOf(i - 1), this.yOf(B2[i - 1])); g.closePath(); g.fill(); }
+  }
+  drawPrice(g, D, i0, i1, type, P){
+    const bw = this.bw, bwid = Math.max(1, Math.floor(bw * 0.72));
+    if (type === 'line' || type === 'area'){ g.strokeStyle = P.ac; g.lineWidth = 1.8; g.beginPath(); for (let i = i0; i <= i1; i++){ const x = this.xOf(i), y = this.yOf(D[i].c); if (i === i0) g.moveTo(x, y); else g.lineTo(x, y); } g.stroke(); if (type === 'area'){ g.lineTo(this.xOf(i1), this.L.mainH); g.lineTo(this.xOf(i0), this.L.mainH); g.closePath(); const gr = g.createLinearGradient(0, 0, 0, this.L.mainH); gr.addColorStop(0, rgba('#58a6ff', 0.28)); gr.addColorStop(1, rgba('#58a6ff', 0.02)); g.fillStyle = gr; g.fill(); } return; }
+    for (let i = i0; i <= i1; i++){
+      const k = D[i], up = k.c >= k.o, col = up ? P.up : P.dn, x = this.xOf(i), yo = this.yOf(k.o), yc = this.yOf(k.c), yh = this.yOf(k.h), yl = this.yOf(k.l);
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
+      if (type === 'bar'){ const xx = Math.round(x) + 0.5; g.beginPath(); g.moveTo(xx, yh); g.lineTo(xx, yl); g.moveTo(xx - bw * 0.3, yo); g.lineTo(xx, yo); g.moveTo(xx, yc); g.lineTo(xx + bw * 0.3, yc); g.stroke(); continue; }
+      const xx = Math.round(x) + 0.5; g.beginPath(); g.moveTo(xx, yh); g.lineTo(xx, yl); g.stroke();
+      const top = Math.min(yo, yc), hh = Math.max(1, Math.abs(yc - yo));
+      if (type === 'hollow' && up){ g.fillStyle = P.bg; g.fillRect(Math.round(x - bwid / 2), top, bwid, hh); g.strokeRect(Math.round(x - bwid / 2) + 0.5, top + 0.5, bwid - 1, Math.max(0, hh - 1)); } else g.fillRect(Math.round(x - bwid / 2), top, bwid, hh);
+    }
+  }
+  drawSub(g, x, y0, h, plotW, i0, i1, n, ticks, mono, ff){
+    const P = this.P, r = this.res[x.id], spec = IND[x.k]; g.save(); g.beginPath(); g.rect(0, y0, plotW, h); g.clip();
+    g.strokeStyle = P.line; g.lineWidth = 1; g.beginPath(); g.moveTo(0, y0 + 0.5); g.lineTo(this.L.W, y0 + 0.5); g.stroke();
+    g.strokeStyle = rgba('#8393a7', 0.13); g.beginPath(); for (const t of ticks){ const xx = Math.round(t.x) + 0.5; g.moveTo(xx, y0); g.lineTo(xx, y0 + h); } g.stroke();
+    if (!r){ g.restore(); return; }
+    let lo = Infinity, hi = -Infinity; if (r.rng){ lo = r.rng[0]; hi = r.rng[1]; } else for (const ln of r.lines) for (let i = i0; i <= Math.min(i1, ln.d.length - 1, n - 1); i++){ const v = ln.d[i]; if (isN(v)){ if (v < lo) lo = v; if (v > hi) hi = v; } }
+    if (r.lev && !r.rng) for (const v of r.lev){ if (v < lo) lo = Math.min(lo, v); if (v > hi) hi = Math.max(hi, v); }
+    if (!isFinite(lo)){ lo = 0; hi = 1; } if (hi === lo){ hi += 1; lo -= 1; } const pd = (hi - lo) * 0.1; if (!r.rng){ lo -= pd; hi += pd; }
+    const m = {lo, hi, y0, h}; x._m = m; const Y = v => y0 + 14 + (hi - v) / (hi - lo) * (h - 20);
+    if (r.lev){ g.setLineDash([3, 4]); g.strokeStyle = rgba('#8393a7', 0.45); for (const v of r.lev){ const y = Math.round(Y(v)) + 0.5; g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); } g.setLineDash([]); if (r.rng && r.lev.length >= 2){ const a = Y(r.lev[r.lev.length - 1]), b = Y(r.lev[0]); g.fillStyle = rgba(x.c[0], 0.05); g.fillRect(0, a, plotW, b - a); } }
+    const lim = this.rep.on ? this.n - 1 : r.lines[0].d.length - 1;
+    r.lines.forEach((ln, li) => { const d = ln.d, col = x.c[li] || x.c[0];
+      if (ln.hist){ const zy = Y(0); for (let i = i0; i <= Math.min(i1, lim); i++){ if (!isN(d[i])) continue; g.fillStyle = rgba(d[i] >= 0 ? (isN(d[i - 1]) && d[i] >= d[i - 1] ? '#2fbf71' : '#2fbf71') : '#f0616d', d[i] >= (d[i - 1] || 0) ? 0.85 : 0.45); const yy = Y(d[i]); g.fillRect(this.xOf(i) - Math.max(1, this.bw * 0.33), Math.min(zy, yy), Math.max(1, this.bw * 0.66), Math.max(1, Math.abs(yy - zy))); } return; }
+      g.strokeStyle = col; g.lineWidth = 1.4; g.beginPath(); let on = false; for (let i = Math.max(0, i0); i <= Math.min(i1, lim); i++){ if (!isN(d[i])){ on = false; continue; } const xx = this.xOf(i), yy = Y(d[i]); if (on) g.lineTo(xx, yy); else { g.moveTo(xx, yy); on = true; } } g.stroke(); });
+    g.restore();
+    g.font = mono; g.fillStyle = P.mut; g.textAlign = 'left'; const tk = r.lev || niceTicks(lo, hi, 3); for (const v of tk){ const y = Y(v); if (y < y0 + 8 || y > y0 + h - 4) continue; g.fillText(Math.abs(v) >= 1e6 ? fmtV(v) : Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2), plotW + 6, y + 4); }
+    x._Y = Y;
+  }
+  drawHead(g, n, ff){
+    const P = this.P, p = this.pane, D = this.disp(), j = this.hoverIdx(n), k = D[j], pk = this.bars[j]; if (!k) return; const prev = j > 0 ? this.bars[j - 1].c : pk.o, chg = (pk.c - prev) / prev * 100, col = pk.c >= pk.o ? P.up : P.dn;
+    g.font = 'bold 12px ' + ff; g.fillStyle = P.fg; const t0 = p.sym + ' · ' + p.tf + (p.type === 'ha' ? ' · HA' : ''); g.fillText(t0, 8, 16); let x = 8 + g.measureText(t0).width + 10; g.font = '11px ' + ff;
+    const seg = [['O', fmtP(pk.o)], ['H', fmtP(pk.h)], ['L', fmtP(pk.l)], ['C', fmtP(pk.c)], [(chg >= 0 ? '+' : '') + chg.toFixed(2) + '%', ''], ['Vol', fmtV(pk.v)]];
+    for (const [a, b] of seg){ g.fillStyle = P.mut; if (b){ g.fillText(a, x, 16); x += g.measureText(a).width + 3; g.fillStyle = col; g.fillText(b, x, 16); x += g.measureText(b).width + 9; } else { g.fillStyle = col; g.fillText(a, x, 16); x += g.measureText(a).width + 9; } }
+    this.updVals(j);
+  }
+  hoverIdx(n){ if (this.cx && this.cx.in){ const i = Math.round(this.iOf(this.cx.x)); return Math.max(0, Math.min(n - 1, i)); } return n - 1; }
+  drawCross(g, W, H, plotW, mainH, timeH, subs, subH, mono){
+    const P = this.P; let x = null, yv = null, inMain = false, subI = -1;
+    if (this.cx && this.cx.in){ x = this.cx.x; yv = this.cx.y; if (yv < mainH) inMain = true; else subI = Math.min(subs.length - 1, Math.floor((yv - mainH) / subH)); }
+    else if (this.sx != null && S.sync){ x = this.xOf(this.iOfT(this.sx)); if (x < 0 || x > plotW) x = null; }
+    if (x === null) return; const snap = this.cx && this.cx.in ? this.xOf(Math.round(this.iOf(x))) : x; if (this.cx && this.cx.in) x = snap;
+    g.save(); g.setLineDash([4, 4]); g.strokeStyle = rgba('#8393a7', 0.8); g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(x) + 0.5, 0); g.lineTo(Math.round(x) + 0.5, H - timeH); if (this.cx && this.cx.in && yv < H - timeH){ g.moveTo(0, Math.round(yv) + 0.5); g.lineTo(plotW, Math.round(yv) + 0.5); } g.stroke(); g.setLineDash([]); g.restore();
+    g.font = 'bold 11px ' + getComputedStyle(document.body).fontFamily; const lab = (xx, yy, w, txt) => { g.fillStyle = P.fg; g.fillRect(xx, yy, w, 18); g.fillStyle = P.bg; g.fillText(txt, xx + 6, yy + 13); };
+    if (this.cx && this.cx.in){ if (inMain) lab(plotW, yv - 9, this.L.axisW, fmtP(this.pOf(yv))); else if (subI >= 0 && subs[subI] && subs[subI]._m){ const m = subs[subI]._m, v = m.hi - (yv - m.y0 - 14) / (m.h - 20) * (m.hi - m.lo); lab(plotW, yv - 9, this.L.axisW, Math.abs(v) >= 1000 ? fmtV(v) : v.toFixed(2)); } }
+    const t = this.tOfI(this.iOf(x)); const txt = fmtT(t, 'full'), w = g.measureText(txt).width + 14; lab(Math.max(0, Math.min(plotW - w, x - w / 2)), H - timeH + 3, w, txt);
+  }
+  fixLegend(subs, mainH, subH){
+    const sig = this.pane.ind.map(x => x.id + x.on + x.p.join(',') + x.c.join(',')).join('|') + '|' + mainH + '|' + subH; if (sig === this.sig) return; this.sig = sig; const lg = this.lg; if (!lg) return; lg.innerHTML = '';
+    const chip = x => { const s = IND[x.k], c = mk('span', 'ta-chip' + (x.on === false ? ' off' : '')); c.dataset.id = x.id; c.innerHTML = '<i style="background:' + esc(x.c[0]) + '"></i><b>' + esc(s.n) + (x.p.length ? ' ' + esc(x.p.join(',')) : '') + '</b><em class="v"></em><button data-a="eye" title="Show / hide">' + (x.on === false ? '◌' : '◉') + '</button><button data-a="cfg" title="Settings">⚙</button><button data-a="x" title="Remove">✕</button>'; return c; };
+    const ov = mk('div', 'ta-lgrow'); ov.style.top = '24px'; this.pane.ind.filter(x => IND[x.k].ov).forEach(x => ov.appendChild(chip(x))); lg.appendChild(ov);
+    let y = mainH; for (const x of subs){ const row = mk('div', 'ta-lgrow'); row.style.top = (y + 3) + 'px'; row.appendChild(chip(x)); lg.appendChild(row); y += subH; }
+    this.pane.ind.filter(x => !IND[x.k].ov && x.on === false).forEach(x => ov.appendChild(chip(x)));
+  }
+  updVals(j){
+    if (!this.lg) return; const n = this.n; for (const x of this.pane.ind){ const r = this.res[x.id], c = this.lg.querySelector('.ta-chip[data-id="' + x.id + '"] .v'); if (!c || !r) continue; c.textContent = r.lines.filter(l => !l.hist || true).slice(0, 3).map(l => { const v = l.d[Math.min(j, l.d.length - 1)]; return isN(v) ? (Math.abs(v) >= 1e6 ? fmtV(v) : fmtP(v)) : ''; }).filter(Boolean).join('  '); }
+  }
+}
+
+/* ---------- drawings, replay, interaction ---------- */
+const NEED = {trend:2, ray:2, hline:1, vline:1, rect:2, fib:2, channel:3, measure:2, text:1, long:1, short:1};
+function dseg(px, py, ax, ay, bx, by){ const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy; let t = l2 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0; t = Math.max(0, Math.min(1, t)); const x = ax + t * dx, y = ay + t * dy; return Math.hypot(px - x, py - y); }
+Object.assign(Chart.prototype, {
+  magnet(pt, x, y){
+    if (!S.magnet || !this.bars.length) return pt; const i = Math.max(0, Math.min(this.n - 1, Math.round(this.iOf(x)))), k = this.bars[i]; if (!k) return pt; let best = null, bd = 16;
+    for (const v of [k.o, k.h, k.l, k.c]){ const d = Math.abs(this.yOf(v) - y); if (d < bd){ bd = d; best = v; } }
+    return best === null ? pt : {t:k.t, p:best};
+  },
+  planLines(){ const q = this.plan; if (!q) return []; const o = [{p:q.entry, col:'#58a6ff', lab:'Scanner entry ' + String(q.dir).toUpperCase()}, {p:q.sl, col:'#f0616d', lab:'Scanner SL'}]; if (isN(q.tp1)) o.push({p:q.tp1, col:'#2fbf71', lab:'TP1'}); if (isN(q.tp2)) o.push({p:q.tp2, col:'#22c55e', lab:'TP2'}); return o.filter(x => isN(x.p)); },
+  drawPlan(g, plotW){ g.font = '10px ' + getComputedStyle(document.body).fontFamily; for (const q of this.planLines()){ const y = Math.round(this.yOf(q.p)) + 0.5; g.strokeStyle = q.col; g.lineWidth = 1; g.setLineDash([8, 4]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = q.col; g.fillText(q.lab + '  ' + fmtP(q.p), 8, y - 4); } },
+  drawRepPos(g, plotW){ const r = this.rep; if (!r.on || !r.pos) return; const ps = r.pos, ff = getComputedStyle(document.body).fontFamily; g.font = '10px ' + ff; for (const [p, col, lab] of [[ps.entry, '#58a6ff', ps.side.toUpperCase() + ' entry'], [ps.sl, '#f0616d', 'SL'], [ps.tp, '#2fbf71', 'TP']]){ const y = Math.round(this.yOf(p)) + 0.5, x0 = Math.max(0, this.xOf(ps.i)); g.strokeStyle = col; g.setLineDash([6, 3]); g.lineWidth = 1.2; g.beginPath(); g.moveTo(x0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.fillText(lab + ' ' + fmtP(p), Math.max(x0, 4) + 4, y - 3); } },
+  drawAll(g, plotW){
+    for (const d of this.draws()) this.drawOne(g, d, plotW, false);
+    if (this.pend.length && this.cx && this.cx.in && this.tool !== 'cursor'){ const t = this.tool, cur = this.magnet(this.fromXY(this.cx.x, this.cx.y), this.cx.x, this.cx.y), pts = this.pend.concat([cur]); this.drawOne(g, {id:'_pv', type:t, pts, color:'#58a6ff'}, plotW, true); }
+  },
+  handlesOf(d){
+    if (d.type === 'long' || d.type === 'short'){ const x0 = this.xOf(this.iOfT(d.pts[0].t)), x1 = this.xOf(this.iOfT(d.t2)); return [{part:'entry', x:x0, y:this.yOf(d.pts[0].p)}, {part:'w', x:x1, y:this.yOf(d.pts[0].p)}, {part:'sl', x:x1, y:this.yOf(d.sl)}, {part:'tp', x:x1, y:this.yOf(d.tp)}]; }
+    if (d.type === 'hline') return [{part:'p0', x:this.L ? this.L.plotW - 14 : 40, y:this.yOf(d.pts[0].p)}]; if (d.type === 'vline') return [{part:'p0', x:this.xOf(this.iOfT(d.pts[0].t)), y:20}];
+    return d.pts.map((pt, i) => { const [x, y] = this.toXY(pt); return {part:'p' + i, x, y}; });
+  },
+  drawOne(g, d, plotW, pv){
+    const P = this.P, col = d.color || '#58a6ff', sel = this.sel === d.id, ff = getComputedStyle(document.body).fontFamily; g.save(); g.lineWidth = sel ? 2.2 : 1.5; g.strokeStyle = col; g.fillStyle = col; g.font = '11px ' + ff; const mh = this.L.mainH;
+    const XY = i => this.toXY(d.pts[i]);
+    if (d.type === 'hline' && d.pts[0]){ const y = Math.round(this.yOf(d.pts[0].p)) + 0.5; g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); if (d.text){ g.fillText(d.text, 8, y - 4); } }
+    else if (d.type === 'vline' && d.pts[0]){ const x = Math.round(this.xOf(this.iOfT(d.pts[0].t))) + 0.5; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, mh); g.stroke(); }
+    else if ((d.type === 'trend' || d.type === 'ray') && d.pts.length >= 2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); let ex = x1, ey = y1; if (d.type === 'ray' && x1 !== x0){ ex = x1 > x0 ? plotW + 60 : -60; ey = y0 + (y1 - y0) / (x1 - x0) * (ex - x0); } g.beginPath(); g.moveTo(x0, y0); g.lineTo(ex, ey); g.stroke(); }
+    else if (d.type === 'rect' && d.pts.length >= 2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); g.fillStyle = rgba(col, 0.12); g.fillRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)); g.strokeRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)); }
+    else if (d.type === 'fib' && d.pts.length >= 2){ const [x0] = XY(0), [x1] = XY(1), a = d.pts[0].p, b = d.pts[1].p, xl = Math.min(x0, x1), xr = Math.max(x0, x1, plotW * 0 + Math.max(x0, x1)); g.font = '10px ' + ff;
+      FIBL.forEach(([r, c], k) => { const p = b + (a - b) * r, y = Math.round(this.yOf(p)) + 0.5; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); g.moveTo(xl, y); g.lineTo(xr, y); g.stroke(); g.fillStyle = c; g.fillText(r + '  (' + fmtP(p) + ')', xl + 4, y - 3); if (k < 6){ const p2n = b + (a - b) * FIBL[k + 1][0], y2 = this.yOf(p2n); g.fillStyle = rgba(c, 0.06); g.fillRect(xl, Math.min(y, y2), xr - xl, Math.abs(y2 - y)); } });
+      g.strokeStyle = rgba('#8393a7', 0.7); g.setLineDash([3, 3]); g.beginPath(); const [ax, ay] = XY(0), [bx, by] = XY(1); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+    else if (d.type === 'channel' && d.pts.length >= 2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); let off = 0; if (d.pts[2]){ const f = (d.pts[2].t - d.pts[0].t) / ((d.pts[1].t - d.pts[0].t) || 1), lp = d.pts[0].p + (d.pts[1].p - d.pts[0].p) * f; off = this.yOf(d.pts[2].p) - this.yOf(lp); } g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.beginPath(); g.moveTo(x0, y0 + off); g.lineTo(x1, y1 + off); g.stroke(); g.fillStyle = rgba(col, 0.1); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.lineTo(x1, y1 + off); g.lineTo(x0, y0 + off); g.closePath(); g.fill(); g.setLineDash([4, 4]); g.beginPath(); g.moveTo(x0, y0 + off / 2); g.lineTo(x1, y1 + off / 2); g.stroke(); }
+    else if (d.type === 'measure' && d.pts.length >= 2){ const [x0, y0] = XY(0), [x1, y1] = XY(1), dp = d.pts[1].p - d.pts[0].p, pc = dp / d.pts[0].p * 100, nb = Math.round(this.iOfT(d.pts[1].t) - this.iOfT(d.pts[0].t)), up = dp >= 0, c = up ? '#2fbf71' : '#f0616d'; g.fillStyle = rgba(c, 0.13); g.fillRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)); g.strokeStyle = c; g.lineWidth = 1.2; g.strokeRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
+      const secs = Math.abs(d.pts[1].t - d.pts[0].t) / 1000, dur = secs >= 86400 ? (secs / 86400).toFixed(1) + 'd' : secs >= 3600 ? (secs / 3600).toFixed(1) + 'h' : Math.round(secs / 60) + 'm', txt = (dp >= 0 ? '+' : '') + fmtP(dp) + ' (' + (pc >= 0 ? '+' : '') + pc.toFixed(2) + '%)  ' + Math.abs(nb) + ' bars · ' + dur, w = g.measureText(txt).width + 12, bx = Math.max(2, Math.min(plotW - w - 2, (x0 + x1) / 2 - w / 2)), by = y1 < y0 ? Math.max(2, y1 - 24) : Math.min(mh - 22, y1 + 6); g.fillStyle = c; g.fillRect(bx, by, w, 18); g.fillStyle = '#fff'; g.fillText(txt, bx + 6, by + 13); }
+    else if (d.type === 'text' && d.pts[0]){ const [x, y] = XY(0); g.font = 'bold 12px ' + ff; const t = d.text || 'Text', w = g.measureText(t).width + 12; g.fillStyle = rgba(col, 0.2); g.fillRect(x, y - 16, w, 20); g.strokeRect(x + 0.5, y - 15.5, w - 1, 19); g.fillStyle = P.fg; g.fillText(t, x + 6, y - 2); }
+    else if ((d.type === 'long' || d.type === 'short') && d.pts[0]){ const x0 = this.xOf(this.iOfT(d.pts[0].t)), x1 = this.xOf(this.iOfT(d.t2)), ye = this.yOf(d.pts[0].p), ys = this.yOf(d.sl), yt = this.yOf(d.tp), risk = Math.abs(d.pts[0].p - d.sl), rew = Math.abs(d.tp - d.pts[0].p), rr = risk ? rew / risk : 0, w = x1 - x0;
+      g.fillStyle = rgba('#2fbf71', 0.16); g.fillRect(x0, Math.min(ye, yt), w, Math.abs(yt - ye)); g.fillStyle = rgba('#f0616d', 0.16); g.fillRect(x0, Math.min(ye, ys), w, Math.abs(ys - ye)); g.lineWidth = 1.2; g.strokeStyle = '#2fbf71'; g.strokeRect(x0, Math.min(ye, yt), w, Math.abs(yt - ye)); g.strokeStyle = '#f0616d'; g.strokeRect(x0, Math.min(ye, ys), w, Math.abs(ys - ye)); g.strokeStyle = col; g.beginPath(); g.moveTo(x0, ye); g.lineTo(x1, ye); g.stroke();
+      const sg2 = (dv, e) => (dv >= 0 ? '+' : '') + (dv / e * 100).toFixed(2) + '%'; g.font = 'bold 11px ' + ff; g.fillStyle = '#2fbf71'; g.fillText('TP ' + fmtP(d.tp) + '  ' + sg2(d.tp - d.pts[0].p, d.pts[0].p), x0 + 6, (yt < ye ? yt + 14 : yt - 5)); g.fillStyle = '#f0616d'; g.fillText('SL ' + fmtP(d.sl) + '  ' + sg2(d.sl - d.pts[0].p, d.pts[0].p), x0 + 6, (ys < ye ? ys + 14 : ys - 5)); const ok = (d.type === 'long' && d.tp > d.pts[0].p && d.sl < d.pts[0].p) || (d.type === 'short' && d.tp < d.pts[0].p && d.sl > d.pts[0].p); g.fillStyle = ok ? P.fg : '#f0b429'; g.fillText((d.type === 'long' ? 'LONG' : 'SHORT') + '  R:R 1:' + rr.toFixed(2) + (ok ? '' : '  (check SL/TP side)'), x0 + 6, ye - 5 + (Math.abs(ye - yt) < 14 ? 16 : 0)); }
+    if ((sel || d.id === this.hov) && d.id !== '_pv'){ g.fillStyle = P.bg; g.strokeStyle = col; g.lineWidth = 1.8; for (const h of this.handlesOf(d)){ g.beginPath(); g.arc(h.x, h.y, 4.5, 0, 6.2832); g.fill(); g.stroke(); } }
+    if (pv && d.pts.length){ g.fillStyle = col; for (const pt of d.pts){ const [x, y] = this.toXY(pt); g.beginPath(); g.arc(x, y, 3, 0, 6.2832); g.fill(); } }
+    g.restore();
+  },
+  hit(x, y){
+    const ds = this.draws(), mh = this.L ? this.L.mainH : 0; if (!ds.length) return null;
+    if (this.sel){ const d = ds.find(q => q.id === this.sel); if (d && !d.lock) for (const h of this.handlesOf(d)) if (Math.hypot(h.x - x, h.y - y) <= 9) return {d, part:h.part}; }
+    for (let k = ds.length - 1; k >= 0; k--){
+      const d = ds[k]; if (!d.pts[0]) continue; const XY = i => this.toXY(d.pts[i]); let ok = false;
+      if (d.type === 'hline') ok = Math.abs(this.yOf(d.pts[0].p) - y) <= 6;
+      else if (d.type === 'vline') ok = Math.abs(this.xOf(this.iOfT(d.pts[0].t)) - x) <= 6;
+      else if (d.type === 'trend' || d.type === 'ray'){ if (d.pts.length < 2) continue; const [x0, y0] = XY(0), [x1, y1] = XY(1); let ex = x1, ey = y1; if (d.type === 'ray' && x1 !== x0){ ex = x1 > x0 ? 1e4 : -1e4; ey = y0 + (y1 - y0) / (x1 - x0) * (ex - x0); } ok = dseg(x, y, x0, y0, ex, ey) <= 6; }
+      else if (d.type === 'rect' || d.type === 'measure'){ if (d.pts.length < 2) continue; const [x0, y0] = XY(0), [x1, y1] = XY(1); ok = x >= Math.min(x0, x1) - 4 && x <= Math.max(x0, x1) + 4 && y >= Math.min(y0, y1) - 4 && y <= Math.max(y0, y1) + 4; }
+      else if (d.type === 'fib'){ if (d.pts.length < 2) continue; const [x0] = XY(0), [x1] = XY(1); ok = x >= Math.min(x0, x1) - 6 && x <= Math.max(x0, x1) + 6 && FIBL.some(([r]) => Math.abs(this.yOf(d.pts[1].p + (d.pts[0].p - d.pts[1].p) * r) - y) <= 6); }
+      else if (d.type === 'channel'){ if (d.pts.length < 2) continue; const [x0, y0] = XY(0), [x1, y1] = XY(1); let off = 0; if (d.pts[2]){ const f = (d.pts[2].t - d.pts[0].t) / ((d.pts[1].t - d.pts[0].t) || 1), lp = d.pts[0].p + (d.pts[1].p - d.pts[0].p) * f; off = this.yOf(d.pts[2].p) - this.yOf(lp); } ok = dseg(x, y, x0, y0, x1, y1) <= 6 || dseg(x, y, x0, y0 + off, x1, y1 + off) <= 6; }
+      else if (d.type === 'text'){ const [x0, y0] = XY(0); ok = x >= x0 - 2 && x <= x0 + (d.text || 'Text').length * 7.5 + 14 && y >= y0 - 18 && y <= y0 + 6; }
+      else if (d.type === 'long' || d.type === 'short'){ const x0 = this.xOf(this.iOfT(d.pts[0].t)), x1 = this.xOf(this.iOfT(d.t2)), ya = Math.min(this.yOf(d.tp), this.yOf(d.sl), this.yOf(d.pts[0].p)), yb = Math.max(this.yOf(d.tp), this.yOf(d.sl), this.yOf(d.pts[0].p)); ok = x >= Math.min(x0, x1) && x <= Math.max(x0, x1) && y >= ya && y <= yb; }
+      if (ok) return {d, part:'body'};
+    }
+    return null;
+  },
+  atrNow(){ const B = this.bars, e = this.n - 1; let s = 0, c = 0; for (let i = Math.max(1, e - 13); i <= e; i++){ s += Math.max(B[i].h - B[i].l, Math.abs(B[i].h - B[i - 1].c), Math.abs(B[i].l - B[i - 1].c)); c++; } return c ? s / c : (B[e] ? B[e].c * 0.01 : 1); },
+  commit(tool, pts){
+    const d = {id:nid(), type:tool, pts, color:this.dcol || (tool === 'long' ? '#58a6ff' : tool === 'short' ? '#58a6ff' : '#58a6ff')};
+    if (tool === 'long' || tool === 'short'){ const a = this.atrNow() * 1.5, e = pts[0].p; d.sl = tool === 'long' ? e - a : e + a; d.tp = tool === 'long' ? e + 2 * a : e - 2 * a; d.t2 = pts[0].t + this.step * 24; }
+    if (tool === 'text'){ const t = window.prompt('Text for this note:', ''); if (t === null){ return; } d.text = t || 'Note'; }
+    this.draws().push(d); this.sel = d.id; this.tool = 'cursor'; this.pend = []; save(); this.dirty = true; if (window.TA) TA.ui(this);
+  },
+  delSel(){ if (!this.sel) return; const a = this.draws(), i = a.findIndex(d => d.id === this.sel); if (i >= 0 && !a[i].lock){ a.splice(i, 1); this.sel = null; save(); this.dirty = true; if (window.TA) TA.ui(this); } },
+  /* replay and paper trading */
+  enterReplay(){ const r = this.rep; r.on = true; r.pick = true; r.pos = null; r.trades = []; this.stopPlay(); this.dirty = true; if (window.TA) TA.ui(this); },
+  exitReplay(){ const r = this.rep; this.stopPlay(); r.on = false; r.pick = false; r.pos = null; this.zones.key = ''; this.fit(); this.dirty = true; if (window.TA) TA.ui(this); },
+  stepRep(){ const r = this.rep; if (!r.on || r.idx >= this.bars.length - 1){ this.stopPlay(); this.dirty = true; if (window.TA) TA.ui(this); return; } r.idx++; const k = this.bars[r.idx], ps = r.pos;
+    if (ps){ const long = ps.side === 'long', hitSl = long ? k.l <= ps.sl : k.h >= ps.sl, hitTp = long ? k.h >= ps.tp : k.l <= ps.tp; if (hitSl || hitTp){ const ex = hitSl ? ps.sl : ps.tp, risk = Math.abs(ps.entry - ps.sl); r.trades.push({side:ps.side, entry:ps.entry, exit:ex, R:(long ? ex - ps.entry : ps.entry - ex) / risk, i0:ps.i, i1:r.idx}); r.pos = null; } }
+    const pw = this.L ? this.L.plotW : 600; if (this.xOf(r.idx) > pw - 50) this.v0 += (this.xOf(r.idx) - (pw - 50)) / this.bw; this.zones.key = ''; this.dirty = true; if (window.TA) TA.ui(this); },
+  playRep(){ const r = this.rep; if (r.play){ this.stopPlay(); } else { r.play = true; r.tm = setInterval(() => this.stepRep(), Math.max(60, 700 / r.speed)); } if (window.TA) TA.ui(this); },
+  openPos(side){ const r = this.rep; if (!r.on || r.pos || r.pick) return; const k = this.bars[r.idx], a = this.atrNow() * r.slx, long = side === 'long'; r.pos = {side, entry:k.c, sl:long ? k.c - a : k.c + a, tp:long ? k.c + a * r.rr : k.c - a * r.rr, i:r.idx}; this.dirty = true; if (window.TA) TA.ui(this); },
+  closePos(){ const r = this.rep; if (!r.pos) return; const ps = r.pos, k = this.bars[r.idx], long = ps.side === 'long', risk = Math.abs(ps.entry - ps.sl); r.trades.push({side:ps.side, entry:ps.entry, exit:k.c, R:(long ? k.c - ps.entry : ps.entry - k.c) / risk, i0:ps.i, i1:r.idx}); r.pos = null; this.dirty = true; if (window.TA) TA.ui(this); },
+  updRep(){ if (!this.rp) return; const r = this.rep; this.rp.hidden = !r.on; if (!r.on) return; const t = r.trades, w = t.filter(x => x.R > 0).length, tr = t.reduce((a, x) => a + x.R, 0), s = $q('.ta-rs', this.rp); if (s){ const ps = r.pos ? (r.pos.side.toUpperCase() + ' open: ' + (((r.pos.side === 'long' ? this.bars[r.idx].c - r.pos.entry : r.pos.entry - this.bars[r.idx].c) / Math.abs(r.pos.entry - r.pos.sl)).toFixed(2)) + 'R') : 'flat'; const txt = (r.pick ? 'Click a candle to start from there.' : 'Bar ' + (r.idx + 1) + '/' + this.bars.length + ' · ' + ps) + (t.length ? ' · trades ' + t.length + ' · wins ' + w + ' (' + Math.round(w / t.length * 100) + '%) · total ' + (tr >= 0 ? '+' : '') + tr.toFixed(2) + 'R' : ''); if (s.textContent !== txt) s.textContent = txt; } },
+  /* pointer / keyboard */
+  bind(){
+    const cv = this.cv; cv.tabIndex = 0; const ptrs = new Map(); let pinch = null;
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.addEventListener('pointerdown', e => {
+      if (e.button === 2) return; cv.focus(); window.TA && TA.setActive(this.i); const [x, y] = pos(e); ptrs.set(e.pointerId, [x, y]); try { cv.setPointerCapture(e.pointerId); } catch(_){}
+      if (ptrs.size === 2){ const a = [...ptrs.values()]; pinch = {d:Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), bw:this.bw}; this.drag = null; return; }
+      const L = this.L; if (!L) return; this.cx = {x, y, in:true};
+      if (this.rep.pick && x < L.plotW){ const i = Math.max(5, Math.min(this.bars.length - 1, Math.round(this.iOf(x)))); this.rep.idx = i; this.rep.pick = false; this.zones.key = ''; this.v0 = i - (L.plotW * 0.7) / this.bw; this.dirty = true; if (window.TA) TA.ui(this); return; }
+      if (x > L.plotW && y < L.mainH){ this.drag = {k:'y', y0:y, yz0:this.yz}; this.ymanual = true; return; }
+      if (this.tool !== 'cursor' && y < L.mainH && x < L.plotW){ const pt = this.magnet(this.fromXY(x, y), x, y); this.pend.push(pt); if (this.pend.length >= NEED[this.tool]) this.commit(this.tool, this.pend.slice()); this.dirty = true; return; }
+      const h = y < L.mainH ? this.hit(x, y) : null;
+      if (h){ this.sel = h.d.id; if (!h.d.lock){ this.drag = {k:'obj', d:h.d, part:h.part, last:this.fromXY(x, y), moved:false}; } if (window.TA) TA.ui(this); this.dirty = true; return; }
+      if (this.sel){ this.sel = null; if (window.TA) TA.ui(this); }
+      this.drag = {k:'pan', x0:x, y0:y, v00:this.v0, yo0:this.yo}; this.dirty = true;
+    });
+    cv.addEventListener('pointermove', e => {
+      const [x, y] = pos(e), L = this.L; if (!L) return; if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
+      if (pinch && ptrs.size === 2){ const a = [...ptrs.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), mx = (a[0][0] + a[1][0]) / 2, i = this.iOf(mx); this.bw = Math.max(1.2, Math.min(60, pinch.bw * d / pinch.d)); this.v0 = i - (mx - this.bw / 2) / this.bw; this.dirty = true; return; }
+      this.cx = {x, y, in:x >= 0 && x <= L.plotW && y >= 0 && y <= L.H - L.timeH};
+      const dr = this.drag;
+      if (dr){
+        if (dr.k === 'pan'){ this.v0 = dr.v00 - (x - dr.x0) / this.bw; if (this.ymanual && this.ym){ this.yo = dr.yo0 + (y - dr.y0) / this.ym.h * this.yz; } }
+        else if (dr.k === 'y'){ this.yz = Math.max(0.05, Math.min(20, dr.yz0 * Math.exp((y - dr.y0) * 0.006))); }
+        else if (dr.k === 'obj'){ const d = dr.d, cur = this.fromXY(x, y); dr.moved = true; const part = dr.part;
+          if (part === 'body'){ const dt = cur.t - dr.last.t, dp = cur.p - dr.last.p; if (d.type === 'hline'){ d.pts[0].p += dp; } else if (d.type === 'vline'){ d.pts[0].t += dt; } else { d.pts.forEach(q => { q.t += dt; q.p += dp; }); if (d.sl != null){ d.sl += dp; d.tp += dp; d.t2 += dt; } } dr.last = cur; }
+          else if (part === 'sl'){ d.sl = this.pOf(y); } else if (part === 'tp'){ d.tp = this.pOf(y); } else if (part === 'w'){ d.t2 = Math.max(d.pts[0].t + this.step, cur.t); }
+          else if (part === 'entry'){ const dt = cur.t - dr.last.t, dp = cur.p - dr.last.p; d.pts[0].t += dt; d.pts[0].p += dp; d.sl += dp; d.tp += dp; d.t2 += dt; dr.last = cur; }
+          else { const k = +part.slice(1), m = this.magnet(cur, x, y); if (d.type === 'hline') d.pts[0].p = m.p; else if (d.type === 'vline') d.pts[0].t = m.t; else d.pts[k] = m; } }
+      } else if (!ptrs.size || ptrs.size === 1){ const h = L && y < L.mainH && this.tool === 'cursor' ? this.hit(x, y) : null, id = h ? h.d.id : null; if (id !== this.hov){ this.hov = id; } cv.style.cursor = this.tool !== 'cursor' ? 'crosshair' : h ? (h.part === 'body' ? 'move' : 'pointer') : x > L.plotW ? 'ns-resize' : this.drag ? 'grabbing' : 'crosshair'; }
+      if (window.TA && S.sync) TA.broadcast(this, this.cx.in ? this.tOfI(Math.round(this.iOf(x))) : null);
+      this.dirty = true;
+    });
+    const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (this.drag && this.drag.k === 'obj' && this.drag.moved) save(); this.drag = null; this.dirty = true; };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointerleave', () => { if (!this.drag){ this.cx = null; if (window.TA) TA.broadcast(this, null); this.dirty = true; } });
+    cv.addEventListener('wheel', e => {
+      e.preventDefault(); const [x, y] = pos(e), L = this.L; if (!L) return;
+      if (x > L.plotW){ this.yz = Math.max(0.05, Math.min(20, this.yz * Math.exp(e.deltaY * 0.0015))); this.ymanual = true; }
+      else if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)){ this.v0 += (e.deltaX || e.deltaY) / this.bw * 0.8; }
+      else { const i = this.iOf(x); this.bw = Math.max(1.2, Math.min(60, this.bw * Math.exp(-e.deltaY * 0.0016))); this.v0 = i - (x - this.bw / 2) / this.bw; }
+      this.dirty = true;
+    }, {passive:false});
+    cv.addEventListener('dblclick', e => { const [x, y] = pos(e), L = this.L; if (!L) return; if (x > L.plotW){ this.yz = 1; this.yo = 0; this.ymanual = false; } else if (!this.hit(x, y)) this.fit(); this.dirty = true; });
+    cv.addEventListener('contextmenu', e => { e.preventDefault(); const [x, y] = pos(e), h = this.L && y < this.L.mainH ? this.hit(x, y) : null; if (h){ this.sel = h.d.id; if (window.TA) TA.ui(this); this.dirty = true; } });
+    cv.addEventListener('keydown', e => {
+      if (e.key === 'Delete' || e.key === 'Backspace'){ if (this.sel){ e.preventDefault(); this.delSel(); } }
+      else if (e.key === 'Escape'){ this.tool = 'cursor'; this.pend = []; this.sel = null; if (this.rep.pick) this.exitReplay(); if (window.TA) TA.ui(this); this.dirty = true; }
+      else if (e.key === 'ArrowLeft'){ this.v0 -= 5; this.dirty = true; e.preventDefault(); } else if (e.key === 'ArrowRight'){ if (this.rep.on && !this.rep.pick){ this.stepRep(); } else this.v0 += 5; this.dirty = true; e.preventDefault(); }
+      else if (e.key === ' ' && this.rep.on && !this.rep.pick){ e.preventDefault(); this.playRep(); }
+      else if (e.key === '+' || e.key === '='){ this.bw = Math.min(60, this.bw * 1.15); this.dirty = true; } else if (e.key === '-'){ this.bw = Math.max(1.2, this.bw / 1.15); this.dirty = true; }
+      else if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)){ const a = this.draws(); if (a.length){ a.pop(); this.sel = null; save(); this.dirty = true; } }
+    });
+  }
+});
+
+/* ---------- workspace UI ---------- */
+const CSS = `
+.ta-wrap{display:flex;flex-direction:column;gap:8px}
+.ta-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.ta-bar .sep{width:1px;height:20px;background:var(--line);margin:0 2px}
+.ta-bar label,.ta-top label{font-size:12px;color:var(--muted);display:inline-flex;gap:4px;align-items:center;cursor:pointer}
+.ta-b{background:var(--surface2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font:inherit;font-size:12px;cursor:pointer;line-height:1.35}
+.ta-b:hover{border-color:var(--accent)}.ta-b.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.ta-fav{display:inline-flex;align-items:center;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:1px 3px 1px 9px;font-size:12px;cursor:pointer}
+.ta-fav:hover{border-color:var(--accent)}.ta-fav b{font-weight:600}.ta-fav u{text-decoration:none;color:var(--muted);padding:0 5px;border-radius:8px}.ta-fav u:hover{color:var(--down)}
+.ta-grid{display:grid;gap:8px}
+.ta-cell{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0;min-height:0}
+.ta-cell.act{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.ta-cell.ta-full{position:fixed;inset:0;z-index:9000;border-radius:0}
+.ta-top{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px 6px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.ta-top input.ta-sym{width:104px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 7px;font:inherit;font-weight:700;font-size:13px;text-transform:none}
+.ta-top select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:2px 4px;font:inherit;font-size:12px}
+.ta-star{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 3px;line-height:1}.ta-star.on{color:var(--warn)}
+.ta-spc{flex:1}
+.ta-badge{font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.ta-badge.up{color:var(--up);border-color:var(--up)}.ta-badge.dn{color:var(--down);border-color:var(--down)}
+.ta-body{display:flex;flex:1;min-height:0}
+.ta-tools{display:flex;flex-direction:column;gap:3px;padding:5px 4px;border-right:1px solid var(--line);background:var(--surface2);overflow:auto}
+.ta-tools .ta-b{padding:3px 0;width:30px;text-align:center;font-size:12px}
+.ta-cv{position:relative;flex:1;min-width:0;min-height:0}
+.ta-cv canvas{position:absolute;inset:0;width:100%;height:100%;outline:none;touch-action:none;display:block}
+.ta-lg{position:absolute;inset:0;pointer-events:none}
+.ta-lgrow{position:absolute;left:8px;display:flex;flex-wrap:wrap;gap:4px;pointer-events:none;max-width:calc(100% - 90px)}
+.ta-chip{pointer-events:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;background:color-mix(in srgb,var(--surface) 82%,transparent);border:1px solid var(--line);border-radius:5px;padding:1px 4px;color:var(--fg)}
+.ta-chip i{width:8px;height:8px;border-radius:2px;display:inline-block}.ta-chip em{font-style:normal;color:var(--muted);font-family:var(--mono)}
+.ta-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0 1px;font-size:11px}.ta-chip button:hover{color:var(--fg)}.ta-chip.off{opacity:.55}
+.ta-db{position:absolute;top:26px;right:74px;display:flex;gap:4px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:3px 5px;z-index:3}
+.ta-db .sw{width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}.ta-db .sw.on{border-color:var(--fg)}
+.ta-rp{position:absolute;left:8px;bottom:30px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:4px 6px;z-index:3;font-size:12px;max-width:calc(100% - 90px)}
+.ta-rp input{width:46px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px;padding:1px 3px;font:inherit;font-size:12px}
+.ta-rp select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px;font-size:12px}
+.ta-rp[hidden],.ta-db[hidden],.ta-pop[hidden]{display:none!important}
+.ta-msg{position:absolute;right:74px;top:4px;font-size:10px;color:var(--muted);pointer-events:none}
+.ta-pop{position:fixed;z-index:9500;background:var(--surface);border:1px solid var(--accent);border-radius:10px;box-shadow:var(--shadow);padding:8px;max-height:70vh;overflow:auto;min-width:230px}
+.ta-pop h5{margin:8px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ta-pop .it{display:block;width:100%;text-align:left;background:none;border:none;color:var(--fg);padding:4px 6px;border-radius:5px;cursor:pointer;font:inherit;font-size:13px}.ta-pop .it:hover{background:var(--surface2)}
+.ta-pop input[type=text],.ta-pop input[type=number]{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px;padding:3px 6px;font:inherit;width:100%;box-sizing:border-box}
+.ta-pop .rw{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:12px}.ta-pop .rw span{flex:1}.ta-pop .rw input{width:78px}
+.ta-help{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.6}
+.ta-help b{color:var(--accent)}.ta-help kbd{background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:0 5px;font-family:var(--mono);font-size:11px}
+`;
+const TOOLS = [['cursor', '➤', 'Cursor: select and move drawings'], ['trend', '╱', 'Trend line'], ['ray', '↗', 'Ray'], ['hline', '―', 'Horizontal line'], ['vline', '│', 'Vertical line'], ['rect', '▭', 'Rectangle / zone'], ['channel', '▱', 'Parallel channel (3 clicks)'], ['fib', 'Fib', 'Fibonacci retracement (drag from swing to swing)'], ['long', 'L▲', 'Long position: entry, stop, target and R:R'], ['short', 'S▼', 'Short position: entry, stop, target and R:R'], ['measure', '⇔', 'Measure: price, %, bars, time'], ['text', 'T', 'Text note']];
+const TYPES = [['candle', 'Candles'], ['hollow', 'Hollow candles'], ['ha', 'Heikin Ashi'], ['bar', 'OHLC bars'], ['line', 'Line'], ['area', 'Area']];
+const TZS = ['Asia/Karachi', 'UTC', 'America/New_York', 'Europe/London', 'Asia/Dubai', 'Asia/Tokyo', 'Asia/Kolkata'];
+let root = null, charts = [], pop = null, raf = 0, built = false;
+const CELL_TF = ['15m', '1h', '4h', '1d', '5m', '30m'];
+function closePop(){ if (pop){ pop.remove(); pop = null; } }
+function openPop(anchor, html, setup){ closePop(); pop = mk('div', 'ta-pop', html); document.body.appendChild(pop); const r = anchor.getBoundingClientRect(); pop.style.left = Math.max(6, Math.min(window.innerWidth - 270, r.left)) + 'px'; pop.style.top = Math.min(window.innerHeight - 120, r.bottom + 4) + 'px'; if (setup) setup(pop); setTimeout(() => document.addEventListener('pointerdown', function h(e){ if (pop && !pop.contains(e.target) && e.target !== anchor){ closePop(); document.removeEventListener('pointerdown', h, true); } else if (!pop) document.removeEventListener('pointerdown', h, true); }, true), 0); return pop; }
+const cellOf = c => c.cell;
+function coinNames(){ let a = []; try { a = (HOOK().coins && HOOK().coins()) || []; } catch(e){} const set = new Set(DEFSYMS); a.forEach(x => set.add(x)); return [...set]; }
+function setSym(i, sym){
+  sym = String(sym || '').trim(); if (!sym) return; const list = coinNames(), hit = list.find(x => x.toLowerCase() === sym.toLowerCase()); sym = hit || (sym.startsWith('xyz:') ? sym : sym.toUpperCase());
+  const idx = S.link ? charts.map((c, k) => k) : [i]; for (const k of idx){ S.panes[k].sym = sym; charts[k].setFeed(); refresh(charts[k]); } save(); pollPlan();
+}
+function setTf(i, tf){ S.panes[i].tf = tf; charts[i].setFeed(); if (S.link) charts.forEach((c, k) => { if (k !== i){ S.panes[k].tf = tf; c.setFeed(); refresh(c); } }); refresh(charts[i]); save(); }
+function addInd(c, k){ const s = IND[k], same = c.pane.ind.filter(x => x.k === k).length, p = s.P.map(q => q[1]); if ((k === 'sma' || k === 'ema' || k === 'wma') && same) p[0] = [20, 50, 100, 200, 21, 9][same % 6]; const col = s.C.slice(); if (same && col.length === 1) col[0] = DCOL[(same * 2 + 1) % DCOL.length]; c.pane.ind.push({id:nid(), k, p, c:col, on:true}); c.recalc(); c.sig = ''; c.dirty = true; save(); }
+function indMenu(c, btn){
+  const sec = (t, ov) => '<h5>' + t + '</h5>' + Object.keys(IND).filter(k => !!IND[k].ov === ov).map(k => '<button class="it" data-k="' + k + '">' + esc(IND[k].n) + '</button>').join('');
+  openPop(btn, '<input type="text" placeholder="Search indicators…" class="q">' + '<h5>Quick sets</h5><button class="it" data-set="elpp">ELPP set: EMA 21/50/200 + VWAP + RSI</button><button class="it" data-set="trend">Trend set: Supertrend + MACD + ADX</button><button class="it" data-set="mean">Mean-reversion set: Bollinger + Stoch + MFI</button><button class="it" data-set="clear">Remove all indicators</button>' + sec('Overlays on the price', true) + sec('Separate panes below', false), p => {
+    const q = $q('.q', p); q.addEventListener('input', () => p.querySelectorAll('.it[data-k]').forEach(b => { b.hidden = q.value && !b.textContent.toLowerCase().includes(q.value.toLowerCase()); }));
+    p.addEventListener('click', e => { const b = e.target.closest('.it'); if (!b) return; if (b.dataset.k){ addInd(c, b.dataset.k); refresh(c); } else if (b.dataset.set){ const s = b.dataset.set; if (s === 'clear') c.pane.ind = []; else { const sets = {elpp:[['ema', [21]], ['ema', [50]], ['ema', [200]], ['vwap', []], ['rsi', [14]]], trend:[['st', [10, 3]], ['macd', [12, 26, 9]], ['adx', [14]]], mean:[['bb', [20, 2]], ['stoch', [14, 3, 3]], ['mfi', [14]]]}; for (const [k, pp] of sets[s]){ addInd(c, k); const x = c.pane.ind[c.pane.ind.length - 1]; if (pp.length) x.p = pp; if (k === 'ema') x.c = [{21:'#f0b429', 50:'#58a6ff', 200:'#e879f9'}[pp[0]]]; } } c.recalc(); c.sig = ''; c.dirty = true; save(); refresh(c); } closePop(); });
+    q.focus();
+  });
+}
+function cfgMenu(c, id, btn){
+  const x = c.pane.ind.find(q => q.id === id); if (!x) return; const s = IND[x.k];
+  openPop(btn, '<b>' + esc(s.n) + '</b>' + s.P.map((q, i) => '<div class="rw"><span>' + esc(q[0]) + '</span><input type="number" step="any" data-p="' + i + '" value="' + x.p[i] + '"></div>').join('') + '<div class="rw"><span>Colour' + (x.c.length > 1 ? 's' : '') + '</span>' + x.c.map((cc, i) => '<input type="color" data-c="' + i + '" value="' + esc(/^#[0-9a-f]{6}$/i.test(cc) ? cc : '#58a6ff') + '" style="width:34px;padding:0;height:24px">').join('') + '</div><div class="rw"><button class="ta-b on" data-ok>Apply</button></div>', p => {
+    p.addEventListener('click', e => { if (!e.target.closest('[data-ok]')) return; p.querySelectorAll('[data-p]').forEach(inp => { const v = parseFloat(inp.value); if (isN(v) && v > 0) x.p[+inp.dataset.p] = v; }); p.querySelectorAll('[data-c]').forEach(inp => { x.c[+inp.dataset.c] = inp.value; }); c.recalc(); c.sig = ''; c.dirty = true; save(); closePop(); refresh(c); });
+  });
+}
+function cellHtml(i){
+  return '<div class="ta-top">' +
+    '<button class="ta-star" data-a="star" title="Star this coin (adds it to your favourites bar)">☆</button>' +
+    '<input class="ta-sym" list="taList" spellcheck="false" autocomplete="off" title="Type any coin: BTC, TAO, CL, BZ, kPEPE, xyz:GOLD … then Enter">' +
+    '<span class="ta-tfs">' + TFQUICK.map(t => '<button class="ta-b" data-a="tf" data-tf="' + t + '">' + (t === '1d' ? '1D' : t) + '</button>').join('') + '</span>' +
+    '<select class="ta-tfm" title="More timeframes">' + Object.keys(TFSEC).map(t => '<option value="' + t + '">' + t + '</option>').join('') + '</select>' +
+    '<select class="ta-type" title="Chart type">' + TYPES.map(t => '<option value="' + t[0] + '">' + t[1] + '</option>').join('') + '</select>' +
+    '<button class="ta-b" data-a="ind" title="Add indicators">ƒx Indicators</button>' +
+    '<button class="ta-b" data-a="vol" title="Volume bars">Vol</button><button class="ta-b" data-a="log" title="Log price scale">Log</button>' +
+    '<button class="ta-b" data-a="liq" title="Auto liquidity: unswept swing highs (BSL) and lows (SSL), and swept ones faded">Liquidity</button>' +
+    '<button class="ta-b" data-a="fvg" title="Auto fair-value gaps that price has not filled yet">FVG</button>' +
+    '<button class="ta-b" data-a="plan" title="Draw the scanner\'s own entry, stop and targets for this coin on the chart">Scanner plan</button>' +
+    '<button class="ta-b" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
+    '<span class="ta-badge" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
+    '<button class="ta-b" data-a="png" title="Save a picture of this chart">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
+    '<div class="ta-body"><div class="ta-tools">' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
+    '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
+    '<div class="ta-rp" hidden><button class="ta-b" data-a="rp-play">▶</button><button class="ta-b" data-a="rp-step" title="Next candle (→)">⏭</button><select data-a="rp-speed"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option></select>' +
+    '<button class="ta-b" data-a="rp-long" style="color:var(--up)">▲ Long</button><button class="ta-b" data-a="rp-short" style="color:var(--down)">▼ Short</button><button class="ta-b" data-a="rp-close">Close</button><label>SL×ATR <input type="number" step="0.1" min="0.2" data-a="rp-slx" value="1.5"></label><label>R:R <input type="number" step="0.5" min="0.5" data-a="rp-rr" value="2"></label>' +
+    '<span class="ta-rs"></span><button class="ta-b" data-a="rp-pick">Pick bar</button><button class="ta-b" data-a="rp-exit">Exit</button></div></div></div>';
+}
+function refresh(c){
+  const cell = c.cell; if (!cell) return; const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
+  cell.querySelectorAll('[data-a=tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === p.tf)); const m = $q('.ta-tfm', cell); m.value = p.tf; $q('.ta-type', cell).value = p.type;
+  const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('liq', p.liq); on('fvg', p.fvg); on('plan', p.plan); on('rep', c.rep.on); on('mag', S.magnet);
+  cell.querySelectorAll('[data-a=tool]').forEach(b => b.classList.toggle('on', b.dataset.t === c.tool)); const st = $q('.ta-star', cell); st.classList.toggle('on', S.stars.includes(p.sym)); st.textContent = S.stars.includes(p.sym) ? '★' : '☆';
+  cell.classList.toggle('act', S.active === c.i);
+  const db = $q('.ta-db', cell), d = c.sel && c.draws().find(q => q.id === c.sel); db.hidden = !d; if (d){ db.innerHTML = DCOL.map(k => '<button class="sw' + ((d.color || '#58a6ff') === k ? ' on' : '') + '" data-a="dcol" data-c="' + k + '" style="background:' + k + '"></button>').join('') + '<button class="ta-b" data-a="dlock" title="Lock so it cannot be moved">' + (d.lock ? '🔒' : '🔓') + '</button><button class="ta-b" data-a="ddel" title="Delete (Del key)">🗑</button>'; }
+  const r = c.rep, pl = $q('[data-a=rp-play]', cell); if (pl) pl.textContent = r.play ? '⏸' : '▶'; c.updRep(); renderFavs();
+}
+function renderFavs(){
+  if (!root) return; const f = $q('.ta-favs', root); if (!f) return; f.innerHTML = S.stars.length ? S.stars.map(s => '<span class="ta-fav" data-sym="' + esc(s) + '"><b>' + esc(s) + '</b><u data-un="' + esc(s) + '" title="Remove star">×</u></span>').join('') : '<span style="font-size:12px;color:var(--muted)">No stars yet. Press ☆ next to a coin name.</span>';
+}
+function build(){
+  const st = mk('style'); st.textContent = CSS; document.head.appendChild(st);
+  root.innerHTML = '<div class="nsec"><h3>TA Lab: practise technical analysis on your own scanner</h3><p class="hint">Real exchange candles (Binance, Bybit or Hyperliquid, whichever has the coin), up to ' + MAXPANES + ' charts at once, 11 overlay and 9 oscillator indicators, drawing tools, auto liquidity and fair-value-gap zones, your scanner\'s own trade plan on the chart, and a bar-replay mode where you can paper-trade past candles. Everything saves in this browser.</p></div>' +
+    '<div class="ta-wrap"><div class="ta-bar"><span style="font-size:12px;color:var(--muted)">Layout</span>' + Object.keys(LAYOUTS).map(k => '<button class="ta-b" data-lay="' + k + '">' + LAYOUTS[k].lab + '</button>').join('') +
+    '<span class="sep"></span><label title="Show the same time on the crosshair in every chart"><input type="checkbox" id="taSync"> Sync crosshair</label><label title="Changing the coin or timeframe in one chart changes all of them"><input type="checkbox" id="taLink"> Link all charts</label>' +
+    '<span class="sep"></span><select id="taTz" title="Time zone for the time axis" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px">' + TZS.map(z => '<option>' + z + '</option>').join('') + '</select>' +
+    '<span class="sep"></span><select id="taTpl" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px;max-width:150px"></select><button class="ta-b" id="taTplLoad" title="Load the chosen saved layout">Load</button><button class="ta-b" id="taTplSave" title="Save the current layout, coins and indicators as a template">Save layout…</button><button class="ta-b" id="taTplDel" title="Delete the chosen template">🗑</button>' +
+    '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
+    '<div class="ta-bar" style="padding:4px 8px"><span style="font-size:12px;color:var(--warn)">★ Favourites</span><span class="ta-favs" style="display:flex;flex-wrap:wrap;gap:5px"></span></div>' +
+    '<div class="ta-help" id="taHelpBox" hidden><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
+    '<div class="ta-grid" id="taGrid"></div></div><datalist id="taList"></datalist>';
+  const tpl = () => { $q('#taTpl', root).innerHTML = '<option value="">Saved layouts…</option>' + Object.keys(S.tpl).map(k => '<option>' + esc(k) + '</option>').join(''); }; tpl();
+  $q('#taSync', root).checked = !!S.sync; $q('#taLink', root).checked = !!S.link; $q('#taTz', root).value = S.tz;
+  root.addEventListener('change', e => {
+    const t = e.target; if (t.id === 'taSync'){ S.sync = t.checked; save(); charts.forEach(c => { c.sx = null; c.dirty = true; }); } else if (t.id === 'taLink'){ S.link = t.checked; save(); } else if (t.id === 'taTz'){ S.tz = t.value; save(); charts.forEach(c => { c.dirty = true; }); }
+    const cell = t.closest('.ta-cell'); if (!cell) return; const c = charts[+cell.dataset.i]; if (t.classList.contains('ta-tfm')) setTf(c.i, t.value); else if (t.classList.contains('ta-type')){ c.pane.type = t.value; c.ha = null; c.dirty = true; save(); } else if (t.dataset.a === 'rp-speed'){ c.rep.speed = +t.value; if (c.rep.play){ c.stopPlay(); c.playRep(); } } else if (t.dataset.a === 'rp-slx'){ c.rep.slx = Math.max(0.2, +t.value || 1.5); } else if (t.dataset.a === 'rp-rr'){ c.rep.rr = Math.max(0.5, +t.value || 2); } else if (t.classList.contains('ta-sym')) setSym(c.i, t.value);
+  });
+  root.addEventListener('keydown', e => { if (e.target.classList && e.target.classList.contains('ta-sym') && e.key === 'Enter'){ const c = charts[+e.target.closest('.ta-cell').dataset.i]; setSym(c.i, e.target.value); e.target.blur(); } });
+  root.addEventListener('focusin', e => { const cell = e.target.closest && e.target.closest('.ta-cell'); if (cell) TA.setActive(+cell.dataset.i); });
+  root.addEventListener('click', e => {
+    const lay = e.target.closest('[data-lay]'); if (lay){ setLayout(lay.dataset.lay); return; }
+    const fav = e.target.closest('.ta-fav'); if (fav){ const un = e.target.closest('[data-un]'); if (un){ S.stars = S.stars.filter(x => x !== un.dataset.un); save(); charts.forEach(refresh); return; } const a = Math.min(S.active, charts.length - 1); setSym(a, fav.dataset.sym); return; }
+    const id = e.target.id; if (id === 'taHelp'){ const h = $q('#taHelpBox', root); h.hidden = !h.hidden; return; }
+    if (id === 'taClear'){ const c = charts[Math.min(S.active, charts.length - 1)]; if (c && c.draws().length && confirm('Delete all ' + c.draws().length + ' drawings on ' + c.pane.sym + '?')){ S.draws[c.pane.sym] = []; c.sel = null; save(); charts.forEach(x => { x.dirty = true; refresh(x); }); } return; }
+    if (id === 'taTplSave'){ const n = prompt('Name for this layout:', ''); if (n){ S.tpl[n] = JSON.parse(JSON.stringify({layout:S.layout, panes:S.panes})); save(); tpl(); $q('#taTpl', root).value = n; } return; }
+    if (id === 'taTplLoad'){ const n = $q('#taTpl', root).value, t = S.tpl[n]; if (t){ S.layout = t.layout; S.panes = JSON.parse(JSON.stringify(t.panes)); save(); buildGrid(); } return; }
+    if (id === 'taTplDel'){ const n = $q('#taTpl', root).value; if (n && confirm('Delete layout "' + n + '"?')){ delete S.tpl[n]; save(); tpl(); } return; }
+    const cell = e.target.closest('.ta-cell'); if (!cell) return; const c = charts[+cell.dataset.i]; TA.setActive(c.i);
+    const chip = e.target.closest('.ta-chip button'); if (chip){ const cid = chip.closest('.ta-chip').dataset.id, x = c.pane.ind.find(q => q.id === cid), a = chip.dataset.a; if (a === 'eye' && x){ x.on = x.on === false; c.sig = ''; c.dirty = true; save(); } else if (a === 'x'){ c.pane.ind = c.pane.ind.filter(q => q.id !== cid); c.sig = ''; c.dirty = true; save(); } else if (a === 'cfg') cfgMenu(c, cid, chip); return; }
+    const b = e.target.closest('[data-a]'); if (!b || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.a, p = c.pane;
+    if (a === 'star'){ const i = S.stars.indexOf(p.sym); if (i >= 0) S.stars.splice(i, 1); else S.stars.push(p.sym); save(); charts.forEach(refresh); return; }
+    if (a === 'tf'){ setTf(c.i, b.dataset.tf); return; }
+    if (a === 'ind'){ indMenu(c, b); return; }
+    if (a === 'vol' || a === 'log' || a === 'liq' || a === 'fvg' || a === 'plan'){ p[a] = !p[a]; if (a === 'plan' && p.plan) pollPlan(); c.zones.key = ''; if (a === 'log') c.yz = 1; c.dirty = true; save(); refresh(c); return; }
+    if (a === 'rep'){ if (c.rep.on) c.exitReplay(); else c.enterReplay(); return; }
+    if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
+    if (a === 'png'){ try { c.cv.toBlob(bl => { const u = URL.createObjectURL(bl), l = document.createElement('a'); l.href = u; l.download = 'ELPP-' + p.sym.replace(/[^a-z0-9]/gi, '_') + '-' + p.tf + '.png'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 3000); }); } catch(_){} return; }
+    if (a === 'fit'){ c.fit(); c.dirty = true; return; }
+    if (a === 'fs'){ cell.classList.toggle('ta-full'); setTimeout(() => { c.dirty = true; }, 30); return; }
+    if (a === 'tool'){ c.tool = b.dataset.t; c.pend = []; c.sel = null; c.dirty = true; refresh(c); c.cv.focus(); return; }
+    if (a === 'mag'){ S.magnet = !S.magnet; save(); charts.forEach(refresh); return; }
+    if (a === 'undo'){ if (c.sel) c.delSel(); else { const ar = c.draws(); if (ar.length){ ar.pop(); save(); c.dirty = true; } } refresh(c); return; }
+    if (a === 'dcol'){ const d = c.draws().find(q => q.id === c.sel); if (d){ d.color = b.dataset.c; c.dcol = b.dataset.c; save(); c.dirty = true; refresh(c); } return; }
+    if (a === 'dlock'){ const d = c.draws().find(q => q.id === c.sel); if (d){ d.lock = !d.lock; save(); refresh(c); } return; }
+    if (a === 'ddel'){ const d = c.draws().find(q => q.id === c.sel); if (d){ d.lock = false; c.delSel(); } return; }
+  });
+  buildGrid();
+}
+function setLayout(k){ S.layout = k; const n = LAYOUTS[k].n; while (S.panes.length < n){ const b = S.panes[0]; S.panes.push(Object.assign(mkPane(b.sym, CELL_TF[S.panes.length % CELL_TF.length]), {type:b.type})); } if (S.panes.length > n) S.panes.length = n; S.active = Math.min(S.active, n - 1); save(); buildGrid(); }
+function buildGrid(){
+  closePop(); charts.forEach(c => { c.stopPlay(); if (c.feed) c.feed.subs--; if (c.ro) c.ro.disconnect(); }); charts = []; const grid = $q('#taGrid', root), L = LAYOUTS[S.layout] || LAYOUTS['2']; while (S.panes.length < L.n) S.panes.push(mkPane('BTC', CELL_TF[S.panes.length % CELL_TF.length])); if (S.panes.length > L.n) S.panes.length = L.n;
+  grid.innerHTML = ''; grid.style.gridTemplateColumns = L.cols; const h = L.rows === 1 ? 'max(480px, calc(100vh - 250px))' : 'max(400px, calc((100vh - 250px) / 2))'; grid.style.gridAutoRows = h;
+  if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(430px, 70vh)'; }
+  S.panes.forEach((p, i) => { const cell = mk('div', 'ta-cell', cellHtml(i)); cell.dataset.i = i; grid.appendChild(cell); const c = new Chart(i); c.attach(cell); charts.push(c); c.setFeed(); c.bind(); c.ro = new ResizeObserver(() => { c.dirty = true; if (!c.fitted2 && c.cv.clientWidth > 100){ c.fitted2 = true; if (c.bars.length) c.fit(); } }); c.ro.observe(c.cv); refresh(c); });
+  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); fillList(); pollPlan();
+}
+function fillList(){ const dl = $q('#taList', root); if (dl) dl.innerHTML = coinNames().map(n => '<option value="' + esc(n) + '">').join(''); }
+function pollPlan(){
+  const h = HOOK(); charts.forEach(c => { try { c.plan = h.plan ? h.plan(c.pane.sym) : null; } catch(e){ c.plan = null; } let v = null; try { v = h.verdict ? h.verdict(c.pane.sym) : null; } catch(e){} const b = $q('.ta-badge', c.cell); if (b){ if (v && v.label){ b.textContent = 'Scanner: ' + v.label + (isN(v.score) ? ' ' + v.score : '') + (v.grade ? ' · ' + v.grade : ''); b.className = 'ta-badge ' + (v.dir === 'long' ? 'up' : v.dir === 'short' ? 'dn' : ''); } else { b.textContent = ''; b.className = 'ta-badge'; } } c.dirty = true; });
+}
+function loop(){
+  raf = requestAnimationFrame(loop); if (!root || root.hidden){ TA.visible = false; return; } if (!TA.visible){ TA.visible = true; try { root.scrollIntoView({block:'start'}); } catch(e){} }
+  for (const c of charts){ if (c.feed && c.feed.ver !== c.ver) c.dirty = true; if (c.dirty){ c.dirty = false; try { c.draw(); } catch(e){ if (!c.errd){ c.errd = 1; console.error('TA draw', e); } } } }
+}
+setInterval(() => { charts.forEach(c => { c.dirty = true; }); }, 1000);
+setInterval(() => { if (root && !root.hidden){ pollPlan(); fillList(); } }, 5000);
+const TA = window.TA = {
+  visible:false,
+  render(el){ if (!el) return; if (!built){ built = true; root = el; build(); loop(); } else { root = el; if (el.hidden === false) charts.forEach(c => { c.dirty = true; }); } },
+  ui(c){ refresh(c); },
+  setActive(i){ if (S.active !== i){ S.active = i; charts.forEach(refresh); save(); } },
+  broadcast(from, t){ if (!S.sync) return; for (const c of charts) if (c !== from){ c.sx = t; c.dirty = true; } },
+  state(){ return S; }, charts(){ return charts; }
+};
 })();
 </script>
 </body>
