@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.81</title>
+<title>ELPP CRYPTO SCANNER PRO V4.82</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -115,6 +115,7 @@ header.top .chips .chip-pop b{color:var(--fg);font-weight:500;font-family:var(--
 .cw-side h4,.cw-grid h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .cw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;margin-top:6px}
 .cw-grid>section{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.psw{overflow:auto;max-height:78vh;border:1px solid var(--line);border-radius:8px}.pst{border-collapse:separate;border-spacing:0;font-size:12px;width:max-content;min-width:100%}.pst th,.pst td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.pst thead th{position:sticky;background:var(--panel,var(--bg));z-index:3}.pst thead tr:first-child th{top:0}.pst thead tr:nth-child(2) th{top:27px;cursor:pointer;color:var(--muted);font-weight:600}.pst .psg{cursor:pointer;text-align:center;color:var(--accent);border-left:1px solid var(--line);font-weight:700}.pst .psg.shut{opacity:.7;font-weight:500;max-width:90px}.pst .pss.on{color:var(--accent)}.pst td:first-child,.pst th.psh0{position:sticky;left:0;background:var(--panel,var(--bg));z-index:2;text-align:left}.pst thead th.psh0{z-index:4}.pst .psx{width:28px;padding:2px 4px;text-align:center}.pst .psgz{text-align:center;opacity:.4}.pst tr.psr:hover td{background:rgba(127,127,127,.08)}.pst tr.psr.open td{background:rgba(127,127,127,.12)}.pst .psdr>td{white-space:normal;text-align:left;padding:8px 12px;background:rgba(127,127,127,.05)}.psdet{max-width:1100px;position:sticky;left:8px}.psdet details.psd{margin:4px 0;border:1px solid var(--line);border-radius:6px;padding:4px 8px}.psdet details.psd>summary{cursor:pointer;font-weight:600;font-size:12px}.psdet details.psd>div{margin-top:4px}.pspl{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}.pspl .psgb{display:flex;gap:4px}.pspg{margin:3px 0}
 .cwr{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:3px 0;font-size:12px}.cwr>span:first-child{color:var(--muted);flex:0 0 42%}.cwr>span:last-child{text-align:right;white-space:normal;word-break:break-word}
 .fp{display:grid;grid-template-columns:70px 1fr 1fr;gap:1px 4px;font-size:11px;font-family:var(--mono)}
 .fp .s{text-align:right;color:var(--down)}.fp .b{color:var(--up)}.fp .poc{outline:1px solid var(--accent)}
@@ -788,7 +789,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.81</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.82</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -825,6 +826,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <button class="nv" type="button" data-mode="position">Positional</button>
     <button class="nv" type="button" data-mode="hype">Hype &amp; News</button>
     <button class="nv" type="button" data-view="screener">Screener (Hyperliquid + Binance)</button>
+    <button class="nv" type="button" data-view="power" style="font-weight:700">⚡ Power Scanner</button>
     <button class="nv" type="button" data-view="inst">Perpetual Institutional Radar</button>
     <button class="nv" type="button" data-view="instspot">Spot Institutional Radar</button>
     <button class="nv" type="button" data-view="listings">All coins &amp; where they are listed</button>
@@ -1041,6 +1043,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
     <div id="viewSignals" class="vcol" hidden></div>
     <div id="viewWatch" class="vcol" hidden></div>
     <div id="viewScreener" class="vcol" hidden></div>
+    <div id="viewPower" class="vcol" hidden></div>
     <div id="viewInst" class="vcol" hidden></div>
     <div id="viewInstSpot" class="vcol" hidden></div>
     <div id="viewOverview" class="vcol" hidden></div>
@@ -1926,7 +1929,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['power','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -2006,7 +2009,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','inst','instSpot','wlCfg','wlLog','minShow','cs','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
+    const o = {}; for (const k of ['hip3','watch','scr','ps','inst','instSpot','wlCfg','wlLog','minShow','cs','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -5118,7 +5121,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'power') renderPower(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -8795,6 +8798,7 @@ function renderModes(){
   if (window.updateNav) window.updateNav();
 }
 function applyView(){
+  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
@@ -11348,6 +11352,199 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
+/* ---------- V4.82: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
+const PS_ELITE_GROUPS = [
+  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
+  ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
+  ['🏦 Exchanges', ['pVen','pHL','pGap']],
+  ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','vol','oiUsd','fund8','dqScore']]
+];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','vol','fund8'];
+const PS_PRESETS = {
+  elite:{n:'Elite (default)', c:PS_DEFAULT},
+  trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','vol','fund8']},
+  smart:{n:'Smart money', c:['pRank','pSide','pInst','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
+  crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
+  mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','vol']},
+  all:{n:'Everything', c:null}
+};
+function psSt(){ const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
+function psStrip(h){ return String(h == null ? '' : h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim(); }
+function psElite(c, mk){
+  const m = c.m, v = m.verdict, hasV = isNum(v), o = {dir:'', rank:null};
+  let rd = null; try { rd = instRow(c, 'perp'); } catch(e){}
+  const idir = rd && rd.conf && rd.conf.dir ? rd.conf.dir : 0, vdir = hasV ? (v >= 4 ? 1 : (v === 2 || v === 3) ? -1 : 0) : 0, d0 = vdir || idir;
+  const is = rd && rd.sc && isNum(rd.sc.score) ? rd.sc.score : null, fin = rd && rd.fin ? rd.fin : {};
+  o.is = is; o.final = fin.final ? 'FINAL' : fin.building ? 'building' : ''; o.rd = rd; o.V = t10Venues(c); o.dq = isNum(m.dqScore) ? m.dqScore : null; o.hasV = hasV; o.vdir = vdir;
+  if (!d0){ o.tag = 'none'; o.grade = ''; o.p = 0; o.hard = []; o.chk = []; return o; }
+  const long = d0 > 0, dir = long ? 'long' : 'short', strong = hasV && (v === 5 || v === 3), sc = isNum(m.verdictScore) ? m.verdictScore : 0;
+  const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = o.dq;
+  o.dir = dir; o.chk = chk; o.grade = gr.g; o.ok = gr.ok; o.n = gr.n; o.p = gr.p; o.hard = gr.hard.map(x => x.label); o.pl = pl && pl.dir === dir ? pl : null; o.strong = strong; o.sc = sc;
+  o.tag = !vdir ? 'lean' : strong && (gr.g === 'A' || gr.g === 'B') && !gr.hard.length ? 'trade' : strong ? 'wait' : (gr.g === 'A' || gr.g === 'B') ? 'watch' : 'lean';
+  o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
+  return o;
+}
+const PS_TAG = {trade:['TRADEABLE', 'up', 'Strong verdict, grade A or B, no blockers'], wait:['STRONG, WAIT', 'warn', 'Strong verdict but the confirmation checks are not ready'], watch:['WATCH', 'warn', 'Lean with decent confirmation'], lean:['LEAN ONLY', 'dim', 'A lean, not a trade yet'], none:['NO SIDE', 'dim', 'No long or short lean right now']};
+function psData(force){
+  const now = Date.now(); if (!force && PS.cache && now - PS.cacheAt < 6000) return PS.cache;
+  const mk = vcMk(), live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && isNum(c.m.vol24) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 250), E = new Map(), errs = [];
+  for (const c of live){ try { E.set(c.name, psElite(c, mk)); } catch(e){ if (errs.length < 3) errs.push(c.name + ': ' + String(e && e.message || e)); E.set(c.name, {dir:'', rank:null, tag:'none', grade:'', hard:[], chk:[], V:{names:[], list:[], gap:null, spot:'', hl:false, top:''}}); } }
+  PS.cache = {live, E, errs, total:snapshot.size}; PS.cacheAt = now; return PS.cache;
+}
+function psCols(){
+  const cw = cwCols(), D = () => (PS.cache || {E:new Map()}).E, el = c => D().get(c.name) || {};
+  const P = x => isNum(x) ? fmtPx(x) : '—', side = e => e.dir === 'long' ? ['LONG', 'up'] : e.dir === 'short' ? ['SHORT', 'dn'] : ['—', 'dim'];
+  const E = [];
+  const add = (id, label, tip, val, cell) => E.push({id, label, tip, val, cell});
+  add('pRank', 'Power rank', 'Combined score: institutional score 60% + signal quality + final/building bonus + verdict strength - blockers + data quality + reward-to-risk. Higher is better.', c => el(c).rank, c => { const r = el(c).rank; return [r == null ? '—' : '<b>' + Math.round(r) + '</b>', r == null ? 'dim' : r >= 70 ? 'up' : r >= 50 ? '' : 'dim']; });
+  add('pSide', 'Side', 'Long or short, from the coin verdict (or the institutional lean when the verdict is neutral).', c => el(c).dir === 'long' ? 1 : el(c).dir === 'short' ? -1 : 0, c => { const s = side(el(c)); return ['<b>' + s[0] + '</b>', s[1]]; });
+  add('pTag', 'Status', 'TRADEABLE = strong verdict + grade A/B + no blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.', c => ({trade:4, wait:3, watch:2, lean:1, none:0})[el(c).tag] || 0, c => { const t = PS_TAG[el(c).tag] || PS_TAG.none; return ['<span title="' + esc(t[2]) + '">' + t[0] + '</span>', t[1]]; });
+  add('pGrade', 'Grade', 'Signal-quality grade A to D from every confirmation check, with how many were met.', c => { const e = el(c); return e.p == null ? null : e.p; }, c => { const e = el(c); return e.grade ? ['<b>' + e.grade + '</b> <small>' + e.ok + '/' + e.n + '</small>', e.grade === 'A' || e.grade === 'B' ? 'up' : e.grade === 'C' ? 'warn' : 'dn'] : ['—', 'dim']; });
+  add('pInst', 'Inst. score', 'Institutional score 0 to 100 (accumulation / distribution read across 15m, 1h, 4h, D).', c => el(c).is, c => { const s = el(c).is; return [isNum(s) ? s + '' : '—', isNum(s) ? (s >= 70 ? 'up' : s >= 45 ? '' : 'dim') : 'dim']; });
+  add('pFinal', 'Take-off', 'FINAL = the scanner calls it ready. building = forming.', c => ({FINAL:2, building:1})[el(c).final] || 0, c => { const f = el(c).final; return [f || '—', f === 'FINAL' ? 'up' : f ? 'warn' : 'dim']; });
+  add('pBlock', 'Blockers', 'Hard blockers from the confirmation checklist. Empty means none.', c => el(c).hard ? el(c).hard.length : 0, c => { const h = el(c).hard || []; return [h.length ? '<span title="' + esc(h.join('; ')) + '">' + h.length + ': ' + esc(h[0]) + (h.length > 1 ? '…' : '') + '</span>' : 'none', h.length ? 'dn' : 'dim']; });
+  add('pEntry', 'Entry', 'Planned entry (current price) for the lean side.', c => (el(c).pl || {}).entry, c => [el(c).pl ? P(el(c).pl.entry) : '—', el(c).pl ? '' : 'dim']);
+  add('pSL', 'Stop', 'Stop loss: beyond the nearest liquidity sweep or 0.75 to 1.5 ATR.', c => (el(c).pl || {}).sl, c => [el(c).pl ? P(el(c).pl.sl) : '—', el(c).pl ? 'dn' : 'dim']);
+  add('pSLp', 'Stop %', 'Distance from entry to the stop, in percent.', c => el(c).pl ? el(c).pl.slPct * 100 : null, c => [el(c).pl ? (el(c).pl.slPct * 100).toFixed(2) + '%' : '—', 'dim']);
+  add('pTP1', 'TP1', 'Take profit 1: nearest liquidity pool at least 1.5 times the risk away.', c => (el(c).pl || {}).tp1, c => [el(c).pl ? P(el(c).pl.tp1) : '—', el(c).pl ? 'up' : 'dim']);
+  add('pTP2', 'TP2', 'Take profit 2: further liquidity pool.', c => (el(c).pl || {}).tp2, c => [el(c).pl ? P(el(c).pl.tp2) : '—', el(c).pl ? 'up' : 'dim']);
+  add('pRR', 'R:R', 'Reward-to-risk at TP1 / TP2.', c => (el(c).pl || {}).rr1, c => [el(c).pl ? el(c).pl.rr1.toFixed(1) + ' / ' + el(c).pl.rr2.toFixed(1) : '—', el(c).pl ? (el(c).pl.rr1 >= 1.5 ? 'up' : 'warn') : 'dim']);
+  add('pLev', 'Max lev', 'Suggested maximum leverage so liquidation sits about 3 times further than the stop.', c => (el(c).pl || {}).lev, c => [el(c).pl ? el(c).pl.lev + 'x' : '—', el(c).pl ? '' : 'dim']);
+  add('pVen', 'Exchanges', 'How many exchanges quote this coin (perp), with the biggest by volume.', c => (el(c).V || {names:[]}).names.length, c => { const V = el(c).V || {names:[]}; return [V.names.length ? '<span title="' + esc(V.list.join('\n')) + '">' + V.names.length + ' · ' + esc(V.top) + '</span>' : '—', V.names.length > 2 ? '' : 'warn']; });
+  add('pHL', 'On HL', 'Listed on Hyperliquid?', c => (el(c).V || {}).hl ? 1 : 0, c => [(el(c).V || {}).hl ? '✔' : '✖', (el(c).V || {}).hl ? 'up' : 'dim']);
+  add('pGap', 'Price gap', 'Highest vs lowest exchange price. A wide gap can mean thin books or an arbitrage move.', c => (el(c).V || {}).gap, c => { const g = (el(c).V || {}).gap; return [isNum(g) ? g.toFixed(2) + '%' : '—', isNum(g) && g > 0.5 ? 'warn' : 'dim']; });
+  const cols = new Map(); E.forEach(x => cols.set(x.id, x));
+  for (const [id, col] of cw){ if (!cols.has(id)) cols.set(id, {id, label:col.label, tip:COLNAMES[id] || col.label, val:col.val, cell:col.cell, gen:true}); }
+  return cols;
+}
+function psGroups(cols){
+  const used = new Set(), out = [];
+  for (const [g, ids] of PS_ELITE_GROUPS.concat(PERP_GROUPS)){ const l = (ids || []).filter(id => id && cols.has(id) && id !== 'sym' && id !== 'score' && !used.has(id)); l.forEach(id => used.add(id)); if (l.length) out.push([g, l]); }
+  const rest = [...cols.keys()].filter(id => id !== 'sym' && id !== 'score' && !used.has(id)); if (rest.length) out.push(['Other data', rest]);
+  return out;
+}
+function psVisible(cols, groups, st){
+  const want = new Set(st.cols), vis = []; for (const [g, ids] of groups){ const l = ids.filter(id => want.has(id)); if (l.length) vis.push([g, l]); } return vis;
+}
+function psRows(D, cols, st){
+  const q = st.q.trim().toUpperCase(), mv = (+st.vol || 0) * 1e6; let rows = D.live.filter(c => { const e = D.E.get(c.name) || {}; if (q && !c.name.toUpperCase().includes(q)) return false; if (st.side === 'long' && e.dir !== 'long') return false; if (st.side === 'short' && e.dir !== 'short') return false; if (st.hl && !(e.V && e.V.hl)) return false; if (mv && !(c.m.vol24 >= mv)) return false; if (st.plan && !e.pl) return false; const k = ({trade:4, wait:3, watch:2, lean:1, none:0})[e.tag] || 0; if (st.min === 'trade' && k < 4) return false; if (st.min === 'watch' && k < 2) return false; if (st.min === 'side' && k < 1) return false; return true; });
+  const sc = cols.get(st.sort.id) || cols.get('pRank'), dir = st.sort.dir || -1;
+  rows = rows.map(c => { let v; try { v = sc.val(c); } catch(e){ v = null; } return [c, v]; });
+  rows.sort((a, b) => { const x = a[1], y = b[1], nx = x == null || (typeof x === 'number' && !isFinite(x)), ny = y == null || (typeof y === 'number' && !isFinite(y)); if (nx && ny) return 0; if (nx) return 1; if (ny) return -1; if (typeof x === 'string' || typeof y === 'string') return String(x).localeCompare(String(y)) * dir; return (x - y) * dir; });
+  return rows.map(r => r[0]).slice(0, st.n);
+}
+function psDetail(c, D){
+  const e = D.E.get(c.name) || {}, m = c.m, V = e.V || {names:[], list:[]}, up = e.dir === 'long';
+  const li = a => a && a.length ? '<ul class="ovstory">' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '<p class="hint">None.</p>';
+  const why = (arr, n) => (arr || []).slice(0, n).map(x => (x[0] > 0 ? '+' : '') + x[0] + ' ' + x[1]);
+  const okL = (e.chk || []).filter(x => x.st === 'ok').map(x => x.label + (x.why ? ' (' + x.why + ')' : '')), badL = (e.chk || []).filter(x => x.st === 'bad').map(x => x.label + (x.why ? ' (' + x.why + ')' : '')), wrnL = (e.chk || []).filter(x => x.st === 'warn').map(x => x.label + (x.why ? ' (' + x.why + ')' : ''));
+  const notes = []; if (String(c.name).includes(':')) notes.push('HIP-3 market (builder-deployed): thin data, use smaller size'); if (!V.hl) notes.push('Not listed on Hyperliquid: trade it on ' + (V.top || 'another exchange')); if (V.names.length < 2) notes.push('Only one exchange quotes it'); if (isNum(e.dq) && e.dq < 45) notes.push('Data quality below 45: the scanner says do not trade'); (e.hard || []).forEach(h => notes.push('Blocker: ' + h)); if (m.vFlags && m.vFlags.length) notes.push('Flags: ' + m.vFlags.join('; '));
+  const pl = e.pl, pc = x => ((x / pl.entry - 1) * 100).toFixed(2) + '%';
+  const plan = pl ? `<div class="cwr"><span>Side</span><span class="${up ? 'up' : 'dn'}"><b>${up ? 'LONG' : 'SHORT'}</b>${pl.lean ? ' (lean only)' : ''}</span></div><div class="cwr"><span>Entry</span><span>${esc(fmtPx(pl.entry))}</span></div><div class="cwr"><span>Stop</span><span class="dn">${esc(fmtPx(pl.sl))} (${pc(pl.sl)}) <small>${esc(pl.slWhy || '')}</small></span></div><div class="cwr"><span>TP1</span><span class="up">${esc(fmtPx(pl.tp1))} (${pc(pl.tp1)}) · R:R ${pl.rr1.toFixed(1)} <small>${esc(pl.t1Why || '')}</small></span></div><div class="cwr"><span>TP2</span><span class="up">${esc(fmtPx(pl.tp2))} (${pc(pl.tp2)}) · R:R ${pl.rr2.toFixed(1)} <small>${esc(pl.t2Why || '')}</small></span></div><div class="cwr"><span>Leverage</span><span>${pl.lev}x max</span></div>` : '<p class="hint">No trade plan: no clear side right now.</p>';
+  const sec = (t, body, open) => `<details class="ovd psd"${open ? ' open' : ''}><summary>${t}</summary><div>${body}</div></details>`;
+  let h = '<div class="psdet">';
+  h += sec('1. Why it is on the list', '<p class="hint"><b>Long reasons</b></p>' + li(why(m.vPos, 5)) + '<p class="hint"><b>Short reasons</b></p>' + li(why(m.vNeg, 5)) + (rdWhy(e) ? '<p class="hint">Institutions: ' + esc(rdWhy(e)) + '</p>' : ''), true);
+  h += sec('2. Trade plan', plan, true);
+  h += sec('3. Checklist: ' + okL.length + ' ready · ' + wrnL.length + ' partly · ' + badL.length + ' not ready', '<p class="hint"><b class="up">Ready</b></p>' + li(okL) + '<p class="hint"><b class="warn">Partly</b></p>' + li(wrnL) + '<p class="hint"><b class="dn">Not ready (wait for these)</b></p>' + li(badL), false);
+  h += sec('4. Caution before entry', li(notes.length ? notes : ['No special warnings.']), true);
+  h += sec('5. Exchanges that quote it', li(V.list) + (V.spot ? '<p class="hint">Spot: ' + esc(V.spot) + '</p>' : ''), false);
+  let cw = ''; try { cw = cwGroups(c); } catch(er){ cw = '<p class="hint">Full data not available: ' + esc(String(er && er.message || er)) + '</p>'; }
+  cw = cw.replace(/<section><h4>/g, '<details class="ovd psd"><summary>').replace(/<\/h4>/g, '</summary><div>').replace(/<\/section>/g, '</div></details>');
+  h += '<h4 style="margin:10px 0 4px">6. Every data point, grouped (tap a title to shrink or open)</h4>' + cw + '</div>';
+  return h;
+}
+function rdWhy(e){ try { return e.rd && e.rd.why ? e.rd.why : ''; } catch(er){ return ''; } }
+function psCsv(D, cols, vis, rows){
+  const r = [], add = a => r.push(a.map(csvCell).join(',')), now = new Date();
+  add(['ELPP Crypto Scanner Pro export']); add(['Page', 'Power Scanner']); add(['Exported (UTC)', now.toISOString()]); add(['Exported (Pakistan time)', now.toLocaleString('en-GB', {timeZone:'Asia/Karachi', hour12:false}) + ' PKT']); add(['Version', (document.querySelector('.v4b') || {}).textContent || '']); add(['Coins in table', rows.length + ' of ' + D.live.length]); add([]);
+  const ids = []; vis.forEach(([g, l]) => l.forEach(id => ids.push(id)));
+  add(['Coin'].concat(ids.map(id => (cols.get(id).label || id))));
+  rows.forEach(c => add([c.name].concat(ids.map(id => { try { const x = cols.get(id).cell(c); return psStrip(x[0]); } catch(e){ return ''; } }))));
+  return '﻿' + r.join('\r\n');
+}
+function psPickerHtml(cols, groups, st){
+  const want = new Set(st.cols);
+  return groups.map(([g, ids]) => { const n = ids.filter(id => want.has(id)).length; return `<details class="ovd pspg"${n ? ' open' : ''}><summary>${esc(g)} <small class="dim">${n}/${ids.length}</small></summary><div class="pspl"><span class="psgb"><button class="btn sm" type="button" data-psg="${esc(g)}" data-on="1">all</button><button class="btn sm" type="button" data-psg="${esc(g)}" data-on="0">none</button></span>${ids.map(id => `<label class="hint" title="${esc(cols.get(id).tip || '')}"><input type="checkbox" data-pscol="${esc(id)}"${want.has(id) ? ' checked' : ''}> ${esc(COLNAMES[id] && COLNAMES[id].length < 34 ? COLNAMES[id] : cols.get(id).label)}</label>`).join('')}</div></details>`; }).join('');
+}
+function renderPower(force){
+  const el = $('viewPower'); if (!el) return; const st = psSt();
+  if (!force && el._built && Date.now() - PS.lastRender < 7000) return;
+  PS.lastRender = Date.now();
+  const D = psData(force), cols = psCols(), groups = psGroups(cols), valid = new Set(cols.keys()); st.cols = st.cols.filter(id => valid.has(id)); if (!st.cols.length) st.cols = PS_DEFAULT.slice();
+  const vis = psVisible(cols, groups, st), rows = psRows(D, cols, st), shut = new Set(st.shut);
+  if (!el._built){
+    el._built = true;
+    el.innerHTML = `<div class="nsec"><h3>⚡ Power Scanner</h3>
+      <p class="hint">Every scanner merged into one table: the Elite call (verdict + institutional score + checklist grade), the trade plan, all exchanges, and every data column from the other pages. Pick exactly the columns you want, shrink any group with its header, and tap ▸ on a row for the full detail.</p>
+      <div class="row" id="psBar" style="gap:8px;flex-wrap:wrap;align-items:center"></div>
+      <details class="ovd" id="psPick" style="margin:6px 0"><summary><b>Choose columns</b> <small class="dim" id="psPickN"></small></summary><div id="psPickBody" style="margin-top:6px"></div></details>
+      <p class="hint" id="psNote"></p>
+      <div class="psw" id="psWrap"></div></div>`;
+    el.addEventListener('click', psClick); el.addEventListener('change', psChange); el.addEventListener('input', e => { if (e.target.id === 'psQ'){ st.q = e.target.value; saveState(); psDraw(true); const q = $('psQ'); if (q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } });
+  }
+  PS.ctx = {D, cols, groups, vis, rows, shut};
+  psBar(st, cols); $('psPickBody').innerHTML = psPickerHtml(cols, groups, st); $('psPickN').textContent = '(' + st.cols.length + ' selected)';
+  psDraw(false);
+}
+function psBar(st, cols){
+  const bar = $('psBar'); if (!bar) return; const act = document.activeElement && document.activeElement.id;
+  const sel = (id, opts, v) => `<select id="${id}">${opts.map(o => `<option value="${o[0]}"${String(o[0]) === String(v) ? ' selected' : ''}>${esc(o[1])}</option>`).join('')}</select>`;
+  bar.innerHTML = `<label class="hint">Preset ${sel('psPre', [['', 'Custom']].concat(Object.keys(PS_PRESETS).map(k => [k, PS_PRESETS[k].n])), PS.pre || '')}</label>
+    <label class="hint">Show ${sel('psSide', [['all', 'Long and short'], ['long', 'Longs only'], ['short', 'Shorts only']], st.side)}</label>
+    <label class="hint">Quality ${sel('psMin', [['all', 'All coins'], ['side', 'Has a side'], ['watch', 'Watch or better'], ['trade', 'Tradeable only']], st.min)}</label>
+    <label class="hint"><input type="checkbox" id="psHL"${st.hl ? ' checked' : ''}> Hyperliquid only</label>
+    <label class="hint"><input type="checkbox" id="psPlan"${st.plan ? ' checked' : ''}> Has trade plan</label>
+    <label class="hint">Min 24h vol $M <input id="psVol" type="number" min="0" value="${+st.vol || 0}" style="width:60px"></label>
+    <label class="hint">Rows ${sel('psN', [[25, '25'], [50, '50'], [100, '100'], [150, '150'], [250, '250']], st.n)}</label>
+    <label class="hint">Find <input id="psQ" type="text" value="${esc(st.q)}" placeholder="coin" style="width:80px"></label>
+    <button class="btn sm" type="button" data-psa="shrink" title="Shrink or open every column group">⇔ Shrink / open all</button>
+    <button class="btn sm" type="button" data-psa="openrows" title="Open or close the detail of every shown row">▸ Details all</button>
+    <button class="btn sm" type="button" data-psa="refresh">↻ Refresh</button>
+    <button class="btn sm" type="button" data-psa="csv">⬇ CSV</button>
+    <button class="btn sm" type="button" data-psa="copy" title="Copy the table as text to paste into Claude or ChatGPT">⧉ Copy</button>`;
+  if (act){ const a = $(act); if (a && a.focus) try { a.focus(); } catch(e){} }
+}
+function psDraw(keepBar){
+  const X = PS.ctx; if (!X) return; const st = psSt(); const D = PS.cache || X.D, cols = X.cols, groups = X.groups;
+  const vis = psVisible(cols, groups, st), rows = psRows(D, cols, st), shut = new Set(st.shut); X.vis = vis; X.rows = rows; X.shut = shut; PS.shown = rows;
+  const head1 = '<th class="psh0" rowspan="2" title="Coin">Coin</th><th rowspan="2" class="psx" title="Open or close the detail"></th>' + vis.map(([g, l]) => shut.has(g) ? `<th class="psg shut" data-psgh="${esc(g)}" title="Open group: ${esc(g)} (${l.length} columns)">▸ ${esc(g.replace(/^[^\w]+/, '').slice(0, 10))}…</th>` : `<th class="psg" colspan="${l.length}" data-psgh="${esc(g)}" title="Shrink this group">▾ ${esc(g)}</th>`).join('');
+  const head2 = vis.map(([g, l]) => shut.has(g) ? '' : l.map(id => { const col = cols.get(id), on = st.sort.id === id; return `<th class="pss${on ? ' on' : ''}" data-pssort="${esc(id)}" title="${esc((col.tip || col.label) + ' (click to sort)')}">${esc(col.label)}${on ? (st.sort.dir < 0 ? ' ▼' : ' ▲') : ''}</th>`; }).join('')).join('');
+  const span = 2 + vis.reduce((a, [g, l]) => a + (shut.has(g) ? 1 : l.length), 0);
+  const body = rows.map(c => {
+    const open = PS.open.has(c.name), e = D.E.get(c.name) || {};
+    const cells = vis.map(([g, l]) => shut.has(g) ? '<td class="dim psgz">·</td>' : l.map(id => { let r; try { r = cols.get(id).cell(c); } catch(er){ r = ['—', 'dim']; } return `<td class="${esc(r[1] || '')}">${r[0]}</td>`; }).join('')).join('');
+    let sym; try { sym = cwCols().get('sym').cell(c)[0]; } catch(er){ sym = esc(c.name); }
+    return `<tr class="psr${open ? ' open' : ''}" data-psn="${esc(c.name)}"><td class="psc0">${sym}</td><td class="psx"><button class="btn sm" type="button" data-psx="${esc(c.name)}" title="${open ? 'Close' : 'Open'} detail">${open ? '▾' : '▸'}</button></td>${cells}</tr>` + (open ? `<tr class="psdr"><td colspan="${span}">${psDetail(c, D)}</td></tr>` : '');
+  }).join('');
+  $('psWrap').innerHTML = `<table class="pst"><thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>${body || `<tr><td colspan="${span}" class="dim" style="text-align:center;padding:14px">No coin matches these filters.</td></tr>`}</tbody></table>`;
+  const nT = D.live.filter(c => (D.E.get(c.name) || {}).tag === 'trade').length, nS = D.live.filter(c => (D.E.get(c.name) || {}).dir).length;
+  $('psNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.live.length} coins with live data (${D.total} in the scanner) · <b class="up">${nT}</b> tradeable now · ${nS} with a long/short lean · sorted by <b>${esc((cols.get(st.sort.id) || {}).label || '')}</b>.` + (D.errs && D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
+}
+function psClick(e){
+  const st = psSt(), t = e.target;
+  const sk = t.closest('[data-pssort]'); if (sk){ const id = sk.dataset.pssort; st.sort = st.sort.id === id ? {id, dir:-st.sort.dir} : {id, dir:-1}; saveState(); psDraw(); return; }
+  const gh = t.closest('[data-psgh]'); if (gh){ const g = gh.dataset.psgh, i = st.shut.indexOf(g); if (i < 0) st.shut.push(g); else st.shut.splice(i, 1); saveState(); psDraw(); return; }
+  const xb = t.closest('[data-psx]'); if (xb){ const n = xb.dataset.psx; if (PS.open.has(n)) PS.open.delete(n); else PS.open.add(n); psDraw(); return; }
+  const g = t.closest('[data-psg]'); if (g){ e.preventDefault(); const X = PS.ctx, grp = X.groups.find(x => x[0] === g.dataset.psg); if (grp){ const on = g.dataset.on === '1', s = new Set(st.cols); grp[1].forEach(id => on ? s.add(id) : s.delete(id)); st.cols = [...s]; PS.pre = ''; saveState(); renderPower(true); } return; }
+  const a = t.closest('[data-psa]'); if (a){ const k = a.dataset.psa, X = PS.ctx;
+    if (k === 'refresh'){ renderPower(true); toast('Power Scanner refreshed'); }
+    else if (k === 'shrink'){ const all = X.vis.map(v => v[0]); st.shut = st.shut.length >= all.length ? [] : all.slice(); saveState(); psDraw(); }
+    else if (k === 'openrows'){ if (PS.open.size) PS.open.clear(); else (PS.shown || []).slice(0, 15).forEach(c => PS.open.add(c.name)); psDraw(); }
+    else if (k === 'csv' || k === 'copy'){ try { const D = PS.cache || X.D, txt = psCsv(D, X.cols, X.vis, X.rows);
+        if (k === 'copy'){ const pre = 'This is data exported from my ELPP crypto scanner, page "Power Scanner". It lists coins with the verdict, signal quality, trade plan and the data columns I picked. Please tell me which 3 look best and why, point out risks, and what to check next.\r\n\r\n'; const full = pre + txt.replace('﻿', ''); (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(full) : Promise.reject()).then(() => toast('Copied ' + X.rows.length + ' rows'), () => toast('Copy was blocked here: use CSV instead')); }
+        else { const d = new Date(), p2 = n => String(n).padStart(2, '0'); jrDownload('ELPP-power-scanner-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.csv', txt, 'text/csv;charset=utf-8'); toast('Downloaded ' + X.rows.length + ' rows'); }
+      } catch(er){ toast('Export failed: ' + errTxt(er)); } }
+    return; }
+}
+function psChange(e){
+  const st = psSt(), t = e.target, id = t.id;
+  if (t.dataset && t.dataset.pscol){ const s = new Set(st.cols); if (t.checked) s.add(t.dataset.pscol); else s.delete(t.dataset.pscol); st.cols = [...s]; PS.pre = ''; saveState(); const open = [...document.querySelectorAll('#psPickBody details')].map(d => d.open); renderPower(true); [...document.querySelectorAll('#psPickBody details')].forEach((d, i) => { if (open[i] != null) d.open = open[i]; }); return; }
+  if (id === 'psPre'){ const p = PS_PRESETS[t.value]; PS.pre = t.value; if (p){ st.cols = p.c ? p.c.slice() : [...psCols().keys()].filter(x => x !== 'sym' && x !== 'score'); st.shut = []; saveState(); renderPower(true); } return; }
+  if (id === 'psSide') st.side = t.value; else if (id === 'psMin') st.min = t.value; else if (id === 'psHL') st.hl = t.checked; else if (id === 'psPlan') st.plan = t.checked; else if (id === 'psVol') st.vol = +t.value || 0; else if (id === 'psN') st.n = +t.value || 100; else return;
+  saveState(); psDraw();
+}
+
 /* V4.73: TA Lab gets its coin list, scanner verdict and trade plan from here */
 window.__elppTaHook = {
   coins: () => { try { return [...snapshot.keys()].filter(n => !/^xyz:/.test(n)).slice(0, 400); } catch(e){ return []; } },
