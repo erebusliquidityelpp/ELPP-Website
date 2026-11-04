@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.85</title>
+<title>ELPP CRYPTO SCANNER PRO V4.86</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -790,7 +790,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.85</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.86</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11357,7 +11357,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.85: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.86: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11405,7 +11405,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.85: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.86: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11617,7 +11617,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.85: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.86: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
@@ -14511,7 +14511,7 @@ function build(){ try { uniLoad(); } catch(e){}
     '<span class="sep"></span><label title="Show the same time on the crosshair in every chart"><input type="checkbox" id="taSync"> Sync crosshair</label><label title="Changing the coin or timeframe in one chart changes all of them"><input type="checkbox" id="taLink"> Link all charts</label>' +
     '<span class="sep"></span><select id="taTz" title="Time zone for the time axis" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px">' + TZS.map(z => '<option>' + z + '</option>').join('') + '</select>' +
     '<span class="sep"></span><select id="taTpl" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px;max-width:150px"></select><button class="ta-b" id="taTplLoad" title="Load the chosen saved layout">Load</button><button class="ta-b" id="taTplSave" title="Save the current layout, coins and indicators as a template">Save layout…</button><button class="ta-b" id="taTplDel" title="Delete the chosen template">🗑</button>' +
-    '<span class="sep"></span><button class="ta-b" id="taWs" title="Enlarge the whole TA Lab to fill the window. Add or change panes there with the Layout buttons (up to 12).">⛶ Workspace</button><button class="ta-b" id="taNew" title="Open a clean analysis-only screen in a new browser tab, with its own panes. Open as many tabs as you like.">↗ New analysis tab</button><label title="Show the market-now strip: regime, BTC / ETH verdict, how many coins lean long or short"><input type="checkbox" id="taMkt"> Market now</label>' + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
+    '<span class="sep"></span><button class="ta-b" id="taWs" title="Enlarge the whole TA Lab to fill the window. Add or change panes there with the Layout buttons (up to 12).">⛶ Workspace</button><button class="ta-b" id="taNew" title="Open a clean analysis-only screen in a new browser tab, with its own panes. Open as many tabs as you like.">↗ New analysis tab</button><label title="Show the market-now strip: regime, BTC / ETH verdict, how many coins lean long or short"><input type="checkbox" id="taMkt"> Market now</label>' + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><span style="font-size:12px;color:var(--muted)" title="Squeeze the panes horizontally: the narrower the width, the more panes fit side by side">Pane width</span>' + [['Auto', 0], ['XS', 240], ['S', 320], ['M', 440], ['L', 620]].map(q => '<button class="ta-b" data-pw="' + q[1] + '" title="' + (q[1] ? 'Panes at least ' + q[1] + 'px wide, as many per row as fit' : 'Use the layout as chosen') + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
     '<div class="ta-bar" style="padding:4px 8px"><span style="font-size:12px;color:var(--warn)">★ Favourites</span><span class="ta-favs" style="display:flex;flex-wrap:wrap;gap:5px"></span></div>' +
     '<div class="ta-help" id="taHelpBox" hidden><b>Where is everything?</b> Second row of every chart: <b>Confluence badge / 📋 Trade plan</b> (plan builder, add to Watchlist) · coloured dots = 15m/1h/4h/D bias (hover for phase and institutional status) · <b>Phase</b> and <b>Inst</b> chips · <b>📈 Stats</b> · <b>🔔 Alerts</b> · <b>⚖ Compare</b> · <b>🗂 Data</b> (liquidation map, order-book walls, scanner pools, signal and journal history, events, open interest, funding, long/short, delta) · <b>🏆 Scorecard</b> (replay stats) · the <b>Favourites</b> bar has the mini-charts · the SMC strip has <i>Market phases</i> and <i>Institutional entry</i> chips · the drawing toolbar shrinks with «.<br><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
     '<div class="ta-mkt" id="taMktBox" hidden></div><div class="ta-grid" id="taGrid"></div></div><datalist id="taList"></datalist>';
@@ -14526,6 +14526,7 @@ function build(){ try { uniLoad(); } catch(e){}
   root.addEventListener('focusin', e => { const cell = e.target.closest && e.target.closest('.ta-cell'); if (cell) TA.setActive(+cell.dataset.i); });
   root.addEventListener('click', e => {
     const lay = e.target.closest('[data-lay]'); if (lay){ setLayout(lay.dataset.lay); return; }
+    const pwb = e.target.closest('[data-pw]'); if (pwb){ S.pw = +pwb.dataset.pw; save(); buildGrid(); return; }
     const hsb = e.target.closest('[data-hs]'); if (hsb){ S.hs = +hsb.dataset.hs; save(); buildGrid(); return; }
     const fav = e.target.closest('.ta-fav'); if (fav){ const un = e.target.closest('[data-un]'); if (un){ S.stars = S.stars.filter(x => x !== un.dataset.un); save(); charts.forEach(refresh); return; } const a = Math.min(S.active, charts.length - 1); setSym(a, fav.dataset.sym); return; }
     const id = e.target.id; if (id === 'taHelp'){ const h = $q('#taHelpBox', root); h.hidden = !h.hidden; if (!h.hidden) fillHow(h); return; }
@@ -14574,9 +14575,10 @@ setInterval(() => { try { if (root && !root.hidden) mktUpd(false); } catch(e){} 
 function buildGrid(){
   closePop(); charts.forEach(c => { c.stopPlay(); if (c.feed) c.feed.subs--; if (c.ro) c.ro.disconnect(); }); charts = []; const grid = $q('#taGrid', root), L = LAYOUTS[S.layout] || LAYOUTS['2']; while (S.panes.length < L.n) S.panes.push(mkPane('BTC', CELL_TF[S.panes.length % CELL_TF.length])); if (S.panes.length > L.n) S.panes.length = L.n;
   grid.innerHTML = ''; grid.style.gridTemplateColumns = L.cols; const hs = S.hs || 1.2, h = L.rows === 1 ? 'max(' + Math.round(640 * hs) + 'px, calc((100vh - 130px) * ' + hs + '))' : 'max(' + Math.round(500 * hs) + 'px, calc((100vh - 130px) * ' + hs * 0.62 + '))'; grid.style.gridAutoRows = h;
+  if (S.pw > 0 && window.innerWidth >= 760){ grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + S.pw + 'px, 1fr))'; }
   if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(520px, ' + Math.round(80 * (S.hs || 1.2)) + 'vh)'; }
   S.panes.forEach((p, i) => { const cell = mk('div', 'ta-cell', cellHtml(i)); cell.dataset.i = i; grid.appendChild(cell); const c = new Chart(i); c.attach(cell); charts.push(c); c.setFeed(); c.bind(); c.ro = new ResizeObserver(() => { c.dirty = true; if (!c.fitted2 && c.cv.clientWidth > 100){ c.fitted2 = true; if (c.bars.length) c.fit(); } }); c.ro.observe(c.cv); refresh(c); });
-  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.2)) < 0.01)); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
+  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.2)) < 0.01)); root.querySelectorAll('[data-pw]').forEach(b => b.classList.toggle('on', +b.dataset.pw === (S.pw || 0))); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
 }
 function fillList(){ const dl = $q('#taList', root); if (dl) dl.innerHTML = coinNames().map(n => '<option value="' + esc(n) + '">').join(''); }
 function pollPlan(){
