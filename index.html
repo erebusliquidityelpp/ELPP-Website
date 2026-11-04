@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.79</title>
+<title>ELPP CRYPTO SCANNER PRO V4.80</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.79</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.80</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -5700,7 +5700,7 @@ function csPool(){ hluLoad(); const s = new Set([...state.coins.values()].filter
 function csFindSug(q){
   const sym = String(q || '').toUpperCase().replace(/[\s$]/g, ''); if (!sym) return [];
   const pool = csPool();
-  return pool.filter(n => n.includes(sym)).sort((a, b) => (a.startsWith(sym) ? 0 : 1) - (b.startsWith(sym) ? 0 : 1) || a.length - b.length).slice(0, 8);
+  const U = n => n.toUpperCase(); return pool.filter(n => U(n).includes(sym)).sort((a, b) => (U(a).startsWith(sym) ? 0 : 1) - (U(b).startsWith(sym) ? 0 : 1) || a.length - b.length).slice(0, 8);
 }
 function csVenueFor(c){
   if (!c) return 'COINBASE|usd';
