@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.74</title>
+<title>ELPP CRYPTO SCANNER PRO V4.75</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.74</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.75</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -13186,6 +13186,7 @@ Object.assign(Chart.prototype, {
       if (e.key === 'Delete' || e.key === 'Backspace'){ if (this.sel){ e.preventDefault(); this.delSel(); } }
       else if (e.key === 'Escape'){ this.tool = 'cursor'; this.pend = []; this.sel = null; if (this.rep.pick) this.exitReplay(); if (window.TA) TA.ui(this); this.dirty = true; }
       else if (e.key === 'ArrowLeft'){ this.v0 -= 5; this.dirty = true; e.preventDefault(); } else if (e.key === 'ArrowRight'){ if (this.rep.on && !this.rep.pick){ this.stepRep(); } else this.v0 += 5; this.dirty = true; e.preventDefault(); }
+      else if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey){ this.cell.classList.toggle('ta-full'); setTimeout(() => { this.dirty = true; }, 30); }
       else if (e.key === ' ' && this.rep.on && !this.rep.pick){ e.preventDefault(); this.playRep(); }
       else if (e.key === '+' || e.key === '='){ this.bw = Math.min(60, this.bw * 1.15); this.dirty = true; } else if (e.key === '-'){ this.bw = Math.max(1.2, this.bw / 1.15); this.dirty = true; }
       else if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)){ const a = this.draws(); if (a.length){ a.pop(); this.sel = null; save(); this.dirty = true; } }
@@ -13329,12 +13330,12 @@ function renderFavs(){
 }
 function build(){
   const st = mk('style'); st.textContent = CSS; document.head.appendChild(st);
-  root.innerHTML = '<div class="nsec"><h3>TA Lab: practise technical analysis on your own scanner</h3><p class="hint">Real exchange candles (Binance, Bybit or Hyperliquid, whichever has the coin), up to ' + MAXPANES + ' charts at once, 11 overlay and 9 oscillator indicators, drawing tools, auto liquidity and fair-value-gap zones, your scanner\'s own trade plan on the chart, and a bar-replay mode where you can paper-trade past candles. Everything saves in this browser.</p></div>' +
+  root.innerHTML = '<details class="nsec" style="padding:6px 12px"><summary style="cursor:pointer;font-weight:700">TA Lab: practise technical analysis on your own scanner <span class="hint" style="font-weight:400">(what is inside)</span></summary><p class="hint">Real exchange candles (Binance, Bybit or Hyperliquid, whichever has the coin), up to ' + MAXPANES + ' charts at once, 11 overlay and 9 oscillator indicators, drawing tools, auto liquidity and fair-value-gap zones, your scanner\'s own trade plan on the chart, and a bar-replay mode where you can paper-trade past candles. Everything saves in this browser.</p></details>' +
     '<div class="ta-wrap"><div class="ta-bar"><span style="font-size:12px;color:var(--muted)">Layout</span>' + Object.keys(LAYOUTS).map(k => '<button class="ta-b" data-lay="' + k + '">' + LAYOUTS[k].lab + '</button>').join('') +
     '<span class="sep"></span><label title="Show the same time on the crosshair in every chart"><input type="checkbox" id="taSync"> Sync crosshair</label><label title="Changing the coin or timeframe in one chart changes all of them"><input type="checkbox" id="taLink"> Link all charts</label>' +
     '<span class="sep"></span><select id="taTz" title="Time zone for the time axis" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px">' + TZS.map(z => '<option>' + z + '</option>').join('') + '</select>' +
     '<span class="sep"></span><select id="taTpl" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px;max-width:150px"></select><button class="ta-b" id="taTplLoad" title="Load the chosen saved layout">Load</button><button class="ta-b" id="taTplSave" title="Save the current layout, coins and indicators as a template">Save layout…</button><button class="ta-b" id="taTplDel" title="Delete the chosen template">🗑</button>' +
-    '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
+    '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
     '<div class="ta-bar" style="padding:4px 8px"><span style="font-size:12px;color:var(--warn)">★ Favourites</span><span class="ta-favs" style="display:flex;flex-wrap:wrap;gap:5px"></span></div>' +
     '<div class="ta-help" id="taHelpBox" hidden><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
     '<div class="ta-grid" id="taGrid"></div></div><datalist id="taList"></datalist>';
@@ -13348,6 +13349,7 @@ function build(){
   root.addEventListener('focusin', e => { const cell = e.target.closest && e.target.closest('.ta-cell'); if (cell) TA.setActive(+cell.dataset.i); });
   root.addEventListener('click', e => {
     const lay = e.target.closest('[data-lay]'); if (lay){ setLayout(lay.dataset.lay); return; }
+    const hsb = e.target.closest('[data-hs]'); if (hsb){ S.hs = +hsb.dataset.hs; save(); buildGrid(); return; }
     const fav = e.target.closest('.ta-fav'); if (fav){ const un = e.target.closest('[data-un]'); if (un){ S.stars = S.stars.filter(x => x !== un.dataset.un); save(); charts.forEach(refresh); return; } const a = Math.min(S.active, charts.length - 1); setSym(a, fav.dataset.sym); return; }
     const id = e.target.id; if (id === 'taHelp'){ const h = $q('#taHelpBox', root); h.hidden = !h.hidden; return; }
     if (id === 'taClear'){ const c = charts[Math.min(S.active, charts.length - 1)]; if (c && c.draws().length && confirm('Delete all ' + c.draws().length + ' drawings on ' + c.pane.sym + '?')){ S.draws[c.pane.sym] = []; c.sel = null; save(); charts.forEach(x => { x.dirty = true; refresh(x); }); } return; }
@@ -13378,17 +13380,17 @@ function build(){
 function setLayout(k){ S.layout = k; const n = LAYOUTS[k].n; while (S.panes.length < n){ const b = S.panes[0]; S.panes.push(Object.assign(mkPane(b.sym, CELL_TF[S.panes.length % CELL_TF.length]), {type:b.type})); } if (S.panes.length > n) S.panes.length = n; S.active = Math.min(S.active, n - 1); save(); buildGrid(); }
 function buildGrid(){
   closePop(); charts.forEach(c => { c.stopPlay(); if (c.feed) c.feed.subs--; if (c.ro) c.ro.disconnect(); }); charts = []; const grid = $q('#taGrid', root), L = LAYOUTS[S.layout] || LAYOUTS['2']; while (S.panes.length < L.n) S.panes.push(mkPane('BTC', CELL_TF[S.panes.length % CELL_TF.length])); if (S.panes.length > L.n) S.panes.length = L.n;
-  grid.innerHTML = ''; grid.style.gridTemplateColumns = L.cols; const h = L.rows === 1 ? 'max(480px, calc(100vh - 250px))' : 'max(400px, calc((100vh - 250px) / 2))'; grid.style.gridAutoRows = h;
-  if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(430px, 70vh)'; }
+  grid.innerHTML = ''; grid.style.gridTemplateColumns = L.cols; const hs = S.hs || 1.2, h = L.rows === 1 ? 'max(' + Math.round(640 * hs) + 'px, calc((100vh - 130px) * ' + hs + '))' : 'max(' + Math.round(500 * hs) + 'px, calc((100vh - 130px) * ' + hs * 0.62 + '))'; grid.style.gridAutoRows = h;
+  if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(520px, ' + Math.round(80 * (S.hs || 1.2)) + 'vh)'; }
   S.panes.forEach((p, i) => { const cell = mk('div', 'ta-cell', cellHtml(i)); cell.dataset.i = i; grid.appendChild(cell); const c = new Chart(i); c.attach(cell); charts.push(c); c.setFeed(); c.bind(); c.ro = new ResizeObserver(() => { c.dirty = true; if (!c.fitted2 && c.cv.clientWidth > 100){ c.fitted2 = true; if (c.bars.length) c.fit(); } }); c.ro.observe(c.cv); refresh(c); });
-  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); fillList(); pollPlan();
+  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.2)) < 0.01)); fillList(); pollPlan();
 }
 function fillList(){ const dl = $q('#taList', root); if (dl) dl.innerHTML = coinNames().map(n => '<option value="' + esc(n) + '">').join(''); }
 function pollPlan(){
   const h = HOOK(); charts.forEach(c => { try { c.plan = h.plan ? h.plan(c.pane.sym) : null; } catch(e){ c.plan = null; } let v = null; try { v = h.verdict ? h.verdict(c.pane.sym) : null; } catch(e){} const b = $q('.ta-badge', c.cell); if (b){ if (v && v.label){ b.textContent = 'Scanner: ' + v.label + (isN(v.score) ? ' ' + v.score : '') + (v.grade ? ' · ' + v.grade : ''); b.className = 'ta-badge ' + (v.dir === 'long' ? 'up' : v.dir === 'short' ? 'dn' : ''); } else { b.textContent = ''; b.className = 'ta-badge'; } } c.dirty = true; });
 }
 function loop(){
-  raf = requestAnimationFrame(loop); if (!root || root.hidden){ TA.visible = false; return; } if (!TA.visible){ TA.visible = true; try { root.scrollIntoView({block:'start'}); } catch(e){} }
+  raf = requestAnimationFrame(loop); if (!root || root.hidden){ TA.visible = false; return; } if (!TA.visible){ TA.visible = true; try { const t = $q('.ta-wrap', root) || root; window.scrollTo({top:Math.max(0, t.getBoundingClientRect().top + window.scrollY - 70)}); } catch(e){} }
   for (const c of charts){ if (c.feed && c.feed.ver !== c.ver) c.dirty = true; if (c.dirty){ c.dirty = false; try { c.draw(); } catch(e){ if (!c.errd){ c.errd = 1; console.error('TA draw', e); } } } }
 }
 setInterval(() => { charts.forEach(c => { c.dirty = true; }); }, 1000);
