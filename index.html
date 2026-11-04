@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.89</title>
+<title>ELPP CRYPTO SCANNER PRO V4.90</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -791,7 +791,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.89</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.90</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9132,6 +9132,7 @@ function ovHtml(){
     ${mood.why.length ? `<ul class="ovwhy">${mood.why.map(([p, t]) => `<li class="${p > 0 ? 'up' : 'dn'}">${p > 0 ? '▲' : '▼'} ${esc(t)}</li>`).join('')}</ul>` : ''}</div>
   <div class="nsec"><h3>The market in plain words</h3>${story.length ? `<ul class="ovstory">${story.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="hint">Loading prices…</p>'}</div>
   <div class="nsec"><h3>Key numbers</h3><div class="ovk">${tiles}</div></div>
+  ${prOvHtml()}
   <div class="ovm ov-${cmp[0]}"><div class="ovmh"><span class="hint">Institutions versus retail</span><h2>${esc(cmp[1])}</h2></div>
     <div class="ovduo"><div><small>Institutions (big money)</small><span class="ovv ov-${I.tone}">${esc(I.label)}</span><em>${I.up} buying · ${I.dn} selling · ${I.n - I.up - I.dn} split, of ${I.n.toLocaleString()} readings${I.coins ? ' across ' + I.coins + ' coins' : ''}</em></div><div><small>Retail (everyday traders)</small><span class="ovv ov-${Rt.tone}">${esc(Rt.label)}</span><em>${Rt.up} buying · ${Rt.dn} selling · ${Rt.n - Rt.up - Rt.dn} split, of ${Rt.n.toLocaleString()} readings${Rt.coins ? ' across ' + Rt.coins + ' coins' : ''}</em></div></div><p>${esc(cmp[2])}</p></div>
   <div class="nsec"><h3>What institutions are doing</h3><p class="hint">Institutions means funds, whales and professional traders: the big money. Nobody can see their private accounts, so each row is the best free clue we have. Green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(inst)}</div>
@@ -10701,6 +10702,46 @@ function scanWidgetHtml(){
     <details class="ovd" data-ovd="scan-table" style="margin-top:8px"${OV.open.has('scan-table') ? ' open' : ''}><summary>All ${total} tracked markets, live status</summary>
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
+
+/* ---------- V4.90: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+const PSN = {};
+function prSnap(hz){
+  const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
+  const live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && isNum(c.m.vol24) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 80), rows = [];
+  for (const c of live){ try { rows.push(prCalc(c, hz)); } catch(e){} }
+  let up = 0, dn = 0, ni = 0, nr = 0, ki = 0, kr = 0; rows.forEach(r => { if (r.dir > 0) up++; else if (r.dir < 0) dn++; if (r.sc.inst != null){ ni += r.sc.inst; ki++; } if (r.sc.ret != null){ nr += r.sc.ret; kr++; } });
+  const v = {rows, up, dn, n:rows.length, inst:ki ? ni / ki : null, ret:kr ? nr / kr : null}; PSN[hz] = {at:now, v}; return v;
+}
+function prSideTxt(v){ return !isNum(v) ? 'no data' : v >= 20 ? 'buying' : v >= 8 ? 'leaning buy' : v <= -20 ? 'selling' : v <= -8 ? 'leaning sell' : 'split'; }
+function prTopTable(hz, k, withBtn){
+  const D = prSnap(hz), good = r => r.dir !== 0 && r.conf >= 40 && !r.warn.some(w => /blackout/i.test(w)), pick = d => D.rows.filter(r => r.dir === d && good(r)).sort((a, b) => b.conf * Math.abs(b.net) - a.conf * Math.abs(a.net)).slice(0, k);
+  const U = pick(1), Dn = pick(-1), f = v => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(0) : '–', cl = v => isNum(v) ? (v >= 8 ? 'up' : v <= -8 ? 'dn' : 'dim') : 'dim';
+  const row = r => `<tr><td style="text-align:left"><b>${esc(r.name)}</b></td><td class="${r.dir > 0 ? 'up' : 'dn'}">${r.pUp}% up</td><td>${r.conf}%</td><td class="${cl(r.sc.inst)}">${f(r.sc.inst)}</td><td class="${cl(r.sc.ret)}">${f(r.sc.ret)}</td><td style="text-align:left" class="hint">${esc(r.story)}${r.trap ? ' <b>' + esc(r.trap.split('.')[0]) + '.</b>' : ''}</td>${withBtn ? `<td><button class="btn sm" type="button" data-chart="${esc(r.name)}">Chart</button></td>` : ''}</tr>`;
+  const tb = (t, L, c) => `<div style="flex:1 1 380px;min-width:0;overflow:auto"><b class="${c}">${t}</b><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Chance</th><th>Confidence</th><th>Institutions</th><th>Retail</th><th style="text-align:left">Psychology</th>${withBtn ? '<th></th>' : ''}</tr></thead><tbody>${L.length ? L.map(row).join('') : '<tr><td colspan="7" class="hint" style="text-align:left">No call strong enough right now. That is a valid answer: no edge, no trade.</td></tr>'}</tbody></table></div>`;
+  return `<div class="row" style="gap:14px;flex-wrap:wrap;align-items:flex-start">${tb('Most likely to rise', U, 'up')}${tb('Most likely to fall', Dn, 'dn')}</div>`;
+}
+function prTodayHtml(){
+  let h = ''; try {
+    const A = prSnap('1h'), B = prSnap('4h'), St = prStats();
+    h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔮 Prediction Radar: next hours</h3><button class="btn sm" type="button" data-ovgo="predict">Open Prediction Radar</button></div>
+    <div class="prcc" data-ccstrip style="margin:6px 0"></div>
+    <p class="hint">${A.n ? `Of ${A.n} biggest coins, the next hour leans <b class="up">up on ${A.up}</b> and <b class="dn">down on ${A.dn}</b>. Institutions are <b>${prSideTxt(A.inst)}</b>, retail is <b>${prSideTxt(A.ret)}</b>. ${A.inst != null && A.ret != null && A.inst * A.ret < 0 && Math.abs(A.inst - A.ret) > 20 ? 'They disagree: follow the institutions, but wait for confirmation.' : ''}` : 'Collecting data…'}</p>
+    <b class="hint">Next 4 hours</b>${prTopTable('4h', 3, true)}
+    <b class="hint" style="display:block;margin-top:8px">Next 1 hour</b>${prTopTable('1h', 3, true)}
+    <p class="hint">Calls are scored automatically when their time ends. ${St.n >= 10 ? `Track record so far: <b>${St.rate}%</b> right over ${St.n} scored calls (50% is a coin toss).` : 'Track record: still collecting, fewer than 10 scored calls.'} A probability is not a promise: size small, use a stop.</p></div>`;
+  } catch(e){ h = ''; } return h;
+}
+function prOvHtml(){
+  let h = ''; try {
+    const A = prSnap('1h'), B = prSnap('4h'), C = prSnap('12h'), btc = C.rows.find(r => r.name === 'BTC'), line = (lab, D) => `<tr><td style="text-align:left"><b>${lab}</b></td><td class="up">${D.up}</td><td class="dn">${D.dn}</td><td>${prSideTxt(D.inst)}</td><td>${prSideTxt(D.ret)}</td></tr>`;
+    if (!A.n) return '';
+    h = `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔮 What the prediction radar expects</h3><button class="btn sm" type="button" data-ovgo="predict">Open Prediction Radar</button></div>
+    <div class="prcc" data-ccstrip style="margin:6px 0"></div>
+    <p class="hint">A short-term lean for the biggest ${A.n} coins, built from big-money data, crowd data and structure. Read it as odds, not a promise.</p>
+    <div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Horizon</th><th>Coins leaning up</th><th>Leaning down</th><th>Institutions</th><th>Retail</th></tr></thead><tbody>${line('Next 1 hour', A)}${line('Next 4 hours', B)}${line('Next 12 hours', C)}</tbody></table></div>
+    ${btc ? `<p class="hint" style="margin-top:8px"><b>Bitcoin, next 12 hours:</b> <b class="${btc.dir > 0 ? 'up' : btc.dir < 0 ? 'dn' : ''}">${btc.pUp}% chance up</b>, confidence ${btc.conf}%. ${esc(btc.story)} ${btc.trap ? '<b>' + esc(btc.trap) + '</b>' : ''}</p>` : ''}</div>`;
+  } catch(e){ h = ''; } return h;
+}
 function todayHtml(){
   const sg = v => (v > 0 ? '+' : '') + v, now = Date.now(), r = MK.last, S = rgStatus(), nx = macNext();
   const all = [...state.coins.values()].filter(c => c.m && isNum(c.m.verdict) && (c.m.verdict === 5 || c.m.verdict === 3)).sort((a, b) => Math.abs(b.m.verdictScore) - Math.abs(a.m.verdictScore)).slice(0, 5);
@@ -10711,6 +10752,7 @@ function todayHtml(){
   let h = scanWidgetHtml();
   h += `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(r.state + '') : 'Collecting…', r ? r.grade + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
   h += `<div class="nsec"><h3>Top set-ups right now</h3>${all.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Verdict</th><th>Score</th><th style="text-align:left">Psychology</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th></th></tr></thead><tbody>${all.map(c => { const p = (() => { try { return planFor(c); } catch(e){ return null; } })(), m = c.m; return `<tr><td style="text-align:left"><b>${esc(c.name)}</b></td><td class="${m.verdict === 5 ? 'up' : 'dn'}">${esc(VERDICT_LAB[m.verdict])}</td><td>${sg(Math.round(m.verdictScore))}</td><td style="text-align:left" class="dim">${esc(m.psy ? m.psy.tag : '—')}</td><td>${p ? esc(fmtPx(p.entry)) : '—'}</td><td>${p ? esc(fmtPx(p.sl)) : '—'}</td><td>${p ? esc(fmtPx(p.tp1)) : '—'}</td><td>${p ? esc(fmtPx(p.tp2)) : '—'}</td><td><button class="btn sm" type="button" data-chart="${esc(c.name)}">Chart</button></td></tr>`; }).join('')}</tbody></table><p class="hint">Check each one on your own chart before taking it. Open "How it decides" to see why a coin scored what it did.</p>` : '<p class="hint">No Strong long or short verdicts at the moment. Waiting is also a position.</p>'}</div>`;
+  h += prTodayHtml();
   h += `<div class="nsec"><h3>Your open signals</h3>${open.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Side</th><th>Entry</th><th>Stop</th><th>TP1</th><th>Age</th><th>MAE</th><th>MFE</th><th style="text-align:left">Status</th></tr></thead><tbody>${open.map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td>${esc(fmtPx(x.entry))}</td><td>${esc(fmtPx(x.sl))}${x.slWhy ? '<br><small class="dim">' + esc(stShort(x.slWhy)) + '</small>' : ''}</td><td>${esc(fmtPx(x.tp1))}</td><td>${esc(ago(x.t))}</td><td>${isNum(x.mae) ? x.mae.toFixed(2) + 'R' : '—'}</td><td>${isNum(x.mfe) ? x.mfe.toFixed(2) + 'R' : '—'}</td><td style="text-align:left">${esc(SIG_LAB[x.status] || x.status)}</td></tr>`).join('')}</tbody></table>` : '<p class="hint">No open signals.</p>'}</div>`;
   const at = +(LS.get('elpp_bk_at') || 0);
   h += `<div class="nsec"><h3>Backup and restore</h3><p class="hint">Your signal log, journal and settings are stored only in this browser. Clearing the browser data would erase them. ${at ? 'Last backup: ' + esc(ago(at)) + '.' : 'No backup yet.'} By default the file leaves out your API keys, tokens and wallet addresses, so it is safe to keep. Restoring never overwrites a key you already have with a blank.</p><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="bkOut">Download backup</button><label class="hint"><input type="checkbox" id="bkKeys"> include my API keys and tokens (keep this file private)</label><label class="btn" style="cursor:pointer">Restore from file<input type="file" id="bkIn" accept=".json,application/json" hidden></label></div><p class="hint" id="bkMsg"></p></div>`;
@@ -10721,10 +10763,11 @@ function renderToday(){
   if (!el._built){ el._built = true;
     el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
     el.addEventListener('click', e => { const t = e.target; const a = t.closest('[data-chart]'); if (a){ openChart(a.dataset.chart); return; }
+      { const g = t.closest('[data-ovgo]'); if (g){ const b = document.querySelector('#side .nv[data-view="' + g.dataset.ovgo + '"]'); if (b) b.click(); return; } }
       if (t.closest('#bkOut')){ const n = bkExport($('bkKeys').checked); $('bkMsg').textContent = 'Saved ' + n + ' items to your downloads folder.'; el._h = ''; } });
     el.addEventListener('change', e => { if (e.target.id === 'bkIn' && e.target.files[0]){ const rd = new FileReader(); rd.onload = () => { try { const n = bkImport(rd.result); $('bkMsg').textContent = 'Restored ' + n + ' items. Reloading…'; setTimeout(() => location.reload(), 900); } catch(x){ $('bkMsg').textContent = 'Could not restore: ' + errTxt(x); } }; rd.readAsText(e.target.files[0]); } }); }
   const ae = document.activeElement; if (ae && el.contains(ae) && (ae.tagName === 'INPUT' || ae.tagName === 'SELECT')) return;
-  const html = todayHtml(); if (el._h !== html){ const msg = $('bkMsg') ? $('bkMsg').textContent : ''; el.innerHTML = html; el._h = html; if (msg && $('bkMsg')) $('bkMsg').textContent = msg; }
+  const html = todayHtml(); if (el._h !== html){ const msg = $('bkMsg') ? $('bkMsg').textContent : ''; el.innerHTML = html; el._h = html; if (msg && $('bkMsg')) $('bkMsg').textContent = msg; try { ccTick(); } catch(e){} }
 }
 
 VIEW_GUIDE.today = [['Market verdict', 'Overall tradability right now.', 'BEST/GOOD TO TRADE = normal size. SELECTIVE or TRADE WITH CARE = reduce size. NOT TRADEABLE = skip.'], ['Signals today', 'Closed signals today and their total in R.', 'Judge the day only after 5 or more closed signals; one day proves nothing.'], ['Risk guard', 'Your optional daily limits.', 'LOCKED means a limit was hit: stop looking for trades until it resumes.'], ['Data health', 'Feeds working or failing.', 'A few failing optional feeds are fine. Many failing means your connection is the problem.'], ['Top set-ups', 'Strongest long and short verdicts.', 'Strong needs a score of +35 or more (or -35 or less). Always check your own chart first.']];
@@ -11361,7 +11404,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.89: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.90: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11409,7 +11452,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.89: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.90: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11621,7 +11664,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.89: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.90: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11635,7 +11678,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.89: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.90: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11831,7 +11874,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.89: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.90: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
@@ -12158,7 +12201,7 @@ function renderOverview(){
     el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
     ovLoadExtra(); mxLoad();
   }
-  const html = ovHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; }
+  const html = ovHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; try { ccTick(); } catch(e){} }
 }
 
 /* ===== V4.9: install as an app (Chrome / Edge on Windows, Android) ===== */
