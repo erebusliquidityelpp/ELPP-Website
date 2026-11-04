@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.77</title>
+<title>ELPP CRYPTO SCANNER PRO V4.78</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -788,7 +788,7 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.77</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.78</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -13430,6 +13430,8 @@ const CSS_X = `
 .ta-mtf i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#556;margin-right:2px;vertical-align:-1px}
 .ta-mtf i.u{background:var(--up)}.ta-mtf i.d{background:var(--down)}.ta-mtf i.m{background:var(--warn)}
 .ta-cmps{font-size:10px;color:var(--muted)}
+.ta-phase,.ta-inst{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;cursor:help}
+.ta-phase.up{color:var(--up);border-color:var(--up)}.ta-phase.dn{color:var(--down);border-color:var(--down)}
 .ta-pp{width:360px;max-width:92vw;font-size:12px}.ta-pp h4{margin:0 0 6px;font-size:13px}
 .ta-pp table{width:100%;border-collapse:collapse}.ta-pp td,.ta-pp th{padding:2px 4px;text-align:left;border-bottom:1px solid rgba(127,127,127,.2)}.ta-pp th{color:var(--muted);font-weight:500}
 .ta-pp td.r,.ta-pp th.r{text-align:right}.ta-pp .g{color:var(--up)}.ta-pp .rd{color:var(--down)}
@@ -13480,7 +13482,7 @@ const MTFS = ['15m', '1h', '4h', '1d'];
 function anaUpd(c){
   const cell = c.cell; if (!cell) return; const cf = $q('.ta-conf', cell), R = confOf(c);
   if (cf){ if (!R){ cf.textContent = 'Confluence: loading…'; cf.className = 'ta-conf'; } else { const d = R.dir, s = d ? R[d].s : Math.max(R.long.s, R.short.s); cf.textContent = 'Confluence ' + (d ? d.toUpperCase() : 'MIXED') + ' ' + s + '/' + R.max + ' · ' + (d ? R[d].g : 'D'); cf.className = 'ta-conf ' + (d === 'long' ? 'up' : d === 'short' ? 'dn' : ''); } }
-  const m = $q('.ta-mtf', cell); if (m){ const p = c.pane; let h = ''; for (const tf of MTFS){ const f = getFeed(p.sym, tf, p.ven, p.pool); if (f.src && Date.now() - (f._tk || 0) > 60000){ f._tk = Date.now(); f.tick(); } const b = f.bars.length ? biasOf(f.bars) : null; h += '<span title="' + esc(tf + ': ' + (b ? (b.dir === 'u' ? 'bullish' : b.dir === 'd' ? 'bearish' : 'mixed') + ' — ' + b.why : (f.err ? 'no data' : 'loading…'))) + '"><i class="' + (b ? b.dir : '') + '"></i>' + (tf === '1d' ? 'D' : tf) + '</span>'; } if (m._h !== h){ m._h = h; m.innerHTML = h; } }
+  const m = $q('.ta-mtf', cell); if (m){ const p = c.pane; let h = ''; for (const tf of MTFS){ const f = getFeed(p.sym, tf, p.ven, p.pool); if (f.src && Date.now() - (f._tk || 0) > 60000){ f._tk = Date.now(); f.tick(); } const b = f.bars.length ? biasOf(f.bars) : null; h += '<span title="' + esc(tf + ': ' + (b ? (b.dir === 'u' ? 'bullish' : b.dir === 'd' ? 'bearish' : 'mixed') + ' — ' + b.why + mtfInfo(f, tf) : (f.err ? 'no data' : 'loading…'))) + '"><i class="' + (b ? b.dir : '') + '"></i>' + (tf === '1d' ? 'D' : tf) + '</span>'; } if (m._h !== h){ m._h = h; m.innerHTML = h; } }
   const cs = $q('.ta-cmps', cell); if (cs){ const t = cmpStat(c); if (cs.textContent !== t) cs.textContent = t; }
 }
 /* ---------- trade plan builder ---------- */
@@ -13599,7 +13601,8 @@ function cmpMenu(c, btn){
   openPop(btn, html, pp => { pp.addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; let v = b.dataset.c; if (v === '__go') v = ($q('.cq', pp).value || '').trim().toUpperCase(); if (v === '__off'){ p.cmp = null; } else if (v) p.cmp = {sym:v, ven:'auto'}; c.setFeed(); save(); refresh(c); closePop(); }); });
 }
 /* ---------- extra data: open interest, funding, long/short, order-book walls, liquidation map, scanner pools, history, events, mini-charts ---------- */
-const xOn = (p, k) => !!(p.x && p.x[k]);
+const XDFT = {pools:1, hist:1, evt:1};
+const xOn = (p, k) => p.x && k in p.x ? !!p.x[k] : !!XDFT[k];
 function bnSymOf(f){ if (f.src && f.src.src === 'bn') return f.src.s; const v = venSyms('bn', f.sym)[0]; return v ? v[1] : null; }
 const AUXP = {'5m':1, '15m':1, '30m':1, '1h':1, '2h':1, '4h':1, '1d':1};
 const auxPeriod = tf => AUXP[tf] ? tf : (TFSEC[tf] < 300 ? '5m' : '1d');
@@ -13667,8 +13670,8 @@ Chart.prototype.extFront = function(g, plotW, ff){
 const XDEF = [['liqm', 'Liquidation map (estimated)', 'Where leveraged longs and shorts would be liquidated, modelled from volume and 10/25/50/100× leverage tiers'], ['walls', 'Order-book walls', 'The biggest resting bid and ask orders as price lines (live, Binance or Hyperliquid)'], ['pools', 'Scanner liquidity pools', 'The liquidity pools the ELPP scanner has found for this coin'], ['hist', 'Signals & journal trades', 'Past scanner signals and your journal trades, with entry, exit and R'], ['evt', 'Events (news, unlocks, airdrops)', 'Diamonds along the top. Hover for the headline, click to open it']];
 const XIND = [['oi', 'Open interest'], ['fund', 'Funding rate'], ['lsr', 'Long / short ratio'], ['cvd', 'CVD (real on Binance)'], ['delta', 'Volume delta'], ['rs', 'Relative strength (needs Compare)']];
 function dataMenu(c, btn){
-  const p = c.pane; p.x = p.x || {};
-  const html = '<div class="ta-pp" style="width:360px"><h4>Data layers · ' + esc(p.sym) + '</h4><div class="xl">' + XDEF.map(x => '<label style="display:block;margin:4px 0" title="' + esc(x[2]) + '"><input type="checkbox" data-k="' + x[0] + '"' + (p.x[x[0]] ? ' checked' : '') + '> <b>' + x[1] + '</b><br><span style="font-size:10px;color:var(--muted);margin-left:19px">' + esc(x[2]) + '</span></label>').join('') + '</div><div style="margin-top:6px;font-weight:600">Add as a pane under the chart</div><div class="row">' + XIND.map(x => '<button class="ta-b" data-i="' + x[0] + '">+ ' + x[1] + '</button>').join('') + '</div><div style="font-size:10px;color:var(--muted)">Open interest, funding and long/short come from Binance futures (funding falls back to Hyperliquid). Not every coin has them.</div></div>';
+  const p = c.pane; p.x = p.x || {}; const HK = {pools:'pools', hist:'history', evt:'events'}, cnt = nm => { try { return (HOOK()[nm](p.sym) || []).length; } catch(e){ return 0; } };
+  const html = '<div class="ta-pp" style="width:360px"><h4>Data layers · ' + esc(p.sym) + '</h4><div class="xl">' + XDEF.map(x => '<label style="display:block;margin:4px 0" title="' + esc(x[2]) + '"><input type="checkbox" data-k="' + x[0] + '"' + (xOn(p, x[0]) ? ' checked' : '') + '> <b>' + x[1] + (HK[x[0]] ? ' <span style="font-weight:400;color:var(--muted)">(' + cnt(HK[x[0]]) + ' for ' + esc(p.sym) + ')</span>' : '') + '</b><br><span style="font-size:10px;color:var(--muted);margin-left:19px">' + esc(x[2]) + '</span></label>').join('') + '</div><div style="margin-top:6px;font-weight:600">Add as a pane under the chart</div><div class="row">' + XIND.map(x => '<button class="ta-b" data-i="' + x[0] + '">+ ' + x[1] + '</button>').join('') + '</div><div style="font-size:10px;color:var(--muted)">Open interest, funding and long/short come from Binance futures (funding falls back to Hyperliquid). Not every coin has them.</div></div>';
   openPop(btn, html, pp => {
     pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; });
     pp.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; if (b.dataset.i === 'rs' && !p.cmp){ toastX('Turn on Compare first, then add Relative strength.'); return; } addInd(c, b.dataset.i); refresh(c); b.style.opacity = '.5'; toastX('Added ' + IND[b.dataset.i].n); });
@@ -13684,6 +13687,142 @@ function miniUpd(){
     const f = getFeed(sym, '1h'), bars = f.bars.slice(-48); if (!bars.length) return; if (f.src && Date.now() - (f._tk || 0) > 60000){ f._tk = Date.now(); f.tick(); } const key = f.ver + '|' + bars.length; if (cv._k === key) return; cv._k = key; const ch = (bars[bars.length - 1].c / bars[0].c - 1) * 100; spark(cv, bars, ch >= 0); const pc = el.querySelector('.ta-fpc'); pc.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(1) + '%'; pc.style.color = ch >= 0 ? 'var(--up)' : 'var(--down)'; });
 }
 setInterval(() => { try { miniUpd(); } catch(e){} }, 2500);
+/* ---------- extra drawing tools ---------- */
+Object.assign(NEED, {info:2, arrow:2, hray:1, cross:1, ellipse:2, triangle:3, fork:3, fibext:3, flag:1, arrup:1, arrdn:1, vrange:2, prange:2});
+const NEWT = new Set(Object.keys({info:1, arrow:1, hray:1, cross:1, ellipse:1, triangle:1, fork:1, fibext:1, flag:1, arrup:1, arrdn:1, vrange:1, prange:1}));
+const FEXT = [[0, '#8393a7'], [0.618, '#e3b341'], [1, '#58a6ff'], [1.272, '#a78bfa'], [1.618, '#2fbf71'], [2, '#f0b429'], [2.618, '#f0616d']];
+const _drawOne = Chart.prototype.drawOne, _hit = Chart.prototype.hit;
+Chart.prototype.drawOne = function(g, d, plotW, pv){
+  if (!NEWT.has(d.type)) return _drawOne.call(this, g, d, plotW, pv);
+  const need = NEED[d.type]; if (!d.pts || d.pts.length < Math.min(need, pv ? 1 : need)) return;
+  const col = d.color || '#58a6ff', sel = this.sel === d.id, ff = getComputedStyle(document.body).fontFamily, mh = this.L.mainH, P = this.P, XY = i => this.toXY(d.pts[i]);
+  g.save(); g.beginPath(); g.rect(0, 0, plotW, mh); g.clip(); g.lineWidth = sel ? 2.2 : 1.5; g.strokeStyle = col; g.fillStyle = col; g.font = '11px ' + ff;
+  const t = d.type, n2 = d.pts.length >= 2, arrowHead = (x0, y0, x1, y1) => { const a = Math.atan2(y1 - y0, x1 - x0); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - 11 * Math.cos(a - 0.4), y1 - 11 * Math.sin(a - 0.4)); g.lineTo(x1 - 11 * Math.cos(a + 0.4), y1 - 11 * Math.sin(a + 0.4)); g.closePath(); g.fill(); };
+  if (t === 'info' && n2){ const [x0, y0] = XY(0), [x1, y1] = XY(1), dp = d.pts[1].p - d.pts[0].p, pc = dp / d.pts[0].p * 100, nb = Math.round(this.iOfT(d.pts[1].t) - this.iOfT(d.pts[0].t)); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); const tx = (dp >= 0 ? '+' : '') + fmtP(dp) + ' (' + (pc >= 0 ? '+' : '') + pc.toFixed(2) + '%) · ' + Math.abs(nb) + ' bars', w = g.measureText(tx).width + 10, bx = Math.max(2, Math.min(plotW - w - 2, (x0 + x1) / 2 - w / 2)), by = Math.max(2, Math.min(mh - 20, (y0 + y1) / 2 - 22)); g.fillStyle = rgba(col, 0.9); g.fillRect(bx, by, w, 17); g.fillStyle = '#fff'; g.fillText(tx, bx + 5, by + 12); }
+  else if (t === 'arrow' && n2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); arrowHead(x0, y0, x1, y1); }
+  else if (t === 'hray'){ const [x0, y0] = XY(0), y = Math.round(y0) + 0.5; g.beginPath(); g.moveTo(x0, y); g.lineTo(plotW, y); g.stroke(); g.fillText(fmtP(d.pts[0].p), Math.min(plotW - 70, x0 + 6), y - 4); }
+  else if (t === 'cross'){ const [x0, y0] = XY(0); g.setLineDash([5, 4]); g.beginPath(); g.moveTo(0, Math.round(y0) + 0.5); g.lineTo(plotW, Math.round(y0) + 0.5); g.moveTo(Math.round(x0) + 0.5, 0); g.lineTo(Math.round(x0) + 0.5, mh); g.stroke(); }
+  else if (t === 'ellipse' && n2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); g.beginPath(); g.ellipse((x0 + x1) / 2, (y0 + y1) / 2, Math.abs(x1 - x0) / 2 || 1, Math.abs(y1 - y0) / 2 || 1, 0, 0, 6.2832); g.fillStyle = rgba(col, 0.12); g.fill(); g.stroke(); }
+  else if (t === 'triangle' && n2){ g.beginPath(); d.pts.forEach((_, i) => { const [x, y] = XY(i); i ? g.lineTo(x, y) : g.moveTo(x, y); }); if (d.pts.length >= 3) g.closePath(); g.fillStyle = rgba(col, 0.12); if (d.pts.length >= 3) g.fill(); g.stroke(); }
+  else if (t === 'fork' && n2){ const [x0, y0] = XY(0), [x1, y1] = XY(1); if (d.pts.length >= 3){ const [x2, y2] = XY(2), mx = (x1 + x2) / 2, my = (y1 + y2) / 2, k = 4, ln = (ax, ay, bx, by) => { g.beginPath(); g.moveTo(ax, ay); g.lineTo(ax + (bx - ax) * k, ay + (by - ay) * k); g.stroke(); }; ln(x0, y0, mx, my); g.setLineDash([]); ln(x1, y1, x1 + (mx - x0), y1 + (my - y0)); ln(x2, y2, x2 + (mx - x0), y2 + (my - y0)); g.fillStyle = rgba(col, 0.08); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 + (mx - x0) * k, y1 + (my - y0) * k); g.lineTo(x2 + (mx - x0) * k, y2 + (my - y0) * k); g.lineTo(x2, y2); g.closePath(); g.fill(); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); } else { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); } }
+  else if (t === 'fibext' && n2){ const a = d.pts[0].p, b = d.pts[1].p; if (d.pts.length >= 3){ const c = d.pts[2].p, [xc] = XY(2); g.font = '10px ' + ff; for (const [r, cc] of FEXT){ const p = c + (b - a) * r, y = Math.round(this.yOf(p)) + 0.5; g.strokeStyle = cc; g.lineWidth = 1; g.beginPath(); g.moveTo(xc, y); g.lineTo(plotW, y); g.stroke(); g.fillStyle = cc; g.fillText(r + '  (' + fmtP(p) + ')', Math.min(plotW - 120, xc + 4), y - 3); } } g.strokeStyle = rgba('#8393a7', 0.8); g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); d.pts.forEach((_, i) => { const [x, y] = XY(i); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+  else if (t === 'flag'){ const [x0, y0] = XY(0); g.strokeStyle = col; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0, y0 - 24); g.stroke(); g.fillStyle = col; g.beginPath(); g.moveTo(x0, y0 - 24); g.lineTo(x0 + 16, y0 - 19); g.lineTo(x0, y0 - 13); g.closePath(); g.fill(); }
+  else if (t === 'arrup' || t === 'arrdn'){ const [x0, y0] = XY(0), up = t === 'arrup', c2 = up ? '#2fbf71' : '#f0616d'; g.fillStyle = c2; g.beginPath(); if (up){ g.moveTo(x0, y0); g.lineTo(x0 - 8, y0 + 12); g.lineTo(x0 - 3, y0 + 12); g.lineTo(x0 - 3, y0 + 22); g.lineTo(x0 + 3, y0 + 22); g.lineTo(x0 + 3, y0 + 12); g.lineTo(x0 + 8, y0 + 12); } else { g.moveTo(x0, y0); g.lineTo(x0 - 8, y0 - 12); g.lineTo(x0 - 3, y0 - 12); g.lineTo(x0 - 3, y0 - 22); g.lineTo(x0 + 3, y0 - 22); g.lineTo(x0 + 3, y0 - 12); g.lineTo(x0 + 8, y0 - 12); } g.closePath(); g.fill(); }
+  else if (t === 'vrange' && n2){ const [x0] = XY(0), [x1] = XY(1), secs = Math.abs(d.pts[1].t - d.pts[0].t) / 1000, dur = secs >= 86400 ? (secs / 86400).toFixed(1) + 'd' : secs >= 3600 ? (secs / 3600).toFixed(1) + 'h' : Math.round(secs / 60) + 'm', nb = Math.abs(Math.round(this.iOfT(d.pts[1].t) - this.iOfT(d.pts[0].t))); g.fillStyle = rgba(col, 0.12); g.fillRect(Math.min(x0, x1), 0, Math.abs(x1 - x0), mh); g.beginPath(); g.moveTo(x0 + 0.5, 0); g.lineTo(x0 + 0.5, mh); g.moveTo(x1 + 0.5, 0); g.lineTo(x1 + 0.5, mh); g.stroke(); g.fillStyle = col; g.fillText(nb + ' bars · ' + dur, Math.min(x0, x1) + 6, 14); }
+  else if (t === 'prange' && n2){ const [, y0] = XY(0), [, y1] = XY(1), dp = d.pts[1].p - d.pts[0].p, pc = dp / d.pts[0].p * 100; g.fillStyle = rgba(col, 0.12); g.fillRect(0, Math.min(y0, y1), plotW, Math.abs(y1 - y0)); g.beginPath(); g.moveTo(0, Math.round(y0) + 0.5); g.lineTo(plotW, Math.round(y0) + 0.5); g.moveTo(0, Math.round(y1) + 0.5); g.lineTo(plotW, Math.round(y1) + 0.5); g.stroke(); g.fillStyle = col; g.fillText((dp >= 0 ? '+' : '') + fmtP(dp) + ' (' + (pc >= 0 ? '+' : '') + pc.toFixed(2) + '%)', 8, Math.min(y0, y1) + 13); }
+  if ((sel || d.id === this.hov) && d.id !== '_pv'){ g.setLineDash([]); g.fillStyle = P.bg; g.strokeStyle = col; g.lineWidth = 1.8; for (const h of this.handlesOf(d)){ g.beginPath(); g.arc(h.x, h.y, 4.5, 0, 6.2832); g.fill(); g.stroke(); } }
+  if (pv && d.pts.length){ g.fillStyle = col; for (const pt of d.pts){ const [x, y] = this.toXY(pt); g.beginPath(); g.arc(x, y, 3, 0, 6.2832); g.fill(); } }
+  g.restore();
+};
+Chart.prototype.hit = function(x, y){
+  const r = _hit.call(this, x, y); if (r) return r; const ds = this.draws();
+  for (let k = ds.length - 1; k >= 0; k--){ const d = ds[k]; if (!NEWT.has(d.type) || !d.pts || d.pts.length < NEED[d.type]) continue; const XY = i => this.toXY(d.pts[i]); let ok = false; const t = d.type;
+    if (t === 'info' || t === 'arrow'){ const [x0, y0] = XY(0), [x1, y1] = XY(1); ok = dseg(x, y, x0, y0, x1, y1) <= 6; }
+    else if (t === 'hray'){ const [x0, y0] = XY(0); ok = Math.abs(y - y0) <= 6 && x >= x0 - 6; }
+    else if (t === 'cross'){ const [x0, y0] = XY(0); ok = Math.abs(y - y0) <= 5 || Math.abs(x - x0) <= 5; }
+    else if (t === 'ellipse' || t === 'vrange' || t === 'prange'){ const [x0, y0] = XY(0), [x1, y1] = XY(1); ok = t === 'vrange' ? (x >= Math.min(x0, x1) - 4 && x <= Math.max(x0, x1) + 4) : t === 'prange' ? (y >= Math.min(y0, y1) - 4 && y <= Math.max(y0, y1) + 4) : (x >= Math.min(x0, x1) - 4 && x <= Math.max(x0, x1) + 4 && y >= Math.min(y0, y1) - 4 && y <= Math.max(y0, y1) + 4); }
+    else if (t === 'triangle'){ const P3 = d.pts.map((_, i) => XY(i)); const xs = P3.map(q => q[0]), ys = P3.map(q => q[1]); ok = x >= Math.min(...xs) - 4 && x <= Math.max(...xs) + 4 && y >= Math.min(...ys) - 4 && y <= Math.max(...ys) + 4; }
+    else if (t === 'fork'){ const [x0, y0] = XY(0), [x1, y1] = XY(1), [x2, y2] = XY(2), mx = (x1 + x2) / 2, my = (y1 + y2) / 2; ok = dseg(x, y, x0, y0, x0 + (mx - x0) * 4, y0 + (my - y0) * 4) <= 6 || dseg(x, y, x1, y1, x1 + (mx - x0) * 4, y1 + (my - y0) * 4) <= 6 || dseg(x, y, x2, y2, x2 + (mx - x0) * 4, y2 + (my - y0) * 4) <= 6 || dseg(x, y, x1, y1, x2, y2) <= 6; }
+    else if (t === 'fibext'){ const [xc] = XY(2), a = d.pts[0].p, b = d.pts[1].p, c = d.pts[2].p; ok = x >= xc - 6 && FEXT.some(([r]) => Math.abs(this.yOf(c + (b - a) * r) - y) <= 6); if (!ok){ for (let i = 0; i < 2; i++){ const [ax, ay] = XY(i), [bx, by] = XY(i + 1); if (dseg(x, y, ax, ay, bx, by) <= 6) ok = true; } } }
+    else if (t === 'flag' || t === 'arrup' || t === 'arrdn'){ const [x0, y0] = XY(0); ok = Math.abs(x - x0) <= 14 && y >= y0 - 28 && y <= y0 + 26; }
+    if (ok) return {d, part:'body'}; }
+  return null;
+};
+/* ---------- market phases + institutional entry tracking (everything is computed from the candles of the chart's own timeframe) ---------- */
+SMC.push(
+  ['phz', 'Phases', 'Market phases', 'Boxes the ranges and names them: accumulation (buyers loading after a drop), distribution (sellers unloading after a rise) or choppy (no edge). Computed on this timeframe'],
+  ['phb', 'Real / fake breakout', 'Market phases', 'First close beyond the 20-candle range. REAL = it held for 3 candles on above-normal volume. FAKE = it closed back inside within 3 candles (a trap)'],
+  ['phm', 'Manipulation', 'Market phases', 'Stop hunt: a big wick through the recent high or low on rising volume that closes back inside, the way smart money grabs liquidity'],
+  ['ieC', 'Real inst. volume', 'Institutional entry', 'Candles with 2x+ normal volume, a big range and a strong close in one direction: institutions entered. Marked with the volume multiple and a tick if it held, a cross if it failed'],
+  ['ieZ', 'Entry zones', 'Institutional entry', 'The lower (buy) or upper (sell) half of the institutional candle body, drawn forward until price closes through it. Where institutions defend their position'],
+  ['ieT', '2nd test', 'Institutional entry', 'Price comes back into the institutional zone on lighter volume and holds: the classic confirmation that the entry is real'],
+  ['ieR', 'Reclaim', 'Institutional entry', 'Price closes through the zone, then closes back across it within 5 candles: the loss was a trap and the level is reclaimed'],
+  ['ieW', 'Hunt wick', 'Institutional entry', 'A long wick pokes through the institutional zone and closes back inside: stops taken, position defended']
+);
+SMC_PRESETS.phases = ['phz', 'phb', 'phm']; SMC_PRESETS.instE = ['ieC', 'ieZ', 'ieT', 'ieR', 'ieW'];
+function atrArr(B){ const n = B.length, tr = new Array(n), o = new Array(n); for (let i = 0; i < n; i++){ tr[i] = i ? Math.max(B[i].h - B[i].l, Math.abs(B[i].h - B[i - 1].c), Math.abs(B[i].l - B[i - 1].c)) : B[i].h - B[i].l; } let a = tr[0]; for (let i = 0; i < n; i++){ a = i < 14 ? (a * i + tr[i]) / (i + 1) : (a * 13 + tr[i]) / 14; o[i] = a || 1e-9; } return o; }
+function volAvg(B){ const n = B.length, o = new Array(n); let s = 0; for (let i = 0; i < n; i++){ s += B[i].v; if (i >= 20) s -= B[i - 20].v; o[i] = i >= 20 ? s / 20 : (s / (i + 1)); } return o; }
+/* ---- phases ---- */
+function phaseRun(B, tf){
+  const n = B.length; if (n < 80) return null; const s0 = Math.max(0, n - 1500), A = atrArr(B), V = volAvg(B), W = 30, zones = [], ev = [];
+  const rg = new Array(n).fill(false);
+  for (let i = s0 + W; i < n; i++){ let hh = -Infinity, ll = Infinity, path = 0; for (let j = i - W + 1; j <= i; j++){ if (B[j].h > hh) hh = B[j].h; if (B[j].l < ll) ll = B[j].l; if (j > i - W + 1) path += Math.abs(B[j].c - B[j - 1].c); } const er = path ? Math.abs(B[i].c - B[i - W + 1].c) / path : 1; rg[i] = er < 0.32 && (hh - ll) < 9 * A[i]; }
+  let i = s0 + W; const segs = [];
+  while (i < n){ if (!rg[i]){ i++; continue; } let j = i, gap = 0, end = i; while (j < n && gap <= 5){ if (rg[j]){ end = j; gap = 0; } else gap++; j++; } if (end - i >= 12) segs.push([Math.max(s0, i - W + 1), end]); i = end + 1; }
+  let ctxLo = Infinity, ctxHi = -Infinity, prevB = -1;
+  for (let [a, b] of segs){ if (a <= prevB) a = prevB + 1; if (b - a < 10) continue; prevB = b;
+    let hi = -Infinity, lo = Infinity, up = 0, dn = 0, spr = 0, ut = 0; for (let k = a; k <= b; k++){ if (B[k].h > hi) hi = B[k].h; if (B[k].l < lo) lo = B[k].l; }
+    for (let k = a; k <= b; k++){ if (B[k].c >= B[k].o) up += B[k].v; else dn += B[k].v; if (k > a + 5){ if (B[k].l < lo + (hi - lo) * 0.04 && B[k].c > lo + (hi - lo) * 0.12 && B[k].c - B[k].l > 0.6 * (B[k].h - B[k].l)) spr++; if (B[k].h > hi - (hi - lo) * 0.04 && B[k].c < hi - (hi - lo) * 0.12 && B[k].h - B[k].c > 0.6 * (B[k].h - B[k].l)) ut++; } }
+    const skew = (up - dn) / ((up + dn) || 1), pre = (B[a].c - B[Math.max(0, a - 30)].c) / A[a]; ctxLo = Infinity; ctxHi = -Infinity; for (let k = Math.max(0, a - 150); k <= b; k++){ if (B[k].l < ctxLo) ctxLo = B[k].l; if (B[k].h > ctxHi) ctxHi = B[k].h; } const pos = ((hi + lo) / 2 - ctxLo) / ((ctxHi - ctxLo) || 1);
+    const acc = (pre < -1.5 ? 1 : 0) + (pos < 0.4 ? 1 : 0) + (skew > 0.05 ? 1 : 0) + (spr ? 1 : 0), dis = (pre > 1.5 ? 1 : 0) + (pos > 0.6 ? 1 : 0) + (skew < -0.05 ? 1 : 0) + (ut ? 1 : 0);
+    const type = acc >= 2 && acc > dis ? 'acc' : dis >= 2 && dis > acc ? 'dis' : 'chop';
+    zones.push({a, b, hi, lo, type, skew, spring:spr, upthrust:ut, why:(type === 'acc' ? 'after a drop / low in range, more volume on up candles' + (spr ? ', spring seen' : '') : type === 'dis' ? 'after a rise / high in range, more volume on down candles' + (ut ? ', upthrust seen' : '') : 'no volume skew and no clear location: no edge')});
+  }
+  for (let k = Math.max(s0 + 25, 25); k < n; k++){
+    const r = B[k].h - B[k].l; if (r <= 0) continue; const top = B[k].h - Math.max(B[k].o, B[k].c), bot = Math.min(B[k].o, B[k].c) - B[k].l; let h20 = -Infinity, l20 = Infinity; for (let j = k - 20; j < k; j++){ if (B[j].h > h20) h20 = B[j].h; if (B[j].l < l20) l20 = B[j].l; }
+    if (r > 1.3 * A[k] && B[k].v > 1.3 * V[k - 1]){ if (bot > 0.55 * r && B[k].l < l20 && B[k].c > l20) ev.push({i:k, type:'man', dir:1, txt:'MANIP ▼ stop-hunt'}); else if (top > 0.55 * r && B[k].h > h20 && B[k].c < h20) ev.push({i:k, type:'man', dir:-1, txt:'MANIP ▲ stop-hunt'}); }
+    const tight = (h20 - l20) < 6 * A[k];
+    if (tight && B[k - 1].c <= h20 && B[k].c > h20 && k - 1 >= 20){ let ok = 'pend'; const m = Math.min(n - 1, k + 3); let held = true; for (let j = k + 1; j <= m; j++) if (B[j].c < h20 - 0.1 * A[k]) held = false; if (!held) ok = 'fake'; else if (k + 3 <= n - 1) ok = B[k].v > 1.3 * V[k - 1] ? 'real' : 'weak'; ev.push({i:k, type:'bo', dir:1, st:ok, lvl:h20}); }
+    if (tight && B[k - 1].c >= l20 && B[k].c < l20 && k - 1 >= 20){ let ok = 'pend'; const m = Math.min(n - 1, k + 3); let held = true; for (let j = k + 1; j <= m; j++) if (B[j].c > l20 + 0.1 * A[k]) held = false; if (!held) ok = 'fake'; else if (k + 3 <= n - 1) ok = B[k].v > 1.3 * V[k - 1] ? 'real' : 'weak'; ev.push({i:k, type:'bo', dir:-1, st:ok, lvl:l20}); }
+  }
+  let cur = {t:'none', txt:'No clear range. Trend or transition'}; const last = segs.length ? zones[zones.length - 1] : null;
+  if (last && n - 1 - last.b <= 6) cur = {t:last.type, txt:(last.type === 'acc' ? 'Accumulation' : last.type === 'dis' ? 'Distribution' : 'Choppy') + ' · ' + last.why};
+  else { const k = n - 1, p = Math.abs(B[k].c - B[k - 20].c), path = (() => { let s = 0; for (let j = k - 19; j <= k; j++) s += Math.abs(B[j].c - B[j - 1].c); return s; })(), er = path ? p / path : 0; if (er > 0.45) cur = {t:B[k].c > B[k - 20].c ? 'up' : 'dn', txt:(B[k].c > B[k - 20].c ? 'Markup (trending up)' : 'Markdown (trending down)') + ' · efficiency ' + er.toFixed(2)}; }
+  const lastEv = ev.filter(e => e.type !== 'man' || n - 1 - e.i < 40).slice(-1)[0]; if (lastEv && lastEv.type === 'bo' && n - 1 - lastEv.i < 15) cur.bo = (lastEv.st === 'fake' ? 'FAKE ' : lastEv.st === 'real' ? 'REAL ' : lastEv.st === 'weak' ? 'WEAK ' : 'unconfirmed ') + (lastEv.dir > 0 ? 'upside' : 'downside') + ' breakout ' + (n - 1 - lastEv.i) + ' bars ago';
+  return {zones, ev, cur};
+}
+/* ---- institutional entries ---- */
+function instRun(B, tf){
+  const n = B.length; if (n < 40) return null; const s0 = Math.max(25, n - 1500), A = atrArr(B), V = volAvg(B), out = [], wicks = [];
+  for (let i = s0; i < n; i++){
+    const k = B[i], r = k.h - k.l, body = Math.abs(k.c - k.o), mult = V[i - 1] ? k.v / V[i - 1] : 0; if (r <= 0 || mult < 2) continue; let dir = 0, kind = 'inst';
+    if (r >= A[i] && body >= 0.5 * r){ if (k.c > k.o && (k.c - k.l) / r >= 0.65) dir = 1; else if (k.c < k.o && (k.h - k.c) / r >= 0.65) dir = -1; }
+    if (!dir && mult >= 2.5 && r < 0.8 * A[i]){ kind = 'absorb'; const mid = (B[i - 10].c + B[i - 1].c) / 2; dir = k.c <= mid ? 1 : -1; }
+    if (!dir) continue;
+    const zl = dir > 0 ? (kind === 'absorb' ? k.l : k.o) : (kind === 'absorb' ? (k.h + k.l) / 2 : (k.o + k.c) / 2), zh = dir > 0 ? (kind === 'absorb' ? (k.h + k.l) / 2 : (k.o + k.c) / 2) : (kind === 'absorb' ? k.h : k.o), o = {i, dir, kind, mult, lo:Math.min(zl, zh), hi:Math.max(zl, zh), st:'pending', end:n - 1, tests:[], rec:[], hunts:[]};
+    let dead = -1; for (let j = i + 1; j <= n - 1; j++){ if (dir > 0 ? B[j].c < o.lo : B[j].c > o.hi){ dead = j; break; } }
+    const lim = dead >= 0 ? dead : n - 1; o.end = lim;
+    if (dead >= 0 && dead - i <= 5) o.st = 'failed'; else if (i + 3 <= n - 1) o.st = 'real';
+    for (let j = i + 2; j <= lim; j++){ const q = B[j]; if (dir > 0 ? (q.l <= o.hi && q.c >= o.lo && q.c >= q.o * 0.998) : (q.h >= o.lo && q.c <= o.hi && q.c <= q.o * 1.002)){ if (q.v < k.v * 0.7 && !o.tests.length){ o.tests.push(j); } } }
+    for (let j = i + 1; j <= Math.min(n - 1, i + 80); j++){ const q = B[j], rr = q.h - q.l; if (!rr) continue; if (dir > 0 ? (q.l < o.lo && q.c >= o.lo && o.lo - q.l > 0.4 * rr && (dead < 0 || j < dead)) : (q.h > o.hi && q.c <= o.hi && q.h - o.hi > 0.4 * rr && (dead < 0 || j < dead))){ if (!o.hunts.length || j - o.hunts[o.hunts.length - 1] > 3) o.hunts.push(j); } }
+    if (dead >= 0){ for (let j = dead + 1; j <= Math.min(n - 1, dead + 5); j++){ if (dir > 0 ? B[j].c > o.hi : B[j].c < o.lo){ o.rec.push(j); o.end = Math.max(o.end, j); o.st = o.st === 'failed' ? 'reclaimed' : o.st; break; } } }
+    out.push(o);
+  }
+  return {c:out.slice(-40)};
+}
+function phCache(c){ const key = c.n + '|' + c.ver + '|' + c.pane.tf; if (c._phC && c._phC.key === key) return c._phC; const B = c.bars.slice(0, c.n); let ph = null, ie = null; try { ph = phaseRun(B, c.pane.tf); } catch(e){} try { ie = instRun(B, c.pane.tf); } catch(e){} c._phC = {key, ph, ie}; return c._phC; }
+const PHC = {acc:'#2fbf71', dis:'#f0616d', chop:'#8393a7'}, PHN = {acc:'ACCUMULATION', dis:'DISTRIBUTION', chop:'CHOPPY'};
+const _ef = Chart.prototype.extFront;
+Chart.prototype.extFront = function(g, plotW, ff){
+  _ef.call(this, g, plotW, ff); const p = this.pane, on = k => smcOn(p, k); if (!(on('phz') || on('phb') || on('phm') || on('ieC') || on('ieZ') || on('ieT') || on('ieR') || on('ieW'))) return; const C = phCache(this), B = this.bars, n = this.n, mh = this.L.mainH; if (!C.ph && !C.ie) return;
+  g.save(); g.beginPath(); g.rect(0, 0, plotW, mh); g.clip(); g.font = '9px ' + ff; const vis0 = Math.floor(this.v0) - 3, vis1 = Math.ceil(this.v0 + plotW / this.bw) + 3, inV = i => i >= vis0 && i <= vis1, mk2 = (x, y, up, col) => { g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y); g.lineTo(x - 4, y + 7); g.lineTo(x + 4, y + 7); } else { g.moveTo(x, y); g.lineTo(x - 4, y - 7); g.lineTo(x + 4, y - 7); } g.fill(); }, lab = (t, x, y, col, al) => { g.fillStyle = col; g.textAlign = al || 'center'; g.fillText(t, x, y); g.textAlign = 'left'; };
+  if (C.ph){
+    if (on('phz')) for (const z of C.ph.zones){ if (z.b < vis0 || z.a > vis1) continue; const x0 = this.xOf(z.a) - this.bw / 2, x1 = this.xOf(z.b) + this.bw / 2, y0 = this.yOf(z.hi), y1 = this.yOf(z.lo), col = PHC[z.type]; g.fillStyle = rgba(col, 0.1); g.fillRect(x0, y0, x1 - x0, y1 - y0); g.strokeStyle = rgba(col, 0.7); g.lineWidth = 1; g.setLineDash([5, 3]); g.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, y1 - y0); g.setLineDash([]); lab(PHN[z.type], Math.max(x0 + 4, 4), y0 + 11, col, 'left'); }
+    for (const e of C.ph.ev.slice(-60)){
+      if (!inV(e.i)) continue; const x = this.xOf(e.i);
+      if (e.type === 'man' && on('phm')){ const y = e.dir > 0 ? this.yOf(B[e.i].l) + 4 : this.yOf(B[e.i].h) - 4; mk2(x, y, e.dir > 0, '#e879f9'); lab(e.txt, x, e.dir > 0 ? y + 17 : y - 10, '#e879f9'); }
+      if (e.type === 'bo' && on('phb') && e.st !== 'weak'){ const real = e.st === 'real', fake = e.st === 'fake', col = real ? '#2fbf71' : fake ? '#f0616d' : '#e3b341', y = e.dir > 0 ? this.yOf(B[e.i].h) - 6 : this.yOf(B[e.i].l) + 6; if (e.lvl){ const yl = Math.round(this.yOf(e.lvl)) + 0.5; g.strokeStyle = rgba(col, 0.5); g.setLineDash([3, 3]); g.beginPath(); g.moveTo(this.xOf(Math.max(vis0, e.i - 20)), yl); g.lineTo(x + this.bw * 4, yl); g.stroke(); g.setLineDash([]); } mk2(x, y, e.dir < 0, col); lab((real ? 'REAL BO' : fake ? 'FAKE BO (trap)' : 'BO?') + (e.dir > 0 ? ' ▲' : ' ▼'), x, e.dir > 0 ? y - 10 : y + 18, col); }
+    }
+  }
+  if (C.ie) for (const o of C.ie.c){
+    const col = o.dir > 0 ? '#2fbf71' : '#f0616d', k = B[o.i];
+    if (on('ieZ') && o.st !== 'failed' && (o.end >= vis0 && o.i <= vis1)){ const x0 = this.xOf(o.i) - this.bw / 2, x1 = this.xOf(o.end) + this.bw * (o.end >= n - 1 ? 12 : 1), y0 = this.yOf(o.hi), y1 = this.yOf(o.lo); g.fillStyle = rgba(col, 0.13); g.fillRect(x0, y0, x1 - x0, Math.max(2, y1 - y0)); g.strokeStyle = rgba(col, 0.6); g.lineWidth = 1; g.setLineDash([4, 3]); g.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, Math.max(2, y1 - y0)); g.setLineDash([]); }
+    if (on('ieC') && inV(o.i)){ const x = this.xOf(o.i), yh = this.yOf(k.h), yl = this.yOf(k.l); g.strokeStyle = rgba(col, 0.9); g.lineWidth = 1.2; g.strokeRect(x - this.bw / 2 - 1, yh - 2, this.bw + 2, yl - yh + 4); const t = (o.kind === 'absorb' ? 'ABSORB ' : o.dir > 0 ? 'INST BUY ' : 'INST SELL ') + o.mult.toFixed(1) + '× ' + (o.st === 'failed' ? '✗' : o.st === 'real' ? '✓' : '…'); lab(t, x, o.dir > 0 ? yl + 14 : yh - 8, o.st === 'failed' ? '#8393a7' : col); }
+    if (on('ieT')) for (const j of o.tests){ if (!inV(j)) continue; const x = this.xOf(j), y = o.dir > 0 ? this.yOf(B[j].l) + 4 : this.yOf(B[j].h) - 4; mk2(x, y, o.dir > 0, '#58a6ff'); lab('2nd test ✓', x, o.dir > 0 ? y + 17 : y - 10, '#58a6ff'); }
+    if (on('ieR')) for (const j of o.rec){ if (!inV(j)) continue; const x = this.xOf(j), y = o.dir > 0 ? this.yOf(B[j].l) + 4 : this.yOf(B[j].h) - 4; mk2(x, y, o.dir > 0, '#22d3ee'); lab('RECLAIM', x, o.dir > 0 ? y + 17 : y - 10, '#22d3ee'); }
+    if (on('ieW')) for (const j of o.hunts){ if (!inV(j)) continue; const x = this.xOf(j), y = o.dir > 0 ? this.yOf(B[j].l) + 4 : this.yOf(B[j].h) - 4; mk2(x, y, o.dir > 0, '#f0b429'); lab('HUNT WICK', x, o.dir > 0 ? y + 17 : y - 10, '#f0b429'); }
+  }
+  g.restore();
+};
+/* ---- header chips (this timeframe) and per-timeframe tooltips ---- */
+function instLine(ie, n){ if (!ie || !ie.c.length) return 'no institutional entry candle in view'; const o = ie.c.filter(x => x.st !== 'failed').slice(-1)[0] || ie.c[ie.c.length - 1]; return (o.kind === 'absorb' ? 'absorption ' : 'institutional ') + (o.dir > 0 ? 'BUY' : 'SELL') + ' ' + o.mult.toFixed(1) + '× volume, ' + (n - 1 - o.i) + ' bars ago · ' + (o.st === 'failed' ? 'FAILED (price closed through it)' : o.st === 'real' ? 'held ✓' : 'too fresh to judge') + (o.tests.length ? ' · 2nd test ✓' : ' · no 2nd test yet') + (o.rec.length ? ' · reclaimed' : '') + (o.hunts.length ? ' · hunt wick seen' : ''); }
+const _au2 = anaUpd;
+anaUpd = function(c){
+  _au2(c); const cell = c.cell; if (!cell) return; const C = phCache(c), pe = $q('.ta-phase', cell), ie = $q('.ta-inst', cell);
+  if (pe){ const cu = C.ph && C.ph.cur, t = cu ? ({acc:'Accumulation', dis:'Distribution', chop:'Choppy', up:'Markup', dn:'Markdown', none:'No clear range'}[cu.t]) : '…'; const txt = 'Phase (' + c.pane.tf + '): ' + t + (cu && cu.bo ? ' · ' + cu.bo : ''); if (pe.textContent !== txt){ pe.textContent = txt; pe.title = cu ? cu.txt + (cu.bo ? ' | ' + cu.bo : '') : ''; pe.className = 'ta-phase ' + (cu ? (cu.t === 'acc' || cu.t === 'up' ? 'up' : cu.t === 'dis' || cu.t === 'dn' ? 'dn' : '') : ''); } }
+  if (ie){ const txt = 'Inst (' + c.pane.tf + '): ' + (C.ie && C.ie.c.length ? (() => { const o = C.ie.c.filter(x => x.st !== 'failed').slice(-1)[0]; return o ? (o.dir > 0 ? 'BUY ' : 'SELL ') + o.mult.toFixed(1) + '×' + (o.tests.length ? ' · 2nd test ✓' : '') : 'last one failed'; })() : 'none'); if (ie.textContent !== txt){ ie.textContent = txt; ie.title = instLine(C.ie, c.n); } }
+};
+function mtfInfo(f, tf){ const B = f.bars; if (B.length < 80) return ''; if (!f._ph || f._ph.v !== f.ver){ let ph = null, ie = null; try { ph = phaseRun(B, tf); } catch(e){} try { ie = instRun(B, tf); } catch(e){} f._ph = {v:f.ver, ph, ie}; } const cu = f._ph.ph && f._ph.ph.cur; return ' | phase: ' + (cu ? cu.txt : 'n/a') + (cu && cu.bo ? ' | ' + cu.bo : '') + ' | inst: ' + instLine(f._ph.ie, B.length); }
 
 /* ---------- workspace UI ---------- */
 const CSS = `
@@ -13715,7 +13854,8 @@ const CSS = `
 .ta-badge.up{color:var(--up);border-color:var(--up)}.ta-badge.dn{color:var(--down);border-color:var(--down)}
 .ta-body{display:flex;flex:1;min-height:0}
 .ta-tools{display:flex;flex-direction:column;gap:3px;padding:5px 4px;border-right:1px solid var(--line);background:var(--surface2);overflow:auto}
-.ta-tools .ta-b{padding:3px 0;width:30px;text-align:center;font-size:12px}
+.ta-tools .ta-b{padding:3px 0;width:30px;text-align:center;font-size:12px;flex:none}
+.ta-tools{scrollbar-width:thin}.ta-tools.min{padding:5px 2px}.ta-tools.min .ta-b{width:20px;font-size:10px}.ta-tools.min .ta-b:not([data-a=tbar]):not(.on){display:none}
 .ta-cv{position:relative;flex:1;min-width:0;min-height:0}
 .ta-cv canvas{position:absolute;inset:0;width:100%;height:100%;outline:none;touch-action:none;display:block}
 .ta-lg{position:absolute;inset:0;pointer-events:none}
@@ -13738,13 +13878,13 @@ const CSS = `
 .ta-help{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.6}
 .ta-help b{color:var(--accent)}.ta-help kbd{background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:0 5px;font-family:var(--mono);font-size:11px}
 `;
-const TOOLS = [['cursor', '➤', 'Cursor: select and move drawings'], ['trend', '╱', 'Trend line'], ['ray', '↗', 'Ray'], ['hline', '―', 'Horizontal line'], ['vline', '│', 'Vertical line'], ['rect', '▭', 'Rectangle / zone'], ['channel', '▱', 'Parallel channel (3 clicks)'], ['fib', 'Fib', 'Fibonacci retracement (drag from swing to swing)'], ['long', 'L▲', 'Long position: entry, stop, target and R:R'], ['short', 'S▼', 'Short position: entry, stop, target and R:R'], ['measure', '⇔', 'Measure: price, %, bars, time'], ['text', 'T', 'Text note']];
+const TOOLS = [['cursor', '➤', 'Cursor: select and move drawings'], ['trend', '╱', 'Trend line'], ['ray', '↗', 'Ray'], ['hline', '―', 'Horizontal line'], ['vline', '│', 'Vertical line'], ['rect', '▭', 'Rectangle / zone'], ['channel', '▱', 'Parallel channel (3 clicks)'], ['fib', 'Fib', 'Fibonacci retracement (drag from swing to swing)'], ['long', 'L▲', 'Long position: entry, stop, target and R:R'], ['short', 'S▼', 'Short position: entry, stop, target and R:R'], ['measure', '⇔', 'Measure: price, %, bars, time'], ['text', 'T', 'Text note'], ['info', 'ℹ╱', 'Info line: shows price change, % and bars'], ['arrow', '➜', 'Arrow'], ['hray', '⇥', 'Horizontal ray: a level that runs from your click to the right'], ['cross', '✛', 'Cross lines: horizontal and vertical at one point'], ['ellipse', '◯', 'Ellipse / circle'], ['triangle', '△', 'Triangle (3 clicks)'], ['fork', 'Ψ', 'Andrews pitchfork (3 clicks)'], ['fibext', 'FxE', 'Trend-based Fib extension (3 clicks: swing start, swing end, retrace)'], ['vrange', '▥', 'Time range: bars and duration between two points'], ['prange', '▤', 'Price range: distance and % between two prices'], ['flag', '⚑', 'Flag marker'], ['arrup', '⬆', 'Arrow up marker (buy idea)'], ['arrdn', '⬇', 'Arrow down marker (sell idea)']];
 const TYPES = [['candle', 'Candles'], ['hollow', 'Hollow candles'], ['ha', 'Heikin Ashi'], ['bar', 'OHLC bars'], ['line', 'Line'], ['area', 'Area']];
 const TZS = ['Asia/Karachi', 'UTC', 'America/New_York', 'Europe/London', 'Asia/Dubai', 'Asia/Tokyo', 'Asia/Kolkata'];
 let root = null, charts = [], pop = null, raf = 0, built = false;
 const CELL_TF = ['15m', '1h', '4h', '1d', '5m', '30m'];
 function closePop(){ if (pop){ pop.remove(); pop = null; } }
-function openPop(anchor, html, setup){ closePop(); pop = mk('div', 'ta-pop', html); document.body.appendChild(pop); const r = anchor.getBoundingClientRect(); pop.style.left = Math.max(6, Math.min(window.innerWidth - 270, r.left)) + 'px'; pop.style.top = Math.min(window.innerHeight - 120, r.bottom + 4) + 'px'; if (setup) setup(pop); setTimeout(() => document.addEventListener('pointerdown', function h(e){ if (pop && !pop.contains(e.target) && e.target !== anchor){ closePop(); document.removeEventListener('pointerdown', h, true); } else if (!pop) document.removeEventListener('pointerdown', h, true); }, true), 0); return pop; }
+function openPop(anchor, html, setup){ closePop(); pop = mk('div', 'ta-pop', html); document.body.appendChild(pop); const r = anchor.getBoundingClientRect(); pop.style.left = Math.max(6, Math.min(window.innerWidth - 270, r.left)) + 'px'; pop.style.maxHeight = (window.innerHeight - 16) + 'px'; pop.style.overflowY = 'auto'; pop.style.top = '0px'; { const hh = pop.offsetHeight; pop.style.top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - hh - 8)) + 'px'; } if (setup) setup(pop); setTimeout(() => document.addEventListener('pointerdown', function h(e){ if (pop && !pop.contains(e.target) && e.target !== anchor){ closePop(); document.removeEventListener('pointerdown', h, true); } else if (!pop) document.removeEventListener('pointerdown', h, true); }, true), 0); return pop; }
 const cellOf = c => c.cell;
 function coinNames(){ let a = []; try { a = (HOOK().coins && HOOK().coins()) || []; } catch(e){} const set = new Set(DEFSYMS); a.forEach(x => set.add(x)); try { for (const b of UNI.map.keys()) set.add(b); } catch(e){} return [...set]; }
 function setSym(i, sym){
@@ -13796,7 +13936,7 @@ function camMenu(c, btn){
 
 function smcStrip(){
   const groups = []; SMC.forEach(q => { let g = groups.find(x => x.n === q[2]); if (!g){ g = {n:q[2], a:[]}; groups.push(g); } g.a.push(q); });
-  return '<div class="ta-smc"><span class="g"><i>Presets</i><button class="c pre" data-a="smcp" data-p="ict" title="Structure, order blocks, FVG, liquidity, premium/discount">ICT core</button><button class="c pre" data-a="smcp" data-p="volume" title="Institutional candles, volume entries, absorption, volume profile">Volume</button><button class="c pre" data-a="smcp" data-p="sessions" title="Kill zones, Asia range, previous day levels, opens">Sessions</button><button class="c pre" data-a="smcp" data-p="off" title="Turn all SMC items off for a clean chart">Clear</button></span>' + groups.map(g => '<span class="g"><i>' + esc(g.n) + '</i>' + g.a.map(q => '<button class="c" data-a="smc" data-k="' + q[0] + '" title="' + esc(q[3]) + '">' + esc(q[1]) + '</button>').join('') + '</span>').join('') + '</div>';
+  return '<div class="ta-smc"><span class="g"><i>Presets</i><button class="c pre" data-a="smcp" data-p="ict" title="Structure, order blocks, FVG, liquidity, premium/discount">ICT core</button><button class="c pre" data-a="smcp" data-p="volume" title="Institutional candles, volume entries, absorption, volume profile">Volume</button><button class="c pre" data-a="smcp" data-p="sessions" title="Kill zones, Asia range, previous day levels, opens">Sessions</button><button class="c pre" data-a="smcp" data-p="phases" title="Accumulation, distribution, choppy, real and fake breakouts, stop hunts">Phases</button><button class="c pre" data-a="smcp" data-p="instE" title="Real institutional volume, entry zones, 2nd test, reclaim, hunt wick">Inst. entry</button><button class="c pre" data-a="smcp" data-p="off" title="Turn all SMC items off for a clean chart">Clear</button></span>' + groups.map(g => '<span class="g"><i>' + esc(g.n) + '</i>' + g.a.map(q => '<button class="c" data-a="smc" data-k="' + q[0] + '" title="' + esc(q[3]) + '">' + esc(q[1]) + '</button>').join('') + '</span>').join('') + '</div>';
 }
 function cellHtml(i){
   return '<div class="ta-top">' +
@@ -13813,15 +13953,15 @@ function cellHtml(i){
     '<button class="ta-b" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
     '<span class="ta-badge" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
     '<button class="ta-b" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button></div>' +
-    '<div class="ta-ana"><button class="ta-conf" data-a="plan2" title="How many smart-money signals line up right now. Click to build a full trade plan from them.">Confluence…</button><span class="ta-mtf" title="Trend bias on 15m, 1h, 4h and Daily (green up, red down, amber mixed)"></span><button class="ta-b" data-a="stats" title="What usually happens on this coin after a sweep, break of structure, volume spike or Asia-low sweep">📈 Stats</button><button class="ta-b" data-a="alert" title="Alerts: price, sweep, CHoCH, OB/FVG tap, confluence score">🔔 Alerts</button><button class="ta-b" data-a="cmp" title="Compare with BTC or any coin">⚖ Compare</button><button class="ta-b" data-a="data" title="Open interest, funding, long/short, order-book walls, liquidation map, scanner pools, signal history, events">🗂 Data</button><button class="ta-b" data-a="score" title="Your replay win rate and average R by setup">🏆 Scorecard</button><span class="ta-cmps"></span></div>' +
-    smcStrip() + '<div class="ta-body"><div class="ta-tools">' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
+    '<div class="ta-ana"><button class="ta-conf" data-a="plan2" title="How many smart-money signals line up right now. Click to build a full trade plan from them.">Confluence…</button><button class="ta-b" data-a="plan2" title="Entry, stop, targets, leverage, margin and risk built from the signals">📋 Trade plan</button><span class="ta-mtf" title="Trend bias on 15m, 1h, 4h and Daily (green up, red down, amber mixed). Hover a light for the phase and institutional status"></span><span class="ta-phase" title="Market phase on this timeframe"></span><span class="ta-inst" title="Latest institutional entry on this timeframe"></span><button class="ta-b" data-a="stats" title="What usually happens on this coin after a sweep, break of structure, volume spike or Asia-low sweep">📈 Stats</button><button class="ta-b" data-a="alert" title="Alerts: price, sweep, CHoCH, OB/FVG tap, confluence score">🔔 Alerts</button><button class="ta-b" data-a="cmp" title="Compare with BTC or any coin">⚖ Compare</button><button class="ta-b" data-a="data" title="Open interest, funding, long/short, order-book walls, liquidation map, scanner pools, signal history, events">🗂 Data</button><button class="ta-b" data-a="score" title="Your replay win rate and average R by setup">🏆 Scorecard</button><span class="ta-cmps"></span></div>' +
+    smcStrip() + '<div class="ta-body"><div class="ta-tools"><button class="ta-b" data-a="tbar" title="Shrink or expand the drawing toolbar">«</button>' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
     '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
     '<div class="ta-rp" hidden><button class="ta-b" data-a="rp-play">▶</button><button class="ta-b" data-a="rp-step" title="Next candle (→)">⏭</button><select data-a="rp-speed"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option></select>' +
     '<select data-a="rp-tag" title="Tag this trade with its setup so the scorecard can rank your edges">' + TAGS.map(t => '<option>' + t + '</option>').join('') + '</select><button class="ta-b" data-a="rp-long" style="color:var(--up)">▲ Long</button><button class="ta-b" data-a="rp-short" style="color:var(--down)">▼ Short</button><button class="ta-b" data-a="rp-close">Close</button><label>SL×ATR <input type="number" step="0.1" min="0.2" data-a="rp-slx" value="1.5"></label><label>R:R <input type="number" step="0.5" min="0.5" data-a="rp-rr" value="2"></label>' +
     '<span class="ta-rs"></span><button class="ta-b" data-a="rp-pick">Pick bar</button><button class="ta-b" data-a="rp-exit">Exit</button></div></div></div>';
 }
 function refresh(c){
-  const cell = c.cell; if (!cell) return; { const vl = $q('.ta-vl2', cell); if (vl){ const f = c.feed, v = c.pane.ven || 'auto'; vl.textContent = f && f.src ? VEN[f.src.src].tag + (v === 'auto' ? '·auto' : '') : (v === 'auto' ? 'Auto' : VEN[v].tag); } } const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
+  const cell = c.cell; if (!cell) return; { const tb = $q('.ta-tools', cell); if (tb){ tb.classList.toggle('min', !!S.tbMin); const b0 = $q('[data-a=tbar]', tb); if (b0) b0.textContent = S.tbMin ? '»' : '«'; } } { const vl = $q('.ta-vl2', cell); if (vl){ const f = c.feed, v = c.pane.ven || 'auto'; vl.textContent = f && f.src ? VEN[f.src.src].tag + (v === 'auto' ? '·auto' : '') : (v === 'auto' ? 'Auto' : VEN[v].tag); } } const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
   cell.querySelectorAll('[data-a=tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === p.tf)); const m = $q('.ta-tfm', cell); m.value = p.tf; $q('.ta-type', cell).value = p.type;
   const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('plan', p.plan); { let cnt = 0; cell.querySelectorAll('[data-a=smc]').forEach(b => { const v = smcOn(p, b.dataset.k); if (v) cnt++; b.classList.toggle('on', v); }); const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; $q('.ta-smc', cell).hidden = !open; const sb = $q('[data-a=smcs]', cell); sb.textContent = 'SMC' + (cnt ? ' (' + cnt + ')' : '') + (open ? ' ▴' : ' ▾'); sb.classList.toggle('on', cnt > 0); } on('rep', c.rep.on); on('mag', S.magnet);
   cell.querySelectorAll('[data-a=tool]').forEach(b => b.classList.toggle('on', b.dataset.t === c.tool)); const st = $q('.ta-star', cell); st.classList.toggle('on', S.stars.includes(p.sym)); st.textContent = S.stars.includes(p.sym) ? '★' : '☆';
@@ -13841,7 +13981,7 @@ function build(){ try { uniLoad(); } catch(e){}
     '<span class="sep"></span><select id="taTpl" style="background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:2px 4px;max-width:150px"></select><button class="ta-b" id="taTplLoad" title="Load the chosen saved layout">Load</button><button class="ta-b" id="taTplSave" title="Save the current layout, coins and indicators as a template">Save layout…</button><button class="ta-b" id="taTplDel" title="Delete the chosen template">🗑</button>' +
     '<span class="sep"></span><span style="font-size:12px;color:var(--muted)">Chart size</span>' + [['M', 1], ['L', 1.2], ['XL', 1.5], ['XXL', 1.9]].map(q => '<button class="ta-b" data-hs="' + q[1] + '">' + q[0] + '</button>').join('') + '<span class="sep"></span><button class="ta-b" id="taClear" title="Delete every drawing on the active chart\'s coin">Clear drawings</button><button class="ta-b" id="taHelp">? Guide</button></div>' +
     '<div class="ta-bar" style="padding:4px 8px"><span style="font-size:12px;color:var(--warn)">★ Favourites</span><span class="ta-favs" style="display:flex;flex-wrap:wrap;gap:5px"></span></div>' +
-    '<div class="ta-help" id="taHelpBox" hidden><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
+    '<div class="ta-help" id="taHelpBox" hidden><b>Where is everything?</b> Second row of every chart: <b>Confluence badge / 📋 Trade plan</b> (plan builder, add to Watchlist) · coloured dots = 15m/1h/4h/D bias (hover for phase and institutional status) · <b>Phase</b> and <b>Inst</b> chips · <b>📈 Stats</b> · <b>🔔 Alerts</b> · <b>⚖ Compare</b> · <b>🗂 Data</b> (liquidation map, order-book walls, scanner pools, signal and journal history, events, open interest, funding, long/short, delta) · <b>🏆 Scorecard</b> (replay stats) · the <b>Favourites</b> bar has the mini-charts · the SMC strip has <i>Market phases</i> and <i>Institutional entry</i> chips · the drawing toolbar shrinks with «.<br><b>Mouse:</b> drag to pan · wheel to zoom · drag the price scale (right) to stretch it, double-click it to reset · double-click the chart to fit · click a drawing to select and drag it or its dots · <kbd>Del</kbd> removes the selected drawing · <kbd>Esc</kbd> cancels a tool · <kbd>Ctrl+Z</kbd> removes the last drawing · <kbd>← →</kbd> pan (step in replay) · <kbd>Space</kbd> play/pause replay.<br><b>Long / Short tools:</b> click once, then drag the green target, red stop and the right edge. The box shows R:R live.<br><b>Replay:</b> press ⏪ Replay, click a candle, then step or play forward and press Long or Short to paper-trade it. Stats show win rate and total R.<br><b>Liquidity / FVG:</b> BSL = unswept swing highs (buy-side), SSL = unswept swing lows. Faded dotted lines were already swept. FVG boxes are unfilled gaps.<br><b>Scanner plan:</b> draws the scanner\'s entry, stop and targets for that coin when it has a plan.<br>Drawings are saved per coin and appear on every timeframe of that coin.</div>' +
     '<div class="ta-grid" id="taGrid"></div></div><datalist id="taList"></datalist>';
   const tpl = () => { $q('#taTpl', root).innerHTML = '<option value="">Saved layouts…</option>' + Object.keys(S.tpl).map(k => '<option>' + esc(k) + '</option>').join(''); }; tpl();
   $q('#taSync', root).checked = !!S.sync; $q('#taLink', root).checked = !!S.link; $q('#taTz', root).value = S.tz;
@@ -13878,6 +14018,7 @@ function build(){ try { uniLoad(); } catch(e){}
     if (a === 'png'){ camMenu(c, b); return; }
     if (a === 'fit'){ c.fit(); c.dirty = true; return; }
     if (a === 'fs'){ cell.classList.toggle('ta-full'); setTimeout(() => { c.dirty = true; }, 30); return; }
+    if (a === 'tbar'){ S.tbMin = !S.tbMin; save(); charts.forEach(refresh); return; }
     if (a === 'tool'){ c.tool = b.dataset.t; c.pend = []; c.sel = null; c.dirty = true; refresh(c); c.cv.focus(); return; }
     if (a === 'mag'){ S.magnet = !S.magnet; save(); charts.forEach(refresh); return; }
     if (a === 'undo'){ if (c.sel) c.delSel(); else { const ar = c.draws(); if (ar.length){ ar.pop(); save(); c.dirty = true; } } refresh(c); return; }
