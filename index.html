@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.96</title>
+<title>ELPP CRYPTO SCANNER PRO V4.97</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.96</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.97</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10707,7 +10707,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.96: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.97: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -11408,7 +11408,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.96: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.97: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11456,7 +11456,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.96: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.97: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11668,7 +11668,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.96: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.97: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11682,7 +11682,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.96: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.97: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11886,7 +11886,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.96: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.97: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
@@ -11922,7 +11922,7 @@ function psElite(c, mk){
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
   return o;
 }
-/* ===== V4.96: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
+/* ===== V4.97: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
 const BTF = {map:new Map(), busy:false, t:0};
 function btSym(c){ const k = normSym(c.name); return (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; }
 async function btTick(){
@@ -12019,7 +12019,7 @@ function pdTick(){
   if (dirty){ try { LS.set(PDL.k, L.slice(-500)); } catch(e){} }
 }
 function pdStats(){ const L = pdLogLoad(), d = L.filter(x => x.res === 'hit' || x.res === 'miss'), h = d.filter(x => x.res === 'hit').length; return {n:d.length, hit:h, rate:d.length ? Math.round(h / d.length * 1000) / 10 : null, pend:L.filter(x => x.res == null).length, flat:L.filter(x => x.res === 'flat').length}; }
-/* ===== V4.96: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
+/* ===== V4.97: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
 async function pxText(url){
   const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), tries = [];
   if (base) tries.push(base + '/proxy.php'); tries.push('proxy.php');
@@ -12039,20 +12039,24 @@ const FRED_S = [
   ['VIXCLS', 'VIX (stock fear gauge)', '%', 'A spike means stocks are scared and crypto usually follows lower.', -1]
 ];
 const FR = {at:0, busy:false, s:LS.get('elpp_fred') || {}, err:''};
+function frCalc(rows){ const last = rows[rows.length - 1], at = k => rows[Math.max(0, rows.length - 1 - k)][1], yr = rows.slice(-250).map(r => r[1]); return {v:last[1], d:last[0], c5:last[1] - at(5), c20:last[1] - at(20), p5:at(5) ? (last[1] / at(5) - 1) * 100 : null, p20:at(20) ? (last[1] / at(20) - 1) * 100 : null, lo:Math.min(...yr), hi:Math.max(...yr)}; }
+/* the Outside-markets loader (MX) already reads FRED through its own routes: reuse whatever it got */
+function frSyncMx(){ try { let n = 0; for (const [id] of FRED_S){ const r = MX.f && MX.f.get(id); if (r && r.length >= 25 && !(FR.s[id] && FR.s[id].src === 'own')){ const o = frCalc(r.map(x => [new Date(x[0]).toISOString().slice(0, 10), x[1]])); o.src = 'mx'; FR.s[id] = o; n++; } } if (n && !FR.s._at) FR.s._at = Date.now(); return n; } catch(e){ return 0; } }
 async function frLoad(force){
   if (FR.busy) return; const now = Date.now(); if (!force && FR.at && now - FR.at < 7200000) return; if (!force && FR.s && FR.s._at && now - FR.s._at < 7200000){ FR.at = FR.s._at; return; }
   FR.busy = true; const cosd = new Date(now - 420 * 864e5).toISOString().slice(0, 10), out = {}; let ok = 0;
   await Promise.all(FRED_S.map(async ([id]) => { try {
     const t = await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + id + '&cosd=' + cosd), rows = t.trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && isFinite(+a[1])).map(a => [a[0], +a[1]]);
     if (rows.length < 25) throw new Error('short'); const last = rows[rows.length - 1], at = k => rows[Math.max(0, rows.length - 1 - k)][1];
-    out[id] = {v:last[1], d:last[0], c5:last[1] - at(5), c20:last[1] - at(20), p5:at(5) ? (last[1] / at(5) - 1) * 100 : null, p20:at(20) ? (last[1] / at(20) - 1) * 100 : null, lo:Math.min(...rows.slice(-250).map(r => r[1])), hi:Math.max(...rows.slice(-250).map(r => r[1]))}; ok++;
+    out[id] = Object.assign(frCalc(rows), {src:'own'}); ok++;
   } catch(e){} }));
-  if (ok){ out._at = Date.now(); FR.s = out; LS.set('elpp_fred', out); FR.at = out._at; FR.err = ''; } else { FR.err = 'FRED data unreachable: upload proxy.php next to index.html'; FR.at = now - 7200000 + 300000; }
+  if (!ok){ try { await mxFred(FRED_S.map(x => x[0]), 420); if (frSyncMx()) ok = -1; } catch(e){} }
+  if (ok < 0){ FR.err = ''; FR.at = Date.now(); LS.set('elpp_fred', FR.s); } else if (ok){ out._at = Date.now(); FR.s = out; LS.set('elpp_fred', out); FR.at = out._at; FR.err = ''; } else { FR.err = 'FRED could not be reached from this address (US government site, no browser access). It will work once proxy.php is uploaded next to index.html on your own host.'; FR.at = now - 7200000 + 300000; }
   FR.busy = false;
 }
 /* macro score -1..1 from real yields, dollar and VIX over 5 days (bearish for crypto when they rise) */
 function frScore(){
-  const S = FR.s || {}, why = []; let num = 0, den = 0; const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  frSyncMx(); const S = FR.s || {}, why = []; let num = 0, den = 0; const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const put = (s, w, t) => { num += s * w; den += w; if (Math.abs(s) >= 0.25) why.push(t); };
   if (S.DFII10){ const b = S.DFII10.c5 * 100; put(-clamp(b / 12, -1, 1), 1.2, 'real yield ' + (b >= 0 ? 'up ' : 'down ') + Math.abs(b).toFixed(0) + ' bp in 5 days'); }
   if (S.DGS10){ const b = S.DGS10.c5 * 100; put(-clamp(b / 15, -1, 1), 0.7, '10y yield ' + (b >= 0 ? 'up ' : 'down ') + Math.abs(b).toFixed(0) + ' bp in 5 days'); }
@@ -12061,7 +12065,7 @@ function frScore(){
   return {score:den ? num / den : null, why, n:den};
 }
 function frHtml(){
-  const S = FR.s || {}, has = FRED_S.some(x => S[x[0]]); if (!has) return `<div class="nsec"><h3>🏛️ US yields and dollar (FRED)</h3><p class="hint">${FR.busy ? 'Loading…' : esc(FR.err || 'Not loaded yet.')}</p></div>`;
+  frSyncMx(); const S = FR.s || {}, has = FRED_S.some(x => S[x[0]]); if (!has) return `<div class="nsec"><h3>🏛️ US yields and dollar (FRED)</h3><p class="hint">${FR.busy ? 'Loading…' : esc(FR.err || 'Not loaded yet.')}</p></div>`;
   const sc = frScore(), fmt = (x, u) => u === 'bp' ? (x >= 0 ? '+' : '') + (x * 100).toFixed(0) + ' bp' : (x >= 0 ? '+' : '') + x.toFixed(1) + '%';
   const rows = FRED_S.map(([id, nm, u, say, sgn]) => { const o = S[id]; if (!o) return ''; const c5 = u === 'bp' ? o.c5 : o.p5, c20 = u === 'bp' ? o.c20 : o.p20, cl = x => !isNum(x) || !sgn ? 'dim' : (x * sgn > 0 ? 'dn' : 'up'), pos = o.hi > o.lo ? Math.round((o.v - o.lo) / (o.hi - o.lo) * 100) : null;
     return `<tr><td style="text-align:left"><b>${esc(nm)}</b><br><small class="hint">${esc(say)}</small></td><td>${id === 'DTWEXBGS' || id === 'VIXCLS' ? o.v.toFixed(1) : o.v.toFixed(2) + (id === 'T10Y2Y' ? '' : '%')}</td><td class="${cl(c5)}">${isNum(c5) ? fmt(c5, u) : '–'}</td><td class="${cl(c20)}">${isNum(c20) ? fmt(c20, u) : '–'}</td><td>${pos == null ? '–' : pos + '%'}</td><td class="dim">${esc(o.d)}</td></tr>`; }).join('');
