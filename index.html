@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.98</title>
+<title>ELPP CRYPTO SCANNER PRO V4.99</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.98</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.99</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10707,7 +10707,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.98: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.99: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -11408,7 +11408,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.98: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.99: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11456,7 +11456,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.98: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.99: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11668,7 +11668,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.98: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.99: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11682,7 +11682,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.98: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.99: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11886,7 +11886,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.98: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.99: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
@@ -11922,7 +11922,7 @@ function psElite(c, mk){
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
   return o;
 }
-/* ===== V4.98: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
+/* ===== V4.99: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
 const BTF = {map:new Map(), busy:false, t:0};
 function btSym(c){ const k = normSym(c.name); return (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; }
 async function btTick(){
@@ -12019,7 +12019,7 @@ function pdTick(){
   if (dirty){ try { LS.set(PDL.k, L.slice(-500)); } catch(e){} }
 }
 function pdStats(){ const L = pdLogLoad(), d = L.filter(x => x.res === 'hit' || x.res === 'miss'), h = d.filter(x => x.res === 'hit').length; return {n:d.length, hit:h, rate:d.length ? Math.round(h / d.length * 1000) / 10 : null, pend:L.filter(x => x.res == null).length, flat:L.filter(x => x.res === 'flat').length}; }
-/* ===== V4.98: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
+/* ===== V4.99: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
 async function pxText(url){
   const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), tries = [];
   if (base) tries.push(base + '/proxy.php'); tries.push('proxy.php');
@@ -12319,7 +12319,8 @@ window.__elppTaHook = {
   plan: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c) return null; const q = planFor(c); return q && isNum(q.entry) ? {dir:q.dir, entry:q.entry, sl:q.sl, tp1:q.tp1, tp2:q.tp2} : null; } catch(e){ return null; } },
   watch: (n, o) => { try { if (!(snapshot.get(n) || state.coins.get(n))){ toast(n + ' is not in the scanner list, so it was starred here only'); return false; } let w = wlGet(n), fresh = false; if (!w){ w = wlAdd(n); fresh = true; } if (o && w){ if (o.side) w.side = o.side; if (o.note) w.note = (w.note ? w.note + ' | ' : '') + o.note; saveState(); } toast(fresh ? '★ ' + n + ' added to your Watchlist' + (o && o.side ? ' (' + o.side + ')' : '') : n + ' is already in your watchlist' + (o && o.note ? ' (plan note added)' : '')); if (state.view === 'watch') { try { renderWatch(); } catch(e){} } return true; } catch(e){ return false; } },
   acct: () => { try { const a = state.acct || {}; return {bal:parseNum(a.bal) || 1000, risk:parseNum(a.risk) || 1}; } catch(e){ return {bal:1000, risk:1}; } },
-  pools: n => { try { const c = snapshot.get(n) || state.coins.get(n) || snapshot.get('xyz:' + n); const pl = (c && c.m && c.m.pools) || []; return pl.filter(q => isNum(q.p)).slice(0, 40).map(q => ({p:q.p, label:[...(q.types || [])].slice(0, 2).join('/'), rank:q.rank || 0, wall:q.wall || 0, inst:!!q.inst, side:q.side || 0})); } catch(e){ return []; } },
+  pools: n => { try { const c = snapshot.get(n) || state.coins.get(n) || snapshot.get('xyz:' + n); const pl = (c && c.m && c.m.pools) || []; return pl.filter(q => isNum(q.p)).slice(0, 40).map(q => ({p:q.p, label:[...(q.types || [])].slice(0, 2).join('/'), name:q.name || '', types:[...(q.types || [])], d:isNum(q.d) ? q.d : null, usd:q.usd || 0, rank:q.rank || 0, wall:q.wall || 0, inst:!!q.inst, side:q.side || 0})); } catch(e){ return []; } },
+  liqt: () => LIQT,
   history: n => { try { const out = [], N = String(n).toUpperCase(); (SIG.list || []).forEach(s => { if (String(s.name).toUpperCase() !== N || !isNum(s.entry) || !s.t) return; out.push({kind:'signal', dir:s.dir === 'short' || s.dir === -1 ? 'short' : 'long', t:s.t, entry:s.entry, tEnd:s.tEnd || null, exit:isNum(s.pxEnd) ? s.pxEnd : null, r:isNum(s.r) ? s.r : null, st:s.status || ''}); }); try { jrLoad(); (JR.trades || []).forEach(t => { const co = String(t.coin || '').toUpperCase().replace(/(USDT|USD|-PERP)$/, ''); if (co !== N || !isNum(t.entry) || !t.open) return; const lg = !/short|sell/i.test(String(t.side)); const R = isNum(t.exit) && isNum(t.sl) && t.sl !== t.entry ? ((lg ? t.exit - t.entry : t.entry - t.exit) / Math.abs(t.entry - t.sl)) : null; out.push({kind:'journal', dir:lg ? 'long' : 'short', t:t.open, entry:t.entry, tEnd:t.close || null, exit:isNum(t.exit) ? t.exit : null, r:R, st:t.status || ''}); }); } catch(e){} return out.slice(-80); } catch(e){ return []; } },
   events: n => { try { const out = [], N = String(n).toUpperCase(); (X.news || []).forEach(a => { if (a && a.t && (a.coins || []).map(x => String(x).toUpperCase()).includes(N)) out.push({kind:'news', t:a.t, title:a.title, url:a.url}); }); const e = X.dropIdx && X.dropIdx.get(N); if (e){ [['air', 'airdrop'], ['unl', 'unlock'], ['hyp', 'listing']].forEach(([k, lab]) => (e[k] || []).forEach(d => { if (d && d.t) out.push({kind:k, t:d.t, title:lab + ': ' + (d.name || N) + (d.usd ? ' · $' + Math.round(d.usd).toLocaleString() : '') + (d.pct ? ' · ' + (+d.pct).toFixed(1) + '% supply' : ''), url:d.url}); })); } return out.sort((a, b) => a.t - b.t).slice(-60); } catch(e){ return []; } },
   toast: m => { try { toast(m); } catch(e){} }
@@ -14605,6 +14606,8 @@ function cmpMenu(c, btn){
 /* ---------- extra data: open interest, funding, long/short, order-book walls, liquidation map, scanner pools, history, events, mini-charts ---------- */
 const XDFT = {pools:1, hist:1, evt:1};
 const xOn = (p, k) => p.x && k in p.x ? !!p.x[k] : !!XDFT[k];
+const plKey = q => (q.name || q.label) + '|' + (+q.p).toPrecision(5);
+function plShow(p, q){ const o = p.pl || {}, ty = q.types || []; if (o.t && ty.length && ty.every(t => o.t[t] === false)) return false; if (o.h && o.h[plKey(q)]) return false; return true; }
 function bnSymOf(f){ if (f.src && f.src.src === 'bn') return f.src.s; const v = venSyms('bn', f.sym)[0]; return v ? v[1] : null; }
 const AUXP = {'5m':1, '15m':1, '30m':1, '1h':1, '2h':1, '4h':1, '1d':1};
 const auxPeriod = tf => AUXP[tf] ? tf : (TFSEC[tf] < 300 ? '5m' : '1d');
@@ -14661,7 +14664,7 @@ Chart.prototype.extFront = function(g, plotW, ff){
   }
   if (xOn(p, 'liqm')){ const M = liqMap(this); if (M){ const ml = 110; for (let i = 0; i < M.nb; i++){ const y0 = this.yOf(M.lo + (i + 1) * M.bs), y1 = this.yOf(M.lo + i * M.bs); if (y1 < 0 || y0 > mh) continue; const h = Math.max(1.5, y1 - y0 - 0.5); if (M.S[i] > 0){ g.fillStyle = 'rgba(240,97,109,' + (0.12 + 0.5 * M.S[i] / M.mx) + ')'; g.fillRect(plotW - ml * M.S[i] / M.mx, y0, ml * M.S[i] / M.mx, h); } if (M.L[i] > 0){ g.fillStyle = 'rgba(47,191,113,' + (0.12 + 0.5 * M.L[i] / M.mx) + ')'; g.fillRect(plotW - ml * M.L[i] / M.mx, y0, ml * M.L[i] / M.mx, h); } } g.textAlign = 'right'; for (const t of M.top){ const y = this.yOf(t.p); if (y < 8 || y > mh - 8) continue; g.fillStyle = t.s === 'S' ? '#f0616d' : '#2fbf71'; g.fillText('~' + (t.s === 'S' ? 'short' : 'long') + ' liq $' + fmtV(t.v), plotW - 4, y - 2); } g.fillStyle = '#8393a7'; g.fillText('estimated liquidation map', plotW - 4, 10); g.textAlign = 'left'; } }
   if (xOn(p, 'walls')){ if (!this.walls || Date.now() - this.walls.at > 20000) wallsLoad(this); const W = this.walls; if (W){ if (W.err) { g.fillStyle = '#8393a7'; g.fillText('order-book walls: no book for this venue', 8, 22); } for (const [arr, col, lab] of [[W.bid, '#2fbf71', 'BID'], [W.ask, '#f0616d', 'ASK']]){ for (const w of arr){ const y = Math.round(this.yOf(w.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = col; g.lineWidth = 1.5; g.setLineDash([6, 3]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.fillText(lab + ' wall $' + fmtV(w.v) + ' (' + W.src + ')', 8, y - 3); } } } }
-  if (xOn(p, 'pools')){ const pl = hookCache(this, 'pools'); for (const q of pl){ const y = Math.round(this.yOf(q.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = 'rgba(227,179,65,' + (q.inst ? 0.9 : 0.55) + ')'; g.lineWidth = q.inst ? 1.4 : 1; g.setLineDash([2, 4]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#e3b341'; g.textAlign = 'right'; g.fillText('pool ' + q.label + (q.wall ? ' $' + fmtV(q.wall) : ''), plotW - 4, y - 2); g.textAlign = 'left'; } }
+  if (xOn(p, 'pools')){ const pl = hookCache(this, 'pools'); for (const q of pl){ if (!plShow(p, q)) continue; const y = Math.round(this.yOf(q.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = 'rgba(227,179,65,' + (q.inst ? 0.9 : 0.55) + ')'; g.lineWidth = q.inst ? 1.4 : 1; g.setLineDash([2, 4]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#e3b341'; g.textAlign = 'right'; g.fillText((q.name || ('pool ' + q.label)) + (q.wall ? ' $' + fmtV(q.wall) : ''), plotW - 4, y - 2); g.textAlign = 'left'; } }
   if (xOn(p, 'hist')){ const hs = hookCache(this, 'history'); for (const s of hs){ const x = this.xOf(this.iOfT(s.t)); if (x < -20 || x > plotW + 20) continue; const y = this.yOf(s.entry), up = s.dir === 'long', col = s.kind === 'journal' ? '#58a6ff' : (up ? '#2fbf71' : '#f0616d'); g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y - 1); g.lineTo(x - 5, y + 9); g.lineTo(x + 5, y + 9); } else { g.moveTo(x, y + 1); g.lineTo(x - 5, y - 9); g.lineTo(x + 5, y - 9); } g.fill(); if (s.tEnd && s.exit != null){ const x2 = this.xOf(this.iOfT(s.tEnd)), y2 = this.yOf(s.exit), win = s.r != null ? s.r >= 0 : (up ? s.exit >= s.entry : s.exit <= s.entry); g.strokeStyle = win ? '#2fbf71' : '#f0616d'; g.lineWidth = 1; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]); g.fillStyle = win ? '#2fbf71' : '#f0616d'; g.fillRect(x2 - 2, y2 - 2, 4, 4); g.fillText((s.kind === 'journal' ? 'J ' : '') + (s.r != null ? (s.r >= 0 ? '+' : '') + s.r.toFixed(1) + 'R' : (win ? 'win' : 'loss')), x2 + 5, y2 + 3); } else { g.fillStyle = col; g.fillText((s.kind === 'journal' ? 'J ' : 'S ') + (s.st || 'open'), x + 7, y + 3); } } }
   this.evtPos = [];
   if (xOn(p, 'evt')){ const es = hookCache(this, 'events'); for (const e of es){ const x = this.xOf(this.iOfT(e.t)); if (x < 0 || x > plotW) continue; const col = EVC[e.kind] || '#8393a7', y = 12; g.fillStyle = col; g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x + 5, y); g.lineTo(x, y + 6); g.lineTo(x - 5, y); g.closePath(); g.fill(); g.strokeStyle = rgba(col, 0.3); g.lineWidth = 1; g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x, mh); g.stroke(); this.evtPos.push({x, y, e}); }
@@ -14673,9 +14676,25 @@ const XDEF = [['liqm', 'Liquidation map (estimated)', 'Where leveraged longs and
 const XIND = [['oi', 'Open interest'], ['fund', 'Funding rate'], ['lsr', 'Long / short ratio'], ['cvd', 'CVD (real on Binance)'], ['delta', 'Volume delta'], ['rs', 'Relative strength (needs Compare)']];
 function dataMenu(c, btn){
   const p = c.pane; p.x = p.x || {}; const HK = {pools:'pools', hist:'history', evt:'events'}, cnt = nm => { try { return (HOOK()[nm](p.sym) || []).length; } catch(e){ return 0; } };
-  const html = '<div class="ta-pp" style="width:360px"><h4>Data layers · ' + esc(p.sym) + '</h4><div class="xl">' + XDEF.map(x => '<label style="display:block;margin:4px 0" title="' + esc(x[2]) + '"><input type="checkbox" data-k="' + x[0] + '"' + (xOn(p, x[0]) ? ' checked' : '') + '> <b>' + x[1] + (HK[x[0]] ? ' <span style="font-weight:400;color:var(--muted)">(' + cnt(HK[x[0]]) + ' for ' + esc(p.sym) + ')</span>' : '') + '</b><br><span style="font-size:10px;color:var(--muted);margin-left:19px">' + esc(x[2]) + '</span></label>').join('') + '</div><div style="margin-top:6px;font-weight:600">Add as a pane under the chart</div><div class="row">' + XIND.map(x => '<button class="ta-b" data-i="' + x[0] + '">+ ' + x[1] + '</button>').join('') + '</div><div style="font-size:10px;color:var(--muted)">Open interest, funding and long/short come from Binance futures (funding falls back to Hyperliquid). Not every coin has them.</div></div>';
+  const html = '<div class="ta-pp" style="width:360px"><h4>Data layers · ' + esc(p.sym) + '</h4><div class="xl">' + XDEF.map(x => '<label style="display:block;margin:4px 0" title="' + esc(x[2]) + '"><input type="checkbox" data-k="' + x[0] + '"' + (xOn(p, x[0]) ? ' checked' : '') + '> <b>' + x[1] + (HK[x[0]] ? ' <span style="font-weight:400;color:var(--muted)">(' + cnt(HK[x[0]]) + ' for ' + esc(p.sym) + ')</span>' : '') + '</b><br><span style="font-size:10px;color:var(--muted);margin-left:19px">' + esc(x[2]) + '</span></label>').join('') + '</div><div class="ta-pl"></div><div style="margin-top:6px;font-weight:600">Add as a pane under the chart</div><div class="row">' + XIND.map(x => '<button class="ta-b" data-i="' + x[0] + '">+ ' + x[1] + '</button>').join('') + '</div><div style="font-size:10px;color:var(--muted)">Open interest, funding and long/short come from Binance futures (funding falls back to Hyperliquid). Not every coin has them.</div></div>';
+  const plBlock = () => {
+    const pls = (() => { try { return (HOOK().pools(p.sym) || []).slice().sort((a, b) => b.p - a.p); } catch(e){ return []; } })(), LQ = (() => { try { return HOOK().liqt() || {}; } catch(e){ return {}; } })(), o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.h = o.h || {};
+    if (!pls.length) return '<p class="hint" style="margin:6px 0">No scanner pools for ' + esc(p.sym) + ' yet.</p>';
+    const fp = v => v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v.toPrecision(4), cats = {}; for (const q of pls) for (const t of q.types) cats[t] = (cats[t] || 0) + 1;
+    const nOn = pls.filter(q => plShow(p, q)).length, dis = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
+    return '<div' + dis + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(' + nOn + ' of ' + pls.length + ' shown)</span>'
+      + '<div class="row" style="gap:4px;margin:4px 0;flex-wrap:wrap"><button class="ta-b" data-pq="all">All</button><button class="ta-b" data-pq="none">None</button><button class="ta-b" data-pq="above">Above price</button><button class="ta-b" data-pq="below">Below price</button><button class="ta-b" data-pq="inst">Institutional only</button></div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY TYPE</div><div style="display:flex;flex-wrap:wrap;gap:2px 10px">' + Object.keys(cats).sort((a, b) => a - b).map(t => '<label style="font-size:11px"><input type="checkbox" data-pt="' + t + '"' + (o.t[t] === false ? '' : ' checked') + '> ' + esc(LQ[t] || ('Type ' + t)) + ' <span style="color:var(--muted)">' + cats[t] + '</span></label>').join('') + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:6px">EACH POOL (highest price first)</div><div style="max-height:220px;overflow:auto">' + pls.map(q => '<label style="display:flex;gap:6px;align-items:baseline;font-size:11px;padding:1px 0"><input type="checkbox" data-pk="' + esc(plKey(q)) + '"' + (plShow(p, q) ? ' checked' : '') + '> <span style="font-family:var(--mono)">' + fp(q.p) + '</span> <b>' + esc(q.name || ('pool ' + q.label)) + '</b> <span style="color:var(--muted)">' + (Number.isFinite(q.d) ? (q.d > 0 ? '+' : '') + q.d.toFixed(2) + '%' : '') + (q.usd ? ' · $' + fmtV(q.usd) : '') + (q.inst ? ' · institutional' : '') + '</span></label>').join('') + '</div></div>';
+  };
   openPop(btn, html, pp => {
-    pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; });
+    const plBox = pp.querySelector('.ta-pl'); if (plBox) plBox.innerHTML = plBlock();
+    pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {};
+      for (const q of pls){ const a = b.dataset.pq, keep = a === 'all' ? true : a === 'none' ? false : a === 'above' ? q.side === 1 : a === 'below' ? q.side === 2 : !!q.inst; if (!keep) o.h[plKey(q)] = true; }
+      save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); });
+    pp.addEventListener('change', e => { if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
+      if (e.target.dataset.pk != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.h = o.h || {}; if (e.target.checked) delete o.h[e.target.dataset.pk]; else o.h[e.target.dataset.pk] = true; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; } });
+    pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; if (k === 'pools' && plBox) plBox.innerHTML = plBlock(); });
     pp.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; if (b.dataset.i === 'rs' && !p.cmp){ toastX('Turn on Compare first, then add Relative strength.'); return; } addInd(c, b.dataset.i); refresh(c); b.style.opacity = '.5'; toastX('Added ' + IND[b.dataset.i].n); });
   });
 }
