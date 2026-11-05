@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.94</title>
+<title>ELPP CRYPTO SCANNER PRO V4.95</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.94</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.95</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9134,6 +9134,7 @@ function ovHtml(){
   <div class="nsec"><h3>The market in plain words</h3>${story.length ? `<ul class="ovstory">${story.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="hint">Loading prices…</p>'}</div>
   <div class="nsec"><h3>Key numbers</h3><div class="ovk">${tiles}</div></div>
   ${prOvHtml()}
+  ${frHtml()}
   <div class="ovm ov-${cmp[0]}"><div class="ovmh"><span class="hint">Institutions versus retail</span><h2>${esc(cmp[1])}</h2></div>
     <div class="ovduo"><div><small>Institutions (big money)</small><span class="ovv ov-${I.tone}">${esc(I.label)}</span><em>${I.up} buying · ${I.dn} selling · ${I.n - I.up - I.dn} split, of ${I.n.toLocaleString()} readings${I.coins ? ' across ' + I.coins + ' coins' : ''}</em></div><div><small>Retail (everyday traders)</small><span class="ovv ov-${Rt.tone}">${esc(Rt.label)}</span><em>${Rt.up} buying · ${Rt.dn} selling · ${Rt.n - Rt.up - Rt.dn} split, of ${Rt.n.toLocaleString()} readings${Rt.coins ? ' across ' + Rt.coins + ' coins' : ''}</em></div></div><p>${esc(cmp[2])}</p></div>
   <div class="nsec"><h3>What institutions are doing</h3><p class="hint">Institutions means funds, whales and professional traders: the big money. Nobody can see their private accounts, so each row is the best free clue we have. Green = buying side, red = selling side, yellow = split or careful.</p>${ovTable(inst)}</div>
@@ -10704,7 +10705,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.94: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.95: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -11405,7 +11406,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.94: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.95: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11453,7 +11454,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.94: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.95: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11665,7 +11666,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.94: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.95: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11679,7 +11680,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.94: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.95: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11720,6 +11721,9 @@ function prFactors(c, hz){
   { const ch = m.chg && m.chg['1d'], cr = isNum(m.lsRatio) ? m.lsRatio : 1; let s = null, t = ''; if (isNum(ch)){ if (ch >= 15){ s = -0.5 - (cr >= 1.4 ? 0.3 : 0); t = 'up ' + ch.toFixed(0) + '% in 24h: chasing / FOMO zone'; } else if (ch <= -15){ s = 0.5 + (cr <= 0.8 ? 0.3 : 0); t = 'down ' + Math.abs(ch).toFixed(0) + '% in 24h: panic / capitulation zone'; } else { s = 0; t = '24h move normal'; } } f('ret', 'Extended move (FOMO / panic)', s, 4, t || 'no data'); }
   { let s = null, t = 'no retail cluster nearby'; if (isNum(m.retailDist) && m.retailDist <= 2){ s = (m.retailSide === 1 ? 1 : -1) * 0.7 * (1 - m.retailDist / 3); t = 'retail stops ' + (m.retailSide === 1 ? 'above' : 'below') + ' within ' + m.retailDist.toFixed(1) + '%: price is drawn to take them first'; } else if (isNum(m.retailDist)) s = 0; f('ret', 'Retail stop cluster', s, 4, t); }
   { let s = null, t = 'quiet'; if (isNum(m.wikiX) || isNum(m.trendRank)){ const hot = (isNum(m.wikiX) && m.wikiX >= 2.5) + (isNum(m.trendRank) && m.trendRank <= 5); s = hot ? -0.4 * hot : 0; t = hot ? 'public attention spiking (late retail is arriving)' : 'attention normal'; } f('ret', 'Public attention', s, 2, t); }
+  { const bt = BTF.map.get(c.name); if (bt && bt.ok && Date.now() - bt.at < 900000){ const w = Math.min(1, bt.win / 2.5) * (bt.nb >= 4 ? 1 : 0.5); f('inst', 'Big trades on Binance', prClamp(bt.net / 40) * w, 4, (bt.net >= 0 ? 'buyers ' : 'sellers ') + Math.abs(bt.net).toFixed(0) + '% net across ' + bt.nb + ' prints above $' + Math.round(bt.thr / 1000) + 'k'); } }
+  { const mc = frScore(); f('str', 'US macro: real yields, dollar, VIX (FRED)', mc.score == null ? null : mc.score * 0.8, 2, mc.score == null ? 'no FRED data (upload proxy.php)' : mc.why.length ? mc.why.join('; ') : 'yields and dollar are flat'); }
+  { const ls = lstFor(c); if (ls){ f('str', 'Binance listing news', ls.kind === 'delist' ? -0.8 : ls.age < 6 ? 0.3 : 0, 2, (ls.kind === 'delist' ? 'delisting' : 'listing') + ' announced ' + Math.round(ls.age) + 'h ago' + (ls.kind === 'delist' ? ': forced selling' : ': early pump, then usually fades')); } }
   /* ---- STRUCTURE / LIQUIDITY ---- */
   { const pools = (m.pools || []).filter(q => isNum(q.p) && isNum(q.d) && isNum(q.usd)), atrp = (m.atr && (m.atr['1h'] || m.atr['15m'])) || 1, reach = atrp * Math.sqrt(H.h) * 2.2; let up = 0, dn = 0; for (const q of pools){ if (Math.abs(q.d) > reach) continue; const w = q.usd * (q.weight || 1) / (0.4 + Math.abs(q.d)); if (q.d > 0) up += w; else dn += w; } const tot = up + dn; f('str', 'Liquidity magnets', tot > 0 ? (up - dn) / tot : (pools.length ? 0 : null), 8, tot > 0 ? (up > dn ? 'more resting liquidity above price (pull up first)' : 'more resting liquidity below price (pull down first)') : 'no nearby pools'); }
   { const v = m.vwapDist; f('str', 'Distance from VWAP', isNum(v) ? -prClamp(v / 3) * 0.4 : null, 2, isNum(v) ? (v > 0 ? 'above' : 'below') + ' VWAP by ' + Math.abs(v).toFixed(2) + '% (pull back to the mean)' : 'no VWAP'); }
@@ -11880,12 +11884,12 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.94: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.95: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
-  ['🏦 Exchanges', ['pVen','pHL','pGap']],
+  ['🏦 Exchanges', ['pVen','pHL','pGap','pList']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
 const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
@@ -11916,7 +11920,7 @@ function psElite(c, mk){
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
   return o;
 }
-/* ===== V4.94: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
+/* ===== V4.95: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
 const BTF = {map:new Map(), busy:false, t:0};
 function btSym(c){ const k = normSym(c.name); return (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; }
 async function btTick(){
@@ -11937,7 +11941,7 @@ async function btTick(){
 }
 const PDL = {k:'elpp_pd_log', last:0, cache:new Map()};
 function pdLogLoad(){ try { const v = LS.get(PDL.k); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
-function btStart(){ if (BTF.t) return; BTF.t = setInterval(() => { try { btTick(); } catch(e){} }, 3500); setInterval(() => { try { pdTick(); } catch(e){} }, 60000); setTimeout(() => { try { btTick(); } catch(e){} }, 800); }
+function btStart(){ try { frLoad(); lstLoad(); } catch(e){} if (BTF.t) return; setInterval(() => { try { frLoad(); lstLoad(); } catch(e){} }, 600000); BTF.t = setInterval(() => { try { btTick(); } catch(e){} }, 3500); setInterval(() => { try { pdTick(); } catch(e){} }, 60000); setTimeout(() => { try { btTick(); } catch(e){} }, 800); }
 function pdCalc(c, rd){
   const m = c.m || {}, n = isNum, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), R = [], caution = [];
   if (!rd){ try { rd = instRow(c, 'perp'); } catch(e){ rd = null; } }
@@ -11958,6 +11962,7 @@ function pdCalc(c, rd){
   { const cd = (m.cvdDiv || {})['1h']; if (cd === 1) add(0.6, 1, 'hidden buying (CVD divergence)'); else if (cd === 2) add(-0.6, 1, 'hidden selling (CVD divergence)'); }
   if (m.whSide === 1) add(0.5, 1, 'whale wallets net long'); else if (m.whSide === 2) add(-0.5, 1, 'whale wallets net short');
   if (n(m.optMpDist) && Math.abs(m.optMpDist) >= 3) add(clamp(m.optMpDist / 8, -0.5, 0.5), 0.5);
+  const lsn = lstFor(c); if (lsn && lsn.kind === 'delist'){ add(-0.8, 2, 'Binance delisting announced ' + Math.round(lsn.age) + 'h ago'); caution.push('Binance delisting news: forced selling risk'); }
   let Dn = dw > 0 ? D / dw * 100 : 0;
   /* energy: how much explosive volume / set-up is present, 0 to 100 */
   let E = 0; const en = (v, why) => { E += v; if (why && v >= 8) R.push([v * 0.6, why]); };
@@ -11972,6 +11977,7 @@ function pdCalc(c, rd){
   if (m.oiPx && (m.oiPx['15m'] === 5 || m.oiPx['1h'] === 5)) en(10, 'open interest building on flat price');
   if (rd && rd.active) en(5);
   { const mx = Math.max(n(m.readyLong) ? m.readyLong : 0, n(m.readyShort) ? m.readyShort : 0); if (mx >= 60) en(10, 'take-off score ' + mx); }
+  if (lsn && lsn.kind !== 'delist' && lsn.age < 24){ E += 12; R.push([8, 'Binance ' + (lsn.kind === 'futures' ? 'futures launch' : 'listing') + ' announced ' + Math.round(lsn.age) + 'h ago']); caution.push('listing news pumps often fade within hours: do not chase late'); }
   E = Math.min(100, E);
   const dir = Dn >= 20 ? 1 : Dn <= -20 ? -1 : 0;
   /* squeeze fuel: crowd stuck on the wrong side makes the move faster */
@@ -12011,6 +12017,75 @@ function pdTick(){
   if (dirty){ try { LS.set(PDL.k, L.slice(-500)); } catch(e){} }
 }
 function pdStats(){ const L = pdLogLoad(), d = L.filter(x => x.res === 'hit' || x.res === 'miss'), h = d.filter(x => x.res === 'hit').length; return {n:d.length, hit:h, rate:d.length ? Math.round(h / d.length * 1000) / 10 : null, pend:L.filter(x => x.res == null).length, flat:L.filter(x => x.res === 'flat').length}; }
+/* ===== V4.95: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
+async function pxText(url){
+  const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), tries = [];
+  if (base) tries.push(base + '/proxy.php'); tries.push('proxy.php');
+  for (const b of tries){ try { const r = await fetch(b + '?u=' + encodeURIComponent(url), {cache:'no-store'}); if (r.ok && r.headers.get('x-elpp-proxy')) return await r.text(); } catch(e){} }
+  const rel = String(state.mxRelay || '').trim().replace(/\/+$/, ''), mm = /^https:\/\/([^\/]+)(\/.*)$/.exec(url);
+  if (rel && mm){ try { const r = await fetch(rel + '/x/' + mm[1] + mm[2]); if (r.ok) return await r.text(); } catch(e){} }
+  if (state.pubProxy !== false){ for (const f of PXW){ try { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 14000); try { const r = await fetch(f(url), {signal:ctl.signal}); if (r.ok){ const t = await r.text(); if (t && t.length > 20) return t; } } finally { clearTimeout(to); } } catch(e){} } }
+  throw new Error('blocked');
+}
+const FRED_S = [
+  ['DFII10', '10-year real yield', 'bp', 'What you earn on US bonds above inflation. This is the single biggest macro brake on crypto: when it rises, money leaves risky assets.', -1],
+  ['DGS10', '10-year US yield', 'bp', 'The base cost of money. A fast rise squeezes risk assets.', -1],
+  ['DGS2', '2-year US yield', 'bp', 'Follows what traders expect the Fed to do. Rising = fewer rate cuts priced in.', -1],
+  ['T10Y2Y', 'Yield curve (10y minus 2y)', 'bp', 'Negative = recession warning. A curve steepening from below zero often comes with risk-off.', 0],
+  ['T10YIE', '10-year inflation expectation', 'bp', 'Inflation the bond market expects. Rising slowly can help crypto as an inflation hedge; rising fast pushes yields up.', 0],
+  ['DTWEXBGS', 'US dollar (broad index)', '%', 'A stronger dollar usually weighs on crypto, a weaker one helps.', -1],
+  ['VIXCLS', 'VIX (stock fear gauge)', '%', 'A spike means stocks are scared and crypto usually follows lower.', -1]
+];
+const FR = {at:0, busy:false, s:LS.get('elpp_fred') || {}, err:''};
+async function frLoad(force){
+  if (FR.busy) return; const now = Date.now(); if (!force && FR.at && now - FR.at < 7200000) return; if (!force && FR.s && FR.s._at && now - FR.s._at < 7200000){ FR.at = FR.s._at; return; }
+  FR.busy = true; const cosd = new Date(now - 420 * 864e5).toISOString().slice(0, 10), out = {}; let ok = 0;
+  await Promise.all(FRED_S.map(async ([id]) => { try {
+    const t = await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + id + '&cosd=' + cosd), rows = t.trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && isFinite(+a[1])).map(a => [a[0], +a[1]]);
+    if (rows.length < 25) throw new Error('short'); const last = rows[rows.length - 1], at = k => rows[Math.max(0, rows.length - 1 - k)][1];
+    out[id] = {v:last[1], d:last[0], c5:last[1] - at(5), c20:last[1] - at(20), p5:at(5) ? (last[1] / at(5) - 1) * 100 : null, p20:at(20) ? (last[1] / at(20) - 1) * 100 : null, lo:Math.min(...rows.slice(-250).map(r => r[1])), hi:Math.max(...rows.slice(-250).map(r => r[1]))}; ok++;
+  } catch(e){} }));
+  if (ok){ out._at = Date.now(); FR.s = out; LS.set('elpp_fred', out); FR.at = out._at; FR.err = ''; } else { FR.err = 'FRED data unreachable: upload proxy.php next to index.html'; FR.at = now - 7200000 + 300000; }
+  FR.busy = false;
+}
+/* macro score -1..1 from real yields, dollar and VIX over 5 days (bearish for crypto when they rise) */
+function frScore(){
+  const S = FR.s || {}, why = []; let num = 0, den = 0; const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const put = (s, w, t) => { num += s * w; den += w; if (Math.abs(s) >= 0.25) why.push(t); };
+  if (S.DFII10){ const b = S.DFII10.c5 * 100; put(-clamp(b / 12, -1, 1), 1.2, 'real yield ' + (b >= 0 ? 'up ' : 'down ') + Math.abs(b).toFixed(0) + ' bp in 5 days'); }
+  if (S.DGS10){ const b = S.DGS10.c5 * 100; put(-clamp(b / 15, -1, 1), 0.7, '10y yield ' + (b >= 0 ? 'up ' : 'down ') + Math.abs(b).toFixed(0) + ' bp in 5 days'); }
+  if (S.DTWEXBGS && isNum(S.DTWEXBGS.p5)){ const p = S.DTWEXBGS.p5; put(-clamp(p / 0.8, -1, 1), 0.8, 'dollar ' + (p >= 0 ? 'up ' : 'down ') + Math.abs(p).toFixed(1) + '% in 5 days'); }
+  if (S.VIXCLS && isNum(S.VIXCLS.p5)){ const p = S.VIXCLS.p5; put(-clamp(p / 25, -1, 1), 0.5, 'VIX ' + (p >= 0 ? 'up ' : 'down ') + Math.abs(p).toFixed(0) + '% in 5 days'); }
+  return {score:den ? num / den : null, why, n:den};
+}
+function frHtml(){
+  const S = FR.s || {}, has = FRED_S.some(x => S[x[0]]); if (!has) return `<div class="nsec"><h3>🏛️ US yields and dollar (FRED)</h3><p class="hint">${FR.busy ? 'Loading…' : esc(FR.err || 'Not loaded yet.')}</p></div>`;
+  const sc = frScore(), fmt = (x, u) => u === 'bp' ? (x >= 0 ? '+' : '') + (x * 100).toFixed(0) + ' bp' : (x >= 0 ? '+' : '') + x.toFixed(1) + '%';
+  const rows = FRED_S.map(([id, nm, u, say, sgn]) => { const o = S[id]; if (!o) return ''; const c5 = u === 'bp' ? o.c5 : o.p5, c20 = u === 'bp' ? o.c20 : o.p20, cl = x => !isNum(x) || !sgn ? 'dim' : (x * sgn > 0 ? 'dn' : 'up'), pos = o.hi > o.lo ? Math.round((o.v - o.lo) / (o.hi - o.lo) * 100) : null;
+    return `<tr><td style="text-align:left"><b>${esc(nm)}</b><br><small class="hint">${esc(say)}</small></td><td>${id === 'DTWEXBGS' || id === 'VIXCLS' ? o.v.toFixed(1) : o.v.toFixed(2) + (id === 'T10Y2Y' ? '' : '%')}</td><td class="${cl(c5)}">${isNum(c5) ? fmt(c5, u) : '–'}</td><td class="${cl(c20)}">${isNum(c20) ? fmt(c20, u) : '–'}</td><td>${pos == null ? '–' : pos + '%'}</td><td class="dim">${esc(o.d)}</td></tr>`; }).join('');
+  const v = sc.score, tone = v == null ? 'dim' : v >= 0.25 ? 'up' : v <= -0.25 ? 'dn' : 'warn', txt = v == null ? 'no read' : v >= 0.25 ? 'MACRO TAILWIND for crypto' : v <= -0.25 ? 'MACRO HEADWIND for crypto' : 'macro neutral';
+  return `<div class="nsec"><div class="row" style="justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🏛️ US yields and dollar (FRED)</h3><button class="btn sm" type="button" id="frRefresh">${FR.busy ? 'Loading…' : '↻ Refresh'}</button></div>
+    <p class="hint">Official US data from the St. Louis Fed, updated daily. Red = moving against crypto, green = moving for it. <b class="${tone}">${txt}</b>${sc.why.length ? ': ' + esc(sc.why.join('; ')) : ''}.</p>
+    <div style="overflow:auto"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Series</th><th>Now</th><th>5 days</th><th>20 days</th><th>Position in 1-year range</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+/* Binance listing and delisting news */
+const LST = {at:0, map:new Map(), err:'', busy:false};
+async function lstLoad(force){
+  if (LST.busy) return; const now = Date.now(); if (!force && LST.at && now - LST.at < 600000) return; LST.busy = true; LST.at = now; const m = new Map(); let ok = 0;
+  for (const [cat, kind] of [[48, 'list'], [161, 'delist']]){ try {
+    const t = await pxText('https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&catalogId=' + cat + '&pageNo=1&pageSize=30'), j = JSON.parse(t), arts = (((j.data || {}).catalogs || [])[0] || {}).articles || (j.data || {}).articles || []; if (!arts.length) continue; ok++;
+    for (const a of arts){ const title = String(a.title || ''), tm = +a.releaseDate || 0; if (!tm) continue; let syms = [];
+      if (kind === 'delist'){ const mm = /delist\s+(.+?)(?:\s+on\s+\d{4}|\s+and\s+\d|$)/i.exec(title); syms = mm ? (mm[1].match(/\b[A-Z0-9]{2,12}\b/g) || []).map(x => x.replace(/USDT$|USDC$/, '')) : []; }
+      else { syms = [...title.matchAll(/\(([A-Z0-9]{2,12})\)/g)].map(x => x[1]); if (!syms.length && /perpetual/i.test(title)){ const mm = /\b([A-Z0-9]{2,12})USDT\b/.exec(title); if (mm) syms = [mm[1]]; } }
+      const k = /delist|removal/i.test(title) ? 'delist' : /perpetual|futures/i.test(title) ? 'futures' : 'list';
+      for (const s0 of syms){ const s = liSym(s0), o = m.get(s); if (!o || tm > o.t) m.set(s, {kind:k, t:tm, title:title.slice(0, 120)}); } }
+  } catch(e){} }
+  if (ok){ LST.map = m; LST.err = ''; } else LST.err = 'Binance announcements unreachable: upload proxy.php next to index.html';
+  LST.busy = false;
+}
+function lstFor(c){ try { const o = LST.map.get(liSym(normSym(c.name))); if (!o) return null; const age = (Date.now() - o.t) / 36e5; return age > 24 * 14 ? null : Object.assign({age}, o); } catch(e){ return null; } }
+function lstCell(c){ const o = lstFor(c); if (!o) return ['—', 'dim']; const a = o.age < 48 ? Math.round(o.age) + 'h ago' : Math.round(o.age / 24) + 'd ago', nm = o.kind === 'delist' ? 'DELISTING' : o.kind === 'futures' ? 'FUTURES LAUNCH' : 'LISTING'; return ['<span title="' + esc(o.title) + '"><b>' + nm + '</b> ' + a + '</span>', o.kind === 'delist' ? 'dn' : o.age < 24 ? 'warn' : 'dim']; }
+try { VIEW_GUIDE.overview.push(['US yields and dollar (FRED)', 'Official daily US data: real yield, 10y and 2y yields, curve, inflation expectation, dollar index and VIX, with 5-day and 20-day changes.', 'Real yield up 12+ bp in 5 days or dollar up 0.8%+ = headwind for crypto. Falling = tailwind. Needs proxy.php on your host.']); VIEW_GUIDE.power.push(['Binance news', 'Listing, futures-launch or delisting announcements from the last 14 days.', 'Listing under 24h: early pump, do not chase late. Delisting: forced selling, avoid longs.']); } catch(e){}
 const PS_TAG = {trade:['TRADEABLE', 'up', 'Strong verdict, grade A or B, no blockers'], wait:['STRONG, WAIT', 'warn', 'Strong verdict but the confirmation checks are not ready'], watch:['WATCH', 'warn', 'Lean with decent confirmation'], lean:['LEAN ONLY', 'dim', 'A lean, not a trade yet'], none:['NO SIDE', 'dim', 'No long or short lean right now']};
 function psData(force){
   const now = Date.now(); if (!force && PS.cache && now - PS.cacheAt < 6000) return PS.cache;
@@ -12031,6 +12106,7 @@ function psCols(){
   add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const ph = f.final ? 'GO' : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; '); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'BUILDING' ? 'warn' : 'up') : (ph === 'BUILDING' ? 'warn' : 'dn')]; });
   add('pPD', 'PUMP / DUMP (hours)', 'Forecast of an explosive move in the coming hours. Built from real institutional volume (big-bar flow, institutional share, big trades on Binance), net money flow on 15m/1h/4h, take-off score, breakouts, hidden CVD buying/selling, open-interest build-up, volatility compression and crowd squeeze fuel. PUMP/DUMP LIKELY = score 68+ with strong volume energy. BUILDING = 50-67. VOLUME COMING = heavy volume but side unclear. Hover for the reasons, the time window and cautions.', c => { const p = (el(c) || {}).pd; return p ? (p.dir || 1) * (p.dir ? p.score : p.energy * 0.5) : 0; }, c => pdCellOf((el(c) || {}).pd));
   add('pBig', 'Institutional volume side', 'Which side the real institutional volume is on right now and how much: big-bar flow, big trades on Binance (prints above about $15k or the top 10% of trades) and 1h money flow. BUY or SELL with the 1h flow in dollars and the big-print balance.', c => { const p = (el(c) || {}).pd; return p ? p.vside * (1 + Math.abs(isNum(p.flowUsd) ? p.flowUsd : 0) / 1e6) : 0; }, c => pdVolCell((el(c) || {}).pd));
+  add('pList', 'Binance news', 'Recent Binance listing, futures-launch or delisting announcements for this coin (last 14 days). A fresh listing can pump for hours then fade; a delisting brings forced selling.', c => { const o = lstFor(c); return o ? (o.kind === 'delist' ? -1 : 1) * Math.max(1, 336 - o.age) : 0; }, c => lstCell(c));
   add('pFinal', 'Take-off', 'FINAL = the scanner calls it ready. building = forming.', c => ({FINAL:2, building:1})[el(c).final] || 0, c => { const f = el(c).final; return [f || '—', f === 'FINAL' ? 'up' : f ? 'warn' : 'dim']; });
   add('pBlock', 'Blockers', 'Hard blockers from the confirmation checklist. Empty means none.', c => el(c).hard ? el(c).hard.length : 0, c => { const h = el(c).hard || []; return [h.length ? '<span title="' + esc(h.join('; ')) + '">' + h.length + ': ' + esc(h[0]) + (h.length > 1 ? '…' : '') + '</span>' : 'none', h.length ? 'dn' : 'dim']; });
   const vv = (c, k) => { const v = (c.m.vol || {})[k]; return isNum(v) ? v : null; }, vdv = (c, k) => { const v = (c.m.volD || {})[k]; return isNum(v) ? v : null; };
@@ -12058,6 +12134,7 @@ const PS_THR = {
   pPress:['GO = all conditions met · READY = 1 missing · BUILDING = 2+ missing', 'Direction of institutional pressure (BUYING or SELLING) and how close it is to firing. Needs institutional activity, take-off score, rising money flow, rising volume and 2 of 4 timeframes agreeing. Best: BUYING/SELLING + GO that matches the verdict side. READY = watch closely. BUILDING = too early.'],
   pPD:['LIKELY 68+ · BUILDING 50-67 · under 50 quiet', 'Pump or dump forecast for the coming hours. It needs two things at once: direction evidence (money flow, institutional bars, big trades, take-off, breakouts) and volume energy (volume spikes, institutional share, compression, open-interest build-up). Strong direction without volume is a drift, not a pump. Best: LIKELY on the same side as the Side column and Inst. pressure GO. Chasing risk appears when price already moved more than 2.5x its hourly range.'],
   pBig:['BUY / SELL with 1h dollars', 'Real institutional volume side. Big prints on Binance above the top 10% of trades (at least $15k) are counted separately from small trades. Big prints and the big-bar flow agreeing is the strongest sign that size is moving.'],
+  pList:['LISTING under 24h = chase risk · DELISTING = avoid', 'Binance announcements: a fresh listing or futures launch often pumps for hours and then fades, so do not chase late. A delisting brings forced selling.'],
   pSide:['LONG / SHORT = verdict side', 'From the coin verdict: score +15 lean long, +35 strong long; -15 lean short, -35 strong short. Neutral verdict falls back to the institutional lean.'],
   pTag:['TRADEABLE needs strong + grade A/B + 0 blockers', 'TRADEABLE = strong verdict, grade A or B, no hard blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.'],
   pGrade:['A 82%+ · B 68%+ · C 52%+ · D below', 'Share of weighted confirmation checks met. Trade A or B. C only with small size. D = wait.'],
@@ -12306,11 +12383,12 @@ function renderOverview(){
     el.addEventListener('click', e => {
       if (e.target.closest('#mxRefresh')){ mxLoad(true); return; }
       { const pb = e.target.closest('[data-mxper]'); if (pb){ MX.per = pb.dataset.mxper; MX.cacheAt = 0; renderOverview(); return; } }
+      if (e.target.closest('#frRefresh')){ frLoad(true); lstLoad(true); return; }
       if (e.target.closest('#ovRefresh')){ OV.cacheAt = 0; ovLoadExtra(true); renderOverview(); return; }
       const g = e.target.closest('[data-ovgo]'); if (g){ const b = document.querySelector('#side .nv[data-view="' + g.dataset.ovgo + '"],#side .nv[data-mode="' + g.dataset.ovgo + '"]'); if (b) b.click(); }
     });
     el.addEventListener('toggle', e => { const d = e.target; if (d && d.dataset && d.dataset.ovd){ if (d.open) OV.open.add(d.dataset.ovd); else OV.open.delete(d.dataset.ovd); } }, true);
-    ovLoadExtra(); mxLoad();
+    ovLoadExtra(); mxLoad(); try { frLoad(); } catch(e){}
   }
   const html = ovHtml(); if (el._h !== html){ el.innerHTML = html; el._h = html; try { ccTick(); } catch(e){} }
 }
