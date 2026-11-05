@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5</title>
+<title>ELPP CRYPTO SCANNER PRO V5.1</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.1</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -14867,6 +14867,9 @@ const CSS = `
 .ta-ws .ta-wrap{flex:1;min-height:0}
 .ta-ws .ta-grid{flex:1;min-height:0;grid-auto-rows:minmax(0,1fr)!important}
 .ta-ws .ta-cell{min-height:260px}
+.ta-ws.ta-focus>.ta-wrap>.ta-bar,.ta-ws.ta-focus>.ta-wrap>.ta-cc,.ta-ws.ta-focus>.ta-wrap>.ta-mkt,.ta-ws.ta-focus>.ta-wrap>.ta-help{display:none!important}
+.ta-ws.ta-focus{padding:2px;gap:0}.ta-ws.ta-focus>.ta-wrap{gap:0}.ta-ws.ta-focus .ta-grid{gap:2px}
+.ta-focusb{position:fixed;right:8px;bottom:4px;z-index:9600;opacity:.55;font-size:11px!important;padding:1px 8px!important}.ta-focusb:hover{opacity:1}
 body.ta-wsb{overflow:hidden}
 .ta-mkt{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:linear-gradient(90deg,rgba(212,175,55,.10),transparent);border:1px solid rgba(212,175,55,.35);border-radius:10px;padding:5px 10px;font-size:12px}
 .ta-mkt[hidden]{display:none!important}
@@ -15074,7 +15077,14 @@ function build(){ try { uniLoad(); } catch(e){}
 }
 function setLayout(k){ S.layout = k; const n = LAYOUTS[k].n; while (S.panes.length < n){ const b = S.panes[0]; S.panes.push(Object.assign(mkPane(b.sym, CELL_TF[S.panes.length % CELL_TF.length]), {type:b.type})); } if (S.panes.length > n) S.panes.length = n; S.active = Math.min(S.active, n - 1); save(); buildGrid(); }
 function fillHow(h){ try { let d = $q('.ta-how', h); if (!d){ d = mk('div', 'ta-how'); h.appendChild(d); } const g = HOOK().guide && HOOK().guide(); if (!g) return; d.innerHTML = '<b>How to use this screen, step by step</b><ol>' + (g.how || []).map(x => '<li>' + esc(x) + '</li>').join('') + '<li>Press <b>⛶ Workspace</b> to fill the whole window, then use the Layout buttons (1 to 12 panes) to add panes. <b>↗ New analysis tab</b> opens a clean analysis-only window you can place on another monitor.</li><li>Tick <b>Market now</b> to keep the regime and BTC / ETH verdict in view while you analyse.</li><li>Thresholds and every word are explained under 📚 Vocabulary &amp; Academy in the main menu.</li></ol>' + ((g.rows || []).length ? '<table class="gtab sm" style="width:100%"><tbody>' + g.rows.map(r => '<tr><td style="text-align:left;vertical-align:top"><b>' + esc(r[0]) + '</b></td><td style="text-align:left">' + esc(r[1]) + '</td><td style="text-align:left">' + esc(r[2]) + '</td></tr>').join('') + '</tbody></table>' : ''); } catch(e){} }
-function setWs(on){ root.classList.toggle('ta-ws', !!on); document.body.classList.toggle('ta-wsb', !!on); const b = $q('#taWs', root); if (b){ b.textContent = on ? '✕ Exit workspace' : '⛶ Workspace'; b.classList.toggle('on', !!on); } if (on && !S.mkt && SCR){ S.mkt = true; const k = $q('#taMkt', root); if (k) k.checked = true; mktUpd(true); } setTimeout(() => { charts.forEach(c => { c.dirty = true; }); window.dispatchEvent(new Event('resize')); }, 60); }
+/* analysis tab with one pane: hide the layout / favourites / clock / market strips so the chart fills the window, like TradingView. The small ☰ button (bottom right) brings them back. */
+function applyFocus(){
+  if (!SCR || !root) return; const on = S.focus !== undefined ? !!S.focus : S.layout === '1';
+  root.classList.toggle('ta-focus', on && root.classList.contains('ta-ws'));
+  let b = document.getElementById('taFocus'); if (!b){ b = document.createElement('button'); b.id = 'taFocus'; b.type = 'button'; b.className = 'ta-b ta-focusb'; b.addEventListener('click', () => { const cur = S.focus !== undefined ? !!S.focus : S.layout === '1'; S.focus = !cur; save(); applyFocus(); setTimeout(() => { charts.forEach(c => { c.dirty = true; }); window.dispatchEvent(new Event('resize')); }, 60); }); root.appendChild(b); }
+  b.textContent = on ? '☰ Panels' : '⤢ Focus'; b.title = on ? 'Show the layout, favourites, candle clocks and market strips again' : 'Hide the strips so the chart fills the whole window';
+}
+function setWs(on){ root.classList.toggle('ta-ws', !!on); document.body.classList.toggle('ta-wsb', !!on); const b = $q('#taWs', root); if (b){ b.textContent = on ? '✕ Exit workspace' : '⛶ Workspace'; b.classList.toggle('on', !!on); } if (on && !S.mkt && SCR){ S.mkt = true; const k = $q('#taMkt', root); if (k) k.checked = true; mktUpd(true); } try { applyFocus(); } catch(e){} setTimeout(() => { charts.forEach(c => { c.dirty = true; }); window.dispatchEvent(new Event('resize')); }, 60); }
 function openScreen(){ let n = 1; try { n = (+localStorage.getItem('elpp_ta_scrn') || 0) + 1; localStorage.setItem('elpp_ta_scrn', String(n)); localStorage.setItem(LSK0 + '_s' + n, JSON.stringify(S)); } catch(e){} const u = location.origin + location.pathname + '?screen=' + n + '#view=ta'; const w = window.open(u, '_blank'); if (!w) toast('Your browser blocked the new tab. Allow pop-ups for this site, then try again.'); }
 function mktUpd(force){ const box = $q('#taMktBox', root); if (!box) return; box.hidden = !S.mkt; if (!S.mkt) return; if (!force && Date.now() - (mktUpd.t || 0) < 8000) return; mktUpd.t = Date.now(); const m = HOOK().market && HOOK().market(); if (!m){ box.innerHTML = '<span class="k">Market data is still loading…</span>'; return; }
   const cl = v => v > 0 ? 'color:var(--up)' : v < 0 ? 'color:var(--down)' : '', pc = v => typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '—', coin = x => x ? '<span><span class="k">' + esc(x.n) + '</span> <b>' + esc(String(x.px < 10 ? x.px.toFixed(4) : x.px < 1000 ? x.px.toFixed(2) : Math.round(x.px))) + '</b> <b style="' + cl(x.c1) + '">1h ' + pc(x.c1) + '</b> <b style="' + cl(x.c4) + '">4h ' + pc(x.c4) + '</b>' + (x.v ? ' <span class="reg">' + esc(x.v) + (typeof x.vs === 'number' ? ' (' + (x.vs > 0 ? '+' : '') + x.vs + ')' : '') + '</span>' : '') + '</span>' : '';
@@ -15087,7 +15097,7 @@ function buildGrid(){
   if (S.pw > 0 && window.innerWidth >= 760){ grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + S.pw + 'px, 1fr))'; }
   if (window.innerWidth < 760){ grid.style.gridTemplateColumns = '1fr'; grid.style.gridAutoRows = 'max(520px, ' + Math.round(80 * (S.hs || 1.5)) + 'vh)'; }
   S.panes.forEach((p, i) => { const cell = mk('div', 'ta-cell', cellHtml(i)); cell.dataset.i = i; grid.appendChild(cell); const c = new Chart(i); c.attach(cell); charts.push(c); c.setFeed(); c.bind(); c.ro = new ResizeObserver(() => { c.dirty = true; if (!c.fitted2 && c.cv.clientWidth > 100){ c.fitted2 = true; if (c.bars.length) c.fit(); } }); c.ro.observe(c.cv); refresh(c); });
-  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.5)) < 0.01)); root.querySelectorAll('[data-pw]').forEach(b => b.classList.toggle('on', +b.dataset.pw === (S.pw || 0))); root.querySelectorAll('[data-hca]').forEach(b => b.classList.toggle('on', S.hc != null && +b.dataset.hca === S.hc)); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
+  root.querySelectorAll('[data-lay]').forEach(b => b.classList.toggle('on', b.dataset.lay === S.layout)); try { applyFocus(); } catch(e){} root.querySelectorAll('[data-hs]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.hs - (S.hs || 1.5)) < 0.01)); root.querySelectorAll('[data-pw]').forEach(b => b.classList.toggle('on', +b.dataset.pw === (S.pw || 0))); root.querySelectorAll('[data-hca]').forEach(b => b.classList.toggle('on', S.hc != null && +b.dataset.hca === S.hc)); fillList(); pollPlan(); if (SCR && !buildGrid.ws){ buildGrid.ws = true; setWs(true); } mktUpd(true);
 }
 function fillList(){ const dl = $q('#taList', root); if (dl) dl.innerHTML = coinNames().map(n => '<option value="' + esc(n) + '">').join(''); }
 function pollPlan(){
