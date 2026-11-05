@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.95</title>
+<title>ELPP CRYPTO SCANNER PRO V4.96</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.95</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.96</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -6750,12 +6750,14 @@ function mkCalc(all){
   const bot = botBadge(manip, churnPct, crowdHi);
   return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, liqDir, volDir, voltDir, liqChgPct, voltChgPct, combo, bot, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
 }
+function mkDirTxt(r){ return r.state === 'Bad' ? 'Bearish (strong)' : r.state === 'Weak' ? 'Bearish' : r.state === 'Good' ? 'Bullish' : r.state === 'Strong' ? 'Bullish (strong)' : r.state; }
+function mkSideTxt(r){ return (r.state === 'Bad' || r.state === 'Weak') ? ' · FOR SHORTS' : (r.state === 'Good' || r.state === 'Strong') ? ' · FOR LONGS' : ''; }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
   const pill = b => `<span class="mkb-pill mkb-p-${b.tone}" title="${esc(b.why)}">${esc(b.label)}</span>`;
   const pills = [r.liq, r.volTrend, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
-  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">${esc(r.state)}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability score ${r.score}/100: ${esc(r.why.join(', '))}">${esc(r.grade)} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Score ${r.score}/100 because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
+  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state" title="Direction: which side is winning. This word says nothing about how clean the market is to trade.">${esc(mkDirTxt(r))}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability ${r.score}/100 = how clean the market is to trade (clear direction, trending coins, volume), NOT which way it goes. Direction is the word on the left. ${esc(r.why.join(', '))}">${esc(r.grade)}${esc(mkSideTxt(r))} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Tradeability ${r.score}/100 (how clean it is to trade, not which way) because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
 const OPT_GLOSS = [
   ['Option','A contract that gives the right, not the duty, to buy or sell at a fixed price before a date.'],
@@ -10705,7 +10707,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.95: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.96: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -10752,7 +10754,7 @@ function todayHtml(){
   let hs = []; try { hs = healthRows(); } catch(e){} const bad = hs.filter(x => !x.ok && !x.opt).length;
   const tile = (lab, val, sub, cls) => `<div style="flex:1;min-width:170px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:18px;font-weight:700" class="${cls || ''}">${val}</div><small class="hint">${sub && sub.raw ? sub.raw : esc(sub || '')}</small></div>`;
   let h = scanWidgetHtml();
-  h += `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(r.state + '') : 'Collecting…', r ? r.grade + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
+  h += `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(mkDirTxt(r)) : 'Collecting…', r ? r.grade + mkSideTxt(r) + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
   h += `<div class="nsec"><h3>Top set-ups right now</h3>${all.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Verdict</th><th>Score</th><th style="text-align:left">Psychology</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th></th></tr></thead><tbody>${all.map(c => { const p = (() => { try { return planFor(c); } catch(e){ return null; } })(), m = c.m; return `<tr><td style="text-align:left"><b>${esc(c.name)}</b></td><td class="${m.verdict === 5 ? 'up' : 'dn'}">${esc(VERDICT_LAB[m.verdict])}</td><td>${sg(Math.round(m.verdictScore))}</td><td style="text-align:left" class="dim">${esc(m.psy ? m.psy.tag : '—')}</td><td>${p ? esc(fmtPx(p.entry)) : '—'}</td><td>${p ? esc(fmtPx(p.sl)) : '—'}</td><td>${p ? esc(fmtPx(p.tp1)) : '—'}</td><td>${p ? esc(fmtPx(p.tp2)) : '—'}</td><td><button class="btn sm" type="button" data-chart="${esc(c.name)}">Chart</button></td></tr>`; }).join('')}</tbody></table><p class="hint">Check each one on your own chart before taking it. Open "How it decides" to see why a coin scored what it did.</p>` : '<p class="hint">No Strong long or short verdicts at the moment. Waiting is also a position.</p>'}</div>`;
   h += prTodayHtml();
   h += `<div class="nsec"><h3>Your open signals</h3>${open.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Side</th><th>Entry</th><th>Stop</th><th>TP1</th><th>Age</th><th>MAE</th><th>MFE</th><th style="text-align:left">Status</th></tr></thead><tbody>${open.map(x => `<tr><td style="text-align:left">${esc(x.name)}</td><td class="${x.dir === 'long' ? 'up' : 'dn'}">${x.dir}</td><td>${esc(fmtPx(x.entry))}</td><td>${esc(fmtPx(x.sl))}${x.slWhy ? '<br><small class="dim">' + esc(stShort(x.slWhy)) + '</small>' : ''}</td><td>${esc(fmtPx(x.tp1))}</td><td>${esc(ago(x.t))}</td><td>${isNum(x.mae) ? x.mae.toFixed(2) + 'R' : '—'}</td><td>${isNum(x.mfe) ? x.mfe.toFixed(2) + 'R' : '—'}</td><td style="text-align:left">${esc(SIG_LAB[x.status] || x.status)}</td></tr>`).join('')}</tbody></table>` : '<p class="hint">No open signals.</p>'}</div>`;
@@ -11406,7 +11408,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.95: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.96: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11454,7 +11456,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.95: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.96: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11666,7 +11668,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.95: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.96: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11680,7 +11682,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.95: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.96: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11884,7 +11886,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.95: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.96: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
@@ -11920,7 +11922,7 @@ function psElite(c, mk){
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
   return o;
 }
-/* ===== V4.95: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
+/* ===== V4.96: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
 const BTF = {map:new Map(), busy:false, t:0};
 function btSym(c){ const k = normSym(c.name); return (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; }
 async function btTick(){
@@ -12017,7 +12019,7 @@ function pdTick(){
   if (dirty){ try { LS.set(PDL.k, L.slice(-500)); } catch(e){} }
 }
 function pdStats(){ const L = pdLogLoad(), d = L.filter(x => x.res === 'hit' || x.res === 'miss'), h = d.filter(x => x.res === 'hit').length; return {n:d.length, hit:h, rate:d.length ? Math.round(h / d.length * 1000) / 10 : null, pend:L.filter(x => x.res == null).length, flat:L.filter(x => x.res === 'flat').length}; }
-/* ===== V4.95: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
+/* ===== V4.96: FRED US yields + Binance listing news, fetched through proxy.php (Hostinger) with relay / public-proxy fallbacks ===== */
 async function pxText(url){
   const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), tries = [];
   if (base) tries.push(base + '/proxy.php'); tries.push('proxy.php');
