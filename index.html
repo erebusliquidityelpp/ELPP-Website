@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.1</title>
+<title>ELPP CRYPTO SCANNER PRO V5.2</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.1</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.2</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -14977,7 +14977,7 @@ function camMenu(c, btn){
 
 function smcStrip(){
   const groups = []; SMC.forEach(q => { let g = groups.find(x => x.n === q[2]); if (!g){ g = {n:q[2], a:[]}; groups.push(g); } g.a.push(q); });
-  return '<div class="ta-smc"><span class="g"><i>Presets</i><button class="c pre" data-a="smcp" data-p="ict" title="Structure, order blocks, FVG, liquidity, premium/discount">ICT core</button><button class="c pre" data-a="smcp" data-p="volume" title="Institutional candles, volume entries, absorption, volume profile">Volume</button><button class="c pre" data-a="smcp" data-p="sessions" title="Kill zones, Asia range, previous day levels, opens">Sessions</button><button class="c pre" data-a="smcp" data-p="phases" title="Accumulation, distribution, choppy, real and fake breakouts, stop hunts">Phases</button><button class="c pre" data-a="smcp" data-p="instE" title="Real institutional volume, entry zones, 2nd test, reclaim, hunt wick">Inst. entry</button><button class="c pre" data-a="smcp" data-p="off" title="Turn all SMC items off for a clean chart">Clear</button></span>' + groups.map(g => '<span class="g"><i>' + esc(g.n) + '</i>' + g.a.map(q => '<button class="c" data-a="smc" data-k="' + q[0] + '" title="' + esc(q[3]) + '">' + esc(q[1]) + '</button>').join('') + '</span>').join('') + '</div>';
+  return '<div class="ta-smc"><span class="g"><i>Presets</i><button class="c pre" data-a="smcp" data-p="ict" title="Structure, order blocks, FVG, liquidity, premium/discount">ICT core</button><button class="c pre" data-a="smcp" data-p="volume" title="Institutional candles, volume entries, absorption, volume profile">Volume</button><button class="c pre" data-a="smcp" data-p="sessions" title="Kill zones, Asia range, previous day levels, opens">Sessions</button><button class="c pre" data-a="smcp" data-p="phases" title="Accumulation, distribution, choppy, real and fake breakouts, stop hunts">Phases</button><button class="c pre" data-a="smcp" data-p="instE" title="Real institutional volume, entry zones, 2nd test, reclaim, hunt wick">Inst. entry</button><button class="c pre" data-a="smcp" data-p="off" title="Turn all SMC items off for a clean chart">Clear all</button></span>' + groups.map(g => '<span class="g"><i>' + esc(g.n) + '</i>' + g.a.map(q => '<button class="c" data-a="smc" data-k="' + q[0] + '" title="' + esc(q[3]) + '">' + esc(q[1]) + '</button>').join('') + '</span>').join('') + '</div>';
 }
 function cellHtml(i){
   return '<div class="ta-top">' +
@@ -15005,7 +15005,7 @@ function hcOf(p){ return p.hc != null ? p.hc : (S.hc != null ? S.hc : (LAYOUTS[S
 function refresh(c){
   const cell = c.cell; if (!cell) return; { const h = hcOf(c.pane); cell.classList.toggle('hc1', h === 1); cell.classList.toggle('hc2', h === 2); const hb = $q('.ta-hc span', cell); if (hb) hb.textContent = ['Full', 'Compact', 'Mini'][h]; } { const tb = $q('.ta-tools', cell); if (tb){ tb.classList.toggle('min', !!S.tbMin); const b0 = $q('[data-a=tbar]', tb); if (b0) b0.textContent = S.tbMin ? '»' : '«'; } } { const vl = $q('.ta-vl2', cell); if (vl){ const f = c.feed, v = c.pane.ven || 'auto'; vl.textContent = f && f.src ? VEN[f.src.src].tag + (v === 'auto' ? '·auto' : '') : (v === 'auto' ? 'Auto' : VEN[v].tag); } } const p = c.pane, inp = $q('.ta-sym', cell); if (inp && document.activeElement !== inp) inp.value = p.sym;
   cell.querySelectorAll('[data-a=tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === p.tf)); const m = $q('.ta-tfm', cell); m.value = p.tf; $q('.ta-type', cell).value = p.type;
-  const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('plan', p.plan); { let cnt = 0; cell.querySelectorAll('[data-a=smc]').forEach(b => { const v = smcOn(p, b.dataset.k); if (v) cnt++; b.classList.toggle('on', v); }); const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; $q('.ta-smc', cell).hidden = !open; const sb = $q('[data-a=smcs]', cell); sb.textContent = 'SMC' + (cnt ? ' (' + cnt + ')' : '') + (open ? ' ▴' : ' ▾'); sb.classList.toggle('on', cnt > 0); } on('rep', c.rep.on); on('mag', S.magnet);
+  const on = (a, v) => { const b = $q('[data-a=' + a + ']', cell); if (b) b.classList.toggle('on', !!v); }; on('vol', p.vol); on('log', p.log); on('plan', p.plan); { let cnt = 0; cell.querySelectorAll('[data-a=smc]').forEach(b => { const v = smcOn(p, b.dataset.k); if (v) cnt++; b.classList.toggle('on', v); }); cell.querySelectorAll('[data-a=smcp]').forEach(b => { const st = SMC_PRESETS[b.dataset.p]; b.classList.toggle('on', !!st && st.length > 0 && st.every(k => smcOn(p, k))); }); const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; $q('.ta-smc', cell).hidden = !open; const sb = $q('[data-a=smcs]', cell); sb.textContent = 'SMC' + (cnt ? ' (' + cnt + ')' : '') + (open ? ' ▴' : ' ▾'); sb.classList.toggle('on', cnt > 0); } on('rep', c.rep.on); on('mag', S.magnet);
   cell.querySelectorAll('[data-a=tool]').forEach(b => b.classList.toggle('on', b.dataset.t === c.tool)); const st = $q('.ta-star', cell); st.classList.toggle('on', S.stars.includes(p.sym)); st.textContent = S.stars.includes(p.sym) ? '★' : '☆';
   cell.classList.toggle('act', S.active === c.i);
   const db = $q('.ta-db', cell), d = c.sel && c.draws().find(q => q.id === c.sel); db.hidden = !d; if (d){ db.innerHTML = DCOL.map(k => '<button class="sw' + ((d.color || '#58a6ff') === k ? ' on' : '') + '" data-a="dcol" data-c="' + k + '" style="background:' + k + '"></button>').join('') + '<button class="ta-b" data-a="dlock" title="Lock so it cannot be moved">' + (d.lock ? '🔒' : '🔓') + '</button><button class="ta-b" data-a="ddel" title="Delete (Del key)">🗑</button>'; }
@@ -15057,7 +15057,7 @@ function build(){ try { uniLoad(); } catch(e){}
     if (a === 'plan2'){ planMenu(c, b); return; } if (a === 'stats'){ statsMenu(c, b); return; } if (a === 'alert'){ alertMenu(c, b); return; } if (a === 'cmp'){ cmpMenu(c, b); return; } if (a === 'data'){ dataMenu(c, b); return; } if (a === 'score'){ scoreMenu(c, b); return; }
     if (a === 'smcs'){ const open = S.smcOpen == null ? LAYOUTS[S.layout].n <= 2 : S.smcOpen; S.smcOpen = !open; save(); charts.forEach(x => { refresh(x); x.dirty = true; }); return; }
     if (a === 'smc'){ const k = b.dataset.k; if (k === 'liq' || k === 'fvg') p[k] = !p[k]; else { p.smc = p.smc || {}; p.smc[k] = !p.smc[k]; } c.zones.key = ''; c.smcC = null; c.dirty = true; save(); refresh(c); return; }
-    if (a === 'smcp'){ const set = SMC_PRESETS[b.dataset.p] || []; p.smc = {}; p.liq = false; p.fvg = false; set.forEach(k => { if (k === 'liq' || k === 'fvg') p[k] = true; else p.smc[k] = true; }); c.zones.key = ''; c.smcC = null; c.dirty = true; save(); refresh(c); return; }
+    if (a === 'smcp'){ const set = SMC_PRESETS[b.dataset.p] || []; p.smc = p.smc || {}; if (b.dataset.p === 'off'){ p.smc = {}; p.liq = false; p.fvg = false; } else { const all = set.every(k => smcOn(p, k)); set.forEach(k => { if (k === 'liq' || k === 'fvg') p[k] = !all; else p.smc[k] = !all; }); } c.zones.key = ''; c.smcC = null; c.dirty = true; save(); refresh(c); return; }
     if (a === 'vol' || a === 'log' || a === 'liq' || a === 'fvg' || a === 'plan'){ p[a] = !p[a]; if (a === 'plan' && p.plan) pollPlan(); c.zones.key = ''; if (a === 'log') c.yz = 1; c.dirty = true; save(); refresh(c); return; }
     if (a === 'rep'){ if (c.rep.on) c.exitReplay(); else c.enterReplay(); return; }
     if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
