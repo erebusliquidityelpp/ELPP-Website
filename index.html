@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.3</title>
+<title>ELPP CRYPTO SCANNER PRO V5.4</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.3</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.4</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -7507,9 +7507,15 @@ function instFinal(c, rd){
   const td2 = takeDir(m), opp = td2 && td2[0] !== side && td2[1] >= tmin;
   const flowOk = flowBuild || (flowThere && volUp), missing = [];
   if (!rd.active) missing.push('institutions are not unusually active'); if (!n(td) || td < tmin) missing.push('take-off score ' + (n(td) ? td : '?') + ' is under ' + tmin); if (!flowOk) missing.push('net money flow is not building'); if (!volUp) missing.push('volume is not rising'); if (agree < 2) missing.push('only ' + agree + ' of 4 timeframes agree'); if (opp) missing.push('the take-off read points the other way');
+  /* V5.4: do not call GO on a move that already ran (chasing / falling knife) */
+  let late = null; { const c1 = m.chg && m.chg['1h'], mx1 = m.moveX && m.moveX['1h'], c4 = m.chg && m.chg['4h'], a4 = m.atr && m.atr['4h'], c1d = m.chg && m.chg['1d'];
+    if (n(c1) && n(mx1) && mx1 >= 2 && c1 * dir > 0) late = 'already moved ' + mx1.toFixed(1) + ' ATR in the last hour';
+    else if (n(c4) && n(a4) && a4 > 0 && Math.abs(c4) / a4 >= 3 && c4 * dir > 0) late = 'already moved ' + (Math.abs(c4) / a4).toFixed(1) + ' ATR in 4 hours';
+    else if (n(c1d) && c1d * dir >= 10) late = 'already ' + (dir > 0 ? 'up ' : 'down ') + Math.abs(c1d).toFixed(0) + '% in 24h'; }
+  if (late) missing.push('LATE: price ' + late + ' (wait for a pullback or sweep, do not chase)');
   const final = !missing.length;
   const good = []; if (flowBuild) good.push('flow building on 15m and 1h'); else if (flowThere) good.push('flow present'); if (volUp) good.push('volume rising'); if (n(td)) good.push('take-off ' + td); good.push(agree + ' of 4 timeframes agree');
-  return {final:final ? side : null, dir, building:!final && (flowThere || (n(td) && td >= tmin * 0.75)), td, text:final ? 'FINAL ' + side.toUpperCase() + ': ' + good.join(', ') : 'Building ' + side + ': ' + good.join(', ') + '. Missing: ' + missing.join('; '), missing};
+  return {final:final ? side : null, late, dir, building:!final && (flowThere || (n(td) && td >= tmin * 0.75)), td, text:final ? 'FINAL ' + side.toUpperCase() + ': ' + good.join(', ') : 'Building ' + side + ': ' + good.join(', ') + '. Missing: ' + missing.join('; '), missing};
 }
 function instListed(c){
   const k = normSym(c.name), by = FX.ven && FX.ven.by, ok = FX.ven && FX.ven.ok;
@@ -12112,7 +12118,7 @@ function psCols(){
   add('pTag', 'Status', 'TRADEABLE = strong verdict + grade A/B + no blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.', c => ({trade:4, wait:3, watch:2, lean:1, none:0})[el(c).tag] || 0, c => { const t = PS_TAG[el(c).tag] || PS_TAG.none; return ['<span title="' + esc(t[2]) + '">' + t[0] + '</span>', t[1]]; });
   add('pGrade', 'Grade', 'Signal-quality grade A to D from every confirmation check, with how many were met.', c => { const e = el(c); return e.p == null ? null : e.p; }, c => { const e = el(c); return e.grade ? ['<b>' + e.grade + '</b> <small>' + e.ok + '/' + e.n + '</small>', e.grade === 'A' || e.grade === 'B' ? 'up' : e.grade === 'C' ? 'warn' : 'dn'] : ['—', 'dim']; });
   add('pInst', 'Inst. score', 'Institutional score 0 to 100 (accumulation / distribution read across 15m, 1h, 4h, D).', c => el(c).is, c => { const s = el(c).is; return [isNum(s) ? s + '' : '—', isNum(s) ? (s >= 70 ? 'up' : s >= 45 ? '' : 'dim') : 'dim']; });
-  add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const ph = f.final ? 'GO' : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; '); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'BUILDING' ? 'warn' : 'up') : (ph === 'BUILDING' ? 'warn' : 'dn')]; });
+  add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : f.late ? 1 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const ph = f.final ? 'GO' : f.late ? 'LATE · don\'t chase' : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; '); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'GO' || ph === 'READY' ? 'up' : 'warn') : (ph === 'GO' || ph === 'READY' ? 'dn' : 'warn')]; });
   add('pPD', 'PUMP / DUMP (hours)', 'Forecast of an explosive move in the coming hours. Built from real institutional volume (big-bar flow, institutional share, big trades on Binance), net money flow on 15m/1h/4h, take-off score, breakouts, hidden CVD buying/selling, open-interest build-up, volatility compression and crowd squeeze fuel. PUMP/DUMP LIKELY = score 68+ with strong volume energy. BUILDING = 50-67. VOLUME COMING = heavy volume but side unclear. Hover for the reasons, the time window and cautions.', c => { const p = (el(c) || {}).pd; return p ? (p.dir || 1) * (p.dir ? p.score : p.energy * 0.5) : 0; }, c => pdCellOf((el(c) || {}).pd));
   add('pBig', 'Institutional volume side', 'Which side the real institutional volume is on right now and how much: big-bar flow, big trades on Binance (prints above about $15k or the top 10% of trades) and 1h money flow. BUY or SELL with the 1h flow in dollars and the big-print balance.', c => { const p = (el(c) || {}).pd; return p ? p.vside * (1 + Math.abs(isNum(p.flowUsd) ? p.flowUsd : 0) / 1e6) : 0; }, c => pdVolCell((el(c) || {}).pd));
   add('pList', 'Binance news', 'Recent Binance listing, futures-launch or delisting announcements for this coin (last 14 days). A fresh listing can pump for hours then fade; a delisting brings forced selling.', c => { const o = lstFor(c); return o ? (o.kind === 'delist' ? -1 : 1) * Math.max(1, 336 - o.age) : 0; }, c => lstCell(c));
@@ -12140,7 +12146,7 @@ function psCols(){
 }
 const PS_THR = {
   pRank:['70+ strong · 50-70 ok · under 50 weak', 'Power rank combines institutional score (60%), signal grade, FINAL/building bonus, verdict strength, minus blockers, plus data quality and R:R. Look first at 70 and above with no blockers.'],
-  pPress:['GO = all conditions met · READY = 1 missing · BUILDING = 2+ missing', 'Direction of institutional pressure (BUYING or SELLING) and how close it is to firing. Needs institutional activity, take-off score, rising money flow, rising volume and 2 of 4 timeframes agreeing. Best: BUYING/SELLING + GO that matches the verdict side. READY = watch closely. BUILDING = too early.'],
+  pPress:['GO = all conditions met · READY = 1 missing · BUILDING = 2+ missing · LATE = the move already ran, wait for a pullback', 'Direction of institutional pressure (BUYING or SELLING) and how close it is to firing. Needs institutional activity, take-off score, rising money flow, rising volume and 2 of 4 timeframes agreeing. Best: BUYING/SELLING + GO that matches the verdict side. READY = watch closely. BUILDING = too early.'],
   pPD:['LIKELY 68+ · BUILDING 50-67 · under 50 quiet', 'Pump or dump forecast for the coming hours. It needs two things at once: direction evidence (money flow, institutional bars, big trades, take-off, breakouts) and volume energy (volume spikes, institutional share, compression, open-interest build-up). Strong direction without volume is a drift, not a pump. Best: LIKELY on the same side as the Side column and Inst. pressure GO. Chasing risk appears when price already moved more than 2.5x its hourly range.'],
   pBig:['BUY / SELL with 1h dollars', 'Real institutional volume side. Big prints on Binance above the top 10% of trades (at least $15k) are counted separately from small trades. Big prints and the big-bar flow agreeing is the strongest sign that size is moving.'],
   pList:['LISTING under 24h = chase risk · DELISTING = avoid', 'Binance announcements: a fresh listing or futures launch often pumps for hours and then fades, so do not chase late. A delisting brings forced selling.'],
