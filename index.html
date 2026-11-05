@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.4</title>
+<title>ELPP CRYPTO SCANNER PRO V5.5</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -580,6 +580,8 @@ td.h{background:color-mix(in srgb,var(--c) calc(var(--a) * 55%),transparent)}
   td,th{padding:7px 8px!important;font-size:12px}
   td.sym .cp[data-copy]{display:none}
   td.sym a[data-chart]{font-size:14px}
+#vtfBar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;padding:6px 8px;border:1px solid var(--line,#2a3345);border-radius:8px;background:var(--panel,#121826);position:sticky;top:0;z-index:20}
+#vtfBar[hidden]{display:none}.vtl{font-size:12px;opacity:.7;margin-right:2px}.vtb{font:600 12px inherit;font-family:inherit;padding:3px 12px;border-radius:14px;border:1px solid var(--line,#2a3345);background:transparent;color:inherit;cursor:pointer}.vtb.on{background:#c9a24a;color:#111;border-color:#c9a24a}.vtn{flex:1 1 260px;font-size:11px;opacity:.65}
   td:first-child{white-space:nowrap}
   /* filter panel opens as a full-screen sheet */
   .wrap:not(.nofilters) .panel{position:fixed!important;inset:0;width:100vw!important;max-width:100vw!important;box-sizing:border-box;z-index:130;max-height:none!important;border-radius:0;border:0;padding:12px 12px calc(90px + env(safe-area-inset-bottom,0px));overflow-y:auto}
@@ -792,7 +794,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.4</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.5</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -3816,11 +3818,11 @@ function tfAnalyze(b, px){
     if (L.i > H.i){
       let hh = -Infinity; for (let j = L.i; j < n; j++) if (b[j].h > hh) hh = b[j].h; hh = Math.max(hh, px);
       const leg = hh - L.p;
-      if (leg >= 1.5 * atr){ const ret = (hh - px) / leg; r.retr = ret * 100; r.ote = (ret >= 0.62 && ret <= 0.79) ? 1 : ret > 0.79 ? 3 : 0; }
+      if (leg >= 1.5 * atr){ const ret = (hh - px) / leg; r.retr = ret * 100; r.legDir = 1; r.legPct = leg / L.p * 100; r.ote = (ret >= 0.62 && ret <= 0.79) ? 1 : ret > 0.79 ? 3 : 0; }
     } else {
       let ll = Infinity; for (let j = H.i; j < n; j++) if (b[j].l < ll) ll = b[j].l; ll = Math.min(ll, px);
       const leg = H.p - ll;
-      if (leg >= 1.5 * atr){ const ret = (px - ll) / leg; r.retr = ret * 100; r.ote = (ret >= 0.62 && ret <= 0.79) ? 2 : ret > 0.79 ? 3 : 0; }
+      if (leg >= 1.5 * atr){ const ret = (px - ll) / leg; r.retr = ret * 100; r.legDir = -1; r.legPct = leg / H.p * 100; r.ote = (ret >= 0.62 && ret <= 0.79) ? 2 : ret > 0.79 ? 3 : 0; }
     }
   }
   /* liquidity sweep + reclaim, then breakout confirmation (close beyond the swing that came before the sweep, on real volume) */
@@ -4002,13 +4004,13 @@ function instCompute(c, now, px, m){
   return R;
 }
 function instFill(c, now){
-  const m = c.m; m.fvg = {}; m.fvgBelow = {}; m.fvgAbove = {}; m.ob = {}; m.obBelow = {}; m.obAbove = {}; m.oteState = {}; m.retr = {}; m.pattern = {}; m.bo = {}; m.boDist = {}; m.boAge = {}; m.ic = {}; m.icEntry = {}; m.icAge = {}; m.icVolX = {}; m.moveX = {}; m.pools = null;
+  const m = c.m; m.fvg = {}; m.fvgBelow = {}; m.fvgAbove = {}; m.ob = {}; m.obBelow = {}; m.obAbove = {}; m.oteState = {}; m.retr = {}; m.legDir = {}; m.legPct = {}; m.pattern = {}; m.bo = {}; m.boDist = {}; m.boAge = {}; m.ic = {}; m.icEntry = {}; m.icAge = {}; m.icVolX = {}; m.moveX = {}; m.pools = null;
   if (!isNum(m.px) || !c.loaded) return;
   const key = c.ver + ':' + Math.floor(now / 20000) + ':' + (c.l2 ? c.l2.at : 0);
   let R = c._inst;
   if (!R || c._ik !== key){ try { R = instCompute(c, now, m.px, m); } catch(e){ R = null; } c._inst = R; c._ik = key; }
   if (!R) return;
-  for (const tf of INST_TF){ const a = R.tf[tf]; if (!a) continue; m.fvg[tf] = a.fvg; m.fvgBelow[tf] = a.fvgBelow; m.fvgAbove[tf] = a.fvgAbove; m.ob[tf] = a.ob; m.obBelow[tf] = a.obBelow; m.obAbove[tf] = a.obAbove; m.oteState[tf] = a.ote; m.retr[tf] = a.retr; m.pattern[tf] = a.pattern; m.bo[tf] = a.bo; m.boDist[tf] = a.boDist; m.boAge[tf] = a.boAge; m.ic[tf] = a.ic; m.icEntry[tf] = a.icEntry; m.icAge[tf] = a.icAge; m.icVolX[tf] = a.icVolX; }
+  for (const tf of INST_TF){ const a = R.tf[tf]; if (!a) continue; m.fvg[tf] = a.fvg; m.fvgBelow[tf] = a.fvgBelow; m.fvgAbove[tf] = a.fvgAbove; m.ob[tf] = a.ob; m.obBelow[tf] = a.obBelow; m.obAbove[tf] = a.obAbove; m.oteState[tf] = a.ote; m.retr[tf] = a.retr; m.legDir[tf] = a.legDir; m.legPct[tf] = a.legPct; m.pattern[tf] = a.pattern; m.bo[tf] = a.bo; m.boDist[tf] = a.boDist; m.boAge[tf] = a.boAge; m.ic[tf] = a.ic; m.icEntry[tf] = a.icEntry; m.icAge[tf] = a.icAge; m.icVolX[tf] = a.icVolX; }
   m.cvdDiv = {}; for (const tf of INST_TF){ const a = R.tf[tf]; if (a) m.cvdDiv[tf] = a.cvdDiv; }
   for (const tf of ['15m','1h']){ const ch = m.chg && m.chg[tf], at = m.atr && m.atr[tf]; if (isNum(ch) && isNum(at) && at > 0) m.moveX[tf] = Math.abs(ch) / at; }
   Object.assign(m, R.flat); m.pools = R.pools;
@@ -4789,7 +4791,24 @@ const COLNAMES = {cpConf:'Confirm: 13 extra institutional checks (click for the 
   rangePos:'Range position',vwapDay:'VWAP distance (UTC day)',distHi:'Distance below high',distLo:'Distance above low',sweep:'Sweep + reclaim',tfAgree:'Timeframe agreement',atr:'ATR %',fundChg:'Funding change',relStr:'Change vs BTC',rvolBest:'RVOL best of last 3',obi:'Order book imbalance',spread:'Spread %',maxLev:'Max leverage',iso:'Isolated-only',hist:'Candle history',flowUsd:'Net money flow $',flowPct:'Net money flow %',mcap:'Market cap',volMcap:'Trading heat',fdvRatio:'Unlock overhang',athDist:'Discount from all-time high',hype:'Hype score',hypeWhy:'Why it is hot',newsCount:'News stories',sector:'Sector',hypeStage:'Hype timing',pch_1h:'Change 1h',pch_24h:'Change 24h',pch_7d:'Change 7d',pch_30d:'Change 30d',pch_200d:'Change 200d',pch_1y:'Change 1y',cgVol:'24h volume',atlDist:'Rise from all-time low',supplyPct:'Supply in circulation',rank:'Rank',cgTrend:'Trend',phase:'Market phase',perpLink:'Perp on Hyperliquid',pressure:'Buy/sell pressure',obiPct:'Book imbalance %',liqUsd:'Liquidity $',liqPct:'Liquidity % of OI',regime:'Regime (chop / accumulation / distribution / manipulation)',trend:'Trend (up / down / consolidating)'};
 for (const tf of TFS) COLNAMES['chg_' + tf] = 'Change % ' + tf;
 function hiddenList(){ return state.mode === 'perp' ? state.hiddenCols : state.hiddenColsCg; }
-function columns(){ const h = hiddenList(); return allColumns().filter(c => c.id === 'sym' || c.id === 'score' || !h.includes(c.id)); }
+/* ---------- V5.5: one timeframe switch for every scanner (1h / 4h / 12h / D / Universal) ---------- */
+const VTF_FAM = new Set(['chg','chgUsd','vol','volD','volDUsd','rvol','trades','tradesX','vlt','vltX','oiChg','oiChgUsd','fundChg','relStr','flowUsd','flowPct','pressure','vwapDist','atr','corr','rvolBest']);
+const VTF_MAP = {'1h':'1h','4h':'4h','12h':'12h','1d':'1d'};
+try { const v = localStorage.getItem('elpp_vtf'); state.vtf = VTF_MAP[v] ? v : 'all'; } catch(e){ state.vtf = 'all'; }
+function vtfOn(){ return !!VTF_MAP[state.vtf]; }
+function vtfIsFam(id){ const m = /^([A-Za-z]+)_(5m|15m|1h|4h|8h|12h|1d)$/.exec(id); return !!m && VTF_FAM.has(m[1]); }
+function vtfId(id){
+  if (!vtfOn()) return id; const m = /^([A-Za-z]+)_(5m|15m|1h|4h|8h|12h|1d)$/.exec(id); if (!m || !VTF_FAM.has(m[1])) return id;
+  const mt = METRICS[m[1]], list = (mt && mt.tf) || []; let t = VTF_MAP[state.vtf];
+  if (!list.includes(t)){ let best = null; for (let j = TFS.indexOf(t); j >= 0; j--) if (list.includes(TFS[j])){ best = TFS[j]; break; } t = best || list[list.length - 1]; if (!t) return id; }
+  return m[1] + '_' + t;
+}
+function columns(){
+  const h = hiddenList(), all = allColumns();
+  if (!vtfOn()) return all.filter(c => c.id === 'sym' || c.id === 'score' || !h.includes(c.id));
+  const keep = new Set(); all.forEach(c => { if (vtfIsFam(c.id) && !h.includes(c.id)) keep.add(vtfId(c.id)); });
+  return all.filter(c => c.id === 'sym' || c.id === 'score' || (vtfIsFam(c.id) ? keep.has(c.id) : !h.includes(c.id)));
+}
 function extCols(num, cols){
   cols.push({id:'takeoff', label:'Take-off', val:c => { const d = takeDir(c.m); return d ? d[1] : null; }, cell:c => { const d = takeDir(c.m); if (!d) return ['—','dim']; const t = takeMinV(); const hot = d[1] >= t; return [`<span title="${esc(d[0] === 'long' ? c.m.takeWhyL : c.m.takeWhyS)}">${d[0] === 'long' ? 'LONG' : 'SHORT'} ${d[1]}</span>`, hot ? (d[0] === 'long' ? 'up' : 'dn') : 'dim']; }});
   cols.push({id:'buildup', label:'Build-up', val:c => { const b = buildUp(c); return b ? b.text : ''; }, cell:c => { const b = buildUp(c); if (!b || !b.text) return ['—','dim']; return [esc(b.text), b.side === 'long' ? 'up' : b.side === 'short' ? 'dn' : b.side === 'conflict' ? 'warn' : 'dim', 'white-space:normal;min-width:220px;max-width:320px;text-align:left']; }});
@@ -4800,6 +4819,7 @@ function extCols(num, cols){
     col('verdict', 'Verdict', c => c.m.verdictScore, c => { const v = c.m.verdict; if (!isNum(v)) return ['—', 'dim']; return [`<span title="${esc(c.m.verdictWhy || '')}">${esc(VERDICT_LAB[v])} (${c.m.verdictScore > 0 ? '+' : ''}${c.m.verdictScore})</span>`, v >= 4 ? 'up' : (v === 2 || v === 3) ? 'dn' : v === 0 ? 'warn' : 'dim']; });
     col('dataRead', 'Data read (Orion-style)', c => dataVerdictM(c.m).score, c => { const d = dataVerdictM(c.m); return dvCell(d); });
     col('swpRe', 'Sweep + 2nd test', c => swpVal(c.m), c => swpCell(c.m));
+    col('pbStat', 'Pullback status', c => { const p = pbInfo(c.m); return p ? p.r : -1; }, c => { const p = pbInfo(c.m); if (!p) return ['<span title="No clear recent leg to measure">— no clear move</span>', 'dim']; return ['<span title="' + esc(p.why) + '">' + (p.up ? '▲ ' : '▼ ') + esc(p.t) + '</span>', p.k]; });
     col('walScore', 'Tracked wallets (100)', c => c.m.walScore, c => walCell(c.m));
     col('pressTh', 'Buy/sell pressure %', c => (c.m.pressure || {})['1h'], c => pressCell(c.m));
     col('verdictWhy', 'Verdict: why', c => c.m.verdictWhy || '', c => [esc(c.m.verdictWhy || '—'), 'dim', 'white-space:normal;min-width:340px;max-width:560px;text-align:left']);
@@ -7508,7 +7528,7 @@ function instFinal(c, rd){
   const flowOk = flowBuild || (flowThere && volUp), missing = [];
   if (!rd.active) missing.push('institutions are not unusually active'); if (!n(td) || td < tmin) missing.push('take-off score ' + (n(td) ? td : '?') + ' is under ' + tmin); if (!flowOk) missing.push('net money flow is not building'); if (!volUp) missing.push('volume is not rising'); if (agree < 2) missing.push('only ' + agree + ' of 4 timeframes agree'); if (opp) missing.push('the take-off read points the other way');
   /* V5.4: do not call GO on a move that already ran (chasing / falling knife) */
-  let late = null; { const c1 = m.chg && m.chg['1h'], mx1 = m.moveX && m.moveX['1h'], c4 = m.chg && m.chg['4h'], a4 = m.atr && m.atr['4h'], c1d = m.chg && m.chg['1d'];
+  let late = null; { const c1 = m.chg && m.chg['1h'], mx1 = m.moveX && m.moveX['1h'], c4 = m.chg && m.chg['4h'], a4 = m.atr && (m.atr['4h'] || (m.atr['1h'] ? m.atr['1h'] * 2 : null)), c1d = m.chg && m.chg['1d'];
     if (n(c1) && n(mx1) && mx1 >= 2 && c1 * dir > 0) late = 'already moved ' + mx1.toFixed(1) + ' ATR in the last hour';
     else if (n(c4) && n(a4) && a4 > 0 && Math.abs(c4) / a4 >= 3 && c4 * dir > 0) late = 'already moved ' + (Math.abs(c4) / a4).toFixed(1) + ' ATR in 4 hours';
     else if (n(c1d) && c1d * dir >= 10) late = 'already ' + (dir > 0 ? 'up ' : 'down ') + Math.abs(c1d).toFixed(0) + '% in 24h'; }
@@ -8817,12 +8837,47 @@ function renderModes(){
   $('scopes').hidden = state.view !== 'table';
   if (window.updateNav) window.updateNav();
 }
+
+function vtfSet(v){
+  state.vtf = VTF_MAP[v] ? v : 'all'; try { localStorage.setItem('elpp_vtf', state.vtf); } catch(e){}
+  if (vtfOn()){ try { const hz = {'1h':'1h','4h':'4h','12h':'12h','1d':'12h'}[state.vtf]; prSt().hz = hz; PR.hz = hz; PR.at = 0; saveState(); } catch(e){} }
+  vtfShow(); try { render(); } catch(e){} try { requestRender(); } catch(e){}
+}
+function vtfShow(){
+  let b = $('vtfBar'); const host = document.querySelector('section.results');
+  if (!b && host){ b = document.createElement('div'); b.id = 'vtfBar'; host.insertBefore(b, host.firstChild);
+    b.addEventListener('click', e => { const x = e.target.closest('[data-vtf]'); if (x) vtfSet(x.dataset.vtf); }); }
+  if (!b) return; const scan = ['table','power','predict','inst','instspot','screener','listings'].includes(state.view); b.hidden = !scan;
+  const L = [['1h','1h'],['4h','4h'],['12h','12h'],['1d','D'],['all','Universal']];
+  b.innerHTML = '<span class="vtl">Timeframe</span>' + L.map(([k, t]) => '<button type="button" class="vtb' + ((state.vtf || 'all') === k ? ' on' : '') + '" data-vtf="' + k + '">' + t + '</button>').join('') + '<small class="vtn">' + (vtfOn() ? 'Showing ' + (state.vtf === '1d' ? 'Daily' : state.vtf) + ' data: change, RVOL, volume, money flow, pressure and the other per-timeframe columns follow this, and so does the Prediction horizon. Verdicts and trade plans always use all timeframes together.' : 'Universal = the normal mixed view. Pick a timeframe to see only that timeframe\'s numbers.') + '</small>';
+}
+/* click a coin name in any scanner: its super chart (full TA Lab: every tool, indicator and SMC layer) opens in a separate tab. Shift+click keeps the quick chart panel. */
+function openSuperChart(name){
+  try {
+    let base = null; try { base = JSON.parse(localStorage.getItem('elpp_ta_v1') || 'null'); } catch(e){}
+    const src = base && Array.isArray(base.panes) && base.panes.length ? (base.panes[base.active || 0] || base.panes[0]) : {};
+    const tf = {'1h':'1h','4h':'4h','12h':'4h','1d':'1d'}[state.vtf] || (src.tf && src.tf !== '1m' ? src.tf : '15m');
+    const pane = JSON.parse(JSON.stringify(Object.assign({ven:'auto', pool:null, type:'candle', log:false, vol:true, liq:false, fvg:false, smc:{}, ind:[]}, src, {sym:name, tf, plan:true})));
+    const st = Object.assign({}, base || {}, {layout:'1', active:0, panes:[pane], focus:true});
+    let n = 1; try { n = (+localStorage.getItem('elpp_ta_scrn') || 0) + 1; localStorage.setItem('elpp_ta_scrn', String(n)); localStorage.setItem('elpp_ta_v1_s' + n, JSON.stringify(st)); } catch(e){}
+    const u = location.href.split('#')[0].split('?')[0] + '?screen=' + n + '#view=ta';
+    const w = window.open(u, '_blank'); if (!w) toast('Your browser blocked the new tab. Allow pop-ups for this site, then click the coin again.');
+  } catch(e){ toast('Could not open the super chart: ' + errTxt(e)); }
+}
+document.addEventListener('click', e => {
+  if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.target; if (!t || !t.closest || t.closest('#viewTa, dialog, #chartDlg')) return;
+  const a = t.closest('a[data-chart]'); let nm = a && a.dataset.chart;
+  if (!nm){ const tr = t.closest('tr[data-chart]'); if (tr && !t.closest('a,button,input,select,label,summary')) nm = tr.dataset.chart; }
+  if (!nm) return; e.preventDefault(); e.stopImmediatePropagation(); openSuperChart(nm);
+}, true);
 function applyView(){
   { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
   $('wrap').classList.toggle('nofilters', !tableOnly || !state.panelOpen);
+  try { vtfShow(); } catch(e){}
 }
 const ago = t => { const m = Math.max(0, Math.round((Date.now() - t) / 60000)); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
 const tagPills = it => [it.types.invest && '<span class="tagp good">Investment</span>', it.types.listing && '<span class="tagp good">Listing</span>', it.types.build && '<span class="tagp good">Upgrade / partner</span>', it.types.unlock && '<span class="tagp bad">Unlock</span>', it.types.risk && '<span class="tagp bad">Risk</span>', it.types.delist && '<span class="tagp bad">Delisting</span>'].filter(Boolean).join('');
@@ -11898,21 +11953,39 @@ AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of g
 /* ---------- V5: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
-  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
+  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPB','pPD','pBig','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
   ['🏦 Exchanges', ['pVen','pHL','pGap','pList']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
   trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','pV1h','pV4h','pV24','fund8']},
-  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
+  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPB','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
   crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
   mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
 };
-function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp2){ state.ps.pp2 = 1; const a = state.ps.cols, i = a.indexOf('pPress'), j = i >= 0 ? i : a.indexOf('pInst'); for (const id of ['pBig', 'pPD']) if (!a.includes(id)) a.splice(j >= 0 ? j + 1 : 0, 0, id); }
+/* V5.5: pullback status after a move already ran (uses the last leg and how much of it price has given back) */
+function pbInfo(m){
+  for (const tf of ['1h', '15m']){
+    const r = m.retr && m.retr[tf], d = m.legDir && m.legDir[tf], lp = m.legPct && m.legPct[tf]; if (!isNum(r) || !d) continue;
+    const up = d > 0, mv = (up ? 'rise' : 'fall') + (isNum(lp) ? ' (' + lp.toFixed(1) + '%)' : ''), rr = Math.round(r);
+    let t, k, why;
+    if (rr < 15){ t = up ? 'still rising: no pullback yet' : 'still falling: no pullback yet'; k = 'dim'; why = 'Price is still near the end of its ' + tf + ' ' + mv + '. Entering now is chasing.'; }
+    else if (rr < 38){ t = 'starting to pull back ' + rr + '%'; k = 'warn'; why = 'Price has given back ' + rr + '% of the ' + tf + ' ' + mv + '. Too shallow: the move can still resume. Keep waiting.'; }
+    else if (rr < 62){ t = 'pulling back ' + rr + '%'; k = 'warn'; why = 'Price has given back ' + rr + '% of the ' + tf + ' ' + mv + '. Healthy pullback. Wait for a sweep and reclaim or a rejection before entering with the trend.'; }
+    else if (rr <= 79){ t = 'deep pullback ' + rr + '% · entry zone'; k = up ? 'up' : 'dn'; why = 'Price has given back ' + rr + '% of the ' + tf + ' ' + mv + ': the 62 to 79% zone where trend traders look for an entry. Confirm with a sweep, reclaim or institutional candle.'; }
+    else if (rr < 100){ t = 'too deep ' + rr + '% · move failing'; k = 'warn'; why = 'Price has given back ' + rr + '% of the ' + tf + ' ' + mv + '. Past 79% the original move often fails. Do not enter with the old trend.'; }
+    else { t = 'move fully reversed'; k = 'warn'; why = 'Price gave back the whole ' + tf + ' ' + mv + '.'; }
+    if (vtfOn() && state.vtf !== '1h') why += ' (Measured on the ' + tf + ' leg: higher-timeframe legs are not tracked yet.)';
+    return {t, k, why, tf, r: rr, up};
+  }
+  return null;
+}
+function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp3){ state.ps.pp3 = 1; const a = state.ps.cols; if (!a.includes('pPB')){ const i = a.indexOf('pPress'); a.splice(i >= 0 ? i + 1 : 0, 0, 'pPB'); } }
+  if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp2){ state.ps.pp2 = 1; const a = state.ps.cols, i = a.indexOf('pPress'), j = i >= 0 ? i : a.indexOf('pInst'); for (const id of ['pBig', 'pPD']) if (!a.includes(id)) a.splice(j >= 0 ? j + 1 : 0, 0, id); }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp1){ state.ps.pp1 = 1; if (!state.ps.cols.includes('pPress')){ const i = state.ps.cols.indexOf('pInst'); state.ps.cols.splice(i >= 0 ? i + 1 : 0, 0, 'pPress'); } }
   if (state.ps && Array.isArray(state.ps.cols) && state.ps.cols.includes('vol') && !state.ps.cols.includes('pV1h')){ state.ps.cols = state.ps.cols.flatMap(x => x === 'vol' ? ['pV1h', 'pV4h', 'pV24'] : [x]); }
   const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
@@ -12118,7 +12191,8 @@ function psCols(){
   add('pTag', 'Status', 'TRADEABLE = strong verdict + grade A/B + no blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.', c => ({trade:4, wait:3, watch:2, lean:1, none:0})[el(c).tag] || 0, c => { const t = PS_TAG[el(c).tag] || PS_TAG.none; return ['<span title="' + esc(t[2]) + '">' + t[0] + '</span>', t[1]]; });
   add('pGrade', 'Grade', 'Signal-quality grade A to D from every confirmation check, with how many were met.', c => { const e = el(c); return e.p == null ? null : e.p; }, c => { const e = el(c); return e.grade ? ['<b>' + e.grade + '</b> <small>' + e.ok + '/' + e.n + '</small>', e.grade === 'A' || e.grade === 'B' ? 'up' : e.grade === 'C' ? 'warn' : 'dn'] : ['—', 'dim']; });
   add('pInst', 'Inst. score', 'Institutional score 0 to 100 (accumulation / distribution read across 15m, 1h, 4h, D).', c => el(c).is, c => { const s = el(c).is; return [isNum(s) ? s + '' : '—', isNum(s) ? (s >= 70 ? 'up' : s >= 45 ? '' : 'dim') : 'dim']; });
-  add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : f.late ? 1 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const ph = f.final ? 'GO' : f.late ? 'LATE · don\'t chase' : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; '); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'GO' || ph === 'READY' ? 'up' : 'warn') : (ph === 'GO' || ph === 'READY' ? 'dn' : 'warn')]; });
+  add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : f.late ? 1 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const pb = f.late ? pbInfo(c.m) : null, ph = f.final ? 'GO' : f.late ? 'LATE · ' + (pb ? pb.t : 'still running, don\'t chase') : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; ') + (pb ? ' · ' + pb.why : ''); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'GO' || ph === 'READY' ? 'up' : 'warn') : (ph === 'GO' || ph === 'READY' ? 'dn' : 'warn')]; });
+  add('pPB', 'Pullback status', 'After a move has run, shows whether price is now pulling back and how deep. Reads the last 1h leg (15m if 1h has none): how much of it price has given back. Under 15% = still running (chasing). 15 to 38% = just starting. 38 to 62% = healthy pullback. 62 to 79% = entry zone. Over 79% = the move is failing. Hover for the explanation.', c => { const p = pbInfo(c.m); return p ? p.r : -1; }, c => { const p = pbInfo(c.m); if (!p) return ['<span title="No clear recent leg to measure">— no clear move</span>', 'dim']; return ['<span title="' + esc(p.why) + '">' + (p.up ? '▲ ' : '▼ ') + esc(p.t) + '</span>', p.k]; });
   add('pPD', 'PUMP / DUMP (hours)', 'Forecast of an explosive move in the coming hours. Built from real institutional volume (big-bar flow, institutional share, big trades on Binance), net money flow on 15m/1h/4h, take-off score, breakouts, hidden CVD buying/selling, open-interest build-up, volatility compression and crowd squeeze fuel. PUMP/DUMP LIKELY = score 68+ with strong volume energy. BUILDING = 50-67. VOLUME COMING = heavy volume but side unclear. Hover for the reasons, the time window and cautions.', c => { const p = (el(c) || {}).pd; return p ? (p.dir || 1) * (p.dir ? p.score : p.energy * 0.5) : 0; }, c => pdCellOf((el(c) || {}).pd));
   add('pBig', 'Institutional volume side', 'Which side the real institutional volume is on right now and how much: big-bar flow, big trades on Binance (prints above about $15k or the top 10% of trades) and 1h money flow. BUY or SELL with the 1h flow in dollars and the big-print balance.', c => { const p = (el(c) || {}).pd; return p ? p.vside * (1 + Math.abs(isNum(p.flowUsd) ? p.flowUsd : 0) / 1e6) : 0; }, c => pdVolCell((el(c) || {}).pd));
   add('pList', 'Binance news', 'Recent Binance listing, futures-launch or delisting announcements for this coin (last 14 days). A fresh listing can pump for hours then fade; a delisting brings forced selling.', c => { const o = lstFor(c); return o ? (o.kind === 'delist' ? -1 : 1) * Math.max(1, 336 - o.age) : 0; }, c => lstCell(c));
@@ -12146,6 +12220,7 @@ function psCols(){
 }
 const PS_THR = {
   pRank:['70+ strong · 50-70 ok · under 50 weak', 'Power rank combines institutional score (60%), signal grade, FINAL/building bonus, verdict strength, minus blockers, plus data quality and R:R. Look first at 70 and above with no blockers.'],
+  pPB:['Under 15% still running · 15-38% starting · 38-62% pulling back · 62-79% entry zone · over 79% failing','Shows whether price is pulling back after a move already ran. ▲ means the last leg was up (the pullback is a dip), ▼ means the last leg was down (the pullback is a bounce). The best entries with the trend are in the 62 to 79% zone after a sweep or reclaim. Under 15% you would be chasing.'],
   pPress:['GO = all conditions met · READY = 1 missing · BUILDING = 2+ missing · LATE = the move already ran, wait for a pullback', 'Direction of institutional pressure (BUYING or SELLING) and how close it is to firing. Needs institutional activity, take-off score, rising money flow, rising volume and 2 of 4 timeframes agreeing. Best: BUYING/SELLING + GO that matches the verdict side. READY = watch closely. BUILDING = too early.'],
   pPD:['LIKELY 68+ · BUILDING 50-67 · under 50 quiet', 'Pump or dump forecast for the coming hours. It needs two things at once: direction evidence (money flow, institutional bars, big trades, take-off, breakouts) and volume energy (volume spikes, institutional share, compression, open-interest build-up). Strong direction without volume is a drift, not a pump. Best: LIKELY on the same side as the Side column and Inst. pressure GO. Chasing risk appears when price already moved more than 2.5x its hourly range.'],
   pBig:['BUY / SELL with 1h dollars', 'Real institutional volume side. Big prints on Binance above the top 10% of trades (at least $15k) are counted separately from small trades. Big prints and the big-bar flow agreeing is the strongest sign that size is moving.'],
@@ -12191,7 +12266,7 @@ function psGroups(cols){
   return out;
 }
 function psVisible(cols, groups, st){
-  const want = new Set(st.cols), vis = []; for (const [g, ids] of groups){ const l = ids.filter(id => want.has(id)); if (l.length) vis.push([g, l]); } return vis;
+  const want = new Set(st.cols.map(vtfId)), vis = []; for (const [g, ids] of groups){ const l = ids.filter(id => want.has(id)); if (l.length) vis.push([g, l]); } return vis;
 }
 function psRows(D, cols, st){
   const q = st.q.trim().toUpperCase(), mv = (+st.vol || 0) * 1e6; let rows = D.live.filter(c => { const e = D.E.get(c.name) || {}; if (q && !c.name.toUpperCase().includes(q)) return false; if (st.side === 'long' && e.dir !== 'long') return false; if (st.side === 'short' && e.dir !== 'short') return false; if (st.hl && !(e.V && e.V.hl)) return false; if (mv && !(c.m.vol24 >= mv)) return false; if (st.plan && !e.pl) return false; const k = ({trade:4, wait:3, watch:2, lean:1, none:0})[e.tag] || 0; if (st.min === 'trade' && k < 4) return false; if (st.min === 'watch' && k < 2) return false; if (st.min === 'side' && k < 1) return false; return true; });
