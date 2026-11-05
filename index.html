@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.90</title>
+<title>ELPP CRYPTO SCANNER PRO V4.91</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -791,7 +791,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.90</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.91</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10703,7 +10703,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.90: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.91: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -10716,8 +10716,8 @@ function prSideTxt(v){ return !isNum(v) ? 'no data' : v >= 20 ? 'buying' : v >= 
 function prTopTable(hz, k, withBtn){
   const D = prSnap(hz), good = r => r.dir !== 0 && r.conf >= 40 && !r.warn.some(w => /blackout/i.test(w)), pick = d => D.rows.filter(r => r.dir === d && good(r)).sort((a, b) => b.conf * Math.abs(b.net) - a.conf * Math.abs(a.net)).slice(0, k);
   const U = pick(1), Dn = pick(-1), f = v => isNum(v) ? (v > 0 ? '+' : '') + v.toFixed(0) : '–', cl = v => isNum(v) ? (v >= 8 ? 'up' : v <= -8 ? 'dn' : 'dim') : 'dim';
-  const row = r => `<tr><td style="text-align:left"><b>${esc(r.name)}</b></td><td class="${r.dir > 0 ? 'up' : 'dn'}">${r.pUp}% up</td><td>${r.conf}%</td><td class="${cl(r.sc.inst)}">${f(r.sc.inst)}</td><td class="${cl(r.sc.ret)}">${f(r.sc.ret)}</td><td style="text-align:left" class="hint">${esc(r.story)}${r.trap ? ' <b>' + esc(r.trap.split('.')[0]) + '.</b>' : ''}</td>${withBtn ? `<td><button class="btn sm" type="button" data-chart="${esc(r.name)}">Chart</button></td>` : ''}</tr>`;
-  const tb = (t, L, c) => `<div style="flex:1 1 380px;min-width:0;overflow:auto"><b class="${c}">${t}</b><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Chance</th><th>Confidence</th><th>Institutions</th><th>Retail</th><th style="text-align:left">Psychology</th>${withBtn ? '<th></th>' : ''}</tr></thead><tbody>${L.length ? L.map(row).join('') : '<tr><td colspan="7" class="hint" style="text-align:left">No call strong enough right now. That is a valid answer: no edge, no trade.</td></tr>'}</tbody></table></div>`;
+  const row = r => `<tr><td style="text-align:left"><b>${esc(r.name)}</b></td><td class="${r.dir > 0 ? 'up' : 'dn'}">${r.pUp}% up</td><td>${r.conf}%</td><td class="${cl(r.sc.inst)}">${f(r.sc.inst)}</td><td class="${cl(r.sc.ret)}">${f(r.sc.ret)}</td><td style="text-align:left">${prInstTxt(r)}</td><td style="text-align:left">${prMoodTxt(r)}</td><td style="text-align:left" class="hint">${esc(r.story)}${r.trap ? ' <b>' + esc(r.trap.split('.')[0]) + '.</b>' : ''}</td>${withBtn ? `<td><button class="btn sm" type="button" data-chart="${esc(r.name)}">Chart</button></td>` : ''}</tr>`;
+  const tb = (t, L, c) => `<div style="flex:1 1 380px;min-width:0;overflow:auto"><b class="${c}">${t}</b><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Chance</th><th>Confidence</th><th>Institutions</th><th>Retail</th><th style="text-align:left">Institutional psychology</th><th style="text-align:left">Retail psychology</th><th style="text-align:left">Story</th>${withBtn ? '<th></th>' : ''}</tr></thead><tbody>${L.length ? L.map(row).join('') : '<tr><td colspan="9" class="hint" style="text-align:left">No call strong enough right now. That is a valid answer: no edge, no trade.</td></tr>'}</tbody></table></div>`;
   return `<div class="row" style="gap:14px;flex-wrap:wrap;align-items:flex-start">${tb('Most likely to rise', U, 'up')}${tb('Most likely to fall', Dn, 'dn')}</div>`;
 }
 function prTodayHtml(){
@@ -11404,7 +11404,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.90: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.91: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11452,7 +11452,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.90: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.91: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11664,7 +11664,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.90: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.91: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11678,7 +11678,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.90: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.91: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11786,11 +11786,15 @@ function prStats(){
 }
 /* ---------- view ---------- */
 function prBar(v){ const w = Math.min(100, Math.abs(v == null ? 0 : v)); return v == null ? '<span class="dim">–</span>' : `<span class="prb"><i class="${v >= 0 ? 'up' : 'dn'}" style="width:${w / 2}%;${v >= 0 ? 'left:50%' : 'right:50%'}"></i></span><b class="${v >= 10 ? 'up' : v <= -10 ? 'dn' : 'dim'}">${v > 0 ? '+' : ''}${Math.round(v)}</b>`; }
+function prInstLab(r){ const v = r.sc && r.sc.inst; if (!isNum(v)) return ['no data', 'dim']; return v >= 25 ? ['accumulating (buying)', 'up'] : v >= 10 ? ['leaning to buy', 'up'] : v <= -25 ? ['distributing (selling)', 'dn'] : v <= -10 ? ['leaning to sell', 'dn'] : ['undecided', 'dim']; }
+function prInstWhy(r){ const w = r.psy && r.psy.instWhy && r.psy.instWhy.length ? r.psy.instWhy.slice(0, 3).join('; ') : ''; const top = (r.F || []).filter(x => x[0] === 'inst' && x[2] != null && Math.abs(x[2]) >= 0.3).sort((a, b) => Math.abs(b[2]) - Math.abs(a[2])).slice(0, 2).map(x => x[1] + ': ' + x[4]).join('; '); return w || top || 'no clear institutional footprint'; }
+function prInstTxt(r){ const l = prInstLab(r); return `<span class="${l[1]}" title="${esc(prInstWhy(r))}">${esc(l[0])}</span>`; }
+function prRetWhy(r){ return r.psy && r.psy.retWhy && r.psy.retWhy.length ? r.psy.retWhy.slice(0, 3).join('; ') : "no clear crowd signal"; }
 function prMoodTxt(r){ const m = r.mood; return m === 'euphoric' ? '<span class="dn">euphoric / FOMO</span>' : m === 'fearful' ? '<span class="up">fearful</span>' : m === 'quiet' ? '<span class="dim">quiet</span>' : '<span class="dim">–</span>'; }
 function prDetail(r){
   const rows = ['inst', 'ret', 'str'].map(g => { const nm = {inst:'🏦 Institutional data (smart money)', ret:'👥 Retail psychology (crowd, read as a contrarian)', str:'🧲 Structure and liquidity'}[g], fs = r.F.filter(x => x[0] === g); return `<tr><th colspan="4" style="text-align:left;background:rgba(127,127,127,.12)">${nm} · score ${r.sc[g] == null ? '–' : (r.sc[g] > 0 ? '+' : '') + Math.round(r.sc[g])}</th></tr>` + fs.map(x => `<tr><td style="text-align:left">${esc(x[1])}</td><td>${x[2] == null ? '<span class="dim">no data</span>' : prBar(x[2] * 100)}</td><td class="dim">w ${x[3]}</td><td style="text-align:left">${esc(x[4])}</td></tr>`).join(''); }).join('');
   const P = fmtPx, tg = r.tgt ? `${P(r.tgt.p)} (${esc(r.tgt.name || 'pool')}, ${r.tgt.d > 0 ? '+' : ''}${r.tgt.d.toFixed(2)}%)` : '–', iv = r.inv ? `${P(r.inv.p)} (${esc(r.inv.name || 'pool')})` : '–';
-  return `<div class="psdet"><div class="cwr"><span>Psychology read</span><span>${esc(r.story)}</span></div>${r.trap ? `<div class="cwr"><span class="warn">Trap warning</span><span class="warn">${esc(r.trap)}</span></div>` : ''}${r.warn.map(w => `<div class="cwr"><span class="dn">Caution</span><span class="dn">${esc(w)}</span></div>`).join('')}
+  return `<div class="psdet"><div class="cwr"><span>🏦 Institutional psychology</span><span><b class="${prInstLab(r)[1]}">${esc(prInstLab(r)[0])}</b> · ${esc(prInstWhy(r))}. Big money is patient: it buys into fear, sells into excitement and hides its size by splitting orders.</span></div><div class="cwr"><span>👥 Retail psychology</span><span>${prMoodTxt(r)} · ${esc(prRetWhy(r))}. The crowd chases moves and gets trapped at extremes.</span></div><div class="cwr"><span>Psychology read</span><span>${esc(r.story)}</span></div>${r.trap ? `<div class="cwr"><span class="warn">Trap warning</span><span class="warn">${esc(r.trap)}</span></div>` : ''}${r.warn.map(w => `<div class="cwr"><span class="dn">Caution</span><span class="dn">${esc(w)}</span></div>`).join('')}
     <div class="cwr"><span>Probability up / down</span><span><b class="up">${r.pUp}%</b> / <b class="dn">${100 - r.pUp}%</b> · net score ${r.net > 0 ? '+' : ''}${Math.round(r.net)} · confidence ${r.conf}</span></div>
     <div class="cwr"><span>Expected range (about 68%)</span><span>${P(r.lo)} to ${P(r.hi)} (centre ${P(r.px + r.drift)})</span></div>
     <div class="cwr"><span>Likely liquidity target</span><span>${tg}</span></div><div class="cwr"><span>Call is wrong if price reaches</span><span>${iv}</span></div>
@@ -11852,9 +11856,9 @@ function prDraw(full){
   const body = rows.map(r => {
     const open = PR.open.has(r.name), up = r.dir > 0, dn = r.dir < 0, cls = up ? 'up' : dn ? 'dn' : 'dim', call = up ? '▲ UP' : dn ? '▼ DOWN' : '◆ NO EDGE', pp = up || !dn ? r.pUp : 100 - r.pUp, cc = r.conf >= 70 ? 'up' : r.conf >= 45 ? 'warn' : 'dim', c = snapshot.get(r.name);
     const tag = r.psy && r.psy.tag ? `<span title="${esc(r.psy.label)}">${esc(r.psy.tag)}</span>` : '–';
-    return `<tr class="psr${open ? ' open' : ''}"><td class="psc0"><a href="#" data-chart="${esc(r.name)}">${esc(r.name)}</a></td><td class="psx"><button class="btn sm" type="button" data-prx="${esc(r.name)}">${open ? '▾' : '▸'}</button></td><td class="${cls}"><b>${call}</b> <small>${pp}%</small></td><td class="${cc}"><b>${r.conf}</b></td><td>${prBar(r.sc.inst)}</td><td>${prBar(r.sc.ret)} <small>${prMoodTxt(r)}</small></td><td>${prBar(r.sc.str)}</td><td>${tag}</td><td>${esc(fmtPx(r.lo))} – ${esc(fmtPx(r.hi))}</td><td>${r.tgt ? esc(fmtPx(r.tgt.p)) : '–'}</td><td>${r.inv ? esc(fmtPx(r.inv.p)) : '–'}</td><td><i data-cc="${tm ? tm[0] : '1h'}">–</i></td></tr>` + (open ? `<tr class="psdr"><td colspan="12">${prDetail(r)}</td></tr>` : '');
+    return `<tr class="psr${open ? ' open' : ''}"><td class="psc0"><a href="#" data-chart="${esc(r.name)}">${esc(r.name)}</a></td><td class="psx"><button class="btn sm" type="button" data-prx="${esc(r.name)}">${open ? '▾' : '▸'}</button></td><td class="${cls}"><b>${call}</b> <small>${pp}%</small></td><td class="${cc}"><b>${r.conf}</b></td><td>${prBar(r.sc.inst)} <small>${prInstTxt(r)}</small></td><td>${prBar(r.sc.ret)} <small>${prMoodTxt(r)}</small></td><td>${prBar(r.sc.str)}</td><td>${tag}</td><td>${esc(fmtPx(r.lo))} – ${esc(fmtPx(r.hi))}</td><td>${r.tgt ? esc(fmtPx(r.tgt.p)) : '–'}</td><td>${r.inv ? esc(fmtPx(r.inv.p)) : '–'}</td><td><i data-cc="${tm ? tm[0] : '1h'}">–</i></td></tr>` + (open ? `<tr class="psdr"><td colspan="12">${prDetail(r)}</td></tr>` : '');
   }).join('');
-  $('prWrap').innerHTML = `<table class="pst"><thead><tr><th class="psh0">Coin</th><th class="psx"></th><th title="Direction and probability for the chosen horizon">Call</th><th title="How much to trust the call, 0 to 100">Confidence</th><th title="Smart money: flow, volume, CVD, wallets, OI, trend, sweeps (-100 to +100)">🏦 Institutional</th><th title="Crowd psychology read as a contrarian: crowded long and greed are bearish, crowded short and panic are bullish">👥 Retail psychology</th><th title="Liquidity magnets, VWAP, range position">🧲 Structure</th><th title="Smart money vs crowd: Accumulation, Distribution, FOMO, Panic, Late trend…">Smart money vs crowd</th><th title="About 68% of the time price stays inside">Expected range</th><th title="Nearest liquidity pool in the call direction">Target</th><th title="Opposite pool: if reached the call is wrong">Invalidation</th><th title="Time left in the current candle of the horizon">Candle left</th></tr></thead><tbody>${body || '<tr><td colspan="12" class="dim" style="text-align:center;padding:14px">No coin matches. Lower the confidence filter or wait for data.</td></tr>'}</tbody></table>`;
+  $('prWrap').innerHTML = `<table class="pst"><thead><tr><th class="psh0">Coin</th><th class="psx"></th><th title="Direction and probability for the chosen horizon">Call</th><th title="How much to trust the call, 0 to 100">Confidence</th><th title="Smart money: flow, volume, CVD, wallets, OI, trend, sweeps (-100 to +100)">🏦 Institutional (score + psychology)</th><th title="Crowd psychology read as a contrarian: crowded long and greed are bearish, crowded short and panic are bullish">👥 Retail (score + psychology)</th><th title="Liquidity magnets, VWAP, range position">🧲 Structure</th><th title="Smart money vs crowd: Accumulation, Distribution, FOMO, Panic, Late trend…">Smart money vs crowd</th><th title="About 68% of the time price stays inside">Expected range</th><th title="Nearest liquidity pool in the call direction">Target</th><th title="Opposite pool: if reached the call is wrong">Invalidation</th><th title="Time left in the current candle of the horizon">Candle left</th></tr></thead><tbody>${body || '<tr><td colspan="12" class="dim" style="text-align:center;padding:14px">No coin matches. Lower the confidence filter or wait for data.</td></tr>'}</tbody></table>`;
   $('prNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.n} coins · horizon <b>${H.lab.toLowerCase()}</b> · ranked by confidence × strength.` + (D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
   ccTick();
 }
@@ -11866,7 +11870,7 @@ function prClick(e){
     if (k === 'refresh'){ PR.cache = null; prDraw(true); toast('Prediction Radar refreshed'); }
     else if (k === 'clear'){ if (confirm('Delete the whole prediction track record saved in this browser?')){ PR.log = []; prLogSave(); prDraw(); } }
     else if (k === 'csv'){ const L = prLogLoad(), r = [['coin', 'horizon', 'time_utc', 'direction', 'confidence', 'net_score', 'institutional', 'retail', 'entry', 'exit', 'move_pct', 'result'].join(',')]; L.forEach(x => r.push([x.n, x.hz, new Date(x.at).toISOString(), x.dir > 0 ? 'UP' : 'DOWN', x.conf, x.net, x.i, x.r, x.px, x.exit == null ? '' : x.exit, x.mv == null ? '' : x.mv, x.res == null ? 'pending' : x.res].map(csvCell).join(','))); jrDownload('ELPP-prediction-log.csv', '﻿' + r.join('\r\n'), 'text/csv;charset=utf-8'); }
-    else if (k === 'csv2'){ const D = prData(false), rows = prRowsFilter(D, st), r = [['coin', 'horizon', 'call', 'prob_up_pct', 'confidence', 'net', 'institutional', 'retail_psychology', 'structure', 'psychology', 'range_low', 'range_high', 'target', 'invalidation', 'trap_warning'].join(',')]; rows.forEach(q => r.push([q.name, q.hz, q.dir > 0 ? 'UP' : q.dir < 0 ? 'DOWN' : 'NO EDGE', q.pUp, q.conf, Math.round(q.net), Math.round(q.sc.inst || 0), Math.round(q.sc.ret || 0), Math.round(q.sc.str || 0), q.psy ? q.psy.tag : '', q.lo, q.hi, q.tgt ? q.tgt.p : '', q.inv ? q.inv.p : '', q.trap].map(csvCell).join(','))); jrDownload('ELPP-prediction-radar.csv', '﻿' + r.join('\r\n'), 'text/csv;charset=utf-8'); }
+    else if (k === 'csv2'){ const D = prData(false), rows = prRowsFilter(D, st), r = [['coin', 'horizon', 'call', 'prob_up_pct', 'confidence', 'net', 'institutional', 'institutional_psychology', 'retail_psychology', 'retail_mood', 'structure', 'psychology', 'range_low', 'range_high', 'target', 'invalidation', 'trap_warning'].join(',')]; rows.forEach(q => r.push([q.name, q.hz, q.dir > 0 ? 'UP' : q.dir < 0 ? 'DOWN' : 'NO EDGE', q.pUp, q.conf, Math.round(q.net), Math.round(q.sc.inst || 0), prInstLab(q)[0], Math.round(q.sc.ret || 0), q.mood, Math.round(q.sc.str || 0), q.psy ? q.psy.tag : '', q.lo, q.hi, q.tgt ? q.tgt.p : '', q.inv ? q.inv.p : '', q.trap].map(csvCell).join(','))); jrDownload('ELPP-prediction-radar.csv', '﻿' + r.join('\r\n'), 'text/csv;charset=utf-8'); }
   }
 }
 function prChange(e){ const st = prSt(), id = e.target.id; if (id === 'prSide') st.side = e.target.value; else if (id === 'prConf') st.conf = +e.target.value; else if (id === 'prHL') st.hl = e.target.checked; else if (id === 'prN') st.n = +e.target.value; else return; saveState(); prDraw(); }
@@ -11874,7 +11878,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.90: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.91: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
