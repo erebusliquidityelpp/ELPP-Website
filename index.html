@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.5</title>
+<title>ELPP CRYPTO SCANNER PRO V5.6</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -580,8 +580,6 @@ td.h{background:color-mix(in srgb,var(--c) calc(var(--a) * 55%),transparent)}
   td,th{padding:7px 8px!important;font-size:12px}
   td.sym .cp[data-copy]{display:none}
   td.sym a[data-chart]{font-size:14px}
-#vtfBar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;padding:6px 8px;border:1px solid var(--line,#2a3345);border-radius:8px;background:var(--panel,#121826);position:sticky;top:0;z-index:20}
-#vtfBar[hidden]{display:none}.vtl{font-size:12px;opacity:.7;margin-right:2px}.vtb{font:600 12px inherit;font-family:inherit;padding:3px 12px;border-radius:14px;border:1px solid var(--line,#2a3345);background:transparent;color:inherit;cursor:pointer}.vtb.on{background:#c9a24a;color:#111;border-color:#c9a24a}.vtn{flex:1 1 260px;font-size:11px;opacity:.65}
   td:first-child{white-space:nowrap}
   /* filter panel opens as a full-screen sheet */
   .wrap:not(.nofilters) .panel{position:fixed!important;inset:0;width:100vw!important;max-width:100vw!important;box-sizing:border-box;z-index:130;max-height:none!important;border-radius:0;border:0;padding:12px 12px calc(90px + env(safe-area-inset-bottom,0px));overflow-y:auto}
@@ -790,11 +788,23 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.38);color:#d4af37;border-radius:6px;opacity:1;font:600 10px var(--sans);letter-spacing:.04em;padding:1px 7px;line-height:1.5;transition:all .15s}td.sym .cp:hover{background:rgba(212,175,55,.22);border-color:#d4af37;color:#f3d77a;box-shadow:0 0 8px rgba(212,175,55,.3)}td.sym .cp.wl{font-size:13px;padding:0 6px;color:#9aa4b2;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.14)}td.sym .cp.wl:hover{color:#f5b942;border-color:#f5b942}td.sym .cp.wl.on{color:#f5b942;background:rgba(245,185,66,.14);border-color:rgba(245,185,66,.5)}
 .pst td.psc0 .cp,.psw .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.38);color:#d4af37;border-radius:6px;font:600 10px var(--sans);letter-spacing:.04em;padding:1px 7px;line-height:1.5;cursor:pointer;text-decoration:none}.pst td.psc0 .cp:hover{background:rgba(212,175,55,.22);border-color:#d4af37;color:#f3d77a}.pst td.psc0 .cp.wl{font-size:13px;padding:0 6px;color:#9aa4b2;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.14)}.pst td.psc0 .cp.wl:hover{color:#f5b942;border-color:#f5b942}.pst td.psc0 .cp.wl.on{color:#f5b942;background:rgba(245,185,66,.14);border-color:rgba(245,185,66,.5)}
 </style>
+<style>
+#vtfBar{display:flex;align-items:center;gap:10px;margin:0 0 8px;padding:0 2px;position:sticky;top:0;z-index:20;background:transparent}
+#vtfBar[hidden]{display:none}
+#vtfBar .vtl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55}
+#vtfBar .vts{display:inline-flex;border:1px solid rgba(201,162,74,.35);border-radius:999px;overflow:hidden;background:transparent}
+#vtfBar .vtb{all:unset;box-sizing:border-box;cursor:pointer;padding:4px 14px;font-size:12px;font-weight:600;color:inherit;opacity:.65;transition:background .15s,opacity .15s}
+#vtfBar .vtb+.vtb{border-left:1px solid rgba(201,162,74,.18)}
+#vtfBar .vtb:hover{opacity:1;background:rgba(201,162,74,.12)}
+#vtfBar .vtb.on{background:#c9a24a;color:#111;opacity:1}
+#vtfBar .vtb:focus-visible{outline:2px solid #c9a24a;outline-offset:-2px}
+#vtfBar .vti{font-size:12px;opacity:.5;cursor:help}
+</style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.5</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.6</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -8849,7 +8859,8 @@ function vtfShow(){
     b.addEventListener('click', e => { const x = e.target.closest('[data-vtf]'); if (x) vtfSet(x.dataset.vtf); }); }
   if (!b) return; const scan = ['table','power','predict','inst','instspot','screener','listings'].includes(state.view); b.hidden = !scan;
   const L = [['1h','1h'],['4h','4h'],['12h','12h'],['1d','D'],['all','Universal']];
-  b.innerHTML = '<span class="vtl">Timeframe</span>' + L.map(([k, t]) => '<button type="button" class="vtb' + ((state.vtf || 'all') === k ? ' on' : '') + '" data-vtf="' + k + '">' + t + '</button>').join('') + '<small class="vtn">' + (vtfOn() ? 'Showing ' + (state.vtf === '1d' ? 'Daily' : state.vtf) + ' data: change, RVOL, volume, money flow, pressure and the other per-timeframe columns follow this, and so does the Prediction horizon. Verdicts and trade plans always use all timeframes together.' : 'Universal = the normal mixed view. Pick a timeframe to see only that timeframe\'s numbers.') + '</small>';
+  const tip = vtfOn() ? 'Showing ' + (state.vtf === '1d' ? 'Daily' : state.vtf) + ' data: change, RVOL, volume, money flow, pressure and the other per-timeframe columns follow this, and so does the Prediction horizon. Verdicts and trade plans always use all timeframes together.' : 'Universal = the normal mixed view. Pick a timeframe to see only that timeframe\'s numbers.';
+  b.innerHTML = '<span class="vtl">Timeframe</span><span class="vts">' + L.map(([k, t]) => '<button type="button" class="vtb' + ((state.vtf || 'all') === k ? ' on' : '') + '" data-vtf="' + k + '">' + t + '</button>').join('') + '</span><span class="vti" title="' + esc(tip) + '">ⓘ</span>';
 }
 /* click a coin name in any scanner: its super chart (full TA Lab: every tool, indicator and SMC layer) opens in a separate tab. Shift+click keeps the quick chart panel. */
 function openSuperChart(name){
