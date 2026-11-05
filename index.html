@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.2</title>
+<title>ELPP CRYPTO SCANNER PRO V5.3</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.2</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.3</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -824,17 +824,17 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <button class="nv" type="button" data-view="today" style="font-weight:700">Today</button>
     <button class="nv" type="button" data-view="overview" style="font-weight:700">Overview: market summary</button>
     <details class="ng" data-g="scanner" open><summary>Scanners</summary>
-    <button class="nv" type="button" data-mode="perp">Perp scalp</button>
-    <button class="nv" type="button" data-mode="spot">Spot</button>
-    <button class="nv" type="button" data-mode="swing">Swing</button>
-    <button class="nv" type="button" data-mode="position">Positional</button>
-    <button class="nv" type="button" data-mode="hype">Hype &amp; News</button>
-    <button class="nv" type="button" data-view="screener">Screener (Hyperliquid + Binance)</button>
-    <button class="nv" type="button" data-view="power" style="font-weight:700">⚡ Power Scanner</button>
-    <button class="nv" type="button" data-view="predict" style="font-weight:700">🔮 Prediction Radar</button>
-    <button class="nv" type="button" data-view="inst">Perpetual Institutional Radar</button>
-    <button class="nv" type="button" data-view="instspot">Spot Institutional Radar</button>
-    <button class="nv" type="button" data-view="listings">All coins &amp; where they are listed</button>
+    <button class="nv" type="button" data-mode="perp">Perp Scalp: long/short signals</button>
+    <button class="nv" type="button" data-mode="spot">Spot: accumulate &amp; hold</button>
+    <button class="nv" type="button" data-mode="swing">Swing: days to weeks</button>
+    <button class="nv" type="button" data-mode="position">Positional: months</button>
+    <button class="nv" type="button" data-mode="hype">Hype &amp; News: early vs late</button>
+    <button class="nv" type="button" data-view="screener">Screener: Hyperliquid + Binance</button>
+    <button class="nv" type="button" data-view="power" style="font-weight:700">⚡ Power Scanner: best set-ups</button>
+    <button class="nv" type="button" data-view="predict" style="font-weight:700">🔮 Prediction Radar: next move</button>
+    <button class="nv" type="button" data-view="inst">Inst. Radar: Perps (smart money)</button>
+    <button class="nv" type="button" data-view="instspot">Inst. Radar: Spot (smart money)</button>
+    <button class="nv" type="button" data-view="listings">Coin listings by exchange</button>
     </details>
   <details class="ng" data-g="trade" open><summary>Trade desk</summary>
     <button class="nv" type="button" data-view="prep">Pre-trade preparation</button>
@@ -1150,7 +1150,7 @@ const METRICS = {
   cgTrend:{label:'Trend',tf:['7d','30d','200d','1y'],unit:'',modes:'cg',cat:{'-1':'Downtrend','0':'Sideways','1':'Uptrend'}},
   phase:{label:'Market phase',tf:null,unit:'',modes:'cg',cat:{0:'Deep value base',1:'Recovery',2:'Uptrend',3:'Pullback',4:'Downtrend',5:'Near all-time high',6:'Sideways'}}
 };
-const MODES = {perp:'Perp scalp', spot:'Spot', swing:'Swing', position:'Positional', hype:'Hype & News'};
+const MODES = {perp:'Perp Scalp', spot:'Spot Accumulation', swing:'Swing', position:'Positional', hype:'Hype & News'};
 const MODE_HINT = {
   perp:'Leveraged trades lasting minutes to a day. Look for liquidity sweeps, volume bursts and open-interest changes.',
   spot:'Buy the coin itself, no leverage, and hold weeks to months. Look for a decent size, real volume, little unlock risk and a sensible price.',
@@ -8804,7 +8804,7 @@ async function showXEmbed(handle, keep){
 function renderModes(){
   const el = $('modes'); if (!el) return;
   const html = Object.entries(MODES).map(([k, v]) => `<button type="button" class="btn scope${state.view === 'table' && k === state.mode ? ' on' : ''}" data-mode="${k}" aria-pressed="${state.view === 'table' && k === state.mode}">${v}</button>`).join('') +
-    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['elite','Elite Terminal'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['today','Today'],['bt','Backtest'],['decide','How it decides'],['proof','Verified results'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Perp inst. radar'],['instspot','Spot inst. radar'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
+    '<span class="vsep"></span>' + [['overview','Overview'],['listings','Listings'],['lookup','Coin lookup'],['elite','Elite Terminal'],['news','News & big names'],['flows','Money flow'],['drops','Airdrops & unlocks'],['whales','Whale positions'],['sdesk','Signal desk'],['memes','Meme holders'],['map','Market map'],['movers','Movers'],['options','Options'],['orderflow','Order flow'],['prep','Pre-trade prep'],['ei','Inst. data+'],['api','API keys'],['today','Today'],['bt','Backtest'],['decide','How it decides'],['proof','Verified results'],['signals','Signals'],['journal','Journal'],['screener','Screener'],['inst','Inst. Radar: Perps'],['instspot','Inst. Radar: Spot'],['watch','★ Watchlist']].map(([k, v]) => `<button type="button" class="btn scope${state.view === k ? ' on' : ''}" data-view="${k}" aria-pressed="${state.view === k}">${v}</button>`).join('');
   if (el._h !== html){ el.innerHTML = html; el._h = html; }
   $('modeHint').textContent = state.view === 'table' ? MODE_HINT[state.mode] : VIEW_HINT[state.view];
   try { renderViewGuide(); } catch(e){}
@@ -11640,7 +11640,7 @@ function acSec(id, title, body, open){ return `<details class="ovd acd" id="ac_$
 function acSteps(a){ return a.map(x => `<div class="acstep"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''); }
 function acManual(){
   const out = []; document.querySelectorAll('#nav [data-view], nav [data-view], .nv[data-view]').forEach(b => { const v = b.dataset.view; if (out.some(x => x[0] === v)) return; out.push([v, b.textContent.replace(/\s+/g, ' ').trim()]); });
-  const modes = [['table:perp', 'Perp scalp'], ['table:spot', 'Spot'], ['table:swing', 'Swing'], ['table:position', 'Positional'], ['table:hype', 'Hype & News']];
+  const modes = [['table:perp', 'Perp Scalp'], ['table:spot', 'Spot Accumulation'], ['table:swing', 'Swing'], ['table:position', 'Positional'], ['table:hype', 'Hype & News']];
   return modes.concat(out.map(x => [x[0], x[1]])).filter(x => VIEW_HOW[x[0]]).map(x => `<details class="ovd psd"><summary>${esc(x[1])}</summary><ol class="ovstory">${VIEW_HOW[x[0]].map(s => '<li>' + esc(s) + '</li>').join('')}</ol></details>`).join('');
 }
 function acThrTable(){
