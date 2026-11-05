@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.93</title>
+<title>ELPP CRYPTO SCANNER PRO V4.94</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -792,7 +792,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.93</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.94</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10704,7 +10704,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.93: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.94: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -11405,7 +11405,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.93: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.94: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11453,7 +11453,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.93: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.94: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11665,7 +11665,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.93: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.94: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11679,7 +11679,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.93: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.94: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11795,7 +11795,8 @@ function prMoodTxt(r){ const m = r.mood; return m === 'euphoric' ? '<span class=
 function prDetail(r){
   const rows = ['inst', 'ret', 'str'].map(g => { const nm = {inst:'🏦 Institutional data (smart money)', ret:'👥 Retail psychology (crowd, read as a contrarian)', str:'🧲 Structure and liquidity'}[g], fs = r.F.filter(x => x[0] === g); return `<tr><th colspan="4" style="text-align:left;background:rgba(127,127,127,.12)">${nm} · score ${r.sc[g] == null ? '–' : (r.sc[g] > 0 ? '+' : '') + Math.round(r.sc[g])}</th></tr>` + fs.map(x => `<tr><td style="text-align:left">${esc(x[1])}</td><td>${x[2] == null ? '<span class="dim">no data</span>' : prBar(x[2] * 100)}</td><td class="dim">w ${x[3]}</td><td style="text-align:left">${esc(x[4])}</td></tr>`).join(''); }).join('');
   const P = fmtPx, tg = r.tgt ? `${P(r.tgt.p)} (${esc(r.tgt.name || 'pool')}, ${r.tgt.d > 0 ? '+' : ''}${r.tgt.d.toFixed(2)}%)` : '–', iv = r.inv ? `${P(r.inv.p)} (${esc(r.inv.name || 'pool')})` : '–';
-  return `<div class="psdet"><div class="cwr"><span>🏦 Institutional psychology</span><span><b class="${prInstLab(r)[1]}">${esc(prInstLab(r)[0])}</b> · ${esc(prInstWhy(r))}. Big money is patient: it buys into fear, sells into excitement and hides its size by splitting orders.</span></div><div class="cwr"><span>👥 Retail psychology</span><span>${prMoodTxt(r)} · ${esc(prRetWhy(r))}. The crowd chases moves and gets trapped at extremes.</span></div><div class="cwr"><span>Psychology read</span><span>${esc(r.story)}</span></div>${r.trap ? `<div class="cwr"><span class="warn">Trap warning</span><span class="warn">${esc(r.trap)}</span></div>` : ''}${r.warn.map(w => `<div class="cwr"><span class="dn">Caution</span><span class="dn">${esc(w)}</span></div>`).join('')}
+  const pdq = (() => { const cc = snapshot.get(r.name); return cc && cc.m ? pdCached(cc) : null; })(), pdc = pdCellOf(pdq), pdv = pdVolCell(pdq);
+  return `<div class="psdet"><div class="cwr"><span>🚀 Pump / dump forecast</span><span class="${pdc[1]}">${pdc[0]}${pdq ? ' · ' + esc(pdq.hz) : ''}</span></div><div class="cwr"><span>Real institutional volume</span><span class="${pdv[1]}">${pdv[0]}</span></div>${pdq && pdq.why.length ? `<div class="cwr"><span>Why</span><span>${esc(pdq.why.slice(0, 4).join('; '))}</span></div>` : ''}${pdq && pdq.caution.length ? `<div class="cwr"><span class="warn">Caution</span><span class="warn">${esc(pdq.caution.join('; '))}</span></div>` : ''}<div class="cwr"><span>🏦 Institutional psychology</span><span><b class="${prInstLab(r)[1]}">${esc(prInstLab(r)[0])}</b> · ${esc(prInstWhy(r))}. Big money is patient: it buys into fear, sells into excitement and hides its size by splitting orders.</span></div><div class="cwr"><span>👥 Retail psychology</span><span>${prMoodTxt(r)} · ${esc(prRetWhy(r))}. The crowd chases moves and gets trapped at extremes.</span></div><div class="cwr"><span>Psychology read</span><span>${esc(r.story)}</span></div>${r.trap ? `<div class="cwr"><span class="warn">Trap warning</span><span class="warn">${esc(r.trap)}</span></div>` : ''}${r.warn.map(w => `<div class="cwr"><span class="dn">Caution</span><span class="dn">${esc(w)}</span></div>`).join('')}
     <div class="cwr"><span>Probability up / down</span><span><b class="up">${r.pUp}%</b> / <b class="dn">${100 - r.pUp}%</b> · net score ${r.net > 0 ? '+' : ''}${Math.round(r.net)} · confidence ${r.conf}</span></div>
     <div class="cwr"><span>Expected range (about 68%)</span><span>${P(r.lo)} to ${P(r.hi)} (centre ${P(r.px + r.drift)})</span></div>
     <div class="cwr"><span>Likely liquidity target</span><span>${tg}</span></div><div class="cwr"><span>Call is wrong if price reaches</span><span>${iv}</span></div>
@@ -11820,7 +11821,7 @@ function prTrackHtml(){
     <div class="row" style="margin-top:6px;gap:6px"><button class="btn sm" type="button" data-pra="csv">⬇ Export log CSV</button><button class="btn sm" type="button" data-pra="clear">Clear log</button></div></details>`;
 }
 function renderPredict(force){
-  const el = $('viewPredict'); if (!el) return; const st = prSt();
+  const el = $('viewPredict'); if (!el) return; btStart(); const st = prSt();
   if (!el._built){ el._built = true;
     el.innerHTML = `<div class="nsec"><h3>🔮 Prediction Radar</h3>
       <p class="hint">What is price likely to do next? Each coin gets a probability, built from <b>institutional data</b> (what smart money is doing), <b>retail psychology</b> (what the crowd is doing, read as a contrarian) and <b>liquidity structure</b> (where the stops are). It keeps its own track record so you can see how accurate it really is.</p>
@@ -11857,9 +11858,9 @@ function prDraw(full){
   const body = rows.map(r => {
     const open = PR.open.has(r.name), up = r.dir > 0, dn = r.dir < 0, cls = up ? 'up' : dn ? 'dn' : 'dim', call = up ? '▲ UP' : dn ? '▼ DOWN' : '◆ NO EDGE', pp = up || !dn ? r.pUp : 100 - r.pUp, cc = r.conf >= 70 ? 'up' : r.conf >= 45 ? 'warn' : 'dim', c = snapshot.get(r.name);
     const tag = r.psy && r.psy.tag ? `<span title="${esc(r.psy.label)}">${esc(r.psy.tag)}</span>` : '–';
-    return `<tr class="psr${open ? ' open' : ''}"><td class="psc0"><a href="#" data-chart="${esc(r.name)}">${esc(r.name)}</a></td><td class="psx"><button class="btn sm" type="button" data-prx="${esc(r.name)}">${open ? '▾' : '▸'}</button></td><td class="${cls}"><b>${call}</b> <small>${pp}%</small></td><td class="${cc}"><b>${r.conf}</b></td><td>${prBar(r.sc.inst)} <small>${prInstTxt(r)}</small></td><td>${prBar(r.sc.ret)} <small>${prMoodTxt(r)}</small></td><td>${prBar(r.sc.str)}</td><td>${tag}</td><td>${esc(fmtPx(r.lo))} – ${esc(fmtPx(r.hi))}</td><td>${r.tgt ? esc(fmtPx(r.tgt.p)) : '–'}</td><td>${r.inv ? esc(fmtPx(r.inv.p)) : '–'}</td><td><i data-cc="${tm ? tm[0] : '1h'}">–</i></td></tr>` + (open ? `<tr class="psdr"><td colspan="12">${prDetail(r)}</td></tr>` : '');
+    return `<tr class="psr${open ? ' open' : ''}"><td class="psc0"><a href="#" data-chart="${esc(r.name)}">${esc(r.name)}</a></td><td class="psx"><button class="btn sm" type="button" data-prx="${esc(r.name)}">${open ? '▾' : '▸'}</button></td><td class="${cls}"><b>${call}</b> <small>${pp}%</small></td><td class="${cc}"><b>${r.conf}</b></td><td>${prBar(r.sc.inst)} <small>${prInstTxt(r)}</small></td><td>${prBar(r.sc.ret)} <small>${prMoodTxt(r)}</small></td><td>${prBar(r.sc.str)}</td><td>${tag}</td>${(() => { const pc = pdCellOf(c && c.m ? pdCached(c) : null); return `<td class="${pc[1]}">${pc[0]}</td>`; })()}<td>${esc(fmtPx(r.lo))} – ${esc(fmtPx(r.hi))}</td><td>${r.tgt ? esc(fmtPx(r.tgt.p)) : '–'}</td><td>${r.inv ? esc(fmtPx(r.inv.p)) : '–'}</td><td><i data-cc="${tm ? tm[0] : '1h'}">–</i></td></tr>` + (open ? `<tr class="psdr"><td colspan="13">${prDetail(r)}</td></tr>` : '');
   }).join('');
-  $('prWrap').innerHTML = `<table class="pst"><thead><tr><th class="psh0">Coin</th><th class="psx"></th><th title="Direction and probability for the chosen horizon">Call</th><th title="How much to trust the call, 0 to 100">Confidence</th><th title="Smart money: flow, volume, CVD, wallets, OI, trend, sweeps (-100 to +100)">🏦 Institutional (score + psychology)</th><th title="Crowd psychology read as a contrarian: crowded long and greed are bearish, crowded short and panic are bullish">👥 Retail (score + psychology)</th><th title="Liquidity magnets, VWAP, range position">🧲 Structure</th><th title="Smart money vs crowd: Accumulation, Distribution, FOMO, Panic, Late trend…">Smart money vs crowd</th><th title="About 68% of the time price stays inside">Expected range</th><th title="Nearest liquidity pool in the call direction">Target</th><th title="Opposite pool: if reached the call is wrong">Invalidation</th><th title="Time left in the current candle of the horizon">Candle left</th></tr></thead><tbody>${body || '<tr><td colspan="12" class="dim" style="text-align:center;padding:14px">No coin matches. Lower the confidence filter or wait for data.</td></tr>'}</tbody></table>`;
+  $('prWrap').innerHTML = `<table class="pst"><thead><tr><th class="psh0">Coin</th><th class="psx"></th><th title="Direction and probability for the chosen horizon">Call</th><th title="How much to trust the call, 0 to 100">Confidence</th><th title="Smart money: flow, volume, CVD, wallets, OI, trend, sweeps (-100 to +100)">🏦 Institutional (score + psychology)</th><th title="Crowd psychology read as a contrarian: crowded long and greed are bearish, crowded short and panic are bullish">👥 Retail (score + psychology)</th><th title="Liquidity magnets, VWAP, range position">🧲 Structure</th><th title="Pump or dump forecast for the coming hours from real institutional volume, big trades, flow and compression">🚀 Pump / Dump</th><th title="Smart money vs crowd: Accumulation, Distribution, FOMO, Panic, Late trend…">Smart money vs crowd</th><th title="About 68% of the time price stays inside">Expected range</th><th title="Nearest liquidity pool in the call direction">Target</th><th title="Opposite pool: if reached the call is wrong">Invalidation</th><th title="Time left in the current candle of the horizon">Candle left</th></tr></thead><tbody>${body || '<tr><td colspan="12" class="dim" style="text-align:center;padding:14px">No coin matches. Lower the confidence filter or wait for data.</td></tr>'}</tbody></table>`;
   $('prNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.n} coins · horizon <b>${H.lab.toLowerCase()}</b> · ranked by confidence × strength.` + (D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
   ccTick();
 }
@@ -11879,24 +11880,25 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.93: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.94: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
-  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pFinal','pBlock']],
+  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
   ['🏦 Exchanges', ['pVen','pHL','pGap']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
   trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','pV1h','pV4h','pV24','fund8']},
-  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
+  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
   crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
   mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
 };
-function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp1){ state.ps.pp1 = 1; if (!state.ps.cols.includes('pPress')){ const i = state.ps.cols.indexOf('pInst'); state.ps.cols.splice(i >= 0 ? i + 1 : 0, 0, 'pPress'); } }
+function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp2){ state.ps.pp2 = 1; const a = state.ps.cols, i = a.indexOf('pPress'), j = i >= 0 ? i : a.indexOf('pInst'); for (const id of ['pBig', 'pPD']) if (!a.includes(id)) a.splice(j >= 0 ? j + 1 : 0, 0, id); }
+  if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp1){ state.ps.pp1 = 1; if (!state.ps.cols.includes('pPress')){ const i = state.ps.cols.indexOf('pInst'); state.ps.cols.splice(i >= 0 ? i + 1 : 0, 0, 'pPress'); } }
   if (state.ps && Array.isArray(state.ps.cols) && state.ps.cols.includes('vol') && !state.ps.cols.includes('pV1h')){ state.ps.cols = state.ps.cols.flatMap(x => x === 'vol' ? ['pV1h', 'pV4h', 'pV24'] : [x]); }
   const s = state.ps = Object.assign({cols:PS_DEFAULT.slice(), shut:[], sort:{id:'pRank', dir:-1}, n:100, side:'all', min:'all', hl:false, q:'', vol:0, plan:false}, state.ps || {}); return s; }
 function psStrip(h){ return String(h == null ? '' : h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim(); }
@@ -11905,7 +11907,7 @@ function psElite(c, mk){
   let rd = null; try { rd = instRow(c, 'perp'); } catch(e){}
   const idir = rd && rd.conf && rd.conf.dir ? rd.conf.dir : 0, vdir = hasV ? (v >= 4 ? 1 : (v === 2 || v === 3) ? -1 : 0) : 0, d0 = vdir || idir;
   const is = rd && rd.sc && isNum(rd.sc.score) ? rd.sc.score : null, fin = rd && rd.fin ? rd.fin : {};
-  o.is = is; o.fin = fin; o.final = fin.final ? 'FINAL' : fin.building ? 'building' : ''; o.rd = rd; o.V = t10Venues(c); o.dq = isNum(m.dqScore) ? m.dqScore : null; o.hasV = hasV; o.vdir = vdir;
+  try { o.pd = pdCalc(c, rd); } catch(e){ o.pd = null; } o.is = is; o.fin = fin; o.final = fin.final ? 'FINAL' : fin.building ? 'building' : ''; o.rd = rd; o.V = t10Venues(c); o.dq = isNum(m.dqScore) ? m.dqScore : null; o.hasV = hasV; o.vdir = vdir;
   if (!d0){ o.tag = 'none'; o.grade = ''; o.p = 0; o.hard = []; o.chk = []; return o; }
   const long = d0 > 0, dir = long ? 'long' : 'short', strong = hasV && (v === 5 || v === 3), sc = isNum(m.verdictScore) ? m.verdictScore : 0;
   const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = o.dq;
@@ -11914,6 +11916,101 @@ function psElite(c, mk){
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
   return o;
 }
+/* ===== V4.94: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
+const BTF = {map:new Map(), busy:false, t:0};
+function btSym(c){ const k = normSym(c.name); return (/^k[A-Z0-9]{2,}$/.test(c.name) ? '1000' : '') + k + 'USDT'; }
+async function btTick(){
+  if (BTF.busy) return; const now = Date.now();
+  const list = [...state.coins.values()].filter(c => c.ctx && !String(c.name).includes(':') && c.m && isNum(c.m.vol24)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 40); if (!list.length) return;
+  list.sort((a, b) => ((BTF.map.get(a.name) || {at:0}).at) - ((BTF.map.get(b.name) || {at:0}).at)); const c = list[0];
+  if (now - (BTF.map.get(c.name) || {at:0}).at < 45000) return;
+  BTF.busy = true;
+  try {
+    const j = await ext('https://fapi.binance.com/fapi/v1/aggTrades?symbol=' + btSym(c) + '&limit=1000', null, 12000);
+    if (!Array.isArray(j) || j.length < 60) throw new Error('too few trades');
+    const T = j.map(t => ({u:+t.p * +t.q, b:!t.m, t:+t.T})).filter(t => isFinite(t.u)), us = T.map(t => t.u).sort((a, b) => a - b), thr = Math.max(15000, us[Math.floor(us.length * 0.9)] || 0);
+    let bb = 0, bs = 0, tb = 0, ts = 0, nb = 0; for (const t of T){ if (t.b) tb += t.u; else ts += t.u; if (t.u >= thr){ nb++; if (t.b) bb += t.u; else bs += t.u; } }
+    const win = Math.max(0.2, (T[T.length - 1].t - T[0].t) / 60000), bt = bb + bs, tt = tb + ts;
+    BTF.map.set(c.name, {at:Date.now(), ok:true, win, bb, bs, nb, thr, net:bt > 0 ? (bb - bs) / bt * 100 : 0, totNet:tt > 0 ? (tb - ts) / tt * 100 : 0, tot:tt, bigShare:tt > 0 ? bt / tt : 0, perMin:tt / win});
+  } catch(e){ BTF.map.set(c.name, {at:Date.now(), ok:false}); }
+  BTF.busy = false;
+}
+const PDL = {k:'elpp_pd_log', last:0, cache:new Map()};
+function pdLogLoad(){ try { const v = LS.get(PDL.k); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
+function btStart(){ if (BTF.t) return; BTF.t = setInterval(() => { try { btTick(); } catch(e){} }, 3500); setInterval(() => { try { pdTick(); } catch(e){} }, 60000); setTimeout(() => { try { btTick(); } catch(e){} }, 800); }
+function pdCalc(c, rd){
+  const m = c.m || {}, n = isNum, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), R = [], caution = [];
+  if (!rd){ try { rd = instRow(c, 'perp'); } catch(e){ rd = null; } }
+  const bt = BTF.map.get(c.name), bok = bt && bt.ok && Date.now() - bt.at < 900000, g = (o, k) => (o && n(o[k])) ? o[k] : null;
+  let D = 0, dw = 0; const add = (v, w, why) => { if (v == null || !isFinite(v)) return; D += v * w; dw += w; if (why && Math.abs(v) >= 0.3) R.push([Math.abs(v * w), why]); };
+  const sg = v => v > 0 ? '+' : '';
+  const f15 = g(m.flowPct, '15m'), f1 = g(m.flowPct, '1h'), f4 = g(m.flowPct, '4h');
+  if (f15 != null) add(clamp(f15 / 20, -1, 1), 2, 'net money flow ' + sg(f15) + f15.toFixed(0) + '% in 15m');
+  if (f1 != null) add(clamp(f1 / 20, -1, 1), 2, 'net money flow ' + sg(f1) + f1.toFixed(0) + '% in 1h');
+  if (f4 != null) add(clamp(f4 / 25, -1, 1), 1, 'net money flow ' + sg(f4) + f4.toFixed(0) + '% in 4h');
+  if (n(m.instFlowPct)) add(clamp(m.instFlowPct / 25, -1, 1), 3, 'institutional (big-bar) flow ' + sg(m.instFlowPct) + m.instFlowPct.toFixed(0) + '%');
+  { const s = m.instFlow; if (s === 1) add(1, 2, 'big bars bought while small traders sell'); else if (s === 2) add(-1, 2, 'big bars sold into small traders buying'); else if (s === 3) add(0.5, 2); else if (s === 4) add(-0.5, 2); }
+  { const s = m.instVolState; if (s === 1) add(1, 2, 'biggest recent bar was strong buying'); else if (s === 3) add(0.7, 2, 'big volume absorbing sells at the lows'); else if (s === 2) add(-1, 2, 'biggest recent bar was strong selling'); else if (s === 4) add(-0.7, 2, 'big volume absorbing buys at the highs'); }
+  { const ic = (m.icEntry || {})['15m'] || (m.icEntry || {})['1h'] || 0; if (ic === 1) add(1, 2, 'fresh bullish institutional candle'); else if (ic === 3) add(0.5, 2); else if (ic === 2) add(-1, 2, 'fresh bearish institutional candle'); else if (ic === 4) add(-0.5, 2); }
+  if (bok){ const w = Math.min(1, bt.win / 2.5) * (bt.nb >= 4 ? 1 : 0.5); add(clamp(bt.net / 40, -1, 1), 3 * w, 'big trades (' + Math.round(bt.nb) + ' prints over $' + Math.round(bt.thr / 1000) + 'k): ' + (bt.net >= 0 ? 'buyers ' : 'sellers ') + Math.abs(bt.net).toFixed(0) + '% net'); add(clamp(bt.totNet / 30, -1, 1), 1 * w); }
+  if (n(m.readyLong) && n(m.readyShort)) add(clamp((m.readyLong - m.readyShort) / 60, -1, 1), 2, 'take-off score ' + (m.readyLong >= m.readyShort ? 'long ' + m.readyLong : 'short ' + m.readyShort));
+  { const b = (m.bo || {})['1h']; if (b === 2) add(1, 1.5, 'breakout confirmed after a swept low'); else if (b === 4) add(-1, 1.5, 'breakdown confirmed after a swept high'); }
+  { const cd = (m.cvdDiv || {})['1h']; if (cd === 1) add(0.6, 1, 'hidden buying (CVD divergence)'); else if (cd === 2) add(-0.6, 1, 'hidden selling (CVD divergence)'); }
+  if (m.whSide === 1) add(0.5, 1, 'whale wallets net long'); else if (m.whSide === 2) add(-0.5, 1, 'whale wallets net short');
+  if (n(m.optMpDist) && Math.abs(m.optMpDist) >= 3) add(clamp(m.optMpDist / 8, -0.5, 0.5), 0.5);
+  let Dn = dw > 0 ? D / dw * 100 : 0;
+  /* energy: how much explosive volume / set-up is present, 0 to 100 */
+  let E = 0; const en = (v, why) => { E += v; if (why && v >= 8) R.push([v * 0.6, why]); };
+  const rv = g(m.rvol, '15m'), rb = g(m.rvolBest, '15m'), rx = Math.max(rv || 0, rb || 0);
+  if (rx >= 3) en(25, 'volume ' + rx.toFixed(1) + 'x normal on 15m'); else if (rx >= 2) en(18, 'volume ' + rx.toFixed(1) + 'x normal on 15m'); else if (rx >= 1.5) en(10, 'volume rising (' + rx.toFixed(1) + 'x)');
+  const r1 = g(m.rvol, '1h'); if (r1 != null && r1 >= 2) en(8, 'hourly volume ' + r1.toFixed(1) + 'x normal');
+  if (n(m.instVolX)) { if (m.instVolX >= INS_TH.big) en(20, 'institutional bar ' + m.instVolX.toFixed(1) + 'x the average'); else if (m.instVolX >= 2) en(10); }
+  if (n(m.instShare)) { if (m.instShare >= 35) en(15, 'institutions are ' + Math.round(m.instShare) + '% of volume'); else if (m.instShare >= INS_TH.share) en(10, 'institutions are ' + Math.round(m.instShare) + '% of volume'); }
+  if (n(m.todX) && m.todX >= 2) en(8, 'this hour is ' + m.todX.toFixed(1) + 'x busier than usual');
+  if (bok && bt.bigShare >= 0.4) en(10, 'big trades are ' + Math.round(bt.bigShare * 100) + '% of recent turnover');
+  if (m.volRegime === 1) en(10, 'volatility compressed: an expansion is due');
+  if (m.oiPx && (m.oiPx['15m'] === 5 || m.oiPx['1h'] === 5)) en(10, 'open interest building on flat price');
+  if (rd && rd.active) en(5);
+  { const mx = Math.max(n(m.readyLong) ? m.readyLong : 0, n(m.readyShort) ? m.readyShort : 0); if (mx >= 60) en(10, 'take-off score ' + mx); }
+  E = Math.min(100, E);
+  const dir = Dn >= 20 ? 1 : Dn <= -20 ? -1 : 0;
+  /* squeeze fuel: crowd stuck on the wrong side makes the move faster */
+  let fuel = 0; if (dir > 0 && m.lsState === 2){ fuel = 6; R.push([6, 'the crowd is short: a squeeze adds fuel']); } else if (dir < 0 && m.lsState === 1){ fuel = 6; R.push([6, 'the crowd is long: a flush adds fuel']); }
+  if (dir > 0 && m.lsState === 1) caution.push('crowd already long: less fuel, late buyers get trapped'); if (dir < 0 && m.lsState === 2) caution.push('crowd already short: a bounce or squeeze can come first');
+  let score = 0.45 * E + 0.55 * Math.abs(Dn) + fuel;
+  if (bok && dir && Math.abs(bt.net) >= 30 && bt.net * dir < 0){ score -= 10; caution.push('big prints point the other way'); }
+  const atr = (m.atr && (m.atr['1h'] || m.atr['15m'])) || null, ch1 = (m.chg || {})['1h'];
+  if (n(atr) && atr > 0 && n(ch1) && dir && ch1 * dir > 2.5 * atr){ score -= 8; caution.push('already moved ' + Math.abs(ch1).toFixed(1) + '% in 1h: chasing risk'); }
+  if (m.eventRisk === 2){ score *= 0.6; caution.push('macro event blackout'); } else if (m.eventRisk === 1) caution.push('high-impact event within 60 minutes');
+  if (isNum(m.dqScore) && m.dqScore < 45){ score = Math.min(score, 49); caution.push('low data quality'); }
+  score = Math.round(clamp(score, 0, 100));
+  let label = 'quiet', tone = 'dim';
+  if (dir && score >= 68 && E >= 40){ label = dir > 0 ? '🚀 PUMP LIKELY' : '💥 DUMP LIKELY'; tone = dir > 0 ? 'up' : 'dn'; }
+  else if (dir && score >= 50){ label = dir > 0 ? 'PUMP BUILDING' : 'DUMP BUILDING'; tone = 'warn'; }
+  else if (!dir && E >= 55){ label = '⚡ VOLUME COMING, side unclear'; tone = 'warn'; }
+  else if (dir && E >= 30){ label = dir > 0 ? 'buy volume appearing' : 'sell volume appearing'; tone = 'dim'; }
+  const fast = (f15 != null && Math.abs(f15) >= 15) || rx >= 2.5, slow = f4 != null && Math.abs(f4) >= 12 && !(f15 != null && Math.abs(f15) >= 8), hz = fast ? 'next 1-2 hours' : slow ? 'next 4-12 hours' : 'next 1-4 hours';
+  /* real institutional volume side and size */
+  const vs = (n(m.instFlowPct) ? clamp(m.instFlowPct / 25, -1, 1) : 0) + (bok ? clamp(bt.net / 40, -1, 1) : 0) + (f1 != null ? clamp(f1 / 20, -1, 1) : 0), vside = vs >= 0.6 ? 1 : vs <= -0.6 ? -1 : 0, fu = g(m.flowUsd, '1h');
+  R.sort((a, b) => b[0] - a[0]);
+  return {dir, score, energy:Math.round(E), D:Math.round(Dn), label, tone, hz, why:R.slice(0, 6).map(x => x[1]), caution, bt:bok ? bt : null, vside, flowUsd:fu, rvol:rx || null, ts:Date.now()};
+}
+function pdCached(c){ const o = PDL.cache.get(c.name), now = Date.now(); if (o && now - o.at < 8000) return o.v; let v = null; try { v = pdCalc(c); } catch(e){ v = null; } PDL.cache.set(c.name, {at:now, v}); return v; }
+function pdCellOf(p){ if (!p) return ['—', 'dim']; const tip = (p.dir ? (p.dir > 0 ? 'PUMP' : 'DUMP') + ' score ' + p.score + ' (energy ' + p.energy + ', direction ' + (p.D > 0 ? '+' : '') + p.D + ') · ' + p.hz + '. ' : '') + (p.why.length ? 'Because: ' + p.why.join('; ') + '. ' : '') + (p.caution.length ? 'Caution: ' + p.caution.join('; ') + '.' : ''); return ['<span title="' + esc(tip) + '"><b>' + esc(p.label) + '</b>' + (p.dir || p.energy >= 55 ? ' <small>' + p.score + '</small>' : '') + '</span>', p.tone]; }
+function pdVolCell(p){ if (!p) return ['—', 'dim']; const s = p.vside; if (!s && !p.bt) return ['<span class="dim">no clear volume side</span>', 'dim']; const usd = isNum(p.flowUsd) ? fmtUsd(Math.abs(p.flowUsd)) : null, big = p.bt ? ' · big prints ' + (p.bt.net >= 0 ? '+' : '') + p.bt.net.toFixed(0) + '%' : ''; return ['<span title="Institutional volume side from big-bar flow, big trades on Binance and 1h money flow' + (p.bt ? '. Big prints: buyers $' + Math.round(p.bt.bb / 1000) + 'k vs sellers $' + Math.round(p.bt.bs / 1000) + 'k in the last ' + p.bt.win.toFixed(1) + ' min' : '') + '"><b>' + (s > 0 ? '▲ BUY' : s < 0 ? '▼ SELL' : '◆ mixed') + '</b>' + (usd ? ' ' + usd + '/1h' : '') + big + '</span>', s > 0 ? 'up' : s < 0 ? 'dn' : 'dim']; }
+/* track record of strong pump/dump calls: scored 4 hours later */
+function pdTick(){
+  const now = Date.now(); if (now - PDL.last < 55000) return; PDL.last = now; const L = pdLogLoad(); let dirty = false;
+  for (const x of L){ if (x.res != null || now < x.at + 4 * 36e5) continue; const c = snapshot.get(x.n) || state.coins.get(x.n), end = x.at + 4 * 36e5; let px = null;
+    if (c && c.candles && c.candles.length){ const cd = c.candles; for (let i = cd.length - 1; i >= 0; i--){ if (cd[i].t <= end){ if (end - cd[i].t < 20 * 6e4) px = cd[i].c; break; } } }
+    if (px == null && c && c.m && isNum(c.m.px) && now - end < 6 * 6e4) px = c.m.px;
+    if (px == null){ if (now - end > 3 * 36e5){ x.res = 'na'; dirty = true; } continue; }
+    const mv = (px / x.px - 1) * 100, sgn = x.dir * mv, th = Math.max(0.4, 0.8 * (x.atr || 0.6)); x.mv = +mv.toFixed(2); x.res = sgn >= th ? 'hit' : sgn <= -th * 0.6 ? 'miss' : 'flat'; dirty = true; }
+  const live = [...snapshot.values()].filter(c => c && c.m && isNum(c.m.px) && isNum(c.m.vol24) && !/^(USDC|USDT|DAI|FDUSD|USDE)$/i.test(c.name)).sort((a, b) => b.m.vol24 - a.m.vol24).slice(0, 40);
+  for (const c of live){ const p = pdCached(c); if (!p || !p.dir || p.score < 68 || p.energy < 40) continue; if (L.some(x => x.n === c.name && now - x.at < 4 * 36e5)) continue; L.push({n:c.name, at:now, px:c.m.px, dir:p.dir, score:p.score, atr:(c.m.atr && (c.m.atr['1h'] || c.m.atr['15m'])) || 0.6}); dirty = true; }
+  if (dirty){ try { LS.set(PDL.k, L.slice(-500)); } catch(e){} }
+}
+function pdStats(){ const L = pdLogLoad(), d = L.filter(x => x.res === 'hit' || x.res === 'miss'), h = d.filter(x => x.res === 'hit').length; return {n:d.length, hit:h, rate:d.length ? Math.round(h / d.length * 1000) / 10 : null, pend:L.filter(x => x.res == null).length, flat:L.filter(x => x.res === 'flat').length}; }
 const PS_TAG = {trade:['TRADEABLE', 'up', 'Strong verdict, grade A or B, no blockers'], wait:['STRONG, WAIT', 'warn', 'Strong verdict but the confirmation checks are not ready'], watch:['WATCH', 'warn', 'Lean with decent confirmation'], lean:['LEAN ONLY', 'dim', 'A lean, not a trade yet'], none:['NO SIDE', 'dim', 'No long or short lean right now']};
 function psData(force){
   const now = Date.now(); if (!force && PS.cache && now - PS.cacheAt < 6000) return PS.cache;
@@ -11932,6 +12029,8 @@ function psCols(){
   add('pGrade', 'Grade', 'Signal-quality grade A to D from every confirmation check, with how many were met.', c => { const e = el(c); return e.p == null ? null : e.p; }, c => { const e = el(c); return e.grade ? ['<b>' + e.grade + '</b> <small>' + e.ok + '/' + e.n + '</small>', e.grade === 'A' || e.grade === 'B' ? 'up' : e.grade === 'C' ? 'warn' : 'dn'] : ['—', 'dim']; });
   add('pInst', 'Inst. score', 'Institutional score 0 to 100 (accumulation / distribution read across 15m, 1h, 4h, D).', c => el(c).is, c => { const s = el(c).is; return [isNum(s) ? s + '' : '—', isNum(s) ? (s >= 70 ? 'up' : s >= 45 ? '' : 'dim') : 'dim']; });
   add('pPress', 'Inst. pressure', 'Which way institutional pressure is coming and how close it is to firing. BUYING or SELLING = the side big money is on (flow, volume, timeframes). GO = every institutional condition is met right now. READY = only one condition missing. BUILDING = pressure is forming but several conditions are missing. Hover for what is still missing.', c => { const e = el(c), f = e.fin; if (!f || !f.dir) return 0; const ph = f.final ? 3 : (f.missing || []).length <= 1 ? 2 : 1; return f.dir * (ph * 100 + (isNum(e.is) ? e.is : 0)); }, c => { const e = el(c), f = e.fin; if (!f || !f.dir) return ['<span title="No institutional side yet">— no pressure</span>', 'dim']; const ph = f.final ? 'GO' : (f.missing || []).length <= 1 ? 'READY' : 'BUILDING', side = f.dir > 0 ? '▲ BUYING' : '▼ SELLING', tip = f.final ? f.text || 'All institutional conditions are met' : 'Missing: ' + (f.missing || []).join('; '); return ['<span title="' + esc(tip) + '"><b>' + side + '</b> · ' + ph + '</span>', f.dir > 0 ? (ph === 'BUILDING' ? 'warn' : 'up') : (ph === 'BUILDING' ? 'warn' : 'dn')]; });
+  add('pPD', 'PUMP / DUMP (hours)', 'Forecast of an explosive move in the coming hours. Built from real institutional volume (big-bar flow, institutional share, big trades on Binance), net money flow on 15m/1h/4h, take-off score, breakouts, hidden CVD buying/selling, open-interest build-up, volatility compression and crowd squeeze fuel. PUMP/DUMP LIKELY = score 68+ with strong volume energy. BUILDING = 50-67. VOLUME COMING = heavy volume but side unclear. Hover for the reasons, the time window and cautions.', c => { const p = (el(c) || {}).pd; return p ? (p.dir || 1) * (p.dir ? p.score : p.energy * 0.5) : 0; }, c => pdCellOf((el(c) || {}).pd));
+  add('pBig', 'Institutional volume side', 'Which side the real institutional volume is on right now and how much: big-bar flow, big trades on Binance (prints above about $15k or the top 10% of trades) and 1h money flow. BUY or SELL with the 1h flow in dollars and the big-print balance.', c => { const p = (el(c) || {}).pd; return p ? p.vside * (1 + Math.abs(isNum(p.flowUsd) ? p.flowUsd : 0) / 1e6) : 0; }, c => pdVolCell((el(c) || {}).pd));
   add('pFinal', 'Take-off', 'FINAL = the scanner calls it ready. building = forming.', c => ({FINAL:2, building:1})[el(c).final] || 0, c => { const f = el(c).final; return [f || '—', f === 'FINAL' ? 'up' : f ? 'warn' : 'dim']; });
   add('pBlock', 'Blockers', 'Hard blockers from the confirmation checklist. Empty means none.', c => el(c).hard ? el(c).hard.length : 0, c => { const h = el(c).hard || []; return [h.length ? '<span title="' + esc(h.join('; ')) + '">' + h.length + ': ' + esc(h[0]) + (h.length > 1 ? '…' : '') + '</span>' : 'none', h.length ? 'dn' : 'dim']; });
   const vv = (c, k) => { const v = (c.m.vol || {})[k]; return isNum(v) ? v : null; }, vdv = (c, k) => { const v = (c.m.volD || {})[k]; return isNum(v) ? v : null; };
@@ -11957,6 +12056,8 @@ function psCols(){
 const PS_THR = {
   pRank:['70+ strong · 50-70 ok · under 50 weak', 'Power rank combines institutional score (60%), signal grade, FINAL/building bonus, verdict strength, minus blockers, plus data quality and R:R. Look first at 70 and above with no blockers.'],
   pPress:['GO = all conditions met · READY = 1 missing · BUILDING = 2+ missing', 'Direction of institutional pressure (BUYING or SELLING) and how close it is to firing. Needs institutional activity, take-off score, rising money flow, rising volume and 2 of 4 timeframes agreeing. Best: BUYING/SELLING + GO that matches the verdict side. READY = watch closely. BUILDING = too early.'],
+  pPD:['LIKELY 68+ · BUILDING 50-67 · under 50 quiet', 'Pump or dump forecast for the coming hours. It needs two things at once: direction evidence (money flow, institutional bars, big trades, take-off, breakouts) and volume energy (volume spikes, institutional share, compression, open-interest build-up). Strong direction without volume is a drift, not a pump. Best: LIKELY on the same side as the Side column and Inst. pressure GO. Chasing risk appears when price already moved more than 2.5x its hourly range.'],
+  pBig:['BUY / SELL with 1h dollars', 'Real institutional volume side. Big prints on Binance above the top 10% of trades (at least $15k) are counted separately from small trades. Big prints and the big-bar flow agreeing is the strongest sign that size is moving.'],
   pSide:['LONG / SHORT = verdict side', 'From the coin verdict: score +15 lean long, +35 strong long; -15 lean short, -35 strong short. Neutral verdict falls back to the institutional lean.'],
   pTag:['TRADEABLE needs strong + grade A/B + 0 blockers', 'TRADEABLE = strong verdict, grade A or B, no hard blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.'],
   pGrade:['A 82%+ · B 68%+ · C 52%+ · D below', 'Share of weighted confirmation checks met. Trade A or B. C only with small size. D = wait.'],
@@ -12017,6 +12118,7 @@ function psDetail(c, D){
   const plan = pl ? `<div class="cwr"><span>Side</span><span class="${up ? 'up' : 'dn'}"><b>${up ? 'LONG' : 'SHORT'}</b>${pl.lean ? ' (lean only)' : ''}</span></div><div class="cwr"><span>Entry</span><span>${esc(fmtPx(pl.entry))}</span></div><div class="cwr"><span>Stop</span><span class="dn">${esc(fmtPx(pl.sl))} (${pc(pl.sl)}) <small>${esc(pl.slWhy || '')}</small></span></div><div class="cwr"><span>TP1</span><span class="up">${esc(fmtPx(pl.tp1))} (${pc(pl.tp1)}) · R:R ${pl.rr1.toFixed(1)} <small>${esc(pl.t1Why || '')}</small></span></div><div class="cwr"><span>TP2</span><span class="up">${esc(fmtPx(pl.tp2))} (${pc(pl.tp2)}) · R:R ${pl.rr2.toFixed(1)} <small>${esc(pl.t2Why || '')}</small></span></div><div class="cwr"><span>Leverage</span><span>${pl.lev}x max</span></div>` : '<p class="hint">No trade plan: no clear side right now.</p>';
   const sec = (t, body, open) => `<details class="ovd psd"${open ? ' open' : ''}><summary>${t}</summary><div>${body}</div></details>`;
   let h = '<div class="psdet">';
+  if (e.pd){ const q = e.pd, pc = pdCellOf(q), vc = pdVolCell(q); h += sec('⚡ Pump / dump forecast and real institutional volume', `<div class="cwr"><span>Forecast</span><span class="${pc[1]}">${pc[0]} · ${esc(q.hz)}</span></div><div class="cwr"><span>Institutional volume</span><span class="${vc[1]}">${vc[0]}</span></div><div class="cwr"><span>Energy / direction</span><span>volume energy ${q.energy}/100 · direction evidence ${q.D > 0 ? '+' : ''}${q.D}</span></div>` + (q.why.length ? '<p class="hint"><b>Because</b></p>' + li(q.why) : '') + (q.caution.length ? '<p class="hint"><b class="warn">Caution</b></p>' + li(q.caution) : ''), true); }
   h += sec('1. Why it is on the list', '<p class="hint"><b>Long reasons</b></p>' + li(why(m.vPos, 5)) + '<p class="hint"><b>Short reasons</b></p>' + li(why(m.vNeg, 5)) + (rdWhy(e) ? '<p class="hint">Institutions: ' + esc(rdWhy(e)) + '</p>' : ''), true);
   h += sec('2. Trade plan', plan, true);
   h += sec('3. Checklist: ' + okL.length + ' ready · ' + wrnL.length + ' partly · ' + badL.length + ' not ready', '<p class="hint"><b class="up">Ready</b></p>' + li(okL) + '<p class="hint"><b class="warn">Partly</b></p>' + li(wrnL) + '<p class="hint"><b class="dn">Not ready (wait for these)</b></p>' + li(badL), false);
@@ -12042,7 +12144,7 @@ function psPickerHtml(cols, groups, st){
   return groups.map(([g, ids]) => { const n = ids.filter(id => want.has(id)).length; return `<details class="ovd pspg"${n ? ' open' : ''}><summary>${esc(g)} <small class="dim">${n}/${ids.length}</small></summary><div class="pspl"><span class="psgb"><button class="btn sm" type="button" data-psg="${esc(g)}" data-on="1">all</button><button class="btn sm" type="button" data-psg="${esc(g)}" data-on="0">none</button></span>${ids.map(id => `<label class="hint" title="${esc(cols.get(id).tip || '')}"><input type="checkbox" data-pscol="${esc(id)}"${want.has(id) ? ' checked' : ''}> ${esc(COLNAMES[id] && COLNAMES[id].length < 34 ? COLNAMES[id] : cols.get(id).label)}</label>`).join('')}</div></details>`; }).join('');
 }
 function renderPower(force){
-  const el = $('viewPower'); if (!el) return; const st = psSt();
+  const el = $('viewPower'); if (!el) return; btStart(); const st = psSt();
   if (!force && el._built && Date.now() - PS.lastRender < 7000) return;
   PS.lastRender = Date.now();
   const D = psData(force), cols = psCols(), groups = psGroups(cols), valid = new Set(cols.keys()); st.cols = st.cols.filter(id => valid.has(id)); if (!st.cols.length) st.cols = PS_DEFAULT.slice();
@@ -12096,7 +12198,8 @@ function psDraw(keepBar){
   $('psWrap').innerHTML = `<table class="pst"><thead><tr>${head1}</tr><tr>${head2}</tr>${st.thr === false ? '' : '<tr>' + head3 + '</tr>'}</thead><tbody>${body || `<tr><td colspan="${span}" class="dim" style="text-align:center;padding:14px">No coin matches these filters.</td></tr>`}</tbody></table>`;
   const nT = D.live.filter(c => (D.E.get(c.name) || {}).tag === 'trade').length, nS = D.live.filter(c => (D.E.get(c.name) || {}).dir).length;
   { const gb = $('psGuideBox'); if (gb){ const was = gb.querySelector('details') && gb.querySelector('details').open; gb.innerHTML = psGuideHtml(vis, cols); if (was) gb.querySelector('details').open = true; } }
-  $('psNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.live.length} coins with live data (${D.total} in the scanner) · <b class="up">${nT}</b> tradeable now · ${nS} with a long/short lean · sorted by <b>${esc((cols.get(st.sort.id) || {}).label || '')}</b>.` + (D.errs && D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
+  { const S = pdStats(); PS.pdTxt = S.n >= 8 ? ` · pump/dump record: <b>${S.rate}%</b> right over ${S.n} scored calls` : ' · pump/dump record: collecting'; }
+  $('psNote').innerHTML = `Showing <b>${rows.length}</b> of ${D.live.length} coins with live data (${D.total} in the scanner) · <b class="up">${nT}</b> tradeable now · ${nS} with a long/short lean · sorted by <b>${esc((cols.get(st.sort.id) || {}).label || '')}</b>.` + (PS.pdTxt || '') + (D.errs && D.errs.length ? ' <span class="warn">Some coins skipped: ' + esc(D.errs[0]) + '</span>' : '');
 }
 function psClick(e){
   const st = psSt(), t = e.target;
