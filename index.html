@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V4.91</title>
+<title>ELPP CRYPTO SCANNER PRO V4.92</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -786,12 +786,13 @@ dialog::backdrop{background:rgba(4,6,10,.68);-webkit-backdrop-filter:blur(4px);b
 #viewListings{display:flex;flex-direction:column;gap:12px;min-width:0;max-width:100%}
 .mttab td{white-space:normal;vertical-align:top}.mttab td:nth-child(n+3):nth-child(-n+9){text-align:right;white-space:nowrap}
 td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.38);color:#d4af37;border-radius:6px;opacity:1;font:600 10px var(--sans);letter-spacing:.04em;padding:1px 7px;line-height:1.5;transition:all .15s}td.sym .cp:hover{background:rgba(212,175,55,.22);border-color:#d4af37;color:#f3d77a;box-shadow:0 0 8px rgba(212,175,55,.3)}td.sym .cp.wl{font-size:13px;padding:0 6px;color:#9aa4b2;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.14)}td.sym .cp.wl:hover{color:#f5b942;border-color:#f5b942}td.sym .cp.wl.on{color:#f5b942;background:rgba(245,185,66,.14);border-color:rgba(245,185,66,.5)}
+.pst td.psc0 .cp,.psw .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.38);color:#d4af37;border-radius:6px;font:600 10px var(--sans);letter-spacing:.04em;padding:1px 7px;line-height:1.5;cursor:pointer;text-decoration:none}.pst td.psc0 .cp:hover{background:rgba(212,175,55,.22);border-color:#d4af37;color:#f3d77a}.pst td.psc0 .cp.wl{font-size:13px;padding:0 6px;color:#9aa4b2;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.14)}.pst td.psc0 .cp.wl:hover{color:#f5b942;border-color:#f5b942}.pst td.psc0 .cp.wl.on{color:#f5b942;background:rgba(245,185,66,.14);border-color:rgba(245,185,66,.5)}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.91</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V4.92</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10703,7 +10704,7 @@ function scanWidgetHtml(){
     <div style="overflow:auto;max-height:360px;margin-top:6px"><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th style="text-align:left">Status</th><th>Exchanges</th><th style="text-align:left">Flag</th></tr></thead><tbody>${rows.map(r => `<tr><td style="text-align:left">${esc(r.name)}</td><td style="text-align:left" class="${r.status === 'scanning' ? 'up' : r.status === 'fresh' ? '' : 'dim'}">${r.status === 'scanning' ? '⟳ scanning now' : r.status === 'fresh' ? '✓ scanned ' + esc(ago(r.fetchedAt)) : 'queued'}</td><td class="dim">${r.venN}</td><td style="text-align:left" class="${r.v === 5 || r.v === 4 ? 'up' : r.v === 3 || r.v === 2 ? 'dn' : 'dim'}">${esc(r.flag || '—')}</td></tr>`).join('')}</tbody></table></div></details></div>`;
 }
 
-/* ---------- V4.91: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
+/* ---------- V4.92: shared Prediction Radar snapshot for the Today and Overview pages ---------- */
 const PSN = {};
 function prSnap(hz){
   const now = Date.now(), o = PSN[hz]; if (o && now - o.at < 15000) return o.v;
@@ -11404,7 +11405,7 @@ function t10Run(kind){
 }
 window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return 'ERROR ' + String(e && e.message || e); } };
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
-/* ---------- V4.91: step-by-step "how to use this page" for every page ---------- */
+/* ---------- V4.92: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
@@ -11452,7 +11453,7 @@ Object.assign(VIEW_GUIDE, {
   decide: [['Evidence groups', 'Sweeps, flow, institutions, crowd, news.', 'The more groups agree, the stronger the verdict.']],
   academy: [['Search', 'Finds any word, set-up or step.', 'Type a term like CVD or sweep.']]
 });
-/* ---------- V4.91: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
+/* ---------- V4.92: VOCABULARY & ACADEMY - words, set-ups, how the scanner picks coins, how to build your own signal ---------- */
 const AC_PICK = [
   ['Step 1: The coin universe', 'The scanner loads every perpetual coin on Hyperliquid (about 200 plus builder markets) and prices from Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Coinbase, Kraken and DEX pools. Stablecoins are removed. Each coin needs a live price and a 24h volume to be scored.'],
   ['Step 2: Data collection (every refresh)', 'For each coin it pulls candles (5m to Daily), volume, open interest, funding, order book, trades, liquidations, long/short ratio, on-chain flows, news, unlocks and options where they exist. A Data quality score (0-100) tells you how complete this data is. Under 45 the scanner says do not trade it.'],
@@ -11664,7 +11665,7 @@ function renderAcademy(force){
   $('acAll').addEventListener('click', () => { const ds = [...body.querySelectorAll('details.acd')], any = ds.some(d => d.open); ds.forEach(d => { d.open = !any; }); });
 }
 
-/* ---------- V4.91: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
+/* ---------- V4.92: CANDLE CLOCKS (time left in every timeframe candle) ---------- */
 const CC_TFS = [['5m', 300, 0], ['15m', 900, 0], ['30m', 1800, 0], ['1h', 3600, 0], ['4h', 14400, 0], ['8h', 28800, 0], ['12h', 43200, 0], ['1d', 86400, 0], ['1w', 604800, 345600]];
 function ccLeft(step, off){ const n = Date.now() / 1000; return step - ((n - (off || 0)) % step); }
 function ccFmt(s){ s = Math.max(0, Math.floor(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return d ? d + 'd ' + p(h) + ':' + p(m) + ':' + p(x) : h ? h + ':' + p(m) + ':' + p(x) : p(m) + ':' + p(x); }
@@ -11678,7 +11679,7 @@ function ccTick(){
 }
 setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
 
-/* ---------- V4.91: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
+/* ---------- V4.92: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
 const PR_HZ = {'1h':{h:1, tfs:['15m', '1h'], lab:'Next 1 hour'}, '4h':{h:4, tfs:['1h', '4h'], lab:'Next 4 hours'}, '12h':{h:12, tfs:['4h', '12h'], lab:'Next 12 hours'}};
 const PR_W = {inst:0.62, ret:0.26, str:0.12};
@@ -11878,7 +11879,7 @@ setInterval(() => { try { if (state.view === 'predict') prDraw(false); prTick();
 
 Object.assign(VIEW_HOW, {predict:['Pick a horizon (next 1h, 4h or 12h) and watch the candle clocks.','Read Call, Confidence and the three scores: Institutional, Retail psychology and Structure.','Open ▸ on a coin for every factor, the psychology story, trap warnings, the liquidity target and where the call fails.','Only act after a sweep and reclaim on 15m or 1h. The radar tells you the likely direction, not the entry.','Check the Track record panel to see how accurate the calls really were.']});
 AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of going up or down over 1h, 4h or 12h from institutional data, retail psychology and liquidity structure, and tracks its own hit rate.', 'ELPP'], ['Retail psychology', 'What ordinary traders feel and do: fear, greed, FOMO, panic. The scanner reads it as a contrarian signal because the crowd is often wrong at extremes.', 'Market phases'], ['FOMO', 'Fear of missing out: buying after a big rise because everyone else is. Often the top.', 'Market phases'], ['Capitulation', 'Panic selling after a big fall. When it is exhausted a bounce often starts.', 'Market phases'], ['Long trap / Short trap', 'Price moves to tempt traders in one direction, then reverses and stops them out. The crowd is long (or short) but smart money is not.', 'Liquidity'], ['Candle clock', 'Countdown to the close of the current candle on a timeframe. Signals confirm on candle close.', 'Basics'], ['Hit rate', 'Share of scored predictions that ended on the predicted side.', 'Risk']);
-/* ---------- V4.91: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
+/* ---------- V4.92: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
   ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pFinal','pBlock']],
