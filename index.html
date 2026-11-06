@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.7</title>
+<title>ELPP CRYPTO SCANNER PRO V5.8</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -804,7 +804,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.7</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.8</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -14093,7 +14093,7 @@ class Chart {
     this.ym = {lo, hi, log:p.log, h:mainH};
     const ff = getComputedStyle(document.body).fontFamily, mono = '11px ' + ff, step = this.step;
     /* time ticks */
-    const ivs = [60, 300, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 172800, 604800, 2592000, 7776000, 31536000], tfs = TFSEC[p.tf]; let iv = ivs.find(x => x / tfs * this.bw >= 84) || ivs[ivs.length - 1]; const off = tzOff(S.tz) / 1000, ticks = []; let pk = null;
+    const ivs = [60, 300, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 172800, 604800, 2592000, 7776000, 31536000], tfs = TFSEC[p.tf]; let iv = ivs.find(x => x / tfs * this.bw >= 66) || ivs[ivs.length - 1]; const off = tzOff(S.tz) / 1000, ticks = []; let pk = null;
     for (let i = Math.max(0, Math.floor(this.v0)); i <= Math.min(this.bars.length - 1, i1); i++){ const ts = this.bars[i].t / 1000 + off, key = iv >= 2592000 ? Math.floor(ts / 2592000) : Math.floor(ts / iv); if (pk !== null && key !== pk){ const dd = new Date(this.bars[i].t + off * 1000), mode = iv >= 31536000 ? 'year' : iv >= 2592000 ? 'month' : iv >= 86400 ? 'date' : (dd.getUTCHours() === 0 && dd.getUTCMinutes() === 0 ? 'date' : 'time'); ticks.push({x:this.xOf(i), t:this.bars[i].t, mode}); } pk = key; }
     /* grid */
     g.lineWidth = 1; g.strokeStyle = rgba('#8393a7', 0.13); g.beginPath(); for (const t of ticks){ const x = Math.round(t.x) + 0.5; g.moveTo(x, 0); g.lineTo(x, H - timeH); } g.stroke();
@@ -14194,12 +14194,14 @@ class Chart {
   drawCross(g, W, H, plotW, mainH, timeH, subs, subH, mono){
     const P = this.P; let x = null, yv = null, inMain = false, subI = -1;
     if (this.cx && this.cx.in){ x = this.cx.x; yv = this.cx.y; if (yv < mainH) inMain = true; else subI = Math.min(subs.length - 1, Math.floor((yv - mainH) / subH)); }
+    else if (this.cx && this.cx.ax){ x = this.cx.x; }
     else if (this.sx != null && S.sync){ x = this.xOf(this.iOfT(this.sx)); if (x < 0 || x > plotW) x = null; }
-    if (x === null) return; const snap = this.cx && this.cx.in ? this.xOf(Math.round(this.iOf(x))) : x; if (this.cx && this.cx.in) x = snap;
+    if (x === null) return; const snap = this.cx && (this.cx.in || this.cx.ax) ? this.xOf(Math.round(this.iOf(x))) : x; if (this.cx && (this.cx.in || this.cx.ax)) x = snap;
     g.save(); g.setLineDash([4, 4]); g.strokeStyle = rgba('#8393a7', 0.8); g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(x) + 0.5, 0); g.lineTo(Math.round(x) + 0.5, H - timeH); if (this.cx && this.cx.in && yv < H - timeH){ g.moveTo(0, Math.round(yv) + 0.5); g.lineTo(plotW, Math.round(yv) + 0.5); } g.stroke(); g.setLineDash([]); g.restore();
     g.font = 'bold 11px ' + getComputedStyle(document.body).fontFamily; const lab = (xx, yy, w, txt) => { g.fillStyle = P.fg; g.fillRect(xx, yy, w, 18); g.fillStyle = P.bg; g.fillText(txt, xx + 6, yy + 13); };
     if (this.cx && this.cx.in){ if (inMain) lab(plotW, yv - 9, this.L.axisW, fmtP(this.pOf(yv))); else if (subI >= 0 && subs[subI] && subs[subI]._m){ const m = subs[subI]._m, v = m.hi - (yv - m.y0 - 14) / (m.h - 20) * (m.hi - m.lo); lab(plotW, yv - 9, this.L.axisW, Math.abs(v) >= 1000 ? fmtV(v) : v.toFixed(2)); } }
     const t = this.tOfI(this.iOf(x)); const txt = fmtT(t, 'full'), w = g.measureText(txt).width + 14; lab(Math.max(0, Math.min(plotW - w, x - w / 2)), H - timeH + 3, w, txt);
+    if (this.cx && this.cx.ax){ g.font = '10px ' + getComputedStyle(document.body).fontFamily; g.fillStyle = P.mut; g.textAlign = 'left'; g.fillText('◀ drag or scroll here to zoom in / out ▶  ·  double-click = fit', 8, H - timeH - 8); }
   }
   fixLegend(subs, mainH, subH){
     const sig = this.pane.ind.map(x => x.id + x.on + x.p.join(',') + x.c.join(',')).join('|') + '|' + mainH + '|' + subH; if (sig === this.sig) return; this.sig = sig; const lg = this.lg; if (!lg) return; lg.innerHTML = '';
@@ -14299,6 +14301,7 @@ Object.assign(Chart.prototype, {
       if (ptrs.size === 2){ const a = [...ptrs.values()]; pinch = {d:Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), bw:this.bw}; this.drag = null; return; }
       const L = this.L; if (!L) return; this.cx = {x, y, in:true};
       if (this.rep.pick && x < L.plotW){ const i = Math.max(5, Math.min(this.bars.length - 1, Math.round(this.iOf(x)))); this.rep.idx = i; this.rep.pick = false; this.zones.key = ''; this.v0 = i - (L.plotW * 0.7) / this.bw; this.dirty = true; if (window.TA) TA.ui(this); return; }
+      if (y >= L.H - L.timeH){ this.drag = {k:'x', x0:x, bw0:this.bw, i0:this.iOf(L.plotW)}; return; }
       if (x > L.plotW && y < L.mainH){ this.drag = {k:'y', y0:y, yz0:this.yz}; this.ymanual = true; return; }
       if (this.tool !== 'cursor' && y < L.mainH && x < L.plotW){ const pt = this.magnet(this.fromXY(x, y), x, y); this.pend.push(pt); if (this.pend.length >= NEED[this.tool]) this.commit(this.tool, this.pend.slice()); this.dirty = true; return; }
       const h = y < L.mainH ? this.hit(x, y) : null;
@@ -14309,10 +14312,11 @@ Object.assign(Chart.prototype, {
     cv.addEventListener('pointermove', e => {
       const [x, y] = pos(e), L = this.L; if (!L) return; if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
       if (pinch && ptrs.size === 2){ const a = [...ptrs.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), mx = (a[0][0] + a[1][0]) / 2, i = this.iOf(mx); this.bw = Math.max(1.2, Math.min(60, pinch.bw * d / pinch.d)); this.v0 = i - (mx - this.bw / 2) / this.bw; this.dirty = true; return; }
-      this.cx = {x, y, in:x >= 0 && x <= L.plotW && y >= 0 && y <= L.H - L.timeH};
+      this.cx = {x, y, in:x >= 0 && x <= L.plotW && y >= 0 && y <= L.H - L.timeH, ax:x >= 0 && x <= L.plotW && y > L.H - L.timeH};
       const dr = this.drag;
       if (dr){
         if (dr.k === 'pan'){ this.v0 = dr.v00 - (x - dr.x0) / this.bw; if (this.ymanual && this.ym){ this.yo = dr.yo0 + (y - dr.y0) / this.ym.h * this.yz; } }
+        else if (dr.k === 'x'){ const nb = Math.max(1.2, Math.min(60, dr.bw0 * Math.exp((x - dr.x0) * 0.006))); this.bw = nb; this.v0 = dr.i0 - (L.plotW - nb / 2) / nb; }
         else if (dr.k === 'y'){ this.yz = Math.max(0.05, Math.min(20, dr.yz0 * Math.exp((y - dr.y0) * 0.006))); }
         else if (dr.k === 'obj'){ const d = dr.d, cur = this.fromXY(x, y); dr.moved = true; const part = dr.part;
           if (part === 'body'){ const dt = cur.t - dr.last.t, dp = cur.p - dr.last.p; if (d.type === 'hline'){ d.pts[0].p += dp; } else if (d.type === 'vline'){ d.pts[0].t += dt; } else { d.pts.forEach(q => { q.t += dt; q.p += dp; }); if (d.sl != null){ d.sl += dp; d.tp += dp; d.t2 += dt; } } dr.last = cur; }
@@ -14320,6 +14324,7 @@ Object.assign(Chart.prototype, {
           else if (part === 'entry'){ const dt = cur.t - dr.last.t, dp = cur.p - dr.last.p; d.pts[0].t += dt; d.pts[0].p += dp; d.sl += dp; d.tp += dp; d.t2 += dt; dr.last = cur; }
           else { const k = +part.slice(1), m = this.magnet(cur, x, y); if (d.type === 'hline') d.pts[0].p = m.p; else if (d.type === 'vline') d.pts[0].t = m.t; else d.pts[k] = m; } }
       } else if (!ptrs.size || ptrs.size === 1){ const h = L && y < L.mainH && this.tool === 'cursor' ? this.hit(x, y) : null, id = h ? h.d.id : null; if (id !== this.hov){ this.hov = id; } cv.style.cursor = this.tool !== 'cursor' ? 'crosshair' : h ? (h.part === 'body' ? 'move' : 'pointer') : x > L.plotW ? 'ns-resize' : this.drag ? 'grabbing' : 'crosshair'; }
+      if (!dr && y >= L.H - L.timeH && !ptrs.size) cv.style.cursor = 'ew-resize';
       if (window.TA && S.sync) TA.broadcast(this, this.cx.in ? this.tOfI(Math.round(this.iOf(x))) : null);
       this.dirty = true;
     });
@@ -14328,12 +14333,13 @@ Object.assign(Chart.prototype, {
     cv.addEventListener('pointerleave', () => { if (!this.drag){ this.cx = null; if (window.TA) TA.broadcast(this, null); this.dirty = true; } });
     cv.addEventListener('wheel', e => {
       e.preventDefault(); const [x, y] = pos(e), L = this.L; if (!L) return;
-      if (x > L.plotW){ this.yz = Math.max(0.05, Math.min(20, this.yz * Math.exp(e.deltaY * 0.0015))); this.ymanual = true; }
+      if (y >= L.H - L.timeH){ const i = this.iOf(L.plotW); this.bw = Math.max(1.2, Math.min(60, this.bw * Math.exp(-e.deltaY * 0.0016))); this.v0 = i - (L.plotW - this.bw / 2) / this.bw; }
+      else if (x > L.plotW){ this.yz = Math.max(0.05, Math.min(20, this.yz * Math.exp(e.deltaY * 0.0015))); this.ymanual = true; }
       else if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)){ this.v0 += (e.deltaX || e.deltaY) / this.bw * 0.8; }
       else { const i = this.iOf(x); this.bw = Math.max(1.2, Math.min(60, this.bw * Math.exp(-e.deltaY * 0.0016))); this.v0 = i - (x - this.bw / 2) / this.bw; }
       this.dirty = true;
     }, {passive:false});
-    cv.addEventListener('dblclick', e => { const [x, y] = pos(e), L = this.L; if (!L) return; if (x > L.plotW){ this.yz = 1; this.yo = 0; this.ymanual = false; } else if (!this.hit(x, y)) this.fit(); this.dirty = true; });
+    cv.addEventListener('dblclick', e => { const [x, y] = pos(e), L = this.L; if (!L) return; if (y >= L.H - L.timeH){ this.fit(); } else if (x > L.plotW){ this.yz = 1; this.yo = 0; this.ymanual = false; } else if (!this.hit(x, y)) this.fit(); this.dirty = true; });
     cv.addEventListener('contextmenu', e => { e.preventDefault(); const [x, y] = pos(e), h = this.L && y < this.L.mainH ? this.hit(x, y) : null; if (h){ this.sel = h.d.id; if (window.TA) TA.ui(this); this.dirty = true; } });
     cv.addEventListener('keydown', e => {
       if (e.key === 'Delete' || e.key === 'Backspace'){ if (this.sel){ e.preventDefault(); this.delSel(); } }
