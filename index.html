@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.6</title>
+<title>ELPP CRYPTO SCANNER PRO V5.7</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -804,7 +804,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.6</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.7</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -1983,7 +1983,10 @@ if (!state.rules) loadPreset(state.mode === 'perp' ? state.preset : MODE_PRESET[
 (function(){
   try {
     const m = /(?:^|[#&])view=([a-zA-Z]+)/.exec(location.hash); if (m && VIEW_LIST.includes(m[1])) state.view = m[1];
-    if (/[?&]screen=\d+/.test(location.search)){ state.view = 'ta'; document.documentElement.classList.add('ta-screen'); }
+    let sq = (location.search.match(/[?&]screen=(\d+)/) || [])[1] || null;
+    if (!sq){ try { const pr = JSON.parse(localStorage.getItem('elpp_ta_pending') || 'null'); localStorage.removeItem('elpp_ta_pending'); if (pr && pr.n && Date.now() - pr.t < 20000) sq = String(pr.n); } catch(e){} }
+    window.__ELPP_SCR_REQ = sq;
+    if (sq){ state.view = 'ta'; document.documentElement.classList.add('ta-screen'); }
     const mm = /(?:^|[#&])mode=([a-zA-Z]+)/.exec(location.hash); if (mm && MODES[mm[1]]){ switchMode(mm[1]); state.view = 'table'; }
   } catch(e){}
 })();
@@ -8870,7 +8873,7 @@ function openSuperChart(name){
     const tf = {'1h':'1h','4h':'4h','12h':'4h','1d':'1d'}[state.vtf] || (src.tf && src.tf !== '1m' ? src.tf : '15m');
     const pane = JSON.parse(JSON.stringify(Object.assign({ven:'auto', pool:null, type:'candle', log:false, vol:true, liq:false, fvg:false, smc:{}, ind:[]}, src, {sym:name, tf, plan:true})));
     const st = Object.assign({}, base || {}, {layout:'1', active:0, panes:[pane], focus:true});
-    let n = 1; try { n = (+localStorage.getItem('elpp_ta_scrn') || 0) + 1; localStorage.setItem('elpp_ta_scrn', String(n)); localStorage.setItem('elpp_ta_v1_s' + n, JSON.stringify(st)); } catch(e){}
+    let n = 1; try { n = (+localStorage.getItem('elpp_ta_scrn') || 0) + 1; localStorage.setItem('elpp_ta_scrn', String(n)); localStorage.setItem('elpp_ta_v1_s' + n, JSON.stringify(st)); localStorage.setItem('elpp_ta_pending', JSON.stringify({n, t:Date.now()})); } catch(e){}
     const u = location.href.split('#')[0].split('?')[0] + '?screen=' + n + '#view=ta';
     const w = window.open(u, '_blank'); if (!w) toast('Your browser blocked the new tab. Allow pop-ups for this site, then click the coin again.');
   } catch(e){ toast('Could not open the super chart: ' + errTxt(e)); }
@@ -13848,7 +13851,7 @@ loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(l
 })();
 </script>
 <script>
-window.__ELPP_SCR = (location.search.match(/[?&]screen=(\d+)/) || [])[1] || null;
+window.__ELPP_SCR = window.__ELPP_SCR_REQ || (location.search.match(/[?&]screen=(\d+)/) || [])[1] || null;
 /* ===== ELPP TA LAB: native technical-analysis workspace (V4.73). Own canvas engine, no external chart library. ===== */
 (function(){
 'use strict';
