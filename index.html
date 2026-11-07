@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V6.0</title>
+<title>ELPP CRYPTO SCANNER PRO V6.1</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -802,7 +802,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 
 .ict-top h2{margin:0 0 4px}.ict-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}.ict-bar input,.ict-bar select{background:var(--surface2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:13px}.ict-bar label{font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}
 .ict-btn{background:var(--surface2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block}.ict-btn:hover{border-color:var(--accent)}
-.ict-wrap{overflow:auto;max-width:100%;max-height:72vh;cursor:grab;overscroll-behavior:contain}.ict-wrap.drag{cursor:grabbing;user-select:none}.ict-wrap td,.ict-wrap th{white-space:normal}.ict-t th{white-space:nowrap}.ict-t{border-collapse:collapse;width:100%;font-size:12.5px}.ict-t th{text-align:left;font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}.ict-t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.ict-t tr.sel td,.ict-t td.sel,.ict-t th.sel{background:rgba(255,200,0,.06)}
+.ict-sc{display:flex;gap:8px;align-items:center;margin:4px 0}.ict-sc input{flex:1;accent-color:var(--accent);cursor:pointer}.ict-sc .ict-btn{padding:2px 12px;font-size:16px}.ict-wrap{overflow:auto;max-width:100%;max-height:72vh;cursor:grab;overscroll-behavior:contain}.ict-wrap.drag{cursor:grabbing;user-select:none}.ict-wrap td,.ict-wrap th{white-space:normal}.ict-t th{white-space:nowrap}.ict-t{border-collapse:collapse;width:100%;font-size:12.5px}.ict-t th{text-align:left;font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}.ict-t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.ict-t tr.sel td,.ict-t td.sel,.ict-t th.sel{background:rgba(255,200,0,.06)}
 .ict-sm{font-size:12px;max-width:230px}.ict-dim{color:var(--muted)}.ict-note,.ict-empty{padding:14px;color:var(--muted)}
 .ict-chip{display:inline-block;padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--line);white-space:nowrap}.ict-chip.go.l{background:rgba(0,200,120,.18);color:var(--up);border-color:var(--up)}.ict-chip.go.s{background:rgba(255,70,90,.18);color:var(--down);border-color:var(--down)}.ict-chip.ready{color:var(--accent);border-color:var(--accent)}.ict-chip.late{color:var(--warn);border-color:var(--warn)}.ict-chip.watch.l{color:var(--up)}.ict-chip.watch.s{color:var(--down)}.ict-chip.wait{color:var(--muted)}
 .ict-strip{white-space:nowrap}.ict-st{display:inline-block;margin-right:6px;padding:1px 6px;border-radius:6px;font-size:11px;border:1px solid var(--line)}.ict-st small{margin-left:3px;opacity:.7}.ict-st.u{color:var(--up)}.ict-st.d{color:var(--down)}.ict-st.n{color:var(--muted)}.ict-st.sel{border-color:var(--accent)}
@@ -815,7 +815,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.0</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.1</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9700,7 +9700,22 @@ function ictFill(){
   const t = $('ictTable'), d = $('ictDetail'), p = $('ictProg'); if (!t) return;
   if (p) p.textContent = ICTS.busy ? 'Scanning ' + ICTS.prog.done + ' of ' + ICTS.prog.total + '…' : ICTS.at ? 'Updated ' + ago(ICTS.at) + ' · ' + [...ICTS.data.values()].filter(r => r && r.ok !== false).length + ' coins' : '';
   t.innerHTML = ictTable(); const r = ICTS.sel ? ICTS.data.get(ICTS.sel) : null; d.innerHTML = r && r.ok !== false ? ictDetail(r) : '';
+  ictBars(t); ictBars(d);
 }
+function ictBars(root){
+  root.querySelectorAll('.ict-wrap').forEach(w => {
+    if (w.previousElementSibling && w.previousElementSibling.classList.contains('ict-sc')) return;
+    const bar = document.createElement('div'); bar.className = 'ict-sc'; bar.innerHTML = '<button type="button" class="ict-btn" data-d="-1">‹</button><input type="range" min="0" max="1000" value="0" aria-label="Scroll sideways"><button type="button" class="ict-btn" data-d="1">›</button>';
+    const rg = bar.querySelector('input'); let lock = false;
+    const mx = () => Math.max(0, w.scrollWidth - w.clientWidth);
+    const sync = () => { bar.style.display = mx() > 4 ? 'flex' : 'none'; if (!lock) rg.value = mx() ? Math.round(w.scrollLeft / mx() * 1000) : 0; };
+    rg.addEventListener('input', () => { lock = true; w.scrollLeft = rg.value / 1000 * mx(); lock = false; });
+    bar.addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) w.scrollBy({left: +b.dataset.d * Math.max(200, w.clientWidth * 0.6), behavior: 'smooth'}); });
+    w.addEventListener('scroll', sync, {passive: true});
+    w.parentNode.insertBefore(bar, w); sync(); setTimeout(sync, 300); window.addEventListener('resize', sync);
+  });
+}
+
 
 function applyView(){
   { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
