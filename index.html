@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V5.8</title>
+<title>ELPP CRYPTO SCANNER PRO V5.9</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -799,12 +799,23 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 #vtfBar .vtb.on{background:#c9a24a;color:#111;opacity:1}
 #vtfBar .vtb:focus-visible{outline:2px solid #c9a24a;outline-offset:-2px}
 #vtfBar .vti{font-size:12px;opacity:.5;cursor:help}
+
+.ict-top h2{margin:0 0 4px}.ict-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}.ict-bar input,.ict-bar select{background:var(--surface2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:13px}.ict-bar label{font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}
+.ict-btn{background:var(--surface2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block}.ict-btn:hover{border-color:var(--accent)}
+.ict-wrap{overflow:auto;max-width:100%}.ict-t{border-collapse:collapse;width:100%;font-size:12.5px}.ict-t th{text-align:left;font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}.ict-t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.ict-t tr.sel td,.ict-t td.sel,.ict-t th.sel{background:rgba(255,200,0,.06)}
+.ict-sm{font-size:12px;max-width:230px}.ict-dim{color:var(--muted)}.ict-note,.ict-empty{padding:14px;color:var(--muted)}
+.ict-chip{display:inline-block;padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--line);white-space:nowrap}.ict-chip.go.l{background:rgba(0,200,120,.18);color:var(--up);border-color:var(--up)}.ict-chip.go.s{background:rgba(255,70,90,.18);color:var(--down);border-color:var(--down)}.ict-chip.ready{color:var(--accent);border-color:var(--accent)}.ict-chip.late{color:var(--warn);border-color:var(--warn)}.ict-chip.watch.l{color:var(--up)}.ict-chip.watch.s{color:var(--down)}.ict-chip.wait{color:var(--muted)}
+.ict-strip{white-space:nowrap}.ict-st{display:inline-block;margin-right:6px;padding:1px 6px;border-radius:6px;font-size:11px;border:1px solid var(--line)}.ict-st small{margin-left:3px;opacity:.7}.ict-st.u{color:var(--up)}.ict-st.d{color:var(--down)}.ict-st.n{color:var(--muted)}.ict-st.sel{border-color:var(--accent)}
+.ict-detail{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface)}.ict-dh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}.ict-dh h3{margin:0}.ict-detail h4{margin:16px 0 6px}.ict-plain{padding:10px;border-left:3px solid var(--accent);background:var(--surface2);border-radius:6px}
+.ict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.ict-cond,.ict-logic{list-style:none;padding:0;margin:0}.ict-cond li{padding:4px 0;border-bottom:1px solid var(--line);font-size:12.5px}.ict-cond li small{display:block;color:var(--muted)}.ict-cond li.ok b{color:var(--up)}.ict-cond li.no b{color:var(--down)}.ict-logic li{padding:3px 0;font-size:12.5px}
+.ict-card{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--surface2)}.ict-h{font-weight:600;margin-bottom:4px}.ict-why{font-size:12px;color:var(--muted);margin-top:4px}.ict-plan{margin-top:6px;font-size:12.5px}
+.ict-i{display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:6px;border:1px solid var(--line);font-size:11.5px}.ict-i.u,.ict-u{color:var(--up)}.ict-i.d,.ict-d{color:var(--down)}.ict-m td{min-width:130px}.ict-cn{font-weight:600;min-width:180px;max-width:230px}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.8</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V5.9</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -844,6 +855,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <button class="nv" type="button" data-view="screener">Screener: Hyperliquid + Binance</button>
     <button class="nv" type="button" data-view="power" style="font-weight:700">⚡ Power Scanner: best set-ups</button>
     <button class="nv" type="button" data-view="predict" style="font-weight:700">🔮 Prediction Radar: next move</button>
+    <button class="nv" type="button" data-view="ictscan">SMC/ICT Scanner: institutional set-ups</button>
     <button class="nv" type="button" data-view="inst">Inst. Radar: Perps (smart money)</button>
     <button class="nv" type="button" data-view="instspot">Inst. Radar: Spot (smart money)</button>
     <button class="nv" type="button" data-view="listings">Coin listings by exchange</button>
@@ -1062,6 +1074,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <div id="viewWatch" class="vcol" hidden></div>
     <div id="viewScreener" class="vcol" hidden></div>
     <div id="viewPower" class="vcol" hidden></div>
+    <div id="viewIct" class="vcol" hidden></div>
     <div id="viewPredict" class="vcol" hidden></div>
     <div id="viewAcademy" class="vcol" hidden></div>
     <div id="viewInst" class="vcol" hidden></div>
@@ -1949,7 +1962,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['power','predict','academy','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['power','ictscan','predict','academy','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -5166,7 +5179,7 @@ function render(){
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'power') renderPower(); else if (state.view === 'predict') renderPredict(); else if (state.view === 'academy') renderAcademy(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'power') renderPower(); else if (state.view === 'ictscan') renderIct(); else if (state.view === 'predict') renderPredict(); else if (state.view === 'academy') renderAcademy(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -8535,7 +8548,7 @@ function passExtra(c){
   return true;
 }
 
-const VIEW_HINT = {proof:'Automatic proof of how the scanner performs: live signal record plus a daily backtest of every idea, ready to download as clean data for your website.', today:'Your day on one screen: market state, next macro event, the strongest set-ups, open signals, risk guard and backup.', decide:'Exactly which rules add or subtract points: sweeps, volume, institutions, retail positioning and context, with a live breakdown for any coin.', bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', charts:'A full TradingView chart for any coin, built in: pick a coin, pick the exchange and timeframe, and use TradingView\'s own drawing tools, indicators and compare/correlation overlay, all inside the scanner.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
+const VIEW_HINT = {ictscan:'Reads 15m, 1h, 4h, 12h and Daily candles for the biggest coins and looks for institutional footprints (structure, order blocks, FVGs, liquidity sweeps, inducements, pullbacks, traps, volume). Tells you the side, where to enter and why, and whether it is ready, go or too late.', proof:'Automatic proof of how the scanner performs: live signal record plus a daily backtest of every idea, ready to download as clean data for your website.', today:'Your day on one screen: market state, next macro event, the strongest set-ups, open signals, risk guard and backup.', decide:'Exactly which rules add or subtract points: sweeps, volume, institutions, retail positioning and context, with a live breakdown for any coin.', bt:'Replays free exchange history through simplified versions of the scanner rules to see which ones had an edge, with a held-back test period.', api:'Every website or service that uses a key, in one window. Type each key once, press Save all, and the right page starts using it.', ei:'Free institutional data beyond price: CME futures positioning (CFTC), the futures curve, spot ETF flows, prediction-market odds, taker flow on the biggest exchanges, Bitcoin network stress, retail attention and developer activity. Optional API keys unlock sources that block anonymous use.', prep:'The scanner prepares your watchlist: the coins with the strongest institutional evidence, with every data point explained, a confirmation checklist, a liquidity-based plan and cautions. Preparation, not a signal.', journal:'Your trade log. Running and closed trades from Hyperliquid, dYdX and (through your own relay) Binance, Bybit, OKX, Gate, Bitget and Kraken are added automatically; add your own setup, feeling and notes. Shows win rate, profit factor, R, drawdown and where you make or lose money.', listings:'Every coin the scanner can see and which exchanges list it: Hyperliquid (perps, HIP-3 markets, spot), Binance, Bybit, OKX, Bitget, Gate, MEXC, Coinbase, Kraken, KuCoin, Upbit, dYdX and Meteora. Also lists HIP-3 builder markets and HIP-4 outcome markets.', overview:'The whole crypto market in plain words: the overall mood, key numbers, and two separate tables showing what institutions (big money) and retail (everyday traders) are doing. Built for beginners. Not a buy or sell signal.', instspot:'Spot coins where big players look to be accumulating (buying) or distributing (selling), read on 15m, 1h, 4h and the daily, with spot-specific checks: spot volume, market cap, unlock overhang, news and the spot/perp gap. Spot can only be bought, so distribution means avoid or take profit.', inst:'Coins where big players look to be accumulating (buying, long candidates) or distributing (selling, short candidates), ranked by how strong the footprint is. Click a coin to check the chart before trading.', screener:'A live table of perpetual futures on Hyperliquid or Binance: price, 5 minute, 1 hour and 24 hour moves, volume, trades, open interest and its 1 hour change, yearly funding and a 24 hour trend line. Sort by any column to find what is moving.', lookup:'Type any coin symbol and press Enter or Scan to get its verdict, trade plan, every metric the scanner calculates, liquidity levels and live order flow.', charts:'A full TradingView chart for any coin, built in: pick a coin, pick the exchange and timeframe, and use TradingView\'s own drawing tools, indicators and compare/correlation overlay, all inside the scanner.', memes:'Holder concentration for meme coins: Solana wallet shares from a public node, a HolderScan link and your own holder API. The full meme scanner is a separate file.', sdesk:'The best set-ups right now in one place: pick a coin to see why it was rated, the trade plan with sizing, the cross-market read and the caution. Crypto perps use the scanner\'s verdicts; Options uses Deribit positioning.', map:'The whole crypto market as a heatmap: tile size is market cap or volume, colour is the price change over the period you pick. Filter by sector, group by sector, or switch to a table. Click a tile for the chart.', signals:'A log of every signal with what happened next (win rate and R), alerts, the macro calendar, and a guard for your own open positions.', options:'What big money is doing in the options market (Deribit): put/call, skew, max pain, walls, dealer gamma and big trades, with a plain reading of where the market may be heading and why.', orderflow:'Live buying vs selling from Hyperliquid trades (delta and big prints) for the top coins, plus slots for your own ATAS, Bookmap and LuxAlgo feeds.', movers:'Big toppers (biggest gainers), big losers and big movers (biggest move compared with the coin\'s normal range). Pick the time frame and the minimum volume.', whales:'Which coins the biggest public Hyperliquid wallets hold, long or short, with their open profit or loss. Whale, orca and shark count as institutions.', drops:'Airdrops and token unlocks from the five sites you named. Paste each site\'s API address once; unlocks then lower the verdict and show in the table.', news:'Live headlines for coins, tagged by what they could mean: investment, listing, upgrade, unlock or risk. Big names are matched from headlines.', flows:'Stablecoin supply: new USDT and USDC minted is money waiting to buy crypto. Shrinking supply means money is leaving.'};
 const BIG_CATS = ['Government & regulators','Macro & news wires','Founders & CEOs','Institutions & funds','On-chain trackers','Top traders & analysts','Crypto media'];
 const BIGS = [
   /* [handle, name, category index, why they matter] */
@@ -8860,7 +8873,7 @@ function vtfShow(){
   let b = $('vtfBar'); const host = document.querySelector('section.results');
   if (!b && host){ b = document.createElement('div'); b.id = 'vtfBar'; host.insertBefore(b, host.firstChild);
     b.addEventListener('click', e => { const x = e.target.closest('[data-vtf]'); if (x) vtfSet(x.dataset.vtf); }); }
-  if (!b) return; const scan = ['table','power','predict','inst','instspot','screener','listings'].includes(state.view); b.hidden = !scan;
+  if (!b) return; const scan = ['table','power','ictscan','predict','inst','instspot','screener','listings'].includes(state.view); b.hidden = !scan;
   const L = [['1h','1h'],['4h','4h'],['12h','12h'],['1d','D'],['all','Universal']];
   const tip = vtfOn() ? 'Showing ' + (state.vtf === '1d' ? 'Daily' : state.vtf) + ' data: change, RVOL, volume, money flow, pressure and the other per-timeframe columns follow this, and so does the Prediction horizon. Verdicts and trade plans always use all timeframes together.' : 'Universal = the normal mixed view. Pick a timeframe to see only that timeframe\'s numbers.';
   b.innerHTML = '<span class="vtl">Timeframe</span><span class="vts">' + L.map(([k, t]) => '<button type="button" class="vtb' + ((state.vtf || 'all') === k ? ' on' : '') + '" data-vtf="' + k + '">' + t + '</button>').join('') + '</span><span class="vti" title="' + esc(tip) + '">ⓘ</span>';
@@ -8885,8 +8898,808 @@ document.addEventListener('click', e => {
   if (!nm){ const tr = t.closest('tr[data-chart]'); if (tr && !t.closest('a,button,input,select,label,summary')) nm = tr.dataset.chart; }
   if (!nm) return; e.preventDefault(); e.stopImmediatePropagation(); openSuperChart(nm);
 }, true);
+/* ===== SMC/ICT engine ===== */
+/* ===== SMC / ICT engine (pure functions, candles in -> concepts out) ===== */
+const ICT = (function(){
+'use strict';
+const TFMS = {'15m':9e5, '1h':36e5, '4h':144e5, '12h':432e5, '1d':864e5};
+const TFN = {'15m':'15m', '1h':'1h', '4h':'4h', '12h':'12h', '1d':'D'};
+const TFW = {'15m':0.8, '1h':1.4, '4h':1.6, '12h':1.3, '1d':1.0};
+const ZW = {'15m':0.5, '1h':1, '4h':1.6, '12h':1.8, '1d':1.8};
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const avg = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0;
+const fmtP = p => !isFinite(p) ? '-' : p >= 1000 ? p.toFixed(1) : p >= 100 ? p.toFixed(2) : p >= 1 ? p.toFixed(3) : p >= 0.1 ? p.toFixed(4) : p >= 0.01 ? p.toFixed(5) : p.toPrecision(3);
+
+function atrArr(b, n){
+  const out = new Array(b.length).fill(0); let sum = 0;
+  for (let i = 0; i < b.length; i++){
+    const pc = i ? b[i - 1].c : b[i].o, tr = Math.max(b[i].h - b[i].l, Math.abs(b[i].h - pc), Math.abs(b[i].l - pc));
+    if (i < n){ sum += tr; out[i] = sum / (i + 1); } else out[i] = (out[i - 1] * (n - 1) + tr) / n;
+  }
+  return out;
+}
+function prep(b){
+  const A = atrArr(b, 14), vs = b.map(x => x.v);
+  return b.map((x, i) => {
+    const a = Math.max(A[i], x.c * 1e-6, 1e-12), body = Math.abs(x.c - x.o), rng = Math.max(x.h - x.l, 1e-12);
+    let s = 0, k = 0; for (let j = Math.max(0, i - 20); j < i; j++){ s += vs[j]; k++; }
+    const va = k ? s / k : x.v, rv = va > 0 ? x.v / va : 1;
+    return {i, a, body, rng, up: x.c >= x.o, uw: x.h - Math.max(x.o, x.c), lw: Math.min(x.o, x.c) - x.l, rs: rng / a, bs: body / a, rv,
+      sz: rng / a < 0.75 ? 'small' : rng / a < 1.4 ? 'medium' : 'big', vc: rv < 0.75 ? 'small' : rv < 1.4 ? 'avg' : 'big', pos: (x.c - x.l) / rng};
+  });
+}
+function pivots(b, L){
+  const out = [];
+  for (let i = L; i < b.length - L; i++){
+    let h = true, l = true;
+    for (let k = 1; k <= L; k++){
+      if (b[i - k].h >= b[i].h || b[i + k].h > b[i].h) h = false;
+      if (b[i - k].l <= b[i].l || b[i + k].l < b[i].l) l = false;
+      if (!h && !l) break;
+    }
+    if (h) out.push({i, p: b[i].h, t: 'H', c: i + L});
+    if (l) out.push({i, p: b[i].l, t: 'L', c: i + L});
+  }
+  return out;
+}
+/* ---------- market structure: HH HL LH LL, BOS, CHoCH, MSS ---------- */
+function structure(b, E, L){
+  const pv = pivots(b, L); let lastH = null, lastL = null, trend = 0, pi = 0; const ev = [], labels = [];
+  for (let i = 0; i < b.length; i++){
+    while (pi < pv.length && pv[pi].c <= i){
+      const p = pv[pi++];
+      if (p.t === 'H'){ if (lastH) labels.push({i: p.i, p: p.p, l: p.p > lastH.p ? 'HH' : 'LH'}); lastH = {...p, broken: false}; }
+      else { if (lastL) labels.push({i: p.i, p: p.p, l: p.p > lastL.p ? 'HL' : 'LL'}); lastL = {...p, broken: false}; }
+    }
+    const c = b[i].c;
+    if (lastH && !lastH.broken && c > lastH.p){
+      lastH.broken = true; const base = trend >= 0 ? 'BOS' : 'CHoCH', disp = E[i].bs >= 1.2 && E[i].rv >= 1.1;
+      ev.push({i, dir: 1, kind: base === 'CHoCH' && disp ? 'MSS' : base, base, lvl: lastH.p, disp, from: lastH.i}); trend = 1;
+    } else if (lastL && !lastL.broken && c < lastL.p){
+      lastL.broken = true; const base = trend <= 0 ? 'BOS' : 'CHoCH', disp = E[i].bs >= 1.2 && E[i].rv >= 1.1;
+      ev.push({i, dir: -1, kind: base === 'CHoCH' && disp ? 'MSS' : base, base, lvl: lastL.p, disp, from: lastL.i}); trend = -1;
+    }
+  }
+  return {pv, lastH, lastL, trend, ev, labels};
+}
+function dealingRange(b){
+  const n = b.length, w = Math.min(120, n); let hi = -Infinity, lo = Infinity;
+  for (let i = n - w; i < n; i++){ if (b[i].h > hi) hi = b[i].h; if (b[i].l < lo) lo = b[i].l; }
+  const eq = (hi + lo) / 2, px = b[n - 1].c;
+  return {hi, lo, eq, pos: hi > lo ? (px - lo) / (hi - lo) : 0.5, zone: px > eq + (hi - lo) * 0.05 ? 'premium' : px < eq - (hi - lo) * 0.05 ? 'discount' : 'equilibrium'};
+}
+function mktState(b, E, st){
+  const n = b.length, w = Math.min(40, n - 2), a = E[n - 1].a; let hi = -Infinity, lo = Infinity, upV = 0, dnV = 0;
+  for (let i = n - w; i < n; i++){ if (b[i].h > hi) hi = b[i].h; if (b[i].l < lo) lo = b[i].l; if (b[i].c >= b[i].o) upV += b[i].v; else dnV += b[i].v; }
+  const rangeA = (hi - lo) / a, ev = st.ev, le = ev.length ? ev[ev.length - 1] : null, age = le ? n - 1 - le.i : 999;
+  const s5 = avg(E.slice(n - 5).map(x => x.rs)), s30 = avg(E.slice(Math.max(0, n - 30)).map(x => x.rs)), compress = s30 > 0 ? s5 / s30 : 1;
+  const p0 = Math.max(0, n - 2 * w), prior = (b[n - w].c - b[p0].c) / a;
+  let rhi = -Infinity, rlo = Infinity; for (let i = n - w; i < n - 6; i++){ if (b[i].h > rhi) rhi = b[i].h; if (b[i].l < rlo) rlo = b[i].l; }
+  let ut = false, spring = false;
+  for (let i = n - 6; i < n; i++){ if (b[i].h > rhi && b[i].c < rhi) ut = true; if (b[i].l < rlo && b[i].c > rlo) spring = true; }
+  const sideways = rangeA < 6 && age > 12, consolidation = compress < 0.72 && rangeA < 8;
+  let state;
+  if (le && (le.kind === 'MSS' || le.kind === 'CHoCH') && age <= 15) state = 'Reversal';
+  else if ((ut || spring) && rangeA < 9) state = 'Manipulation';
+  else if (sideways) state = prior < -3 && (upV >= dnV * 1.05 || spring) ? 'Accumulation' : prior > 3 && (dnV >= upV * 1.05 || ut) ? 'Distribution' : 'Sideways';
+  else if (consolidation && age > 20) state = 'Consolidation';
+  else state = st.trend > 0 ? 'Uptrend' : st.trend < 0 ? 'Downtrend' : 'Sideways';
+  return {state, trend: st.trend, last: le ? {kind: le.kind, dir: le.dir, age, lvl: le.lvl} : null, labels: st.labels.slice(-4).map(x => x.l), compress, rangeA, ut, spring, prior, volSide: upV > dnV * 1.1 ? 'buyers' : dnV > upV * 1.1 ? 'sellers' : 'balanced'};
+}
+/* ---------- institutional candle psychology ---------- */
+function candlePsy(b, E, pv3){
+  const n = b.length, out = [], push = (kind, dir, i, note) => out.push({kind, dir, i, age: n - 1 - i, rv: E[i].rv, note});
+  for (let i = Math.max(4, n - 40); i < n; i++){
+    const e = E[i], x = b[i];
+    if (e.bs >= 1.5 && e.rv >= 1.8 && (e.up ? e.pos >= 0.7 : e.pos <= 0.3)) push('IFC', e.up ? 1 : -1, i, 'Institutional funded candle: huge body, huge volume, closes near its extreme');
+    else if (e.bs >= 1.3 && e.rv >= 1.2) push('Burst', e.up ? 1 : -1, i, 'Burst candle: fast displacement with real volume');
+    if (e.rs >= 0.8 && e.rv >= 1.0){
+      const topRej = e.uw / e.rng >= 0.6, botRej = e.lw / e.rng >= 0.6;
+      if (topRej || botRej) push('OT', topRej ? -1 : 1, i, 'Over-trap candle: long rejection wick with volume, traders trapped at the extreme');
+    }
+    const prior = pv3.filter(p => p.c <= i - 1 && i - p.c < 60);
+    const lowP = prior.filter(p => p.t === 'L').slice(-3), highP = prior.filter(p => p.t === 'H').slice(-3);
+    const swLow = lowP.find(p => x.l < p.p && x.c > p.p && e.lw / e.rng >= 0.4), swHigh = highP.find(p => x.h > p.p && x.c < p.p && e.uw / e.rng >= 0.4);
+    if (swLow || swHigh){
+      const dir = swLow ? 1 : -1; let burst = false;
+      for (let j = i + 1; j <= Math.min(n - 1, i + 3); j++) if ((dir > 0 ? b[j].c > b[j].o : b[j].c < b[j].o) && E[j].bs >= 1.2 && E[j].rv >= 1.1) burst = true;
+      if (burst) push('Trap & Burst', dir, i, 'Trap candle ran stops, then a burst candle moved the other way');
+    }
+    if (i >= 8){
+      let hh = -Infinity, ll = Infinity; for (let k = i - 5; k < i; k++){ hh = Math.max(hh, b[k].h); ll = Math.min(ll, b[k].l); }
+      if ((hh - ll) / e.a <= 1.4){
+        if (x.l < ll - 0.1 * e.a && x.c > ll) push('Bundle & Sweep', 1, i, 'Tight bundle of candles, then the low was swept and price closed back inside');
+        else if (x.h > hh + 0.1 * e.a && x.c < hh) push('Bundle & Sweep', -1, i, 'Tight bundle of candles, then the high was swept and price closed back inside');
+      }
+    }
+    if (i >= 4 && e.bs >= 1.1){
+      const pdir = Math.sign(b[i - 1].c - b[i - 4].c), same = [1, 2, 3].every(k => (b[i - k].c >= b[i - k].o) === (pdir > 0));
+      if (pdir !== 0 && same && (e.up ? 1 : -1) === -pdir && (e.up ? x.c > Math.max(b[i - 1].h, b[i - 2].h) : x.c < Math.min(b[i - 1].l, b[i - 2].l))) push('Momentum Shift', e.up ? 1 : -1, i, 'Candle engulfs the last move and flips momentum');
+    }
+  }
+  return out.slice(-14);
+}
+/* ---------- order blocks (all 9 flavours + trap) ---------- */
+function orderBlocks(b, E, st, rng, pv3, tf){
+  const n = b.length, out = [], seen = new Set();
+  for (let i = 3; i < n; i++){
+    const e = E[i], up = e.up;
+    if (!(e.bs >= 1.3 && e.rv >= 0.9)) continue;
+    if (i > 0 && E[i - 1].bs >= 1.3 && E[i - 1].up === up) continue;
+    const dir = up ? 1 : -1; let k = -1;
+    for (let j = i - 1; j >= Math.max(0, i - 6); j--) if ((dir > 0 ? b[j].c < b[j].o : b[j].c > b[j].o) && E[j].rs >= 0.3){ k = j; break; }
+    if (k < 0 || seen.has(k)) continue;
+    const brk = st.ev.some(v => v.dir === dir && v.i >= i && v.i <= i + 3), gap = i + 1 < n && (dir > 0 ? b[i + 1].l > b[i - 1].h : b[i + 1].h < b[i - 1].l) || (dir > 0 ? b[i].l > b[i - 2].h : b[i].h < b[i - 2].l);
+    if (!brk && !gap) continue;
+    seen.add(k);
+    const lo = b[k].l, hi = b[k].h, mid = (lo + hi) / 2; let taps = 0, inside = false, swept = false, broke = -1, reclaimed = -1, deep = 0;
+    for (let j = i + 1; j < n; j++){
+      if (broke < 0){
+        if (dir > 0 ? b[j].c < lo : b[j].c > hi){ broke = j; inside = false; continue; }
+        const touch = dir > 0 ? b[j].l <= hi : b[j].h >= lo;
+        if (touch){ if (!inside){ taps++; inside = true; } deep = Math.max(deep, dir > 0 ? (hi - b[j].l) / (hi - lo) : (b[j].h - lo) / (hi - lo)); if (dir > 0 ? (b[j].l < lo && b[j].c >= lo) : (b[j].h > hi && b[j].c <= hi)) swept = true; } else inside = false;
+      } else if ((dir > 0 ? b[j].c > hi : b[j].c < lo) && j - broke <= 8) reclaimed = j;
+    }
+    const kinds = ['Normal']; const pivK = pv3.some(p => p.i === k && p.t === (dir > 0 ? 'L' : 'H'));
+    if (pivK) kinds.push('Pivot');
+    if (lo <= rng.eq + (rng.hi - rng.lo) * 0.05 && hi >= rng.eq - (rng.hi - rng.lo) * 0.05) kinds.push('Equilibrium');
+    { let h2 = -Infinity, l2 = Infinity; for (let j = Math.max(0, k - 20); j < k; j++){ h2 = Math.max(h2, b[j].h); l2 = Math.min(l2, b[j].l); } if (k >= 8 && (h2 - l2) / e.a < 4.5) kinds.push('Range'); }
+    if ((dir > 0 ? E[k].lw : E[k].uw) / E[k].rng >= 0.35) kinds.push('Rejection');
+    let status = 'fresh', effDir = dir;
+    if (broke >= 0){ if (reclaimed >= 0){ status = 'reclaimed'; kinds.push('Reclaim'); } else { status = 'breaker'; effDir = -dir; kinds.push('Breaker'); } }
+    else if (taps > 0){ status = 'tapped'; if (deep >= 0.5) kinds.push('Mitigation'); }
+    if (swept && broke < 0) kinds.push('Trap on OB');
+    out.push({kind: 'OB', dir: effDir, origDir: dir, i: k, di: i, lo, hi, mid, kinds, status, taps, deep, age: n - 1 - k, rv: e.rv, tf, swept});
+  }
+  const fine = out.filter(o => o.age <= 220);
+  const uniq = []; for (const o of fine.slice().reverse()){ if (!uniq.some(u => u.dir === o.dir && Math.min(u.hi, o.hi) - Math.max(u.lo, o.lo) > 0.5 * Math.min(u.hi - u.lo, o.hi - o.lo))) uniq.push(o); }
+  return uniq;
+}
+/* ---------- fair value gaps (all flavours) ---------- */
+function fvgs(b, E, st, rng, tf){
+  const n = b.length, out = [];
+  for (let i = 2; i < n; i++){
+    let dir = 0, lo, hi;
+    if (b[i].l > b[i - 2].h){ dir = 1; lo = b[i - 2].h; hi = b[i].l; } else if (b[i].h < b[i - 2].l){ dir = -1; hi = b[i - 2].l; lo = b[i].h; }
+    if (!dir) continue;
+    const a = E[i - 1].a, size = (hi - lo) / a; if (size < 0.12) continue;
+    let fill = 0, trap = false;
+    for (let j = i + 1; j < n; j++){
+      const pen = dir > 0 ? (hi - b[j].l) / (hi - lo) : (b[j].h - lo) / (hi - lo); fill = Math.max(fill, clamp(pen, 0, 1));
+      if (dir > 0 ? (b[j].l < lo && b[j].c >= lo) : (b[j].h > hi && b[j].c <= hi)) trap = true;
+    }
+    if (fill >= 1 || n - 1 - i > 160) continue;
+    const m = E[i - 1], mid = (lo + hi) / 2, kinds = [dir > 0 ? 'Bullish' : 'Bearish'];
+    if (m.bs >= 1.2 && st.ev.some(v => v.dir === dir && v.i >= i - 2 && v.i <= i + 3)) kinds.push('Primary');
+    const depth = rng.hi > rng.lo ? (dir > 0 ? (rng.hi - mid) / (rng.hi - rng.lo) : (mid - rng.lo) / (rng.hi - rng.lo)) : 0.5;
+    if (depth >= 0.62 && depth <= 0.79) kinds.push('Golden');
+    if (depth > 0.5 && size >= 0.3 && fill < 0.1) kinds.push('Perfection/Discount');
+    kinds.push(m.sz === 'small' ? 'Small-candle' : m.sz === 'medium' ? 'Medium-candle' : 'Big-candle');
+    if (trap) kinds.push('Trap/Manipulation');
+    out.push({kind: 'FVG', dir, i: i - 1, lo, hi, mid, size, fill, kinds, age: n - 1 - i, cs: m.sz, tf, trap});
+  }
+  return out;
+}
+function overlap(a, b){ return Math.min(a.hi, b.hi) - Math.max(a.lo, b.lo); }
+function imbalances(b, E){
+  const n = b.length, out = [];
+  for (let i = 2; i < n; i++){
+    const up = b[i].c >= b[i].o; if (!(E[i].bs >= 1.2 && E[i - 1].bs >= 0.8 && E[i - 1].up === up)) continue;
+    let s = i - 1; while (s > 0 && E[s - 1].up === up && E[s - 1].bs >= 0.6 && i - s < 6) s--;
+    const start = b[s].o, end = b[i].c, move = Math.abs(end - start) / E[i].a; if (move < 2.5) continue;
+    const lo = Math.min(start, end), hi = Math.max(start, end); let pen = 0;
+    for (let j = i + 1; j < n; j++) pen = Math.max(pen, up ? (end - b[j].l) / (end - start) : (b[j].h - end) / (start - end));
+    if (pen < 0.5 && n - 1 - i < 150) out.push({dir: up ? 1 : -1, lo, hi, i, age: n - 1 - i, move, pen: clamp(pen, 0, 1)});
+  }
+  const u = []; for (const x of out.reverse()) if (!u.some(y => y.dir === x.dir && overlap(x, y) > 0)) u.push(x);
+  return u.slice(0, 4);
+}
+function bprs(b, E, gaps){
+  const n = b.length, out = [], act = gaps.filter(g => g.age <= 100);
+  for (const x of act) for (const y of act){
+    if (x.dir !== 1 || y.dir !== -1) continue;
+    const lo = Math.max(x.lo, y.lo), hi = Math.min(x.hi, y.hi), a = E[n - 1].a; if (hi - lo < 0.1 * a) continue;
+    const later = x.i > y.i ? x : y, dir = later.dir, t0 = Math.max(x.i, y.i); let bad = false;
+    for (let j = t0 + 2; j < n; j++) if (dir > 0 ? b[j].c < lo : b[j].c > hi) bad = true;
+    if (bad) continue;
+    const sz = (hi - lo) / a, strong = sz >= 0.5 && x.cs !== 'small' && y.cs !== 'small' && x.fill < 0.6 && y.fill < 0.6 && n - 1 - t0 <= 60;
+    out.push({kind: 'BPR', dir, lo, hi, mid: (lo + hi) / 2, size: sz, grade: strong ? 'Strong' : sz >= 0.25 ? 'Good' : 'Weak', age: n - 1 - t0});
+  }
+  return out.sort((p, q) => p.age - q.age).slice(0, 4);
+}
+return {TFMS, TFN, TFW, ZW, clamp, avg, fmtP, atrArr, prep, pivots, structure, dealingRange, mktState, candlePsy, orderBlocks, fvgs, imbalances, bprs, overlap};
+})();
+
+/* ===== SMC / ICT engine, part 2: liquidity, pullbacks, inducements, operators, footprints, volume, breakouts ===== */
+const ICT2 = (function(I){
+'use strict';
+const {TFMS, clamp, avg, overlap} = I;
+function rsiArr(b, n){
+  const out = new Array(b.length).fill(50); let g = 0, l = 0;
+  for (let i = 1; i < b.length; i++){
+    const d = b[i].c - b[i - 1].c, up = Math.max(d, 0), dn = Math.max(-d, 0);
+    if (i <= n){ g += up; l += dn; if (i === n){ g /= n; l /= n; out[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l); } }
+    else { g = (g * (n - 1) + up) / n; l = (l * (n - 1) + dn) / n; out[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l); }
+  }
+  return out;
+}
+/* ---------- liquidity: every type asked for ---------- */
+function liquidity(b, E, pv3, rng, tf, gaps, obs){
+  const n = b.length, px = b[n - 1].c, a = E[n - 1].a, o = {};
+  const intact = pv3.filter(p => p.i >= n - 160).map(p => { let sw = false; for (let j = p.c; j < n; j++) if (p.t === 'H' ? b[j].h > p.p : b[j].l < p.p){ sw = true; break; } return {...p, swept: sw, age: n - 1 - p.i}; });
+  o.bsl = intact.filter(p => p.t === 'H' && !p.swept && p.p > px).sort((x, y) => x.p - y.p).slice(0, 5).map(p => ({p: p.p, age: p.age, kind: 'Swing high (buy-side)'}));
+  o.ssl = intact.filter(p => p.t === 'L' && !p.swept && p.p < px).sort((x, y) => y.p - x.p).slice(0, 5).map(p => ({p: p.p, age: p.age, kind: 'Swing low (sell-side)'}));
+  const cluster = (arr, tol) => { const res = []; const s = arr.slice().sort((x, y) => x.p - y.p); let cur = []; for (const p of s){ if (cur.length && p.p - cur[cur.length - 1].p > tol){ if (cur.length >= 2) res.push(cur); cur = []; } cur.push(p); } if (cur.length >= 2) res.push(cur); return res; };
+  o.eqh = cluster(intact.filter(p => p.t === 'H' && !p.swept), 0.15 * a).map(c => ({p: Math.max(...c.map(x => x.p)), n: c.length, age: Math.min(...c.map(x => x.age)), above: Math.max(...c.map(x => x.p)) > px})).slice(0, 4);
+  o.eql = cluster(intact.filter(p => p.t === 'L' && !p.swept), 0.15 * a).map(c => ({p: Math.min(...c.map(x => x.p)), n: c.length, age: Math.min(...c.map(x => x.age)), below: Math.min(...c.map(x => x.p)) < px})).slice(0, 4);
+  o.trend = [];
+  const tl = (type) => {
+    const ps = pv3.filter(p => p.t === type && p.i >= n - 130).slice(-4); if (ps.length < 2) return;
+    const p1 = ps[ps.length - 2], p2 = ps[ps.length - 1]; if (p2.i === p1.i) return;
+    const slope = (p2.p - p1.p) / (p2.i - p1.i); if (type === 'L' ? slope <= 0 : slope >= 0) return;
+    const proj = p2.p + slope * (n - 1 - p2.i); let touches = 2; for (const q of ps.slice(0, -2)){ const lv = p2.p + slope * (q.i - p2.i); if (Math.abs(q.p - lv) <= 0.25 * a) touches++; }
+    let broken = false; for (let j = p2.i + 1; j < n; j++){ const lv = p2.p + slope * (j - p2.i); if (type === 'L' ? b[j].c < lv - 0.2 * a : b[j].c > lv + 0.2 * a) broken = true; }
+    if (broken) return;
+    let curved = false; if (ps.length >= 3){ const p0 = ps[ps.length - 3], s1 = (p1.p - p0.p) / Math.max(1, p1.i - p0.i); curved = Math.abs(slope) > 1.3 * Math.abs(s1) && Math.sign(s1) === Math.sign(slope); }
+    o.trend.push({type: type === 'L' ? 'SSL' : 'BSL', p: proj, touches, curved, kind: (curved ? 'Curve line' : 'Trendline') + ' liquidity'});
+  };
+  tl('L'); tl('H');
+  const ins = gaps.concat(obs).filter(x => x.lo > rng.lo && x.hi < rng.hi && x.age < 150);
+  o.erl = {hi: rng.hi, lo: rng.lo}; o.irl = {n: ins.length, nearest: ins.slice().sort((x, y) => Math.abs((x.lo + x.hi) / 2 - px) - Math.abs((y.lo + y.hi) / 2 - px))[0] || null};
+  const all = pv3.filter(p => p.i >= n - 140), hz = []; for (const p of all){ const grp = all.filter(q => Math.abs(q.p - p.p) <= 0.6 * a); if (grp.length >= 3 && !hz.some(z => Math.abs(z.p - p.p) <= 0.6 * a)) hz.push({p: p.p, lo: Math.min(...grp.map(x => x.p)), hi: Math.max(...grp.map(x => x.p)), n: grp.length}); }
+  o.hlz = hz.sort((x, y) => Math.abs(x.p - px) - Math.abs(y.p - px)).slice(0, 3);
+  { const w = Math.min(100, n), lo = rng.lo, hi = rng.hi, K = 20, bins = new Array(K).fill(0); for (let i = n - w; i < n; i++){ const t = (b[i].h + b[i].l + b[i].c) / 3; bins[clamp(Math.floor((t - lo) / Math.max(1e-12, hi - lo) * K), 0, K - 1)] += b[i].v; }
+    const m = avg(bins), step = (hi - lo) / K; o.llz = bins.map((v, k) => ({k, v, lo: lo + k * step, hi: lo + (k + 1) * step})).filter(x => x.v < 0.35 * m && x.hi > rng.lo).sort((x, y) => Math.abs((x.lo + x.hi) / 2 - px) - Math.abs((y.lo + y.hi) / 2 - px)).slice(0, 3).map(x => ({lo: x.lo, hi: x.hi})); }
+  const rej = []; for (let i = Math.max(0, n - 110); i < n - 1; i++){ const e = E[i]; if (e.rs < 0.8) continue; if (e.uw / e.rng >= 0.6) rej.push({p: b[i].h, t: 'H', i}); if (e.lw / e.rng >= 0.6) rej.push({p: b[i].l, t: 'L', i}); }
+  const live = rej.filter(r => { for (let j = r.i + 1; j < n; j++) if (r.t === 'H' ? b[j].c > r.p : b[j].c < r.p) return false; return true; });
+  o.multiRej = []; o.singleRej = [];
+  for (const r of live){ const g = live.filter(q => q.t === r.t && Math.abs(q.p - r.p) <= 0.2 * a); const dup = (g.length >= 2 ? o.multiRej : o.singleRej).some(z => z.t === r.t && Math.abs(z.p - r.p) <= 0.2 * a); if (!dup) (g.length >= 2 ? o.multiRej : o.singleRej).push({p: r.p, t: r.t, n: g.length, side: r.t === 'H' ? 'BSL' : 'SSL'}); }
+  o.singleRej = o.singleRej.sort((x, y) => Math.abs(x.p - px) - Math.abs(y.p - px)).slice(0, 3); o.multiRej = o.multiRej.sort((x, y) => Math.abs(x.p - px) - Math.abs(y.p - px)).slice(0, 3);
+  const cl = pv3.filter(p => p.i >= n - 150), sr = []; for (const p of cl){ const g = cl.filter(q => Math.abs(q.p - p.p) <= 0.25 * a); if (g.length >= 3 && !sr.some(s => Math.abs(s.p - p.p) <= 0.25 * a)){ const lv = avg(g.map(x => x.p)); sr.push({p: lv, n: g.length, side: lv > px ? 'Resistance (BSL)' : 'Support (SSL)'}); } }
+  o.sr = sr.sort((x, y) => Math.abs(x.p - px) - Math.abs(y.p - px)).slice(0, 4);
+  return o;
+}
+function sweeps(b, E, pv3){
+  const n = b.length, out = [];
+  for (let j = Math.max(6, n - 25); j < n; j++){
+    const x = b[j], e = E[j], lv = pv3.filter(p => p.c <= j - 1 && j - p.c < 120);
+    for (const p of lv){
+      if (p.t === 'L' && x.l < p.p - 0.05 * e.a && x.c > p.p){
+        let follow = false; for (let k = j + 1; k <= Math.min(n - 1, j + 3); k++) if (b[k].c > b[j].h) follow = true;
+        out.push({j, side: 'SSL', dir: 1, level: p.p, follow, age: n - 1 - j, wick: e.lw / e.rng}); break;
+      }
+      if (p.t === 'H' && x.h > p.p + 0.05 * e.a && x.c < p.p){
+        let follow = false; for (let k = j + 1; k <= Math.min(n - 1, j + 3); k++) if (b[k].c < b[j].l) follow = true;
+        out.push({j, side: 'BSL', dir: -1, level: p.p, follow, age: n - 1 - j, wick: e.uw / e.rng}); break;
+      }
+    }
+  }
+  const dbl = []; for (const s of out) for (const t of out) if (s.j < t.j && s.side === t.side && Math.abs(s.level - t.level) <= 0.3 * E[n - 1].a && t.j - s.j <= 30) dbl.push({side: t.side, dir: t.dir, level: t.level, age: t.age});
+  return {list: out.slice(-6), dbl: dbl.slice(-2)};
+}
+function retestReclaim(b, E, st){
+  const n = b.length, out = {retest: null, reclaim: null}, a = E[n - 1].a, ev = st.ev[st.ev.length - 1];
+  if (ev && n - 1 - ev.i <= 40){
+    for (let j = ev.i + 1; j < n; j++){ const touch = ev.dir > 0 ? b[j].l <= ev.lvl + 0.3 * a : b[j].h >= ev.lvl - 0.3 * a; if (touch){ const held = ev.dir > 0 ? b[j].c >= ev.lvl - 0.1 * a : b[j].c <= ev.lvl + 0.1 * a; out.retest = {lvl: ev.lvl, dir: ev.dir, held, age: n - 1 - j, kind: ev.kind}; break; } }
+  }
+  return out;
+}
+function timeLevels(b1h, b1d, px){
+  const out = [], U = t => new Date(t), day = t => Math.floor(t / 864e5), now = b1h && b1h.length ? b1h[b1h.length - 1].t : Date.now();
+  if (b1h && b1h.length > 30){
+    const today = day(now), pd = b1h.filter(x => day(x.t) === today - 1);
+    if (pd.length >= 12){ const h = Math.max(...pd.map(x => x.h)), l = Math.min(...pd.map(x => x.l)); out.push({name: 'Previous day high', p: h, side: 'BSL'}, {name: 'Previous day low', p: l, side: 'SSL'}); }
+    const ses = (nm, a0, a1, d) => { const s = b1h.filter(x => day(x.t) === d && U(x.t).getUTCHours() >= a0 && U(x.t).getUTCHours() < a1); if (s.length >= Math.max(2, (a1 - a0) / 2)){ out.push({name: nm + ' high', p: Math.max(...s.map(x => x.h)), side: 'BSL'}, {name: nm + ' low', p: Math.min(...s.map(x => x.l)), side: 'SSL'}); } };
+    const hr = U(now).getUTCHours();
+    ses('Asia session', 0, 8, hr >= 8 ? today : today - 1); ses('London session', 7, 13, hr >= 13 ? today : today - 1); ses('New York session', 13, 21, hr >= 21 ? today : today - 1);
+    const dopen = b1h.find(x => day(x.t) === today); if (dopen) out.push({name: 'Daily open', p: dopen.o, side: dopen.o > px ? 'BSL' : 'SSL'});
+  }
+  if (b1d && b1d.length > 10){
+    const wk = t => Math.floor((t / 864e5 + 3) / 7), cw = wk(b1d[b1d.length - 1].t), pw = b1d.filter(x => wk(x.t) === cw - 1);
+    if (pw.length >= 4) out.push({name: 'Previous week high', p: Math.max(...pw.map(x => x.h)), side: 'BSL'}, {name: 'Previous week low', p: Math.min(...pw.map(x => x.l)), side: 'SSL'});
+  }
+  return out.map(x => ({...x, swept: x.side === 'BSL' ? px > x.p : px < x.p})).filter(x => isFinite(x.p));
+}
+function flagPattern(b, E){
+  const n = b.length;
+  for (let m = 4; m <= 20; m++){
+    const e = n - 1 - m; if (e < 12) break;
+    for (let w = 3; w <= 8; w++){
+      const s = e - w; if (s < 1) continue; const mv = b[e].c - b[s].o, a = E[e].a; if (Math.abs(mv) < 3 * a) continue;
+      const dir = mv > 0 ? 1 : -1; let hi = -Infinity, lo = Infinity; for (let j = e + 1; j < n; j++){ hi = Math.max(hi, b[j].h); lo = Math.min(lo, b[j].l); }
+      if ((hi - lo) > 0.5 * Math.abs(mv)) continue;
+      const slope = (b[n - 1].c - b[e + 1].c) / Math.max(1, n - 2 - e); if (dir > 0 ? slope > 0.1 * a : slope < -0.1 * a) continue;
+      const first = avg(E.slice(e + 1, e + 1 + Math.ceil(m / 2)).map(x => x.rs)), second = avg(E.slice(e + 1 + Math.ceil(m / 2)).map(x => x.rs));
+      if (second > first * 1.15) continue;
+      let trapped = false; for (let j = e + 2; j < n; j++){ if (dir > 0 ? b[j].c < lo + 0 && b[j].l < lo : b[j].c > hi && b[j].h > hi) trapped = true; }
+      let fake = false; for (let j = e + 2; j < n - 1; j++){ if (dir > 0 ? (b[j].l < lo - 0.1 * a && b[j].c > lo) : (b[j].h > hi + 0.1 * a && b[j].c < hi)) fake = true; }
+      return {dir, hi, lo, bars: m, impulse: Math.abs(mv) / a, fake, liqAbove: hi, liqBelow: lo, entry: dir > 0 ? 'Buy the break above the flag high and its retest, or the sweep of the flag low and reclaim' : 'Sell the break below the flag low and its retest, or the sweep of the flag high and reclaim'};
+    }
+  }
+  return null;
+}
+/* ---------- pullbacks: types, probability and probable time ---------- */
+function pullbackStats(b, E, pv3, tf){
+  const ratios = [], dur = [], ps = pv3.slice(-40);
+  for (let k = 0; k + 2 < ps.length; k++){
+    const p0 = ps[k], p1 = ps[k + 1], p2 = ps[k + 2]; if (p0.t === p1.t || p1.t === p2.t) continue;
+    const leg = Math.abs(p1.p - p0.p); if (leg < 1.5 * E[Math.min(E.length - 1, p1.i)].a) continue;
+    ratios.push(Math.abs(p1.p - p2.p) / leg); dur.push(p2.i - p1.i);
+  }
+  const pr = x => ratios.length ? ratios.filter(r => r >= x).length / ratios.length : null, sd = dur.slice().sort((x, y) => x - y), q = f => sd.length ? sd[Math.min(sd.length - 1, Math.floor(f * sd.length))] : null;
+  return {n: ratios.length, p382: pr(0.382), p50: pr(0.5), p618: pr(0.618), med: q(0.5), q1: q(0.25), q3: q(0.75), medRatio: ratios.length ? ratios.slice().sort((x, y) => x - y)[Math.floor(ratios.length / 2)] : null};
+}
+function pullback(b, E, st, pv2, pv3, rng, tf, dirHint){
+  const n = b.length, a = E[n - 1].a, px = b[n - 1].c, le = st.ev[st.ev.length - 1];
+  const dir = dirHint || (le && n - 1 - le.i <= 60 ? le.dir : st.trend) || 0; if (!dir) return {dir: 0, none: true};
+  const W = Math.min(60, n - 2); let iH = n - W, ext = dir > 0 ? -Infinity : Infinity;
+  for (let i = n - W; i < n; i++){ if (dir > 0 ? b[i].h > ext : b[i].l < ext){ ext = dir > 0 ? b[i].h : b[i].l; iH = i; } }
+  let iL = Math.max(0, iH - 60), org = dir > 0 ? Infinity : -Infinity; for (let i = Math.max(0, iH - 60); i < iH; i++){ if (dir > 0 ? b[i].l < org : b[i].h > org){ org = dir > 0 ? b[i].l : b[i].h; iL = i; } }
+  const leg = Math.abs(ext - org); if (!(leg > 1.5 * a)) return {dir, none: true, why: 'No clear impulse leg to measure a pullback from'};
+  const depth = dir > 0 ? (ext - px) / leg : (px - ext) / leg, bars = n - 1 - iH;
+  const impRv = avg(E.slice(iL, iH + 1).map(x => x.rv)), pbE = E.slice(iH + 1), pbRv = pbE.length ? avg(pbE.map(x => x.rv)) : 0, pbRs = pbE.length ? avg(pbE.map(x => x.rs)) : 0;
+  const types = [];
+  if (bars < 1 || depth < 0.05) types.push('Still impulsive, no pullback yet');
+  else {
+    const valid = depth >= 0.236 && depth <= 0.786 && pbRv <= impRv * 1.05;
+    if (depth > 1 || (depth > 0.5 && pbRv > impRv * 1.3)) types.push('Invalid pullback'); else if (valid) types.push('Valid pullback'); else if (depth > 0.786) types.push('Deep pullback (risky)'); else types.push('Shallow pullback');
+    if (depth >= 0.62 && depth <= 1) types.push('Deep pullback');
+    if (depth < 0.382 && bars <= 4 && pbE.some(x => x.rs >= 0.9)) types.push('Aggressive PB');
+    if (bars >= 8 && pbRs < 0.8 && pbRv < 1) types.push('Slow & gradual PB');
+    const minors = pv2.filter(p => p.i > iH && p.t === (dir > 0 ? 'L' : 'H'));
+    if (minors.length) types.push('Inducement PB');
+    const pre = pv2.filter(p => p.i < iH && p.i > iH - 15 && p.t === (dir > 0 ? 'L' : 'H')).slice(-1)[0];
+    if (pre){ for (let j = iH + 1; j < n; j++) if (dir > 0 ? (b[j].l < pre.p && b[j].c > pre.p) : (b[j].h > pre.p && b[j].c < pre.p)){ types.push('Sweep PB'); if (minors.length) types.push('Trap inducement PB'); break; } }
+  }
+  const stats = pullbackStats(b, E, pv3, tf), lv = f => dir > 0 ? ext - leg * f : ext + leg * f;
+  const nowD = new Date(), hrs = nowD.getUTCHours() + nowD.getUTCMinutes() / 60, toOpen = h => ((h - hrs) + 24) % 24;
+  const nxt = toOpen(7) < toOpen(13.5) ? {name: 'London', h: toOpen(7)} : {name: 'New York', h: toOpen(13.5)};
+  const msBar = TFMS[tf] || 36e5, medH = stats.med ? stats.med * msBar / 36e5 : null, q1H = stats.q1 ? stats.q1 * msBar / 36e5 : null, q3H = stats.q3 ? stats.q3 * msBar / 36e5 : null;
+  const remain = stats.med ? Math.max(1, stats.med - bars) : null;
+  const fh = h => h == null ? '-' : h < 1 ? Math.round(h * 60) + ' min' : h < 48 ? (Math.round(h * 10) / 10) + ' h' : Math.round(h / 24 * 10) / 10 + ' d';
+  return {dir, ext, org, leg, depth, bars, impRv, pbRv, types, stats, levels: {l382: lv(0.382), l50: lv(0.5), l618: lv(0.618), l786: lv(0.786)},
+    eta: stats.med ? 'Typical pullback on this timeframe lasts about ' + fh(medH) + ' (usually ' + fh(q1H) + ' to ' + fh(q3H) + ')' + (bars >= 1 ? '; this one is ' + fh(bars * msBar / 36e5) + ' old' + (remain ? ', so roughly ' + fh(remain * msBar / 36e5) + ' may be left' : '') : '') : 'Not enough past pullbacks to time it',
+    chance: stats.n >= 4 ? 'In the last ' + stats.n + ' swings this coin pulled back at least 38% ' + Math.round(stats.p382 * 100) + '% of the time, 50% ' + Math.round(stats.p50 * 100) + '%, 62% ' + Math.round(stats.p618 * 100) + '%' : 'Not enough swings to measure the pullback chance',
+    session: {next: nxt.name, inH: nxt.h, pre: nxt.h <= 2, text: (nxt.h <= 2 ? 'Pre-market pullback window: ' : 'Future market pullback window: ') + nxt.name + ' open in ' + fh(nxt.h)}};
+}
+/* ---------- inducements ---------- */
+function inducements(b, E, st, pv2, pv3, rng, tf, gaps, obs, dir){
+  const n = b.length, px = b[n - 1].c, a = E[n - 1].a, major = tf === '4h' || tf === '12h' || tf === '1d', res = [];
+  const poi = gaps.concat(obs).filter(z => z.dir === dir && z.age < 120).sort((x, y) => Math.abs((x.lo + x.hi) / 2 - px) - Math.abs((y.lo + y.hi) / 2 - px))[0];
+  const le = st.ev[st.ev.length - 1], t = dir > 0 ? 'L' : 'H';
+  const minors = pv2.filter(p => p.t === t && p.i >= n - 40).map(p => { let sw = -1; for (let j = p.c; j < n; j++) if (dir > 0 ? (b[j].l < p.p) : (b[j].h > p.p)){ sw = j; break; } return {...p, sw}; });
+  const mk = (p, kind) => res.push({kind: (major ? 'Major ' : 'Minor ') + kind, p: p.p, age: n - 1 - p.i, swept: p.sw >= 0, dir});
+  for (const p of minors){
+    if (p.sw < 0){
+      if (poi){ const between = dir > 0 ? (p.p < px && p.p > poi.hi) : (p.p > px && p.p < poi.lo), inside = p.p >= poi.lo && p.p <= poi.hi; if (between) mk(p, 'inducement'); if (inside) mk(p, 'hidden inducement'); }
+      if (le && p.i > le.i) mk(p, 'pullback inducement');
+    }
+  }
+  const eqs = []; for (let x = 0; x < minors.length; x++) for (let y = x + 1; y < minors.length; y++) if (Math.abs(minors[x].p - minors[y].p) <= 0.15 * a && minors[x].sw < 0 && minors[y].sw < 0) eqs.push(minors[y]);
+  if (eqs[0]) mk(eqs[0], 'technical inducement (equal ' + (dir > 0 ? 'lows' : 'highs') + ')');
+  const swept = minors.filter(p => p.sw >= 0 && p.sw >= n - 30);
+  if (swept.length >= 2) res.push({kind: 'Double pullback inducement', p: swept[swept.length - 1].p, age: n - 1 - swept[swept.length - 1].sw, swept: true, dir});
+  for (const p of swept){ const sh = st.ev.find(v => v.dir === dir && v.i > p.sw && v.i <= p.sw + 6); if (sh){ res.push({kind: 'Inducement shift (swept then ' + sh.kind + ')', p: p.p, age: n - 1 - sh.i, swept: true, dir}); break; } }
+  return res.slice(0, 6);
+}
+/* ---------- smart money divergence ---------- */
+function divergence(b, E, pv3){
+  const n = b.length, r = rsiArr(b, 14), cvd = []; let c = 0; for (let i = 0; i < n; i++){ c += ((b[i].c - b[i].o) / Math.max(1e-12, b[i].h - b[i].l)) * b[i].v; cvd.push(c); }
+  const out = [];
+  for (const [nm, ser] of [['RSI', r], ['Volume delta', cvd]]){
+    for (const t of ['L', 'H']){
+      const ps = pv3.filter(p => p.t === t && p.i >= n - 90).slice(-2); if (ps.length < 2) continue; const [p1, p2] = ps, s1 = ser[p1.i], s2 = ser[p2.i];
+      if (t === 'L'){ if (p2.p < p1.p && s2 > s1) out.push({kind: 'Regular bullish', src: nm, dir: 1, age: n - 1 - p2.i}); else if (p2.p > p1.p && s2 < s1) out.push({kind: 'Hidden bullish', src: nm, dir: 1, age: n - 1 - p2.i}); }
+      else { if (p2.p > p1.p && s2 < s1) out.push({kind: 'Regular bearish', src: nm, dir: -1, age: n - 1 - p2.i}); else if (p2.p < p1.p && s2 > s1) out.push({kind: 'Hidden bearish', src: nm, dir: -1, age: n - 1 - p2.i}); }
+    }
+  }
+  return {list: out, rsi: r[n - 1]};
+}
+/* ---------- institutional footprints + traps ---------- */
+function footprints(b, E, pv3, rng, flag){
+  const n = b.length, out = {mrt: [], rrp: [], momAcc: [], momTrap: [], trapFlag: []}, a = E[n - 1].a;
+  for (let j = Math.max(6, n - 18); j < n - 1; j++){
+    const e = E[j]; if (!(e.bs >= 1.2 && e.rv >= 1.1)) continue;
+    const dir = e.up ? 1 : -1, ps = pv3.filter(p => p.c <= j - 1 && j - p.c < 80 && p.t === (dir > 0 ? 'H' : 'L')).slice(-1)[0]; if (!ps) continue;
+    if (!(dir > 0 ? b[j].c > ps.p : b[j].c < ps.p)) continue;
+    for (let k = j + 1; k <= Math.min(n - 1, j + 4); k++) if (dir > 0 ? b[k].c < ps.p : b[k].c > ps.p){ out.mrt.push({dir: -dir, lvl: ps.p, age: n - 1 - k, note: (dir > 0 ? 'Bullish' : 'Bearish') + ' momentum break failed within ' + (k - j) + ' bars'}); break; }
+  }
+  { const w0 = Math.max(0, n - 55), w1 = Math.max(w0 + 10, n - 10); let hi = -Infinity, lo = Infinity; for (let i = w0; i < w1; i++){ hi = Math.max(hi, b[i].h); lo = Math.min(lo, b[i].l); }
+    if ((hi - lo) / a < 14 && (hi - lo) / a > 2) for (let j = w1; j < n; j++){
+      if (b[j].l < lo && b[j].c > lo){ const prog = (Math.max(...b.slice(j).map(x => x.h)) - lo) / (hi - lo); out.rrp.push({dir: 1, from: 'range low', to: 'range high', progress: clamp(prog, 0, 1.2), done: prog >= 0.85, age: n - 1 - j, hi, lo}); break; }
+      if (b[j].h > hi && b[j].c < hi){ const prog = (hi - Math.min(...b.slice(j).map(x => x.l))) / (hi - lo); out.rrp.push({dir: -1, from: 'range high', to: 'range low', progress: clamp(prog, 0, 1.2), done: prog >= 0.85, age: n - 1 - j, hi, lo}); break; }
+    } }
+  { const w = 60, hi = Math.max(...b.slice(-w).map(x => x.h)), lo = Math.min(...b.slice(-w).map(x => x.l)); let top = 0, bot = 0;
+    for (let i = n - 12; i < n; i++){ const e = E[i], pos = (b[i].c - lo) / Math.max(1e-12, hi - lo); if (e.rs < 0.6 && e.rv >= 1.2){ if (pos > 0.8) top++; if (pos < 0.2) bot++; } }
+    if (top >= 3) out.momAcc.push({kind: 'Momentum accumulation at the top (distribution)', dir: -1, n: top}); if (bot >= 3) out.momAcc.push({kind: 'Momentum accumulation at the bottom (accumulation)', dir: 1, n: bot}); }
+  for (let i = Math.max(6, n - 15); i < n; i++){
+    let s = i - 1, cnt = 0; while (s >= Math.max(0, i - 6) && E[s].bs >= 0.8 && E[s].up === E[i - 1].up){ cnt++; s--; } if (cnt < 3) continue;
+    const run = Math.abs(b[i - 1].c - b[s + 1].o), rev = Math.abs(b[i].c - b[i - 1].c); if (E[i].up !== E[i - 1].up && run >= 2.5 * E[i].a && rev >= 0.6 * run) out.momTrap.push({dir: E[i].up ? 1 : -1, age: n - 1 - i, note: 'A ' + cnt + '-candle ' + (E[i - 1].up ? 'up' : 'down') + ' run was reversed by one candle'});
+  }
+  if (flag && flag.fake) out.trapFlag.push({dir: flag.dir, note: 'The ' + (flag.dir > 0 ? 'bull' : 'bear') + ' flag was faked through its far side, then price came back and continued: a trapping flag'});
+  return out;
+}
+/* ---------- volume and operators ---------- */
+const VOLTXT = {
+  'small|big': ['Small candle, big volume', 'Absorption: operators are loading orders without moving price. Strong sign at a key area, wait for the breakout candle.'],
+  'small|small': ['Small candle, small volume', 'Nobody is interested. Moves from here are easy to fake, do not trust a breakout on this.'],
+  'small|avg': ['Small candle, average volume', 'Quiet waiting. Price is coiling, no operator action yet.'],
+  'medium|big': ['Medium candle, big volume', 'Operators are active and pushing. Needs follow-through.'],
+  'medium|small': ['Medium candle, small volume', 'Weak push. Likely to fade.'],
+  'medium|avg': ['Medium candle, average volume', 'Normal movement.'],
+  'big|big': ['Big candle, big volume', 'Real institutional move. Respect the direction, buy or sell its pullback.'],
+  'big|small': ['Big candle, small volume', 'Fake move: wide candle without participation. Often retraced or a trap.'],
+  'big|avg': ['Big candle, average volume', 'Decent move but not clearly institutional. Wait for confirmation.']
+};
+function volumeRead(b, E){
+  const n = b.length, rows = [];
+  for (let i = Math.max(0, n - 3); i < n; i++){ const e = E[i], t = VOLTXT[e.sz + '|' + e.vc]; rows.push({i, size: e.sz, vol: e.vc, up: e.up, rv: e.rv, name: t[0], say: t[1]}); }
+  let real = null, fake = null;
+  for (let j = Math.max(0, n - 10); j < n - 1; j++){
+    const e = E[j]; if (e.rv < 1.5) continue; const dir = e.pos >= 0.5 ? 1 : -1; let cont = 0;
+    for (let k = j + 1; k <= Math.min(n - 1, j + 2); k++) if (dir > 0 ? b[k].c > b[j].c : b[k].c < b[j].c) cont++;
+    const churn = Math.abs(e.pos - 0.5) < 0.2 && e.rs > 1;
+    if (cont >= 1 && !churn && (dir > 0 ? e.pos >= 0.6 : e.pos <= 0.4)) real = {dir, age: n - 1 - j, rv: e.rv}; else fake = {dir, age: n - 1 - j, rv: e.rv, why: churn ? 'a lot of volume but price went nowhere' : 'price did not follow through'};
+  }
+  const lastBig = E[n - 1].sz === 'big' && E[n - 1].vc === 'small';
+  return {rows, real, fake, fakeNow: lastBig, verdict: real && (!fake || real.age < fake.age) ? 'Real volume: spike with follow-through' : fake && (!real || fake.age < real.age) ? 'Fake volume: ' + fake.why : lastBig ? 'Fake move: big candle on small volume' : 'No strong volume event in the last 10 candles'};
+}
+/* ---------- breakouts ---------- */
+function breakouts(b, E, st, rng, liq, tl){
+  const n = b.length, out = [], a = E[n - 1].a, lv = [];
+  if (st.lastH) lv.push({p: st.lastH.p, side: 'BSL', nm: 'last swing high'}); if (st.lastL) lv.push({p: st.lastL.p, side: 'SSL', nm: 'last swing low'});
+  lv.push({p: rng.hi, side: 'BSL', nm: 'range high'}, {p: rng.lo, side: 'SSL', nm: 'range low'});
+  liq.eqh.forEach(x => lv.push({p: x.p, side: 'BSL', nm: 'equal highs', liq: true})); liq.eql.forEach(x => lv.push({p: x.p, side: 'SSL', nm: 'equal lows', liq: true}));
+  (tl || []).forEach(x => lv.push({p: x.p, side: x.side, nm: x.name.toLowerCase(), liq: true}));
+  for (let j = Math.max(2, n - 8); j < n; j++){
+    for (const L of lv){
+      const up = L.side === 'BSL', e = E[j];
+      const broke = up ? (b[j].c > L.p && b[j - 1].c <= L.p) : (b[j].c < L.p && b[j - 1].c >= L.p), wick = up ? (b[j].h > L.p && b[j].c <= L.p) : (b[j].l < L.p && b[j].c >= L.p);
+      if (!broke && !wick) continue;
+      let held = true; for (let k = j + 1; k < n; k++) if (up ? b[k].c < L.p : b[k].c > L.p) held = false;
+      const dir = up ? 1 : -1, age = n - 1 - j, beyond = Math.abs(b[j].c - L.p) / e.a;
+      let kind, say;
+      if (wick){ kind = 'Fake breakout'; say = 'Wick beyond the ' + L.nm + ' but the candle closed back: a liquidity grab, not a breakout'; }
+      else if (!held || e.rv < 0.8){ kind = 'Fake breakout'; say = (!held ? 'Closed beyond the ' + L.nm + ' but price came back inside' : 'Broke the ' + L.nm + ' on low volume'); }
+      else if (L.liq && beyond >= 0.2){ kind = 'Liquidity breakout'; say = 'Broke ' + L.nm + ' (stops sitting there were taken) and held'; }
+      else if (e.rv >= 1.3 && e.bs >= 1.0){ kind = 'Volume & candle breakout'; say = 'Big candle with big volume closed beyond the ' + L.nm; }
+      else if (beyond >= 0.25){ kind = 'Valid breakout'; say = 'Closed ' + beyond.toFixed(1) + ' ATR beyond the ' + L.nm + ' and held'; } else continue;
+      out.push({kind, dir: kind === 'Fake breakout' ? -dir : dir, brokeDir: dir, p: L.p, age, say}); break;
+    }
+  }
+  return out.slice(-6);
+}
+function operatorPhase(b, E, st, ms, sw, psy){
+  const n = b.length, ev = st.ev[st.ev.length - 1];
+  const s = sw.list.filter(x => x.age <= 20).slice(-1)[0], disp = s ? psy.find(p => (p.kind === 'IFC' || p.kind === 'Burst') && p.dir === s.dir && p.i > s.j) : null;
+  const shift = s ? st.ev.find(v => v.dir === s.dir && v.i > s.j) : null;
+  let phase = 'No clear operator cycle', dir = 0, confirmed = false;
+  if (s && disp && shift){ phase = 'Distribution / expansion: operators swept ' + (s.side === 'SSL' ? 'sell-side' : 'buy-side') + ' liquidity, then moved price ' + (s.dir > 0 ? 'up' : 'down'); dir = s.dir; confirmed = disp.rv >= 1.3; }
+  else if (s && disp){ phase = 'Manipulation done, displacement started; waiting for structure to break'; dir = s.dir; }
+  else if (s){ phase = 'Manipulation: ' + (s.side === 'SSL' ? 'sell-side' : 'buy-side') + ' liquidity was swept, waiting for displacement'; dir = s.dir; }
+  else if (ms.state === 'Accumulation' || ms.state === 'Consolidation' || ms.state === 'Sideways'){ phase = 'Accumulation: operators are loading inside a range'; }
+  else if (ms.state === 'Distribution'){ phase = 'Distribution: operators are unloading inside a range'; dir = -1; }
+  return {phase, dir, confirmed, sweep: s || null, disp: !!disp, shift: shift ? shift.kind : null};
+}
+return {rsiArr, liquidity, sweeps, retestReclaim, timeLevels, flagPattern, pullback, pullbackStats, inducements, divergence, footprints, volumeRead, breakouts, operatorPhase, VOLTXT};
+})(ICT);
+
+/* ===== SMC / ICT engine, part 3: per-timeframe analysis and the cross-timeframe verdict ===== */
+const ICT3 = (function(I, X){
+'use strict';
+const {TFMS, TFN, TFW, ZW, clamp, avg, fmtP, overlap} = I;
+const TFS5 = ['15m', '1h', '4h', '12h', '1d'];
+function analyze(bars, tf, now){
+  now = now || Date.now();
+  let b = bars.filter(x => isFinite(x.c) && isFinite(x.h) && isFinite(x.l) && isFinite(x.o) && isFinite(x.v)).sort((x, y) => x.t - y.t), formingPx = null;
+  if (b.length && b[b.length - 1].t + (TFMS[tf] || 0) > now){ formingPx = b[b.length - 1].c; b = b.slice(0, -1); }
+  if (b.length < 60) return {tf, ok: false, n: b.length};
+  const E = I.prep(b), n = b.length, a = E[n - 1].a;
+  const st = I.structure(b, E, 3), pv3 = st.pv, pv2 = I.pivots(b, 2), rng = I.dealingRange(b), ms = I.mktState(b, E, st);
+  const psy = I.candlePsy(b, E, pv3), obs = I.orderBlocks(b, E, st, rng, pv3, tf), gaps = I.fvgs(b, E, st, rng, tf);
+  const liq = X.liquidity(b, E, pv3, rng, tf, gaps, obs);
+  const lv = [].concat(liq.eqh.map(x => x.p), liq.eql.map(x => x.p), liq.bsl.map(x => x.p), liq.ssl.map(x => x.p));
+  gaps.forEach(g => { if (obs.some(o => o.dir === g.dir && overlap(o, g) > 0)) g.kinds.push('FVG+OB'); if (lv.some(p => p >= g.lo - 0.25 * a && p <= g.hi + 0.25 * a)) g.kinds.push('FVG+Liquidity'); });
+  const voids = I.imbalances(b, E), bpr = I.bprs(b, E, gaps), sw = X.sweeps(b, E, pv3), rr = X.retestReclaim(b, E, st), flag = X.flagPattern(b, E);
+  const pb = X.pullback(b, E, st, pv2, pv3, rng, tf, 0), dv = X.divergence(b, E, pv3), fp = X.footprints(b, E, pv3, rng, flag), vol = X.volumeRead(b, E);
+  const idm = {long: X.inducements(b, E, st, pv2, pv3, rng, tf, gaps, obs, 1), short: X.inducements(b, E, st, pv2, pv3, rng, tf, gaps, obs, -1)};
+  const op = X.operatorPhase(b, E, st, ms, sw, psy), bo = X.breakouts(b, E, st, rng, liq, null);
+  const ev = st.ev.slice(-4).map(v => ({kind: v.kind, dir: v.dir, age: n - 1 - v.i, lvl: v.lvl, i: v.i}));
+  return {tf, ok: true, n, a, px: formingPx || b[n - 1].c, lastC: b[n - 1].c, t: b[n - 1].t, ms, rng, ev, lastH: st.lastH && st.lastH.p, lastL: st.lastL && st.lastL.p, psy, obs, gaps, voids, bpr, liq, sweeps: sw, rr, flag, pb, div: dv, fp, vol, idm, op, bo, E: E.slice(-3), swingLabels: st.labels.slice(-6).map(x => x.l)};
+}
+const STATEW = {Uptrend: 1, Downtrend: -1, Accumulation: 0.5, Distribution: -0.5, Sideways: 0, Consolidation: 0};
+function tfSign(A){
+  if (!A || !A.ok) return null; const ms = A.ms; let s = STATEW[ms.state];
+  if (ms.state === 'Reversal') s = ms.last ? ms.last.dir : 0; else if (ms.state === 'Manipulation') s = ms.spring ? 0.6 : ms.ut ? -0.6 : 0;
+  if (ms.last && ms.last.age <= 20) s += 0.3 * ms.last.dir;
+  return clamp(s, -1, 1);
+}
+const stName = A => !A || !A.ok ? 'no data' : A.ms.state === 'Manipulation' ? (A.ms.spring ? 'bullish manipulation (low swept)' : 'bearish manipulation (high swept)') : A.ms.state;
+const stWord = A => !A || !A.ok ? 'no data' : stName(A) + (A.ms.last ? ' (' + A.ms.last.kind + ' ' + (A.ms.last.dir > 0 ? 'up' : 'down') + ', ' + A.ms.last.age + ' bars ago)' : '');
+function combine(AT, ctx){
+  ctx = ctx || {}; const A1 = AT['1h'], A15 = AT['15m'], base = A1 && A1.ok ? A1 : A15 && A15.ok ? A15 : null; if (!base) return {ok: false, why: 'Not enough candle history'};
+  const px = ctx.price > 0 ? ctx.price : base.px, atr1 = (A1 && A1.ok ? A1.a : base.a);
+  let bw = 0, bs = 0; const biasBy = {};
+  for (const tf of TFS5){ const s = tfSign(AT[tf]); biasBy[tf] = s; if (s != null){ bw += TFW[tf]; bs += TFW[tf] * s; } }
+  const bias = bw ? bs / bw : 0, dir = bias >= 0.15 ? 1 : bias <= -0.15 ? -1 : 0;
+  /* refine order blocks: a lower timeframe OB sitting inside a higher timeframe OB of the same direction */
+  for (const lt of ['15m', '1h']) for (const ht of ['4h', '12h', '1d']){ const L = AT[lt], H = AT[ht]; if (!L || !L.ok || !H || !H.ok) continue; for (const o of L.obs) for (const h of H.obs) if (o.dir === h.dir && o.lo >= h.lo && o.hi <= h.hi && !o.kinds.includes('Refine')) o.kinds.push('Refine'); }
+  const sweepsAll = []; for (const tf of ['15m', '1h']){ const A = AT[tf]; if (A && A.ok) A.sweeps.list.forEach(s => sweepsAll.push({...s, tf})); }
+  const zones = [];
+  for (const tf of TFS5){
+    const A = AT[tf]; if (!A || !A.ok) continue;
+    const add = (z, type, extra) => {
+      if (z.dir !== dir) return; const mid = (z.lo + z.hi) / 2;
+      if (dir > 0 ? z.lo > px + 0.3 * atr1 : z.hi < px - 0.3 * atr1) return;
+      const dist = dir > 0 ? Math.max(0, px - z.hi) : Math.max(0, z.lo - px); if (dist / atr1 > 14) return;
+      let sc = ZW[tf]; const why = [];
+      const disc = dir > 0 ? mid < A.rng.eq : mid > A.rng.eq; if (disc){ sc += 0.7; why.push(dir > 0 ? 'in discount (cheap half of the range)' : 'in premium (expensive half of the range)'); }
+      for (const k of z.kinds || []){
+        const bonus = {Primary: 0.8, Golden: 0.8, Refine: 0.8, Equilibrium: 0.3, Rejection: 0.4, Reclaim: 0.5, Breaker: 0.3, Mitigation: 0.2, 'FVG+OB': 1, 'FVG+Liquidity': 0.6, 'Perfection/Discount': 0.5, Pivot: 0.3, Range: 0.2}[k]; if (bonus){ sc += bonus; why.push(k); }
+      }
+      if (z.status === 'fresh'){ sc += 1; why.push('fresh, never tapped'); } if (z.fill === 0 || (z.fill != null && z.fill < 0.1)){ sc += 0.3; }
+      if (z.grade){ sc += z.grade === 'Strong' ? 1.2 : z.grade === 'Good' ? 0.8 : 0.2; why.push(z.grade + ' BPR'); }
+      if (sweepsAll.some(s => s.dir === dir && s.age <= 30 && s.level >= z.lo - 2 * atr1 && s.level <= z.hi + 2 * atr1)){ sc += 0.8; why.push('liquidity was swept right here'); }
+      zones.push({tf, type, lo: z.lo, hi: z.hi, kinds: z.kinds || [], status: z.status, sc, why, dist, age: z.age, trap: (z.kinds || []).some(k => /Trap/.test(k))});
+    };
+    A.obs.forEach(o => add(o, 'OB')); A.gaps.forEach(g => add(g, 'FVG')); A.bpr.forEach(g => add(g, 'BPR'));
+  }
+  zones.sort((x, y) => y.sc - x.sc); const clusters = [];
+  for (const z of zones){ const c = clusters.find(c => overlap(c, z) > 0.3 * Math.min(c.hi - c.lo, z.hi - z.lo)); if (c){ c.lo = Math.min(c.lo, z.lo); c.hi = Math.max(c.hi, z.hi); c.comps.push(z); c.sc += z.sc * 0.8; } else clusters.push({lo: z.lo, hi: z.hi, comps: [z], sc: z.sc}); }
+  clusters.forEach(c => { c.dist = dir > 0 ? Math.max(0, px - c.hi) : Math.max(0, c.lo - px); c.rank = c.sc - 0.18 * (c.dist / atr1); });
+  clusters.sort((x, y) => y.rank - x.rank);
+  const key = clusters.slice(0, 3);
+  /* targets: untouched liquidity beyond the area */
+  const tgts = []; const pushT = (p, nm, tf) => { if (isFinite(p)) tgts.push({p, nm, tf}); };
+  for (const tf of TFS5){ const A = AT[tf]; if (!A || !A.ok) continue; const arr = dir > 0 ? A.liq.bsl : A.liq.ssl; arr.forEach(x => pushT(x.p, (dir > 0 ? 'buy-side' : 'sell-side') + ' liquidity (swing ' + (dir > 0 ? 'high' : 'low') + ')', tf)); (dir > 0 ? A.liq.eqh : A.liq.eql).forEach(x => pushT(x.p, 'equal ' + (dir > 0 ? 'highs' : 'lows'), tf)); }
+  (ctx.time || []).filter(x => x.side === (dir > 0 ? 'BSL' : 'SSL') && !x.swept).forEach(x => pushT(x.p, x.name, 'time'));
+  ['4h', '12h', '1d'].forEach(tf => { const A = AT[tf]; if (A && A.ok) pushT(dir > 0 ? A.rng.hi : A.rng.lo, tf + ' range ' + (dir > 0 ? 'high' : 'low') + ' (external liquidity)', tf); });
+  const top = key[0] || null; let entry = null;
+  if (top && dir){
+    const lowestSweep = sweepsAll.filter(s => s.dir === dir && s.age <= 25).map(s => s.level);
+    const edge = dir > 0 ? top.lo : top.hi, swp = lowestSweep.length ? (dir > 0 ? Math.min(...lowestSweep) : Math.max(...lowestSweep)) : null;
+    let sl = dir > 0 ? Math.min(edge, swp != null && swp > edge - 3 * atr1 ? swp : edge) - 0.3 * atr1 : Math.max(edge, swp != null && swp < edge + 3 * atr1 ? swp : edge) + 0.3 * atr1;
+    const ref = (top.lo + top.hi) / 2, risk = Math.abs(ref - sl);
+    const ok = tgts.filter(t => (dir > 0 ? t.p > top.hi + 0.5 * atr1 : t.p < top.lo - 0.5 * atr1)).sort((x, y) => dir > 0 ? x.p - y.p : y.p - x.p);
+    let t1 = ok.find(t => Math.abs(t.p - ref) / risk >= 1.2) || ok[0], t2 = ok.find(t => t1 && (dir > 0 ? t.p > t1.p + 0.5 * atr1 : t.p < t1.p - 0.5 * atr1));
+    const est = !t1; if (!t1) t1 = {p: ref + dir * 2 * risk, nm: 'estimated 2R (no clear liquidity target found)', tf: '-'}; if (!t2) t2 = {p: ref + dir * 3.5 * risk, nm: 'estimated 3.5R', tf: '-'};
+    entry = {lo: top.lo, hi: top.hi, ref, sl, tp1: t1.p, tp1n: t1.nm + (t1.tf !== '-' && t1.tf !== 'time' ? ' (' + TFN[t1.tf] + ')' : ''), tp2: t2.p, tp2n: t2.nm, rr: Math.abs(t1.p - ref) / Math.max(risk, 1e-12), rr2: Math.abs(t2.p - ref) / Math.max(risk, 1e-12), est};
+  }
+  /* confirmation on the lower timeframes */
+  const conf = {sweep: null, shift: null, disp: null, retest: null, reclaim: null, dbl: null};
+  for (const tf of ['15m', '1h']){
+    const A = AT[tf]; if (!A || !A.ok || !dir) continue;
+    const s = A.sweeps.list.filter(x => x.dir === dir && x.age <= 25).slice(-1)[0]; if (s && (!conf.sweep || s.age < conf.sweep.age)) conf.sweep = {...s, tf};
+    const ev = A.ev.filter(v => v.dir === dir && v.age <= 20).slice(-1)[0]; if (ev && (!conf.shift || ev.age < conf.shift.age)) conf.shift = {...ev, tf};
+    const d = A.psy.filter(p => (p.kind === 'IFC' || p.kind === 'Burst') && p.dir === dir && p.age <= 12 && p.rv >= 1.3).slice(-1)[0]; if (d && (!conf.disp || d.age < conf.disp.age)) conf.disp = {...d, tf};
+    if (A.rr.retest && A.rr.retest.dir === dir && A.rr.retest.held) conf.retest = {...A.rr.retest, tf};
+    if (A.sweeps.dbl.some(x => x.dir === dir)) conf.dbl = {tf};
+    const rc = A.obs.find(o => o.dir === dir && o.status === 'reclaimed' && o.age < 40); if (rc) conf.reclaim = {tf, lo: rc.lo, hi: rc.hi};
+  }
+  const shiftAfter = conf.sweep && conf.shift ? conf.shift.age <= conf.sweep.age : false;
+  const trapAgainst = []; for (const tf of ['15m', '1h']){ const A = AT[tf]; if (!A || !A.ok || !dir) continue;
+    A.psy.filter(p => (p.kind === 'Trap & Burst' || p.kind === 'OT') && p.dir === -dir && p.age <= 6).forEach(p => trapAgainst.push(TFN[tf] + ' ' + p.kind));
+    A.fp.mrt.filter(m => m.dir === -dir && m.age <= 6).forEach(() => trapAgainst.push(TFN[tf] + ' momentum reverse trap'));
+    A.obs.filter(o => o.dir === -dir && o.swept && o.age < 15).forEach(() => trapAgainst.push(TFN[tf] + ' trap on an order block')); }
+  const pbMain = A1 && A1.ok ? A1.pb : null, pb4 = AT['4h'] && AT['4h'].ok ? AT['4h'].pb : null;
+  const pbInvalid = [pbMain, pb4].some(p => p && p.types && p.types.includes('Invalid pullback'));
+  const vol1 = A1 && A1.ok ? A1.vol : null, vol15 = A15 && A15.ok ? A15.vol : null;
+  const volReal = [vol1, vol15].some(v => v && v.real && v.real.dir === dir && v.real.age <= 8), volFake = [vol1, vol15].some(v => v && (v.fakeNow || (v.fake && v.fake.dir === dir && v.fake.age <= 3 && !(v.real && v.real.age <= v.fake.age))));
+  /* stage */
+  const inZone = !!(top && px >= top.lo - 0.3 * atr1 && px <= top.hi + 0.3 * atr1), near = !!(top && top.dist <= 1.0 * atr1);
+  const late = !!(top && dir && (dir > 0 ? px > top.hi + 2.5 * atr1 : px < top.lo - 2.5 * atr1));
+  const htfAgree = ['1d', '12h', '4h'].filter(tf => biasBy[tf] != null && Math.sign(biasBy[tf]) === dir).length, htfOpp = ['1d', '12h', '4h'].filter(tf => biasBy[tf] != null && biasBy[tf] * dir <= -0.6).length;
+  const conds = [
+    ['Higher timeframes agree (Daily, 12h, 4h)', dir !== 0 && htfAgree >= 2 && htfOpp === 0, htfAgree + ' of 3 agree' + (htfOpp ? ', ' + htfOpp + ' strongly against' : '')],
+    ['1h structure agrees', dir !== 0 && biasBy['1h'] != null && Math.sign(biasBy['1h']) === dir, A1 && A1.ok ? stWord(A1) : 'no data'],
+    ['15m structure confirms', dir !== 0 && !!(AT['15m'] && AT['15m'].ok && AT['15m'].ev.some(v => v.dir === dir && v.age <= 20)), AT['15m'] && AT['15m'].ok ? stWord(AT['15m']) : 'no data'],
+    ['Liquidity was swept first', !!conf.sweep, conf.sweep ? (dir > 0 ? 'Sell-side' : 'Buy-side') + ' liquidity taken on the ' + TFN[conf.sweep.tf] + ' ' + conf.sweep.age + ' bars ago' : 'No sweep seen in the last 25 bars'],
+    ['Structure shift after the sweep (CHoCH / MSS / BOS)', shiftAfter, conf.shift ? conf.shift.kind + ' on the ' + TFN[conf.shift.tf] + ' ' + conf.shift.age + ' bars ago' : 'Not seen yet'],
+    ['Displacement candle with big volume (IFC / burst)', !!conf.disp, conf.disp ? conf.disp.kind + ' on the ' + TFN[conf.disp.tf] + ' with ' + conf.disp.rv.toFixed(1) + 'x volume' : 'Not seen yet'],
+    ['Entry area exists on the correct side (discount for long, premium for short)', !!(top && top.comps.some(c => c.why.some(w => /discount|premium/.test(w)))), top ? 'Area ' + fmtP(top.lo) + ' to ' + fmtP(top.hi) : 'No order block / FVG / BPR found on the right side'],
+    ['Confluence inside the area (score 3 or more)', !!(top && top.sc >= 3), top ? 'confluence score ' + top.sc.toFixed(1) : 'none'],
+    ['Price is in or next to the area', inZone || near, top ? (inZone ? 'Price is inside the area' : (top.dist / atr1).toFixed(1) + ' ATR away') : 'no area'],
+    ['Pullback is valid (not invalid)', !!(pbMain || pb4) && !pbInvalid, pbInvalid ? 'Pullback broke the leg or came on bigger volume' : pbMain && pbMain.types ? pbMain.types.join(', ') : 'n/a'],
+    ['Volume is real, not fake', volReal && !volFake, volReal ? 'Real volume spike with follow-through' : volFake ? 'Fake / thin volume' : 'No clear volume proof'],
+    ['No trap against the trade', trapAgainst.length === 0, trapAgainst.length ? trapAgainst.join(', ') : 'No recent opposite trap'],
+    ['Not extended, and the reward is worth it (R:R 2 or better)', !late && !!entry && entry.rr >= 2, late ? 'Price already ran away from the area' : entry ? 'R:R ' + entry.rr.toFixed(1) : 'no plan']
+  ].map(c => ({name: c[0], ok: !!c[1], note: c[2]}));
+  const met = conds.filter(c => c.ok).length, confN = (conf.sweep ? 1 : 0) + (shiftAfter ? 1 : 0) + (conf.disp ? 1 : 0);
+  let stage = 'NONE';
+  if (dir && top){ if (late) stage = 'LATE'; else if ((inZone || near) && confN >= 2 && met >= 8 && entry && entry.rr >= 1.5) stage = 'GO'; else if ((inZone || near) && (confN >= 1 || met >= 7)) stage = 'READY'; else stage = 'WATCH'; }
+  const zs = top ? clamp(top.sc / 8, 0, 1) : 0, score = Math.round(clamp(0.35 * Math.abs(bias) * 100 + 0.35 * (met / 13) * 100 + 0.2 * zs * 100 + 0.1 * ({GO: 100, READY: 60, WATCH: 25, LATE: 10, NONE: 0}[stage]), 0, 100));
+  const strength = !dir ? 'NONE' : score >= 70 && Math.abs(bias) >= 0.5 ? 'STRONG' : score >= 50 && Math.abs(bias) >= 0.3 ? 'LEAN' : 'WEAK';
+  const side = dir > 0 ? 'LONG' : dir < 0 ? 'SHORT' : '';
+  const label = !dir ? 'WAIT · timeframes disagree' : stage === 'LATE' ? side + ' · LATE, don\'t chase' : strength + ' ' + side + ' · ' + (stage === 'NONE' ? 'no entry area yet' : stage);
+  /* plain words */
+  const lean = tf => !AT[tf] || !AT[tf].ok ? TFN[tf] + ' n/a' : TFN[tf] + ' ' + stName(AT[tf]).toLowerCase();
+  const parts = [];
+  if (!dir) parts.push('The timeframes disagree (' + ['1d', '12h', '4h', '1h'].map(lean).join(', ') + '). No clean side, stay out or wait for one side to win.');
+  else {
+    parts.push('Bias is ' + (dir > 0 ? 'UP' : 'DOWN') + ' (' + ['1d', '12h', '4h', '1h'].map(lean).join(', ') + ').');
+    if (top){ const c0 = top.comps[0]; parts.push('Best ' + (dir > 0 ? 'buy' : 'sell') + ' area is ' + fmtP(top.lo) + ' to ' + fmtP(top.hi) + ', made of ' + top.comps.slice(0, 3).map(c => TFN[c.tf] + ' ' + (c.type === 'OB' ? 'order block' : c.type === 'FVG' ? 'FVG' : 'BPR')).join(' + ') + (top.comps.length > 3 ? ' + ' + (top.comps.length - 3) + ' more' : '') + '.'); }
+    else parts.push('There is no clean order block, FVG or BPR on the right side yet.');
+    if (stage === 'GO') parts.push('Price is at the area and the sweep, the structure shift and the strong candle are in. That is a GO: ' + (dir > 0 ? 'buy' : 'sell') + ' the area, stop at ' + fmtP(entry.sl) + ', first target ' + fmtP(entry.tp1) + ' (R:R ' + entry.rr.toFixed(1) + ').');
+    else if (stage === 'READY') parts.push('Price is at or next to the area. Not a GO yet: ' + (conf.sweep ? '' : 'wait for liquidity to be swept, ') + (shiftAfter ? '' : 'wait for a 15m close that shifts structure, ') + (conf.disp ? '' : 'and wait for a strong candle with volume') + '.');
+    else if (stage === 'WATCH') parts.push('Price is ' + (top.dist / atr1).toFixed(1) + ' hourly ATRs from the area. Let it come to you, do not chase.');
+    else if (stage === 'LATE') parts.push('Price already ran away from the area. Do not chase; wait for a pullback into ' + fmtP(top.lo) + ' to ' + fmtP(top.hi) + '.');
+    if (trapAgainst.length) parts.push('Caution: ' + trapAgainst[0] + ' just printed against this idea.');
+    if (volFake) parts.push('Caution: recent volume looks thin or fake.');
+    if (pbInvalid) parts.push('Caution: the pullback looks invalid (it broke the leg or came on heavy volume).');
+    if (entry && entry.rr < 1.5) parts.push('Caution: reward is small for the risk (R:R ' + entry.rr.toFixed(1) + ').');
+  }
+  const logic = [];
+  logic.push('Bias score ' + (bias >= 0 ? '+' : '') + bias.toFixed(2) + ' (weights: 4h 1.6, 1h 1.4, 12h 1.3, D 1.0, 15m 0.8). ' + TFS5.slice().reverse().map(tf => TFN[tf] + ': ' + stWord(AT[tf])).join(' | '));
+  if (top) logic.push('Key area score ' + top.sc.toFixed(1) + ': ' + top.comps.map(c => TFN[c.tf] + ' ' + c.type + ' [' + (c.kinds.slice(0, 3).join(', ')) + ']').join('; ') + '. Reasons: ' + [...new Set(top.comps.flatMap(c => c.why))].join(', ') + '.');
+  if (entry) logic.push('Stop sits beyond the area' + (conf.sweep ? ' and the sweep low/high' : '') + ' with a 0.3 hourly-ATR buffer. Targets are the nearest untouched liquidity: ' + entry.tp1n + ' then ' + entry.tp2n + '.');
+  if (conf.retest) logic.push('Retest: price came back to the broken ' + conf.retest.kind + ' level and held.'); if (conf.reclaim) logic.push('Reclaim: a broken order block was taken back (' + fmtP(conf.reclaim.lo) + ' to ' + fmtP(conf.reclaim.hi) + ').'); if (conf.dbl) logic.push('Double sweep: the same liquidity was taken twice, a stronger trap.');
+  if (pbMain && pbMain.types) logic.push('1h pullback: ' + pbMain.types.join(', ') + (pbMain.depth != null ? ' (depth ' + Math.round(pbMain.depth * 100) + '% of the leg)' : '') + '.');
+  logic.push('Volume: ' + (vol1 ? vol1.verdict : 'n/a') + '.');
+  const pbF = pbMain && pbMain.levels ? pbMain : (pb4 && pb4.levels ? pb4 : null);
+  return {ok: true, px, atr1, bias, biasBy, dir, side, stage, strength, label, score, met, conds, key, entry, conf, shiftAfter, trapAgainst, late, inZone, near, plain: parts.join(' '), logic, pbF, tgts: tgts.slice(0, 8), perTf: AT};
+}
+return {analyze, combine, tfSign, stWord, stName, TFS5};
+})(ICT, ICT2);
+
+
+/* ===== SMC / ICT Scanner page ===== */
+const ICTS = {data: new Map(), cache: new Map(), busy: false, prog: {done: 0, total: 0}, sel: null, at: 0, f: {q: '', n: 30, side: 'all', stage: 'all', sort: 'score', min: 0}, msg: '', redrawT: 0, one: ''};
+const ICT_BY = {'15m': '15', '1h': '60', '4h': '240', '12h': '720', '1d': 'D'};
+const ictFmt = p => ICT.fmtP(p);
+async function ictKl(name, tf){
+  const key = name + '|' + tf, hit = ICTS.cache.get(key), ttl = tf === '15m' ? 120000 : tf === '1h' ? 240000 : 600000;
+  if (hit && Date.now() - hit.at < ttl) return hit.v;
+  let v = null; const bn = vSymFor('binance', name);
+  try { const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/klines?symbol=' + encodeURIComponent(bn) + '&interval=' + tf + '&limit=300'); v = j.map(k => ({t: +k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5]})); } catch(e){}
+  if (!v || v.length < 60){ try { const j = await vget('bybit', 'https://api.bybit.com/v5/market/kline?category=linear&symbol=' + encodeURIComponent(bn) + '&interval=' + ICT_BY[tf] + '&limit=300'); v = ((j.result || {}).list || []).map(k => ({t: +k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5]})).reverse(); } catch(e){} }
+  if ((!v || v.length < 60) && state.coins.has(name)){ try { const ms = ICT.TFMS[tf], j = await hl({type: 'candleSnapshot', req: {coin: name, interval: tf, startTime: Date.now() - 300 * ms, endTime: Date.now()}}, 20); v = j.map(k => ({t: +k.t, o: +k.o, h: +k.h, l: +k.l, c: +k.c, v: +k.v})); } catch(e){} }
+  if (!v || v.length < 60) throw new Error('no candles for ' + name + ' ' + tf);
+  ICTS.cache.set(key, {at: Date.now(), v}); return v;
+}
+async function ictScanOne(name){
+  const bars = {}, errs = []; await Promise.all(ICT3.TFS5.map(tf => ictKl(name, tf).then(v => { bars[tf] = v; }, e => { errs.push(tf + ': ' + errTxt(e)); })));
+  const AT = {}; for (const tf of ICT3.TFS5) if (bars[tf]){ try { AT[tf] = ICT3.analyze(bars[tf], tf); } catch(e){ AT[tf] = {tf, ok: false, err: String(e)}; } }
+  if (!(AT['1h'] && AT['1h'].ok) && !(AT['15m'] && AT['15m'].ok)) throw new Error(errs[0] || 'not enough candles');
+  const px = AT['15m'] && AT['15m'].ok ? AT['15m'].px : AT['1h'].px, time = ICT2.timeLevels(bars['1h'], bars['1d'], px), res = ICT3.combine(AT, {price: px, time, name});
+  res.name = name; res.at = Date.now(); res.time = time; res.errs = errs; return res;
+}
+const ictUniverse = () => [...state.coins.values()].filter(c => c.ctx && !String(c.name).includes(':')).sort((a, b) => ((b.m && b.m.vol24) || 0) - ((a.m && a.m.vol24) || 0)).slice(0, ICTS.f.n).map(c => c.name);
+async function ictScanAll(force){
+  if (ICTS.busy) return; const list = ictUniverse(); if (!list.length){ ICTS.msg = 'Waiting for the coin list to load, then the scan starts by itself.'; ictRedraw(); return; }
+  ICTS.busy = true; ICTS.prog = {done: 0, total: list.length}; ICTS.msg = ''; ictRedraw(); const q = list.slice();
+  const worker = async () => { while (q.length){ const c = q.shift(), hit = ICTS.data.get(c); if (!force && hit && hit.ok !== false && Date.now() - hit.at < 180000){ ICTS.prog.done++; continue; } try { ICTS.data.set(c, await ictScanOne(c)); } catch(e){ ICTS.data.set(c, {ok: false, name: c, why: errTxt(e), at: Date.now()}); } ICTS.prog.done++; ictRedrawSoon(); } };
+  await Promise.all([worker(), worker(), worker()]); ICTS.busy = false; ICTS.at = Date.now(); ictRedraw();
+}
+function ictRedraw(){ try { if (state.view === 'ictscan') renderIct(); } catch(e){ console.error(e); } }
+function ictRedrawSoon(){ clearTimeout(ICTS.redrawT); ICTS.redrawT = setTimeout(ictRedraw, 300); }
+const ictArrow = d => d > 0 ? '▲' : d < 0 ? '▼' : '◆';
+function ictChip(r){
+  const cls = !r.dir ? 'wait' : r.stage === 'GO' ? 'go' : r.stage === 'READY' ? 'ready' : r.stage === 'LATE' ? 'late' : 'watch';
+  return '<span class="ict-chip ' + cls + ' ' + (r.dir > 0 ? 'l' : r.dir < 0 ? 's' : '') + '">' + (r.dir ? ictArrow(r.dir) + ' ' : '') + esc(r.label) + '</span>';
+}
+const ictHrs = h => h == null ? '-' : h < 1 ? Math.round(h * 60) + ' min' : h < 48 ? (Math.round(h * 10) / 10) + ' h' : (Math.round(h / 24 * 10) / 10) + ' d';
+function ictPbShort(r){
+  const p = r.pbF; if (!p || !p.types) return '<span class="ict-dim">no clear leg</span>';
+  const ms = ICT.TFMS[r.perTf['1h'] && r.perTf['1h'].pb === p ? '1h' : '4h'], st = p.stats || {}, rem = st.med ? Math.max(1, st.med - p.bars) * ms / 36e5 : null;
+  return '<b>' + esc(p.types[0]) + '</b>' + (p.depth != null ? ' ' + Math.round(p.depth * 100) + '%' : '') + (st.n >= 4 ? '<br><small>' + Math.round(st.p50 * 100) + '% reach 50% · ' + (rem ? '~' + ictHrs(rem) + ' left' : '') + '</small>' : '');
+}
+function ictStrip(r){
+  return ['1d', '12h', '4h', '1h', '15m'].map(tf => {
+    const A = r.perTf[tf], s = ICT3.tfSign(A); if (s == null) return '<span class="ict-st n" title="no data">' + ICT.TFN[tf] + ' –</span>';
+    const e = A.ms.last; return '<span class="ict-st ' + (s > 0.15 ? 'u' : s < -0.15 ? 'd' : 'n') + (state.vtf === tf ? ' sel' : '') + '" title="' + esc(ICT3.stWord(A)) + '">' + ICT.TFN[tf] + ' ' + ictArrow(s > 0.15 ? 1 : s < -0.15 ? -1 : 0) + (e && e.age <= 20 ? '<small>' + e.kind + '</small>' : '') + '</span>';
+  }).join('');
+}
+function ictTfRead(r){
+  const tf = {'1h': '1h', '4h': '4h', '12h': '12h', '1d': '1d'}[state.vtf]; if (!tf) return '<span class="ict-dim">pick 1h / 4h / 12h / D above</span>';
+  const A = r.perTf[tf]; if (!A || !A.ok) return '<span class="ict-dim">no data</span>';
+  const bits = [ICT3.stName(A), A.ms.last ? A.ms.last.kind + ' ' + ictArrow(A.ms.last.dir) + ' ' + A.ms.last.age + 'b' : null, A.obs.length + ' OB', A.gaps.length + ' FVG', A.bpr.length ? A.bpr.length + ' BPR' : null, A.rng.zone];
+  return '<b>' + ICT.TFN[tf] + '</b> ' + esc(bits.filter(Boolean).join(' · ')) + (A.pb && A.pb.types ? '<br><small>' + esc(A.pb.types[0]) + (A.pb.depth != null ? ' ' + Math.round(A.pb.depth * 100) + '%' : '') + '</small>' : '');
+}
+function ictRows(){
+  const q = ICTS.f.q.trim().toUpperCase(); let rows = [...ICTS.data.values()].filter(r => r && r.ok !== false);
+  if (q) rows = rows.filter(r => r.name.toUpperCase().includes(q));
+  if (ICTS.f.side !== 'all') rows = rows.filter(r => (ICTS.f.side === 'long' ? r.dir > 0 : r.dir < 0));
+  if (ICTS.f.stage !== 'all') rows = rows.filter(r => r.stage === ICTS.f.stage);
+  if (ICTS.f.min) rows = rows.filter(r => r.met >= ICTS.f.min);
+  const rank = {GO: 4, READY: 3, WATCH: 2, LATE: 1, NONE: 0}, so = ICTS.f.sort;
+  rows.sort((a, b) => so === 'stage' ? (rank[b.stage] - rank[a.stage]) || (b.score - a.score) : so === 'rr' ? ((b.entry ? b.entry.rr : 0) - (a.entry ? a.entry.rr : 0)) : so === 'met' ? b.met - a.met : so === 'name' ? a.name.localeCompare(b.name) : b.score - a.score);
+  return rows;
+}
+function ictTable(){
+  const rows = ictRows(); if (!rows.length) return '<div class="ict-empty">' + (ICTS.busy ? 'Scanning candles on 15m, 1h, 4h, 12h and Daily for each coin… results appear here as they finish.' : (ICTS.msg || 'No coins match. Change the filters, or press Rescan.')) + '</div>';
+  const bad = [...ICTS.data.values()].filter(r => r && r.ok === false).length;
+  return '<div class="ict-wrap"><table class="ict-t"><thead><tr><th>Coin</th><th>Verdict</th><th>Score</th><th>Conditions met</th><th>Structure (D · 12h · 4h · 1h · 15m)</th><th>Selected timeframe</th><th>Key entry area</th><th>Stop</th><th>Target 1</th><th>R:R</th><th>Pullback chance and time</th><th>Missing</th><th></th></tr></thead><tbody>' + rows.map(r => {
+    const e = r.entry, k = r.key && r.key[0], miss = r.conds.filter(c => !c.ok).slice(0, 2).map(c => c.name.replace(/ \(.*$/, '')).join('; ');
+    return '<tr class="' + (ICTS.sel === r.name ? 'sel' : '') + '" data-ictrow="' + esc(r.name) + '"><td class="sym"><a href="#" data-chart="' + esc(r.name) + '" title="Open the super chart in a new tab">' + esc(r.name) + '</a><br><small class="ict-dim">' + ictFmt(r.px) + '</small></td><td>' + ictChip(r) + '</td><td><b>' + r.score + '</b></td><td>' + r.met + '/13</td><td class="ict-strip">' + ictStrip(r) + '</td><td class="ict-sm">' + ictTfRead(r) + '</td><td class="ict-sm">' + (k ? '<b>' + ictFmt(k.lo) + ' – ' + ictFmt(k.hi) + '</b><br><small>' + esc(k.comps.slice(0, 3).map(c => ICT.TFN[c.tf] + ' ' + c.type).join(' + ')) + '</small>' : '<span class="ict-dim">none yet</span>') + '</td><td>' + (e ? ictFmt(e.sl) : '–') + '</td><td>' + (e ? ictFmt(e.tp1) + (e.est ? '<small class="ict-dim"> est.</small>' : '') : '–') + '</td><td>' + (e ? e.rr.toFixed(1) : '–') + '</td><td class="ict-sm">' + ictPbShort(r) + '</td><td class="ict-sm ict-dim">' + esc(miss || 'nothing') + '</td><td><button type="button" class="ict-btn" data-ictopen="' + esc(r.name) + '">Details</button></td></tr>';
+  }).join('') + '</tbody></table></div>' + (bad ? '<p class="ict-dim ict-note">' + bad + ' coin(s) could not be loaded (no candles from Binance, Bybit or Hyperliquid) and are left out.</p>' : '');
+}
+/* ---------- detail panel ---------- */
+const ictAgeTxt = a => a === 0 ? 'now' : a + ' bars ago';
+const ictIt = (t, c, tip) => ({t, c: c || 0, tip: tip || ''});
+const ICT_MATRIX = [
+  ['Institutional candles: IFC, Trap & Burst, Burst, OT, Bundle & Sweep, Momentum shift', A => A.psy.slice(-5).reverse().map(p => ictIt(p.kind + ' ' + ictArrow(p.dir) + ' ' + ictAgeTxt(p.age), p.dir, p.note + ' (volume ' + p.rv.toFixed(1) + 'x)'))],
+  ['Order blocks: Normal, Equilibrium, Pivot, Range, Mitigation, Breaker, Refine, Rejection, Reclaim', A => A.obs.slice(0, 5).map(o => ictIt(ictArrow(o.dir) + ' ' + o.kinds.filter(k => k !== 'Trap on OB').join('·') + ' · ' + o.status, o.dir, ictFmt(o.lo) + ' – ' + ictFmt(o.hi) + ', ' + o.age + ' bars old, tapped ' + o.taps + 'x'))],
+  ['Trap on order blocks', A => A.obs.filter(o => o.kinds.includes('Trap on OB')).slice(0, 3).map(o => ictIt(ictArrow(o.origDir) + ' OB wick-trap ' + ictFmt(o.lo) + ' – ' + ictFmt(o.hi), o.origDir, 'Price wicked through the far edge of this order block and closed back: stops were run, then it held'))],
+  ['FVGs: Primary, Golden, Perfection / Discount, bullish, bearish, small / medium / big candle', A => A.gaps.slice(0, 6).map(g => ictIt(ictArrow(g.dir) + ' ' + g.kinds.slice(1).join('·'), g.dir, ictFmt(g.lo) + ' – ' + ictFmt(g.hi) + ', ' + Math.round(g.fill * 100) + '% filled, ' + g.age + ' bars old'))],
+  ['FVG traps, FVG with liquidity, FVG with order block', A => A.gaps.filter(g => g.kinds.some(k => /Trap|\+/.test(k))).slice(0, 4).map(g => ictIt(ictArrow(g.dir) + ' ' + g.kinds.filter(k => /Trap|\+/.test(k)).join(' · '), g.dir, ictFmt(g.lo) + ' – ' + ictFmt(g.hi)))],
+  ['Imbalance / liquidity void', A => A.voids.map(v => ictIt(ictArrow(v.dir) + ' void ' + ictFmt(v.lo) + ' – ' + ictFmt(v.hi), v.dir, v.move.toFixed(1) + ' ATR run, ' + Math.round(v.pen * 100) + '% refilled'))],
+  ['Balanced price range (BPR): weak, good, strong', A => A.bpr.map(x => ictIt(ictArrow(x.dir) + ' ' + x.grade + ' BPR ' + ictFmt(x.lo) + ' – ' + ictFmt(x.hi), x.dir, 'Overlap of a bullish and a bearish FVG, ' + x.age + ' bars old'))],
+  ['Pullbacks: valid, invalid, deep, aggressive, hidden, inducement, slow, sweep', A => !A.pb || !A.pb.types ? [ictIt(A.pb && A.pb.why ? A.pb.why : 'no clear leg', 0)] : A.pb.types.map(t => ictIt(t + (t === A.pb.types[0] ? ' ' + Math.round(A.pb.depth * 100) + '%' : ''), A.pb.dir, 'Pullback inside a ' + (A.pb.dir > 0 ? 'bullish' : 'bearish') + ' leg, ' + A.pb.bars + ' bars old'))],
+  ['Inducements: normal, pullback, hidden, technical, shift, major / minor, double', A => A.idm.long.concat(A.idm.short).slice(0, 5).map(x => ictIt(ictArrow(x.dir) + ' ' + x.kind + (x.swept ? ' (swept)' : ''), x.dir, 'Level ' + ictFmt(x.p) + ', ' + x.age + ' bars ago'))],
+  ['Institution operator concept', A => [ictIt(A.op.phase, A.op.dir, A.op.confirmed ? 'Operator entry confirmed: sweep + displacement + structure shift' : 'Not fully confirmed yet')]],
+  ['Smart money divergence', A => A.div.list.map(d => ictIt(d.kind + ' (' + d.src + ') ' + ictAgeTxt(d.age), d.dir, 'Price and ' + d.src + ' disagree'))],
+  ['Footprints: RRP, MRT, momentum accumulation, momentum trap, trapping flag', A => [].concat(A.fp.rrp.map(x => ictIt('RRP ' + ictArrow(x.dir) + ' ' + x.from + ' → ' + x.to + (x.done ? ' (done)' : ' ' + Math.round(x.progress * 100) + '%'), x.dir, 'Reverse range pattern')), A.fp.mrt.map(x => ictIt('MRT ' + ictArrow(x.dir) + ' ' + ictAgeTxt(x.age), x.dir, x.note)), A.fp.momAcc.map(x => ictIt(x.kind, x.dir, x.n + ' absorption candles')), A.fp.momTrap.map(x => ictIt('Momentum trap ' + ictArrow(x.dir), x.dir, x.note)), A.fp.trapFlag.map(x => ictIt('Trapping flag ' + ictArrow(x.dir), x.dir, x.note)))],
+  ['Liquidity: horizontal (equal highs / lows), trendline, curve, support & resistance', A => [].concat(A.liq.eqh.map(x => ictIt('Equal highs ' + ictFmt(x.p) + ' ×' + x.n, -1, 'Buy-side liquidity above')), A.liq.eql.map(x => ictIt('Equal lows ' + ictFmt(x.p) + ' ×' + x.n, 1, 'Sell-side liquidity below')), A.liq.trend.map(x => ictIt(x.kind + ' ' + x.type + ' ~' + ictFmt(x.p), x.type === 'BSL' ? -1 : 1, x.touches + ' touches')), A.liq.sr.map(x => ictIt(x.side + ' ' + ictFmt(x.p) + ' ×' + x.n, 0, 'Touched ' + x.n + ' times')))],
+  ['Liquidity: IRL, ERL, BSL, SSL, high / low liquidity zones, single and multi rejection', A => [ictIt('ERL ' + ictFmt(A.liq.erl.lo) + ' – ' + ictFmt(A.liq.erl.hi), 0, 'External range liquidity: the range extremes'), ictIt('IRL ' + A.liq.irl.n + ' internal imbalances', 0, 'Internal range liquidity: unfilled FVGs and order blocks inside the range')].concat(A.liq.bsl.slice(0, 2).map(x => ictIt('BSL ' + ictFmt(x.p), -1, 'Buy-side liquidity')), A.liq.ssl.slice(0, 2).map(x => ictIt('SSL ' + ictFmt(x.p), 1, 'Sell-side liquidity')), A.liq.hlz.slice(0, 1).map(x => ictIt('High liquidity zone ' + ictFmt(x.lo) + ' – ' + ictFmt(x.hi), 0, x.n + ' swing points stacked')), A.liq.llz.slice(0, 1).map(x => ictIt('Low liquidity zone ' + ictFmt(x.lo) + ' – ' + ictFmt(x.hi), 0, 'Few trades happened here: price can move fast through it')), A.liq.multiRej.slice(0, 2).map(x => ictIt('Multi-rejection ' + ictFmt(x.p), x.t === 'H' ? -1 : 1, 'Rejected ' + x.n + ' times')), A.liq.singleRej.slice(0, 2).map(x => ictIt('Single rejection ' + ictFmt(x.p), x.t === 'H' ? -1 : 1, 'One strong rejection wick')))],
+  ['Sweeps, liquidity traps, double sweep, retest, reclaim', A => [].concat(A.sweeps.list.slice(-3).map(s => ictIt(s.side + ' swept ' + ictAgeTxt(s.age) + (s.follow ? ' + follow-through' : ''), s.dir, 'Trap on liquidity: wick beyond ' + ictFmt(s.level) + ', closed back inside')), A.sweeps.dbl.map(s => ictIt('Double sweep ' + s.side, s.dir, 'Same level taken twice')), A.rr.retest ? [ictIt('Retest of ' + A.rr.retest.kind + ' level ' + (A.rr.retest.held ? 'held' : 'failed'), A.rr.retest.held ? A.rr.retest.dir : -A.rr.retest.dir, ictFmt(A.rr.retest.lvl))] : [], A.obs.filter(o => o.status === 'reclaimed').slice(0, 1).map(o => ictIt('Reclaim ' + ictArrow(o.dir) + ' ' + ictFmt(o.lo) + ' – ' + ictFmt(o.hi), o.dir, 'Order block was broken then taken back')))],
+  ['Bull / bear flag liquidity and entry', A => A.flag ? [ictIt((A.flag.dir > 0 ? 'Bull' : 'Bear') + ' flag ' + ictFmt(A.flag.lo) + ' – ' + ictFmt(A.flag.hi), A.flag.dir, A.flag.entry)] : []],
+  ['Volume and operators: small / big candle × small / average / big volume, fake vs real', A => A.vol.rows.map(r => ictIt(r.name, r.up ? 1 : -1, r.say)).concat([ictIt(A.vol.verdict, A.vol.real ? A.vol.real.dir : A.vol.fake ? -A.vol.fake.dir : 0)])],
+  ['Breakouts: valid, fake, liquidity, volume & candle', A => A.bo.map(x => ictIt(x.kind + ' ' + ictArrow(x.brokeDir) + ' ' + ictAgeTxt(x.age), x.dir, x.say))],
+  ['Market structure: HH, HL, LH, LL, BOS, CHoCH, MSS, state', A => [ictIt(ICT3.stName(A), ICT3.tfSign(A)), ictIt(A.swingLabels.slice(-4).join(' '), 0, 'Last swing labels')].concat(A.ev.slice(-2).map(v => ictIt(v.kind + ' ' + ictArrow(v.dir) + ' ' + ictAgeTxt(v.age), v.dir, 'Broke ' + ictFmt(v.lvl))), [ictIt('Range: ' + A.rng.zone, 0, 'Price is in the ' + A.rng.zone + ' of the ' + ictFmt(A.rng.lo) + ' – ' + ictFmt(A.rng.hi) + ' range')])]
+];
+function ictCell(items, max){
+  if (!items.length) return '<span class="ict-dim">–</span>'; max = max || 5;
+  return items.slice(0, max).map(i => '<span class="ict-i ' + (i.c > 0 ? 'u' : i.c < 0 ? 'd' : '') + '" title="' + esc(i.tip || '') + '">' + esc(i.t) + '</span>').join('') + (items.length > max ? '<span class="ict-i">+' + (items.length - max) + '</span>' : '');
+}
+function ictDetail(r){
+  if (!r) return '';
+  const e = r.entry, TF = ICT3.TFS5.slice().reverse();
+  const conds = r.conds.map(c => '<li class="' + (c.ok ? 'ok' : 'no') + '"><b>' + (c.ok ? '✓' : '✗') + '</b> ' + esc(c.name) + '<small>' + esc(c.note) + '</small></li>').join('');
+  const keys = r.key.length ? r.key.map((k, n) => '<div class="ict-card"><div class="ict-h">' + (n === 0 ? 'Main entry area' : 'Backup area ' + n) + ' · ' + ictFmt(k.lo) + ' – ' + ictFmt(k.hi) + ' <span class="ict-dim">(' + (k.dist === 0 ? 'price is inside or past it' : (k.dist / r.atr1).toFixed(1) + ' hourly ATR away') + ')</span></div><div>' + k.comps.slice(0, 5).map(c => '<span class="ict-i ' + (r.dir > 0 ? 'u' : 'd') + '" title="' + esc(c.why.join(', ')) + '">' + ICT.TFN[c.tf] + ' ' + c.type + ' · ' + esc(c.kinds.filter(x => !/^(Bullish|Bearish)$/.test(x)).slice(0, 3).join('·') || c.status || '') + '</span>').join('') + '</div><div class="ict-why">Why: ' + esc([...new Set(k.comps.flatMap(c => c.why))].join(', ') || 'basic zone') + '. Score ' + k.sc.toFixed(1) + '.</div>' + (n === 0 && e ? '<div class="ict-plan">' + (r.dir > 0 ? 'Buy' : 'Sell') + ' near <b>' + ictFmt(e.ref) + '</b> · Stop <b>' + ictFmt(e.sl) + '</b> · Target 1 <b>' + ictFmt(e.tp1) + '</b> <span class="ict-dim">(' + esc(e.tp1n) + ')</span> · Target 2 <b>' + ictFmt(e.tp2) + '</b> · R:R <b>' + e.rr.toFixed(1) + '</b> / ' + e.rr2.toFixed(1) + (e.est ? ' <span class="ict-dim">(targets estimated)</span>' : '') + '</div>' : '') + '</div>').join('') : '<p class="ict-dim">No order block, FVG or BPR on the right side. Wait.</p>';
+  const cf = r.conf, confs = [['Liquidity sweep', cf.sweep && ICT.TFN[cf.sweep.tf] + ' ' + cf.sweep.age + 'b ago'], ['Structure shift', cf.shift && cf.shift.kind + ' ' + ICT.TFN[cf.shift.tf] + ' ' + cf.shift.age + 'b ago'], ['Strong candle (IFC / burst)', cf.disp && cf.disp.kind + ' ' + ICT.TFN[cf.disp.tf]], ['Retest held', cf.retest && cf.retest.kind + ' level'], ['Reclaim', cf.reclaim && ICT.TFN[cf.reclaim.tf]], ['Double sweep', cf.dbl && ICT.TFN[cf.dbl.tf]]].map(x => '<span class="ict-i ' + (x[1] ? (r.dir > 0 ? 'u' : 'd') : '') + '" title="' + esc(x[1] || 'not seen') + '">' + (x[1] ? '✓ ' : '· ') + x[0] + '</span>').join('');
+  const stRows = TF.map(tf => { const A = r.perTf[tf]; if (!A || !A.ok) return '<tr><td>' + ICT.TFN[tf] + '</td><td colspan="5" class="ict-dim">no data</td></tr>'; const s = ICT3.tfSign(A); return '<tr class="' + (state.vtf === tf ? 'sel' : '') + '"><td><b>' + ICT.TFN[tf] + '</b></td><td class="' + (s > 0.15 ? 'ict-u' : s < -0.15 ? 'ict-d' : '') + '">' + ictArrow(s > 0.15 ? 1 : s < -0.15 ? -1 : 0) + ' ' + esc(ICT3.stName(A)) + '</td><td>' + esc(A.swingLabels.slice(-4).join(' ') || '–') + '</td><td>' + (A.ms.last ? A.ms.last.kind + ' ' + ictArrow(A.ms.last.dir) + ' ' + A.ms.last.age + ' bars ago' : '–') + '</td><td>' + A.rng.zone + '</td><td class="ict-sm">' + esc(A.op.phase) + '</td></tr>'; }).join('');
+  const mat = '<div class="ict-wrap"><table class="ict-t ict-m"><thead><tr><th>Concept</th>' + TF.map(tf => '<th class="' + (state.vtf === tf ? 'sel' : '') + '">' + ICT.TFN[tf] + '</th>').join('') + '</tr></thead><tbody>' + ICT_MATRIX.map(([nm, fn]) => '<tr><td class="ict-cn">' + esc(nm) + '</td>' + TF.map(tf => { const A = r.perTf[tf]; let items = []; try { items = A && A.ok ? fn(A) : []; } catch(e){ items = [ictIt('error', 0, String(e))]; } return '<td class="' + (state.vtf === tf ? 'sel' : '') + '">' + ictCell(items, 5) + '</td>'; }).join('') + '</tr>').join('') + '<tr><td class="ict-cn">Time-based liquidity: previous day / week, Asia, London, New York, daily open</td><td colspan="5">' + (r.time.length ? r.time.map(x => '<span class="ict-i ' + (x.side === 'BSL' ? 'd' : 'u') + '" title="' + (x.swept ? 'already taken' : 'untouched, price may be drawn to it') + '">' + esc(x.name) + ' ' + ictFmt(x.p) + (x.swept ? ' (swept)' : '') + '</span>').join('') : '<span class="ict-dim">not enough data</span>') + '</td></tr></tbody></table></div>';
+  const pbc = ['1h', '4h'].map(tf => { const A = r.perTf[tf]; if (!A || !A.ok || !A.pb || !A.pb.levels) return ''; const p = A.pb; return '<div class="ict-card"><div class="ict-h">' + ICT.TFN[tf] + ' pullback forecast (' + (p.dir > 0 ? 'bullish' : 'bearish') + ' leg)</div><div>' + p.types.map(t => '<span class="ict-i">' + esc(t) + '</span>').join('') + '</div><div class="ict-why">Depth so far ' + Math.round(p.depth * 100) + '% of the leg. Levels: 38% ' + ictFmt(p.levels.l382) + ' · 50% ' + ictFmt(p.levels.l50) + ' · 62% ' + ictFmt(p.levels.l618) + ' · 79% ' + ictFmt(p.levels.l786) + '</div><div class="ict-why">' + esc(p.chance) + '.</div><div class="ict-why">' + esc(p.eta) + '.</div><div class="ict-why">' + esc(p.session.text) + '.</div></div>'; }).join('');
+  return '<section class="ict-detail"><div class="ict-dh"><div><h3>' + esc(r.name) + ' <span class="ict-dim">' + ictFmt(r.px) + '</span> ' + ictChip(r) + '</h3></div><div><a class="ict-btn" href="#" data-chart="' + esc(r.name) + '">Open super chart</a> <button type="button" class="ict-btn" data-ictclose="1">Close</button></div></div>' +
+    '<p class="ict-plain"><b>In plain words:</b> ' + esc(r.plain) + '</p>' +
+    '<div class="ict-grid"><div><h4>Conditions met: ' + r.met + ' of 13</h4><ul class="ict-cond">' + conds + '</ul></div><div><h4>Key areas to enter, and why</h4>' + keys + '<h4>Confirmations seen</h4><div>' + confs + '</div><h4>Logic behind</h4><ul class="ict-logic">' + r.logic.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul></div></div>' +
+    '<h4>Market structure by timeframe</h4><div class="ict-wrap"><table class="ict-t"><thead><tr><th>TF</th><th>State</th><th>Swings</th><th>Last break</th><th>Range</th><th>Operator cycle</th></tr></thead><tbody>' + stRows + '</tbody></table></div>' +
+    '<h4>Pullback chances and probable time</h4><div class="ict-grid">' + (pbc || '<p class="ict-dim">Not enough swings to estimate.</p>') + '</div>' +
+    '<h4>Every concept on every timeframe</h4>' + mat + '</section>';
+}
+/* ---------- page shell ---------- */
+function renderIct(){
+  const el = $('viewIct'); if (!el) return;
+  if (!el.dataset.built){
+    el.dataset.built = '1';
+    el.innerHTML = '<div class="ict-top"><div><h2>SMC / ICT Scanner</h2><p class="hint">Reads candles on 15m, 1h, 4h, 12h and Daily for the biggest coins and looks for institutional footprints: structure, order blocks, FVGs, liquidity sweeps, inducements, pullbacks, traps and volume. It then tells you the side, where to enter, why, and whether it is ready or too late. Click a coin name to open its super chart.</p></div></div>' +
+      '<div class="ict-bar"><input id="ictQ" placeholder="Search or scan a coin, e.g. SOL" autocomplete="off"><button type="button" class="ict-btn" id="ictGo">Scan coin</button>' +
+      '<label>Coins <select id="ictN"><option value="20">Top 20</option><option value="30" selected>Top 30</option><option value="50">Top 50</option></select></label>' +
+      '<label>Side <select id="ictSide"><option value="all">All</option><option value="long">Long</option><option value="short">Short</option></select></label>' +
+      '<label>Stage <select id="ictStage"><option value="all">All</option><option value="GO">GO</option><option value="READY">READY</option><option value="WATCH">WATCH</option><option value="LATE">LATE</option></select></label>' +
+      '<label>Conditions <select id="ictMin"><option value="0">Any</option><option value="6">6+ of 13</option><option value="8">8+ of 13</option><option value="10">10+ of 13</option></select></label>' +
+      '<label>Sort <select id="ictSort"><option value="score">Best score</option><option value="stage">GO first</option><option value="rr">Best R:R</option><option value="met">Most conditions</option><option value="name">Name</option></select></label>' +
+      '<button type="button" class="ict-btn" id="ictScan">Rescan</button><span id="ictProg" class="ict-dim"></span></div>' +
+      '<div id="ictTable"></div><div id="ictDetail"></div>';
+    el.addEventListener('input', e => { if (e.target.id === 'ictQ'){ ICTS.f.q = e.target.value; ictFill(); } });
+    el.addEventListener('keydown', e => { if (e.target.id === 'ictQ' && e.key === 'Enter') ictGoCoin(); });
+    el.addEventListener('change', e => { const m = {ictN: 'n', ictSide: 'side', ictStage: 'stage', ictMin: 'min', ictSort: 'sort'}[e.target.id]; if (!m) return; ICTS.f[m] = m === 'n' || m === 'min' ? +e.target.value : e.target.value; if (m === 'n') ictScanAll(false); else ictFill(); });
+    el.addEventListener('click', e => {
+      const t = e.target;
+      if (t.closest('#ictScan')){ ICTS.cache.clear(); ictScanAll(true); return; }
+      if (t.closest('#ictGo')){ ictGoCoin(); return; }
+      const o = t.closest('[data-ictopen]'); if (o){ ICTS.sel = o.dataset.ictopen; ictFill(); const d = $('ictDetail'); if (d) d.scrollIntoView({behavior: 'smooth', block: 'start'}); return; }
+      if (t.closest('[data-ictclose]')){ ICTS.sel = null; ictFill(); return; }
+    });
+  }
+  ictFill();
+  if (!ICTS.busy && (!ICTS.at || Date.now() - ICTS.at > 240000)) setTimeout(() => ictScanAll(false), 50);
+}
+async function ictGoCoin(){
+  const q = ($('ictQ') || {}).value || ''; const nm = q.trim().toUpperCase(); if (!nm) return;
+  const c = [...state.coins.values()].find(x => String(x.name).toUpperCase() === nm); if (!c){ toast('Coin "' + nm + '" is not in the scanner list'); return; }
+  ICTS.msg = 'Scanning ' + c.name + '…'; ictFill();
+  try { ICTS.data.set(c.name, await ictScanOne(c.name)); ICTS.sel = c.name; ICTS.f.q = ''; $('ictQ').value = ''; } catch(e){ toast('Could not scan ' + c.name + ': ' + errTxt(e)); }
+  ICTS.msg = ''; ictFill();
+}
+function ictFill(){
+  const t = $('ictTable'), d = $('ictDetail'), p = $('ictProg'); if (!t) return;
+  if (p) p.textContent = ICTS.busy ? 'Scanning ' + ICTS.prog.done + ' of ' + ICTS.prog.total + '…' : ICTS.at ? 'Updated ' + ago(ICTS.at) + ' · ' + [...ICTS.data.values()].filter(r => r && r.ok !== false).length + ' coins' : '';
+  t.innerHTML = ictTable(); const r = ICTS.sel ? ICTS.data.get(ICTS.sel) : null; d.innerHTML = r && r.ok !== false ? ictDetail(r) : '';
+}
+
 function applyView(){
-  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
+  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
@@ -10595,6 +11408,7 @@ function renderBt(){
 /* ===== V4.34: beginner guide on every page: what each number means and where good / neutral / bad starts ===== */
 const VG_VERDICT = ['Verdict (Strong long / Lean long / Avoid / Lean short / Strong short)', 'The scanner adds points for and against a trade (trend, flow, positioning, levels, data quality). The total is the score.', 'Perp scalp: score +35 or more = Strong long, +15 to +34 = Lean long, -15 to -34 = Lean short, -35 or less = Strong short, in between = Wait. Spot, swing and positional use +28 / +10. Avoid means a hard block (very low volume, big event). Only trade Strong when the plan and the chart agree.'];
 const VIEW_GUIDE = {
+  ictscan: [['Verdict: LONG / SHORT, STRONG / LEAN / WEAK', 'The weighted agreement of 15m, 1h, 4h, 12h and Daily structure. 4h and 1h count most.', 'STRONG = score 70+ and most timeframes agree. LEAN = a bias but with disagreement. WEAK = a faint lean. WAIT = timeframes disagree.'], ['Stage: WATCH / READY / GO / LATE', 'WATCH = idea is forming, price still far from the area. READY = price at the area, waiting for confirmation. GO = price in the area with 2+ confirmations, 8+ of 13 conditions and R:R 1.5+. LATE = price already ran past the area.', 'Never chase LATE. Wait for a pullback to the key area.'], ['Conditions met (of 13)', 'A checklist: trend alignment, area quality, sweep, structure shift, strong candle, retest or reclaim, volume, premium/discount, R:R and more.', '8+ = solid. 5-7 = partial. Under 5 = skip.'], ['Key entry area', 'The zone where several order blocks, FVGs, BPRs or liquidity levels overlap on different timeframes. Higher timeframe zones weigh more.', 'More stacked timeframes = stronger area. A fresh (untapped) area beats a tapped one.'], ['Pullback chance and time', 'Based on the coin\'s own past pullbacks: how often they reached 50% of the leg and how many candles they usually take.', 'Estimates only, not promises. Needs at least 4 past pullbacks to show.'], ['Stop, Target 1, R:R', 'Stop sits beyond the area and the sweep wick. Targets are the next untouched liquidity (equal highs/lows, swing points).', 'R:R under 1.5 = not worth it. "est." means targets were estimated because no liquidity was found.']],
   overview: [['Market mood', 'One reading of the whole market from price, breadth and money flow.', 'Fear and greed index: 0-24 extreme fear, 25-44 fear, 45-55 neutral, 56-75 greed, 76-100 extreme greed. Extremes are contrarian: extreme fear is often near a low, extreme greed near a high.'], ['Breadth (coins up vs down)', 'How many coins are rising.', 'Above 65% rising = broad strength. 35-65% = mixed. Below 35% = broad weakness. A rally with weak breadth is fragile.'], ['Institutions vs retail table', 'Each row is one reading; the count shows how many readings point to buying vs selling.', 'Share above 60% on one side = clear lean. 40-60% = no edge. Needs at least 100 coins loaded to be reliable.'], ['BTC dominance', 'Bitcoin share of total crypto value.', 'Rising while price falls = money hides in BTC (risk-off). Falling while BTC is steady = money rotates to altcoins (altseason conditions).'], ['Funding (market average)', 'What longs pay shorts every period.', 'Under 10% a year = calm. 10-30% = leaning long. Above 60% a year = crowded longs, flush risk. Negative below -20% = crowded shorts, squeeze risk.']],
   inst: [['Accumulating / Distributing', 'Big players quietly buying (accumulating) or selling (distributing), judged from where price closes inside its candles together with volume.', 'Footprint strength 60+ = clear; 40-60 = weak; below 40 = ignore.'], ['Timeframes 15m / 1h / 4h / Daily', 'The same read on four chart sizes.', 'Best trades: 15m, 1h and 4h agree. Daily is only a bias check. Disagreement = wait.'], ['Buy/sell pressure', 'Share of volume that was aggressive buying minus selling.', 'Plus or minus 15% or more = real pressure. Under 5% either way = noise.'], ['Open interest change (OI)', 'Money in open futures contracts.', 'OI up 3%+ with price up = new longs (healthy trend). OI up with price down = new shorts. OI down with price up = short covering (weak rally).'], VG_VERDICT],
   instspot: [['Accumulating / Distributing (spot)', 'Same footprint logic on spot coins.', 'Spot can only be bought: accumulating = buy zone, distributing = avoid or take profit.'], ['Spot volume', 'Real traded value in 24h.', 'Under $1M = illiquid, avoid. $5M or more = acceptable. $20M or more = comfortable.'], ['Market cap', 'Size of the coin.', 'Under $50M = very risky. $50M-$1B = small cap. Above $1B = established.'], ['Unlock overhang', 'New tokens due to be released soon.', 'Unlock above 2% of supply within 14 days = headwind. Above 5% = serious.'], ['Spot/perp gap', 'Perp price versus spot price.', 'Within 0.1% normal. Beyond 0.3% stretched: wait for spot to catch up.']],
@@ -11488,6 +12302,7 @@ window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return '
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
 /* ---------- V5: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
+  ictscan:['Wait for the first scan to finish (top 30 coins, five timeframes each). Rows appear as they load.','Sort by GO first or Best score. Read the Verdict chip: side, strength and stage.','Check the key entry area, stop, target 1 and R:R in the row. Press Details for the full reason.','In Details read the plain-words verdict, the 13 conditions and the concept table (15m, 1h, 4h, 12h, D).','Only act on GO. READY means wait for confirmation. LATE means do not chase.','Click the coin name to open the super chart in a new tab and check the area yourself.'],
   'table:perp':['Pick the coin group at the top (mega, mid, micro) so volume rules match the coin size.','Read the Verdict column: STRONG LONG / STRONG SHORT are the best, LEAN means wait for confirmation, WAIT/AVOID means stay out.','Click the verdict badge or "Why" to see the reasons, then open the coin chart.','Check Bias, Take-off, Sweep + reclaim and Confirm columns. You want most of them to agree with the verdict.','Open Pre-trade preparation or the Elite Coin Terminal for the stop, targets and R:R, then place the trade yourself.'],
   'table:spot':['Spot mode shows coins to buy and hold for weeks, not scalps.','Look for Accumulating coins with positive money flow and a healthy market phase (Recovery, Uptrend, Pullback).','Avoid coins near unlocks, with a risk story, or with tiny trading volume.','Scale in with partial orders instead of one big buy.'],
   'table:swing':['Swing mode looks for moves that last days to weeks.','Favour coins with 4h and Daily trend agreement and rising volume.','Use wider stops (below the last swing low) and smaller size.','Check the macro calendar before holding over events.'],
