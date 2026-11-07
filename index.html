@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V6.2</title>
+<title>ELPP CRYPTO SCANNER PRO V6.3</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -815,7 +815,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.2</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.3</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -9713,6 +9713,32 @@ function ictBars(root){
 }
 
 
+/* ===== SMC/ICT score blended into the Power Scanner rank (V6.3) ===== */
+function ictBlend(name, dir){
+  const r = ICTS.data.get(name); if (!r || r.ok === false || !r.label) return null;
+  const rd = r.dir > 0 ? 'long' : r.dir < 0 ? 'short' : '', o = {r, score: r.score, label: r.label, stage: r.stage, rdir: rd, pts: 0, agree: null, note: ''};
+  if (!rd){ o.note = 'SMC/ICT sees no clear side (timeframes disagree)'; if (dir) o.pts = -3; return o; }
+  if (!dir){ o.note = 'SMC/ICT leans ' + rd.toUpperCase() + ' (' + r.label + ')'; return o; }
+  o.agree = rd === dir;
+  if (o.agree){
+    let pts = (r.score - 40) / 60 * 12; pts = Math.max(-2, Math.min(12, pts));
+    if (r.stage === 'GO') pts += 4; else if (r.stage === 'READY') pts += 2; else if (r.stage === 'LATE') pts = Math.min(pts, 0) - 8;
+    o.pts = Math.round(pts * 10) / 10; o.note = 'SMC/ICT agrees (' + r.label + ', score ' + r.score + ')';
+  } else {
+    o.pts = -Math.round((8 + r.score / 100 * 12) * 10) / 10; o.note = 'SMC/ICT disagrees: it says ' + rd.toUpperCase() + ' (' + r.label + ')';
+  }
+  return o;
+}
+const ICTF = {busy: false, at: 0};
+async function ictFeed(){
+  if (ICTF.busy || Date.now() - ICTF.at < 20000) return; const D = PS.cache; if (!D) return;
+  const pick = D.live.filter(c => !String(c.name).includes(':')).map(c => [c, (D.E.get(c.name) || {})]).sort((a, b) => ((b[1].rank0 != null ? b[1].rank0 : b[1].rank) || 0) - ((a[1].rank0 != null ? a[1].rank0 : a[1].rank) || 0)).slice(0, 40).map(x => x[0].name)
+    .filter(n => { const h = ICTS.data.get(n); return !h || (h.ok === false ? Date.now() - h.at > 300000 : Date.now() - h.at > 240000); });
+  if (!pick.length) return; ICTF.busy = true; ICTF.at = Date.now(); let n = 0;
+  const w = async () => { while (pick.length){ const nm = pick.shift(); try { ICTS.data.set(nm, await ictScanOne(nm)); } catch(e){ ICTS.data.set(nm, {ok: false, name: nm, why: errTxt(e), at: Date.now()}); } if (++n % 4 === 0){ PS.cacheAt = 0; if (state.view === 'power') { try { renderPower(true); } catch(e){} } } } };
+  await Promise.all([w(), w()]); ICTF.busy = false; PS.cacheAt = 0; if (state.view === 'power') { try { renderPower(true); } catch(e){} }
+}
+
 function applyView(){
   { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
@@ -12373,7 +12399,7 @@ const AC_PICK = [
   ['Step 5: The verdict', 'The verdict is a score from -100 to +100: take-off difference x 0.45, plus 4h/12h trend, big-player flow (accumulation vs distribution), big-volume bars, chart patterns (spring, upthrust, change of character), news, on-chain flows, unlocks, thin trading and more. +15 = lean long, +35 = strong long, -15 = lean short, -35 = strong short. A risk story (hack, ban, delisting), thin trading or an event blackout forces AVOID.'],
   ['Step 6: Institutional read', 'Separately it checks whether big players are accumulating (buying quietly while small traders sell) or distributing on 15m, 1h, 4h and Daily. The Institutional score (0-100) rises when flow, volume, candles and pressure agree. FINAL means 15m/1h are ready with the 4h behind them.'],
   ['Step 7: Confirmation checklist and grade', 'About 14 to 27 weighted checks (4h/1h/15m agree, net flow, volume, institutional candle, sweep and reclaim, 2nd test held, real breakout, spot volume, OI, CVD, pressure, wallets, funding...). The share met gives a grade: A 82%+, B 68%+, C 52%+, D below. Hard blockers stop a trade call whatever the grade.'],
-  ['Step 8: Power rank (how coins are ordered)', 'Power rank = institutional score x 0.6 + grade % x 40 + 15 if FINAL (5 if building) + verdict strength x 0.2 + 8 if strong - 15 per blocker + data quality adjustment (+5 good, -20 poor) + 5 if R:R at TP1 is 1.5 or more. The Power Scanner and the Best top 10 sort by this.'],
+  ['Step 8: Power rank (how coins are ordered)', 'Power rank (now includes the SMC/ICT Scanner score: + up to 16 when it agrees, GO +4, LATE -8, - up to 20 when it disagrees) = institutional score x 0.6 + grade % x 40 + 15 if FINAL (5 if building) + verdict strength x 0.2 + 8 if strong - 15 per blocker + data quality adjustment (+5 good, -20 poor) + 5 if R:R at TP1 is 1.5 or more. The Power Scanner and the Best top 10 sort by this.'],
   ['Step 9: Trade plan', 'Stop goes beyond the nearest swept liquidity with room for a wick (0.75 to 3 ATR). TP1 is the nearest liquidity pool at least 1.5R away; TP2 a further pool. Leverage is capped so liquidation sits about 3 times further than the stop.'],
   ['Step 10: What the scanner cannot know', 'It cannot see the future, hidden orders or sudden news. It gives you a prepared, evidence-based plan. You still decide, size the risk and place the order.']
 ];
@@ -12797,12 +12823,12 @@ AC_VOCAB.push(['Prediction Radar', 'Page that gives each coin a probability of g
 /* ---------- V5: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
-  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pInst','pPress','pPB','pPD','pBig','pFinal','pBlock']],
+  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pIct','pInst','pPress','pPB','pPD','pBig','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
   ['🏦 Exchanges', ['pVen','pHL','pGap','pList']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pIct','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
   trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','pV1h','pV4h','pV24','fund8']},
@@ -12840,12 +12866,13 @@ function psElite(c, mk){
   const idir = rd && rd.conf && rd.conf.dir ? rd.conf.dir : 0, vdir = hasV ? (v >= 4 ? 1 : (v === 2 || v === 3) ? -1 : 0) : 0, d0 = vdir || idir;
   const is = rd && rd.sc && isNum(rd.sc.score) ? rd.sc.score : null, fin = rd && rd.fin ? rd.fin : {};
   try { o.pd = pdCalc(c, rd); } catch(e){ o.pd = null; } o.is = is; o.fin = fin; o.final = fin.final ? 'FINAL' : fin.building ? 'building' : ''; o.rd = rd; o.V = t10Venues(c); o.dq = isNum(m.dqScore) ? m.dqScore : null; o.hasV = hasV; o.vdir = vdir;
-  if (!d0){ o.tag = 'none'; o.grade = ''; o.p = 0; o.hard = []; o.chk = []; return o; }
+  if (!d0){ o.tag = 'none'; o.grade = ''; o.p = 0; o.hard = []; o.chk = []; try { o.ict = ictBlend(c.name, ''); } catch(e){} return o; }
   const long = d0 > 0, dir = long ? 'long' : 'short', strong = hasV && (v === 5 || v === 3), sc = isNum(m.verdictScore) ? m.verdictScore : 0;
   const chk = sigChecks(c, dir, mk).concat(typeof xcChecks === 'function' ? xcChecks(c, dir) : []), gr = sigGrade(chk), pl = planFor(c), dq = o.dq;
   o.dir = dir; o.chk = chk; o.grade = gr.g; o.ok = gr.ok; o.n = gr.n; o.p = gr.p; o.hard = gr.hard.map(x => x.label); o.pl = pl && pl.dir === dir ? pl : null; o.strong = strong; o.sc = sc;
   o.tag = !vdir ? 'lean' : strong && (gr.g === 'A' || gr.g === 'B') && !gr.hard.length ? 'trade' : strong ? 'wait' : (gr.g === 'A' || gr.g === 'B') ? 'watch' : 'lean';
   o.rank = (is == null ? 30 : is) * 0.6 + gr.p * 40 + (fin.final ? 15 : fin.building ? 5 : 0) + Math.abs(sc) * 0.2 + (strong ? 8 : 0) - gr.hard.length * 15 + (dq == null ? 0 : dq >= 60 ? 5 : dq < 45 ? -20 : 0) + (pl && pl.dir === dir && pl.rr1 >= 1.5 ? 5 : 0);
+  o.rank0 = o.rank; try { const ib = ictBlend(c.name, dir); o.ict = ib; if (ib && ib.pts) o.rank += ib.pts; } catch(e){}
   return o;
 }
 /* ===== V5: PUMP / DUMP engine, big-trade flow (Binance aggTrades), real institutional volume, track record ===== */
@@ -13030,7 +13057,8 @@ function psCols(){
   const P = x => isNum(x) ? fmtPx(x) : '—', side = e => e.dir === 'long' ? ['LONG', 'up'] : e.dir === 'short' ? ['SHORT', 'dn'] : ['—', 'dim'];
   const E = [];
   const add = (id, label, tip, val, cell) => E.push({id, label, tip, val, cell});
-  add('pRank', 'Power rank', 'Combined score: institutional score 60% + signal quality + final/building bonus + verdict strength - blockers + data quality + reward-to-risk. Higher is better.', c => el(c).rank, c => { const r = el(c).rank; return [r == null ? '—' : '<b>' + Math.round(r) + '</b>', r == null ? 'dim' : r >= 70 ? 'up' : r >= 50 ? '' : 'dim']; });
+  add('pRank', 'Power rank', 'Combined score: institutional score 60% + signal quality + final/building bonus + verdict strength - blockers + data quality + reward-to-risk + SMC/ICT agreement (up to +16, or down to -20 if it disagrees). Higher is better.', c => el(c).rank, c => { const r = el(c).rank; return [r == null ? '—' : '<b>' + Math.round(r) + '</b>', r == null ? 'dim' : r >= 70 ? 'up' : r >= 50 ? '' : 'dim']; });
+  add('pIct', 'SMC/ICT', 'The SMC/ICT Scanner read for this coin (15m, 1h, 4h, 12h, Daily). Its score is blended into the Power rank: agreeing adds up to +16, GO adds more, LATE subtracts, disagreeing subtracts up to -20. Blank = not scanned yet (it scans the top 40 coins in the background).', c => { const i = el(c).ict; return i ? (i.rdir ? (i.rdir === 'long' ? 1 : -1) * i.score : 0) : null; }, c => { const i = el(c).ict; if (!i) return ['…', 'dim']; const cls = i.agree === true ? (i.pts < 0 ? 'warn' : 'up') : i.agree === false ? 'dn' : 'dim'; return ['<b>' + i.score + '</b> <small>' + esc(i.rdir ? i.rdir.toUpperCase() + ' · ' + i.stage : 'no side') + (i.pts ? ' · ' + (i.pts > 0 ? '+' : '') + i.pts : '') + '</small>', cls]; });
   add('pSide', 'Side', 'Long or short, from the coin verdict (or the institutional lean when the verdict is neutral).', c => el(c).dir === 'long' ? 1 : el(c).dir === 'short' ? -1 : 0, c => { const s = side(el(c)); return ['<b>' + s[0] + '</b>', s[1]]; });
   add('pTag', 'Status', 'TRADEABLE = strong verdict + grade A/B + no blockers. STRONG, WAIT = strong verdict but checks not ready. WATCH = lean with decent confirmation. LEAN ONLY = not a trade yet.', c => ({trade:4, wait:3, watch:2, lean:1, none:0})[el(c).tag] || 0, c => { const t = PS_TAG[el(c).tag] || PS_TAG.none; return ['<span title="' + esc(t[2]) + '">' + t[0] + '</span>', t[1]]; });
   add('pGrade', 'Grade', 'Signal-quality grade A to D from every confirmation check, with how many were met.', c => { const e = el(c); return e.p == null ? null : e.p; }, c => { const e = el(c); return e.grade ? ['<b>' + e.grade + '</b> <small>' + e.ok + '/' + e.n + '</small>', e.grade === 'A' || e.grade === 'B' ? 'up' : e.grade === 'C' ? 'warn' : 'dn'] : ['—', 'dim']; });
@@ -13131,6 +13159,7 @@ function psDetail(c, D){
   let h = '<div class="psdet">';
   if (e.pd){ const q = e.pd, pc = pdCellOf(q), vc = pdVolCell(q); h += sec('⚡ Pump / dump forecast and real institutional volume', `<div class="cwr"><span>Forecast</span><span class="${pc[1]}">${pc[0]} · ${esc(q.hz)}</span></div><div class="cwr"><span>Institutional volume</span><span class="${vc[1]}">${vc[0]}</span></div><div class="cwr"><span>Energy / direction</span><span>volume energy ${q.energy}/100 · direction evidence ${q.D > 0 ? '+' : ''}${q.D}</span></div>` + (q.why.length ? '<p class="hint"><b>Because</b></p>' + li(q.why) : '') + (q.caution.length ? '<p class="hint"><b class="warn">Caution</b></p>' + li(q.caution) : ''), true); }
   h += sec('1. Why it is on the list', '<p class="hint"><b>Long reasons</b></p>' + li(why(m.vPos, 5)) + '<p class="hint"><b>Short reasons</b></p>' + li(why(m.vNeg, 5)) + (rdWhy(e) ? '<p class="hint">Institutions: ' + esc(rdWhy(e)) + '</p>' : ''), true);
+  if (e.ict){ const q = e.ict; h += sec('SMC/ICT cross-check: ' + esc(q.label), '<p class="hint">' + esc(q.note) + '. Effect on the Power rank: <b>' + (q.pts > 0 ? '+' : '') + q.pts + '</b>.</p><p class="hint">' + esc(q.r.plain || '') + '</p><p class="hint">Conditions met ' + q.r.met + '/13 · open the SMC/ICT Scanner for the entry area, stop and targets.</p>', true); }
   h += sec('2. Trade plan', plan, true);
   h += sec('3. Checklist: ' + okL.length + ' ready · ' + wrnL.length + ' partly · ' + badL.length + ' not ready', '<p class="hint"><b class="up">Ready</b></p>' + li(okL) + '<p class="hint"><b class="warn">Partly</b></p>' + li(wrnL) + '<p class="hint"><b class="dn">Not ready (wait for these)</b></p>' + li(badL), false);
   h += sec('4. Caution before entry', li(notes.length ? notes : ['No special warnings.']), true);
@@ -13170,6 +13199,7 @@ function renderPower(force){
       <div class="psw" id="psWrap"></div></div>`;
     el.addEventListener('click', psClick); el.addEventListener('change', psChange); el.addEventListener('input', e => { if (e.target.id === 'psQ'){ st.q = e.target.value; saveState(); psDraw(true); const q = $('psQ'); if (q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } });
   }
+  setTimeout(() => { try { ictFeed(); } catch(e){} }, 400);
   PS.ctx = {D, cols, groups, vis, rows, shut};
   psBar(st, cols); $('psPickBody').innerHTML = psPickerHtml(cols, groups, st); $('psPickN').textContent = '(' + st.cols.length + ' selected)';
   psDraw(false);
