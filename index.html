@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V6.8</title>
+<title>ELPP CRYPTO SCANNER PRO V6.9</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -816,7 +816,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.8</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V6.9</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -12171,7 +12171,7 @@ function prHtml(){
   const tile = (lab, val, sub, c2) => `<div style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:18px;font-weight:700" class="${c2 || ''}">${val}</div><small class="hint">${esc(sub || '')}</small></div>`;
   const auto = state.proofAuto !== false;
   let h = `<div class="nsec"><h3>Verified results (data for the website)</h3><p class="hint">This page tests the scanner by itself, in the background, with the data it already collects: it tracks every confirmed signal to its result, and it re-runs the historical backtest of every idea about once a day while the app is open. Nothing here is edited by hand. Use the buttons to take the data as a file and show it on your own site in your own design.</p>
-    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm primary" type="button" id="prDl">Download website data (JSON)</button><button class="btn sm" type="button" id="prCp">Copy JSON</button><button class="btn sm" type="button" id="prRun"${BT.run ? ' disabled' : ''}>${BT.run ? 'Backtest running… ' + esc(BT.prog || '') : 'Run all tests now'}</button><button class="btn sm" type="button" id="prHtmlCp">Copy ready HTML block</button><label class="hint"><input type="checkbox" id="prQ"${A.qOnly ? ' checked' : ''}> count quality signals only</label><label class="hint"><input type="checkbox" id="prAuto"${auto ? ' checked' : ''}> run the backtest automatically every day</label></div>
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm primary" type="button" id="prDl">Download website data (JSON)</button><button class="btn sm" type="button" id="prCp">Copy JSON</button><button class="btn sm" type="button" id="prRun"${BT.run ? ' disabled' : ''}>${BT.run ? 'Backtest running… ' + esc(BT.prog || '') : 'Run all tests now'}</button><button class="btn sm" type="button" id="prHtmlCp">Copy ready HTML block</button><button class="btn sm" type="button" id="prFresh">Start fresh record</button><label class="hint"><input type="checkbox" id="prQ"${A.qOnly ? ' checked' : ''}> count quality signals only</label><label class="hint"><input type="checkbox" id="prAuto"${auto ? ' checked' : ''}> run the backtest automatically every day</label></div>
     <p class="hint">${bt ? 'Backtest last run ' + esc(ago(bt.at)) + ' (' + bt.coins + ' coins, ' + bt.days + ' days).' : 'Backtest has not run yet. ' + (auto ? 'It starts by itself a couple of minutes after the app opens.' : 'Press Run all tests now.')}</p></div>`;
   h += `<div class="nsec"><h3>Live track record (real signals, logged as they appeared)</h3><p class="hint"><b>${esc(prLiveText(A))}</b> Showing ${A.qOnly ? 'quality signals only (' + A.nQ + ' of ' + A.nAll + ' closed)' : 'all ' + A.nAll + ' closed signals'}. Win rate counts a trade as a win only when it ends above zero after costs; breakeven stops and tiny scratches count as non-wins, which is why a profitable big-target system can show a low win rate (all signals: ${f(A.winAll, 'p')}).</p>`;
   if (!A.n) h += '<p class="hint">No closed signals yet. Keep the app open: signals are logged when a confirmed Strong set-up appears and close at a target, the stop or after 24 hours.</p>';
@@ -12203,7 +12203,8 @@ function prAuto(){
 setInterval(() => { try { prAuto(); if (state.view === 'proof') renderProof(); } catch(e){} }, 60000);
 window.__elppProof = prBuild;
 document.addEventListener('click', e => {
-  const t = e.target.closest && e.target.closest('#prDl,#prCp,#prRun,#prHtmlCp,#prQ'); if (!t) return;
+  const t = e.target.closest && e.target.closest('#prDl,#prCp,#prRun,#prHtmlCp,#prQ,#prFresh'); if (!t) return;
+  if (t.id === 'prFresh'){ if (!confirm('Start a fresh track record? The old signals are saved to a backup and removed from the record. Only new quality signals will count from now. The backtest re-runs now.')) return; try { localStorage.setItem('elpp_siglog_backup_' + Date.now(), JSON.stringify(SIG.list)); } catch(_){} SIG.list = []; sigSave(); state.proofQ = true; try { LS.set('elpp_proof_bt', null); } catch(_){} PRS.tried = 0; try { if (!BT.run) { BT.coins = 20; BT.days = 60; btRun(); } } catch(_){} renderProof(); try { renderSignals(); } catch(_){} toast('Fresh record started'); return; }
   if (t.id === 'prQ'){ state.proofQ = t.checked; try { saveState && saveState(); } catch(_){} renderProof(); return; }
   if (t.id === 'prHtmlCp'){ const B = prBuild().live, h = '<div class="elpp-track" style="font-family:system-ui,sans-serif;border:1px solid #2a3140;border-radius:12px;padding:16px;max-width:520px">\n  <h3 style="margin:0 0 8px">ELPP live track record</h3>\n  <p style="margin:0 0 10px;opacity:.7">' + B.mode + ' &middot; ' + B.closedSignals + ' closed signals</p>\n  <ul style="list-style:none;padding:0;margin:0;line-height:1.8">\n    <li>Win rate: <b>' + B.winPct + '%</b> (excl. breakeven ' + B.winPctExcludingScratches + '%)</li>\n    <li>Average per trade: <b>' + B.averageR + 'R</b></li>\n    <li>Total: <b>' + B.totalR + 'R</b></li>\n    <li>Profit factor: <b>' + B.profitFactor + '</b></li>\n    <li>Worst drop: <b>' + B.maxDrawdownR + 'R</b></li>\n  </ul>\n  <p style="margin:10px 0 0;font-size:12px;opacity:.6">Real signals logged live and tracked to target, stop or 24h expiry, costs included. Past results do not guarantee future results.</p>\n</div>'; (navigator.clipboard ? navigator.clipboard.writeText(h).then(() => toast('HTML block copied'), () => toast('Copy blocked')) : toast('Copy not supported')); return; }
   if (t.id === 'prDl') jrDownload('ELPP-proof-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(prBuild(), null, 1), 'application/json');
