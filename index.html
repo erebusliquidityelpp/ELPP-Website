@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V7.9</title>
+<title>ELPP CRYPTO SCANNER PRO V8.0</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -816,7 +816,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V7.9</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V8.0</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10084,18 +10084,18 @@ function cselCompute(){
   try { tmwCompute(); } catch(e){ console.error(e); }
   const all = (TMW.all || []).filter(r => r.side && r.c && r.c.m), out = all.map(r => { const m = r.c.m, E = r.E || {}, strong = !!E.strong, z = cselZone(m, r.side), reg = isNum(m.regime) ? m.regime : null;
     const f = E.fin || {}, side = r.side, mis = (f.missing || []).length; let pp = 0, pt = ''; if (f.dir){ const ph = f.final ? 'GO' : f.late ? 'LATE' : mis <= 1 ? 'READY' : 'BUILDING'; pt = (f.dir > 0 ? '▲ BUYING' : '▼ SELLING') + ' · ' + ph; pp = f.dir === side ? (f.final ? 4 : f.late ? -3 : mis <= 1 ? 2 : 1) : -6; }
-    let sc = r.score + pp; if (z.fit) sc += 2; if (!strong) sc -= 8; if (E.hard && E.hard.length) sc -= 5; return {name: r.name, score: Math.max(0, Math.min(100, Math.round(sc))), side: r.side, strong, zone: z, press: pt, pressOk: !!f.dir && f.dir === side, phase: reg != null ? CSEL_PHASE[reg] : null, tier: r.tier, x: r}; });
+    let sc = r.score + pp; if (z.fit) sc += 2; if (!strong) sc -= 8; if (E.hard && E.hard.length) sc -= 5; return {name: r.name, score: Math.max(0, Math.min(100, Math.round(sc))), side: r.side, strong, zone: z, ex: (() => { try { return instListed(r.c).on; } catch(e){ return []; } })(), press: pt, pressOk: !!f.dir && f.dir === side, phase: reg != null ? CSEL_PHASE[reg] : null, tier: r.tier, x: r}; });
   out.sort((a, b) => b.score - a.score); CSEL.rows = out.slice(0, 10); CSEL.at = Date.now(); return CSEL.rows;
 }
 function cselHtml(){
   const R = CSEL.rows; if (!R.length) return '<p class="hint">Reading every scanner… the list appears as soon as the first coins have data.</p>';
   const sc = v => v >= 75 ? 'up' : v >= 60 ? '' : 'warn';
-  return '<table class="pst" style="width:100%;max-width:760px"><thead><tr><th style="text-align:left">#  Coin</th><th title="Power Scanner, Prediction Radar, SMC/ICT, crowd/funding, flush, OTE and data quality combined into one 0-100 score">Combined score</th><th title="Market phase of the coin on the 4h: accumulation, distribution, manipulation (sweep and reclaim) or consolidation (chop)">Phase</th><th title="Strong long or strong short from the full verdict. Lean means the verdict is not strong yet">Verdict</th><th title="Discount (cheap half) or premium (expensive half) and whether price is in the golden OTE pullback zone">Disc / Prem zone</th></tr></thead><tbody>' +
-    R.map((r, i) => '<tr><td style="text-align:left"><b>' + (i + 1) + '.</b> <b>' + esc(r.name) + '</b></td><td class="' + sc(r.score) + '"><b>' + r.score + '</b></td><td class="' + (r.phase ? r.phase[1] : 'dim') + '">' + (r.phase ? r.phase[0] : '—') + '</td><td class="' + (r.side > 0 ? 'up' : 'dn') + '"><b>' + (r.strong ? 'STRONG ' : 'LEAN ') + (r.side > 0 ? 'LONG' : 'SHORT') + '</b>' + (r.press ? '<br><small class="' + (r.pressOk ? (r.side > 0 ? 'up' : 'dn') : 'warn') + '" title="Institutional buying or selling pressure and how close it is to firing (GO = all conditions met, READY = one missing, BUILDING = forming)">' + esc(r.press) + '</small>' : '') + '</td><td class="' + r.zone.c + '">' + esc(r.zone.t) + (r.zone.fit ? ' ✓' : '') + '</td></tr>').join('') + '</tbody></table>';
+  return '<table class="pst" style="width:100%;max-width:760px"><thead><tr><th style="text-align:left">#  Coin</th><th title="Power Scanner, Prediction Radar, SMC/ICT, crowd/funding, flush, OTE and data quality combined into one 0-100 score">Combined score</th><th title="Market phase of the coin on the 4h: accumulation, distribution, manipulation (sweep and reclaim) or consolidation (chop)">Phase</th><th title="Strong long or strong short from the full verdict. Lean means the verdict is not strong yet">Verdict</th><th title="Discount (cheap half) or premium (expensive half) and whether price is in the golden OTE pullback zone">Disc / Prem zone</th><th title="Exchanges where this coin trades: HL = Hyperliquid, BN perp / BN spot = Binance futures / spot, plus Bybit, OKX, MEXC and others">Exchanges</th></tr></thead><tbody>' +
+    R.map((r, i) => '<tr><td style="text-align:left"><b>' + (i + 1) + '.</b> <b>' + esc(r.name) + '</b></td><td class="' + sc(r.score) + '"><b>' + r.score + '</b></td><td class="' + (r.phase ? r.phase[1] : 'dim') + '">' + (r.phase ? r.phase[0] : '—') + '</td><td class="' + (r.side > 0 ? 'up' : 'dn') + '"><b>' + (r.strong ? 'STRONG ' : 'LEAN ') + (r.side > 0 ? 'LONG' : 'SHORT') + '</b>' + (r.press ? '<br><small class="' + (r.pressOk ? (r.side > 0 ? 'up' : 'dn') : 'warn') + '" title="Institutional buying or selling pressure and how close it is to firing (GO = all conditions met, READY = one missing, BUILDING = forming)">' + esc(r.press) + '</small>' : '') + '</td><td class="' + r.zone.c + '">' + esc(r.zone.t) + (r.zone.fit ? ' ✓' : '') + '</td><td style="text-align:left">' + (r.ex && r.ex.length ? r.ex.map(x => '<span class="tagp ' + (/^HL$|BN perp/.test(x) ? 'good' : '') + '">' + esc(x) + '</span>').join(' ') : '<span class="dim">—</span>') + '</td></tr>').join('') + '</tbody></table>';
 }
 function cselRender(redo){
   const el = $('viewCsel'); if (!el) return;
-  if (!el._b){ el._b = 1; el.innerHTML = '<div class="nsec"><h3>Coin\'s selection: the 10 best coins</h3><p class="hint">Each coin is checked through all the scanners (Power Scanner, Prediction Radar, SMC/ICT Scanner, funding and crowd, crowd flushed, discount / OTE zone, institutional data and data quality). Only the 10 best are kept and shown with four columns. Under the verdict you also see whether buying or selling pressure is building (BUILDING, READY or GO) and it counts in the score. A tick means price sits in the right zone for the side. Rows marked LEAN have a lean, not a strong verdict yet. Educational, not financial advice.</p><p class="hint" id="cselNote"></p><div id="cselWrap" style="overflow:auto"></div></div>'; el.addEventListener('click', () => {}); }
+  if (!el._b){ el._b = 1; el.innerHTML = '<div class="nsec"><h3>Coin\'s selection: the 10 best coins</h3><p class="hint">Each coin is checked through all the scanners (Power Scanner, Prediction Radar, SMC/ICT Scanner, funding and crowd, crowd flushed, discount / OTE zone, institutional data and data quality). Only the 10 best are kept and shown with four columns plus an Exchanges column that lists where each coin trades (HL = Hyperliquid, BN = Binance). Under the verdict you also see whether buying or selling pressure is building (BUILDING, READY or GO) and it counts in the score. A tick means price sits in the right zone for the side. Rows marked LEAN have a lean, not a strong verdict yet. Educational, not financial advice.</p><p class="hint" id="cselNote"></p><div id="cselWrap" style="overflow:auto"></div></div>'; el.addEventListener('click', () => {}); }
   if (!CSEL.at || Date.now() - CSEL.at > 30000 || redo){ try { cselCompute(); } catch(e){ console.error(e); } }
   const w = $('cselWrap'), h = cselHtml(); if (w && w._h !== h){ w.innerHTML = h; w._h = h; } const n = $('cselNote'); if (n) n.textContent = CSEL.at ? 'Updated ' + ago(CSEL.at) + (TMW.feeding ? ' · adding SMC/ICT reads…' : '') : '';
   setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300);
