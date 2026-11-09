@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V8.5</title>
+<title>ELPP CRYPTO SCANNER PRO V8.6</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -816,7 +816,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V8.5</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V8.6</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10361,7 +10361,7 @@ function trdRender(force){
       if (t.id === 'trdEx'){ TRD.ex = t.value; trdRender(true); trdRefresh(); } else if (t.id === 'trdMode'){ trdSetMode(t.value); } else if (t.dataset.f === 'side'){ TRD.side = t.value; trdPreview(); } else if (t.dataset.f === 'type'){ TRD.type = t.value; trdRender(true); } else if (t.dataset.f === 'tif'){ TRD.tif = t.value; trdPreview(); }
       else if (t.id === 'trdKill'){ const c = trdCfg(); c.kill = t.checked; trdCfgSave(c); trdRender(true); }
       else if (t.dataset.cfg){ const c = trdCfg(), id = t.dataset.cfg; if (id === 'verified'){ c.verified = Object.assign({}, c.verified); c.verified[TRD.ex] = t.checked; } else if (t.type === 'checkbox') c[id] = t.checked; else if (id === 'hedge') c.hedge = t.value === 'true'; else if (id === 'margin' || id === 'sizing') c[id] = t.value; else { const v = parseFloat(t.value); c[id] = isNum(v) && v >= 0 ? v : TRD_CFG_DEF[id]; } trdCfgSave(c); trdRender(true); } }); }
-  if (!force && el._built) return; el._built = 1; const keepFocus = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.f;
+  if (typeof ELPPX === 'undefined'){ el._built = 0; return; } if (!force && el._built) return; el._built = 1; const keepFocus = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.f;
   const names = (() => { try { return (CSEL.rows || []).map(r => r.name).concat(psData(false).live.slice(0, 120).map(c => c.name)).filter((v, i, a) => a.indexOf(v) === i).slice(0, 140); } catch(e){ return []; } })();
   const modeLab = {paper: 'PAPER (practice, fake money)', test: 'TEST NETWORK (exchange test money)', live: 'LIVE (real money)'}, mv = cfg.mode === 'live' ? 'live' : cfg.mode === 'paper' ? 'paper' : 'test';
   const A = ELPPX.EX[TRD.ex], real = cfg.mode !== 'paper', hasVault = !!localStorage.getItem('elpp_trd_vault'), types = (real ? A.caps.types : ['market', 'limit', 'postonly', 'stop', 'stoplimit']).concat(ALGO);
