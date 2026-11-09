@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V7.2</title>
+<title>ELPP CRYPTO SCANNER PRO V7.3</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -816,7 +816,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V7.2</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V7.3</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -13543,6 +13543,9 @@ function renderPower(force){
       <details class="ovd" id="psPick" style="margin:6px 0"><summary><b>Choose columns</b> <small class="dim" id="psPickN"></small></summary><div id="psPickBody" style="margin-top:6px"></div></details>
       <div id="psGuideBox"></div><p class="hint" id="psNote"></p>
       <div class="psw" id="psWrap"></div></div>`;
+    el.addEventListener('keydown', e => { if (e.key !== 'Enter' || e.target.id !== 'psQ') return; e.preventDefault(); const q = e.target.value.trim(); if (!q) return; st.q = q; saveState(); psDraw(true); const R = PS.shown || [];
+      if (R.length){ const c0 = R.find(c => c.name.toUpperCase() === q.toUpperCase()) || R[0]; PS.open.add(c0.name); psDraw(true); e.target.blur(); setTimeout(() => { const tr = document.querySelector('#psWrap tr[data-psn="' + (window.CSS && CSS.escape ? CSS.escape(c0.name) : c0.name) + '"]'); if (tr && tr.scrollIntoView) tr.scrollIntoView({block:'center', behavior:'smooth'}); }, 50); }
+      else { toast('Not in the Power table: opening Coin Lookup for ' + q.toUpperCase()); const b = document.querySelector('#side .nv[data-view="lookup"]'); if (b) b.click(); setTimeout(() => { const i = $('lkIn'); if (i) i.value = q; try { lkScan(q); } catch(err){} }, 450); } });
     el.addEventListener('click', psClick); el.addEventListener('change', psChange); el.addEventListener('input', e => { if (e.target.id === 'psQ'){ st.q = e.target.value; saveState(); psDraw(true); const q = $('psQ'); if (q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } });
   }
   setTimeout(() => { try { ictFeed(); } catch(e){} }, 400);
