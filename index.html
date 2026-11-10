@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V8.8</title>
+<title>ELPP CRYPTO SCANNER PRO V9.0</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -141,6 +141,7 @@ header.top .chips .chip-pop b{color:var(--fg);font-weight:500;font-family:var(--
 .maplg i{font-style:normal;color:#fff;padding:2px 8px;border-radius:3px;font-family:var(--mono);text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .dkgrid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;margin-top:10px}
 @media (max-width:900px){.dkgrid{grid-template-columns:1fr}}
+.wxb{font:700 9px var(--mono);color:#16a085;border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-left:3px;vertical-align:super;line-height:1.3}
 .dkbadge{margin-left:auto;font:600 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 10px}
 .dktab{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
 .dktab th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--line)}
@@ -816,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V8.8</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.0</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -849,6 +850,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <button class="nv" type="button" data-view="overview" style="font-weight:700">Overview: market summary</button>
     <button class="nv" type="button" data-view="trading" style="font-weight:700">💱 TRADING: place trades</button>
     <button class="nv" type="button" data-view="nowcast" style="font-weight:700">📊 Data Release Predictor: CPI, jobs</button>
+    <button class="nv" type="button" data-view="weexcoins" style="font-weight:700">🟩 WEEX coins: what is listed</button>
     <details class="ng" data-g="scanner" open><summary>Scanners</summary>
     <button class="nv" type="button" data-mode="perp">Perp Scalp: long/short signals</button>
     <button class="nv" type="button" data-mode="spot">Spot: accumulate &amp; hold</button>
@@ -1016,6 +1018,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
       </select></div>
       <div class="fld"><label class="hint" for="venueSel">Data source</label><select id="venueSel" aria-label="Exchange data source"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select></div>
       <label class="tg"><input type="checkbox" id="onlyPass"> Only qualifying</label>
+      <label class="tg"><input type="checkbox" id="onlyWeex"> Only coins on WEEX</label>
       <label class="tg" title="If fewer coins pass, fill the list with the closest matches">Show at least <input type="number" id="minShow" min="0" max="30" style="width:52px"> coins</label>
       <span class="sp"></span>
       <button class="btn" id="btnPause" type="button">Pause</button>
@@ -1085,6 +1088,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <div id="viewCsel" class="vcol" hidden></div>
     <div id="viewTrd" class="vcol" hidden></div>
     <div id="viewNowcast" class="vcol" hidden></div>
+    <div id="viewWeex" class="vcol" hidden></div>
     <div id="viewPredict" class="vcol" hidden></div>
     <div id="viewAcademy" class="vcol" hidden></div>
     <div id="viewInst" class="vcol" hidden></div>
@@ -1972,7 +1976,7 @@ function loadPreset(name){
 if (!SCOPES[state.scope]) state.scope = 'all';
 if (!state.scopes || typeof state.scopes !== 'object') state.scopes = {};
 if (!MODES[state.mode]) state.mode = 'perp';
-const VIEW_LIST = ['power','ictscan','tomorrow','csel','trading','nowcast','predict','academy','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
+const VIEW_LIST = ['power','ictscan','tomorrow','csel','trading','nowcast','weexcoins','predict','academy','table','news','flows','drops','whales','movers','lookup','elite','charts','ta','map','sdesk','memes','options','orderflow','signals','watch','screener','inst','instspot','overview','listings','journal','prep','ei','api','bt','today','proof','decide'];
 if (!VIEW_LIST.includes(state.view)) state.view = 'table';
 function menuTabHref(view){ return location.pathname + location.search + '#view=' + view; }
 function menuTabHrefMode(mode){ return location.pathname + location.search + '#view=table&mode=' + mode; }
@@ -2056,7 +2060,7 @@ function saveState(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (state.rules) stashScope();
-    const o = {}; for (const k of ['hip3','watch','scr','ps','pr','inst','instSpot','wlCfg','wlLog','minShow','cs','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','proofQ','sigExpH','feeGate','minStopPct','proofAcct','proofRisk','feeMaxR','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
+    const o = {}; for (const k of ['onlyWeex','hip3','watch','scr','ps','pr','inst','instSpot','wlCfg','wlLog','minShow','cs','xToken','xProxy','xDepth','drops','wh','mv','map','dk','mxRelay','alerts','mac','pf','mySize','hlpAddrs','cz','cmc','opt','extf','acct','optSel','ofSel','icSel','moveSel','boSel','takeSel','takeMin','phaseSel','pressSel','pressMin','view','newsType','autoApply','mode','tierBy','cgKey','sector','newsFilter','hiddenColsCg','scope','scopes','tier','btcLink','preset','edited','rules','minSoft','aSoft','missing','topN','statsTf','readTf','closedOnly','onlyPass','sort','theme','panelOpen','custom','refreshSec','search','sweepBars','hiddenCols','venueMode','sigStrict','lkHist','alch','hel','ocl','pubProxy','pxMain','ei','aplus','capSide','regGate','rg','pap','bw','brief','proofAuto','proofQ','sigExpH','feeGate','minStopPct','proofAcct','proofRisk','feeMaxR','stopMode','adapt','dayCap','qMin']) o[k] = state[k];
     LS.set('elpp_scan_state_v1', o);
   }, 300);
 }
@@ -5231,9 +5235,12 @@ function allColumns(){
 
 /* ---------- render ---------- */
 let renderT = null, lastRender = 0, snapshot = new Map();
+const TBL = {th:'', tb:'', ok:0};
 function requestRender(){
   if (renderT) return;
-  const wait = Math.max(0, 900 - (Date.now() - lastRender));
+  /* the table page refreshes about once a second; every other page, and a hidden tab, refresh much less often */
+  const gap = document.hidden ? 15000 : state.view === 'table' ? 900 : 2500;
+  const wait = Math.max(0, gap - (Date.now() - lastRender));
   renderT = setTimeout(() => { renderT = null; render(); }, wait);
 }
 function render(){
@@ -5251,12 +5258,12 @@ function render(){
   for (const c of pool){
     if (market){ cmp(c); if (!c.cg) continue; }
     for (const k in SCOPES) if (inScope(c, k)) counts[k]++;
-    if (inScope(c, state.scope)){ if (passExtra(c)){ c.ev = evaluate(c); live.push(c); } else if (!market) extraFail.push(c); }
+    if (inScope(c, state.scope) && (!state.onlyWeex || !WX.set.size || wxHas(c.name))){ if (passExtra(c)){ c.ev = evaluate(c); live.push(c); } else if (!market) extraFail.push(c); }
   }
   snapshot = new Map(live.map(c => [c.name, c]));
   try { wlTick(); } catch(e){}
   renderModes(); renderScopes(counts); renderMarket(allLoaded); applyView();
-  if (state.view === 'power') renderPower(); else if (state.view === 'ictscan') renderIct(); else if (state.view === 'tomorrow') tmwRender(); else if (state.view === 'csel') cselRender(); else if (state.view === 'trading') trdRender(false); else if (state.view === 'nowcast') ncRender(); else if (state.view === 'predict') renderPredict(); else if (state.view === 'academy') renderAcademy(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
+  if (state.view === 'power') renderPower(); else if (state.view === 'ictscan') renderIct(); else if (state.view === 'tomorrow') tmwRender(); else if (state.view === 'csel') cselRender(); else if (state.view === 'trading') trdRender(false); else if (state.view === 'nowcast') ncRender(); else if (state.view === 'weexcoins') wxRender(false); else if (state.view === 'predict') renderPredict(); else if (state.view === 'academy') renderAcademy(); else if (state.view === 'today') renderToday(); else if (state.view === 'decide') renderDecide(); else if (state.view === 'proof') renderProof(); else if (state.view === 'bt') renderBt(); else if (state.view === 'api') renderApi(); else if (state.view === 'ei') renderEI(); else if (state.view === 'prep') renderPrep(); else if (state.view === 'journal') renderJournal(); else if (state.view === 'listings') renderListings(); else if (state.view === 'overview') renderOverview(); else if (state.view === 'news') renderNewsView(); else if (state.view === 'flows') renderFlowsView(); else if (state.view === 'drops') renderDropsView(); else if (state.view === 'whales') renderWhales(); else if (state.view === 'movers') renderMovers(); else if (state.view === 'lookup') renderLookup(); else if (state.view === 'elite') renderElite(); else if (state.view === 'charts') renderCharts(); else if (state.view === 'ta') { try { if (window.TA) TA.render($('viewTa')); } catch(e){ console.error(e); } } else if (state.view === 'map') renderMap(); else if (state.view === 'sdesk') renderSdesk(); else if (state.view === 'memes') renderMemes(); else if (state.view === 'options') renderOptions(); else if (state.view === 'orderflow') renderOrderflowView(); else if (state.view === 'signals') renderSignals(); else if (state.view === 'watch') renderWatch(); else if (state.view === 'screener') renderScreener(); else if (state.view === 'inst') renderInst(); else if (state.view === 'instspot') renderInstSpot();
   renderSources();
   /* per-rule pass counts */
   const tally = {}; for (const r of state.rules) tally[r.id] = {ok:0, known:0};
@@ -5291,13 +5298,16 @@ function render(){
   });
 
   if (near.size) rows = rows.filter(c => !near.has(c.name)).concat(rows.filter(c => near.has(c.name)));
-  $('thead').innerHTML = '<tr>' + cols.map(c => `<th data-sort="${c.id}" class="${c.id === sc.id ? 'sorted' : ''}">${esc(c.label)}${c.id === sc.id ? (dir < 0 ? ' ▼' : ' ▲') : ''}</th>`).join('') + '</tr>';
+  if (state.view === 'table' || !TBL.ok){
+  const thH = '<tr>' + cols.map(c => `<th data-sort="${c.id}" class="${c.id === sc.id ? 'sorted' : ''}">${esc(c.label)}${c.id === sc.id ? (dir < 0 ? ' ▼' : ' ▲') : ''}</th>`).join('') + '</tr>';
+  let tbH;
   if (!rows.length){
-    $('tbody').innerHTML = `<tr><td colspan="${cols.length}" class="empty" style="text-align:center">${emptyMsg(live, loading, tally)}</td></tr>`;
+    tbH = `<tr><td colspan="${cols.length}" class="empty" style="text-align:center">${emptyMsg(live, loading, tally)}</td></tr>`;
   } else {
-    $('tbody').innerHTML = rows.map(c => '<tr' + (near.has(c.name) ? ' class="near" title="Closest match: does not pass all your filters yet"' : '') + '>' + cols.map(col => { const [h, cls, st] = col.cell(c); return `<td class="${cls || ''}"${st ? ` style="${st}"` : ''}>${h}</td>`; }).join('') + '</tr>').join('');
+    tbH = rows.map(c => '<tr' + (near.has(c.name) ? ' class="near" title="Closest match: does not pass all your filters yet"' : '') + '>' + cols.map(col => { const [h, cls, st] = col.cell(c); return `<td class="${cls || ''}"${st ? ` style="${st}"` : ''}>${h}</td>`; }).join('') + '</tr>').join('');
   }
-
+  if (thH !== TBL.th){ $('thead').innerHTML = thH; TBL.th = thH; } if (tbH !== TBL.tb){ $('tbody').innerHTML = tbH; TBL.tb = tbH; } TBL.ok = 1;
+  }
   try { cpAuto(rows.map(c => c.name)); } catch(e){}
   /* summary */
   $('summary').innerHTML = `<span><b>${nOk}</b> qualify</span><span><b>${nA}</b> A-grade</span><span><b>${live.length}</b> in ${esc(state.mode === 'perp' ? SCOPES[state.scope] : MODES[state.mode] + ' · ' + SCOPES[state.scope])}</span>` +
@@ -5574,7 +5584,7 @@ function xcHtml(c){
     <p class="hint">Pressure = taker buys against taker sells in each exchange's latest public trades (Hyperliquid: live trades collected since you scanned). Windows differ by exchange, so read the net % and the agreement, not the dollar sizes. Book imbalance = bid minus ask depth within 1% of price. Top-trader and open-interest checks use Binance and Bybit public data. Refreshes about every 20 seconds.</p></div>`;
 }
 /* ---------- more exchanges: spot premiums (Coinbase, Upbit, Bithumb), extra perps (Kraken, BitMEX, BingX, HTX, Phemex) and DEX perps (Aster, Drift) ---------- */
-const EVN = {coinbase:{n:'Coinbase', t:'Spot'}, upbit:{n:'Upbit (KRW)', t:'Spot'}, bithumb:{n:'Bithumb (KRW)', t:'Spot'}, kraken:{n:'Kraken Futures', t:'CEX perp'}, bitmex:{n:'BitMEX', t:'CEX perp'}, bingx:{n:'BingX', t:'CEX perp'}, htx:{n:'HTX', t:'CEX perp'}, phemex:{n:'Phemex', t:'CEX perp'}, aster:{n:'Aster', t:'DEX perp'}, drift:{n:'Drift', t:'DEX perp'}};
+const EVN = {coinbase:{n:'Coinbase', t:'Spot'}, upbit:{n:'Upbit (KRW)', t:'Spot'}, bithumb:{n:'Bithumb (KRW)', t:'Spot'}, kraken:{n:'Kraken Futures', t:'CEX perp'}, bitmex:{n:'BitMEX', t:'CEX perp'}, bingx:{n:'BingX', t:'CEX perp'}, htx:{n:'HTX', t:'CEX perp'}, phemex:{n:'Phemex', t:'CEX perp'}, weex:{n:'WEEX', t:'CEX perp'}, aster:{n:'Aster', t:'DEX perp'}, drift:{n:'Drift', t:'DEX perp'}};
 const EVL = Object.keys(EVN);
 const EV = {name:'', rows:{}, err:{}, cache:{}, at:0, krw:null, krwAt:0, busy:false};
 const evSt = {}, evLast = {};
@@ -5595,9 +5605,54 @@ const EVB = { /* bulk tickers: Map<coin, {sym, mark (USD), funding (fraction per
   async bingx(){ const [a, b] = await Promise.all([evget('bingx', 'https://open-api.bingx.com/openApi/swap/v2/quote/ticker'), evget('bingx', 'https://open-api.bingx.com/openApi/swap/v2/quote/premiumIndex')]), pm = new Map((b.data || []).map(x => [x.symbol, x])), mp = new Map(); for (const t of (a.data || [])){ const m = /^([A-Z0-9]+)-USDT$/.exec(t.symbol || ''); if (!m) continue; const p = pm.get(t.symbol) || {}, mark = vnum(p.markPrice) > 0 ? vnum(p.markPrice) : vnum(t.lastPrice); if (!(mark > 0)) continue; const fr = vnum(p.lastFundingRate); mp.set(m[1], {sym:t.symbol, mark, funding:isFinite(fr) ? fr / 8 : null, oi:null, vol:vnum(t.quoteVolume)}); } return mp; },
   async htx(){ const [a, b] = await Promise.all([evget('htx', 'https://api.hbdm.com/linear-swap-ex/market/detail/batch_merged'), evget('htx', 'https://api.hbdm.com/linear-swap-api/v1/swap_batch_funding_rate').catch(() => ({data:[]}))]), fm = new Map((b.data || []).map(x => [x.contract_code, vnum(x.funding_rate)])), mp = new Map(); for (const t of (a.ticks || [])){ const m = /^([A-Z0-9]+)-USDT$/.exec(t.contract_code || ''); if (!m) continue; const mark = vnum(t.close); if (!(mark > 0)) continue; const fr = fm.get(t.contract_code); mp.set(m[1], {sym:t.contract_code, mark, funding:isFinite(fr) ? fr / 8 : null, oi:null, vol:vnum(t.trade_turnover)}); } return mp; },
   async phemex(){ const j = await evget('phemex', 'https://api.phemex.com/md/v3/ticker/24hr/all'), mp = new Map(); for (const t of (j.result || j.data || [])){ const m = /^([A-Z0-9]+)USDT$/.exec(t.symbol || ''); if (!m) continue; const mark = vnum(t.markPriceRp), fr = vnum(t.fundingRateRr); if (!(mark > 0)) continue; mp.set(m[1], {sym:t.symbol, mark, funding:isFinite(fr) ? fr / 8 : null, oi:isFinite(vnum(t.openInterestRv)) ? vnum(t.openInterestRv) * mark : null, vol:vnum(t.turnoverRv)}); } return mp; },
+  async weex(){ const [a, b] = await Promise.all([evget('weex', 'https://api-contract.weex.com/capi/v3/market/exchangeInfo'), evget('weex', 'https://api-contract.weex.com/capi/v3/market/ticker/24hr').catch(() => null)]), tm = new Map((Array.isArray(b) ? b : (b && b.data) || []).map(x => [x.symbol, x])), mp = new Map(); for (const s of ((a && (a.symbols || a.data)) || [])){ const m = /^([A-Z0-9]+)USDT$/.exec(s.symbol || ''); if (!m) continue; const t = tm.get(s.symbol) || {}, mark = vnum(t.lastPrice); if (!(mark > 0)) continue; mp.set(evBase(m[1]), {sym:s.symbol, mark, funding:null, oi:null, vol:vnum(t.quoteVolume) > 0 ? vnum(t.quoteVolume) : null}); } return mp; },
   async aster(){ const [a, b] = await Promise.all([evget('aster', 'https://fapi.asterdex.com/fapi/v1/ticker/24hr'), evget('aster', 'https://fapi.asterdex.com/fapi/v1/premiumIndex')]), pm = new Map((b || []).map(x => [x.symbol, x])), mp = new Map(); for (const t of (a || [])){ if (!/USDT$/.test(t.symbol || '')) continue; const p = pm.get(t.symbol) || {}, mark = vnum(p.markPrice) > 0 ? vnum(p.markPrice) : vnum(t.lastPrice); if (!(mark > 0)) continue; const fr = vnum(p.lastFundingRate); mp.set(vKey(t.symbol.slice(0, -4)), {sym:t.symbol, mark, funding:isFinite(fr) ? fr / 8 : null, oi:null, vol:vnum(t.quoteVolume)}); } return mp; },
   async drift(){ const j = await evget('drift', 'https://data.api.drift.trade/contracts'), mp = new Map(); for (const t of (j.contracts || [])){ const m = /^([A-Z0-9]+)-PERP$/.exec(t.ticker_id || ''); if (!m) continue; const mark = vnum(t.last_price); if (!(mark > 0)) continue; mp.set(m[1], {sym:t.ticker_id, mark, funding:null, oi:null, vol:vnum(t.quote_volume)}); } return mp; }
 };
+/* ---------- WEEX: which coins are listed there (badge in every scanner, filter, own page) ---------- */
+const WX = {set:new Map(), at:0, err:'', busy:false, q:'', only:false};
+async function wxGet(url){ try { return await evget('weex', url); } catch(e){ try { return JSON.parse(await pxText(url)); } catch(e2){ throw e; } } }
+async function wxLoad(force){
+  if (WX.busy || (!force && WX.at && Date.now() - WX.at < 1800000)) return; WX.busy = true;
+  try {
+    const [inf, tk] = await Promise.all([wxGet('https://api-contract.weex.com/capi/v3/market/exchangeInfo'), wxGet('https://api-contract.weex.com/capi/v3/market/ticker/24hr').catch(() => null)]);
+    const tm = new Map((Array.isArray(tk) ? tk : (tk && tk.data) || []).map(x => [x.symbol, x])), mp = new Map();
+    for (const s of ((inf && (inf.symbols || inf.data)) || [])){ const m = /^([A-Z0-9]+)USDT$/.exec(s.symbol || ''); if (!m || (s.status && !/TRADING|ONLINE|NORMAL/i.test(s.status))) continue; const t = tm.get(s.symbol) || {}; mp.set(evBase(m[1]), {sym:s.symbol, px:vnum(t.lastPrice), vol:vnum(t.quoteVolume) > 0 ? vnum(t.quoteVolume) : (vnum(t.volume) * vnum(t.lastPrice) || null), chg:vnum(t.priceChangePercent)}); }
+    if (!mp.size) throw new Error('empty list'); WX.set = mp; WX.at = Date.now(); WX.err = '';
+  } catch(e){ WX.err = (e && e.message) || 'blocked'; if (!WX.at) WX.at = Date.now() - 1500000; }
+  finally { WX.busy = false; }
+  wxDecorate(true); if (state.view === 'weexcoins') wxRender(true);
+}
+const wxKey = name => { const p = vPlain(name); if (WX.set.has(p)) return p; if (WX.set.has('1000' + p)) return '1000' + p; if (/^1000/.test(p) && WX.set.has(p.slice(4))) return p.slice(4); return null; };
+const wxHas = name => !!WX.set.size && !!wxKey(name);
+/* coin links (a[data-chart]) in any scanner get a small W badge when the coin trades on WEEX; one cheap pass, marks what it has seen */
+let wxT = 0;
+function wxDecorate(all){
+  if (!WX.set.size) return;
+  if (all) document.querySelectorAll('a[data-chart][data-wx]').forEach(a => { a.removeAttribute('data-wx'); const n = a.nextElementSibling; if (n && n.classList.contains('wxb')) n.remove(); });
+  document.querySelectorAll('a[data-chart]:not([data-wx])').forEach(a => { a.setAttribute('data-wx', '1'); const n = a.dataset.chart; if (a.textContent.trim() !== n || !wxHas(n)) return; a.insertAdjacentHTML('afterend', '<span class="wxb" title="Listed on WEEX futures">W</span>'); });
+}
+function wxSchedule(){ if (wxT) return; wxT = setTimeout(() => { wxT = 0; try { wxDecorate(false); } catch(e){} }, 400); }
+try { new MutationObserver(wxSchedule).observe(document.body, {childList:true, subtree:true}); } catch(e){}
+function wxRender(force){
+  const el = $('viewWeex'); if (!el) return;
+  if (!el._b){ el._b = 1; el.addEventListener('input', e => { if (e.target.id === 'wxQ'){ WX.q = e.target.value; wxList(); } }); el.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.hasAttribute('data-wx-reload')){ wxLoad(true); } const a = e.target.closest('[data-chart]'); if (a){ e.preventDefault(); openChart(a.dataset.chart); } }); }
+  if (!el._built || force){ el._built = 1; el.innerHTML = '<div class="nsec"><h3>WEEX coins: what is listed on WEEX futures</h3><p class="hint">Coins that trade on WEEX carry a small <span class="wxb">W</span> badge next to their name in every scanner, and the Filters panel has "Only coins on WEEX". This page lists every WEEX perpetual and says whether the scanners cover it. The scanners read prices and candles from Hyperliquid, Binance and other open feeds, so a WEEX coin that those do not list shows here but cannot be scanned.</p><div class="row"><input type="text" id="wxQ" placeholder="Search a coin" autocomplete="off" autocapitalize="characters" style="min-width:180px;font-family:var(--mono);text-transform:uppercase" value="' + esc(WX.q) + '"> <button type="button" class="btn sm" data-wx-reload>Reload WEEX list</button> <span id="wxSt" class="hint"></span></div><div id="wxList"></div></div>'; }
+  wxList();
+}
+function wxList(){
+  const el = $('wxList'); if (!el) return; const st = $('wxSt');
+  if (st) st.textContent = WX.err ? 'WEEX list could not be loaded (' + WX.err + '). The browser may be blocked from WEEX; try Reload, or open the app from your own site.' : WX.set.size ? WX.set.size + ' perpetuals on WEEX, updated ' + new Date(WX.at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Loading…';
+  if (!WX.set.size){ el.innerHTML = ''; return; }
+  const scan = new Map(); for (const [n, c] of state.coins) scan.set(vPlain(n), c);
+  const q = WX.q.trim().toUpperCase(); let rows = [...WX.set.entries()].filter(([k]) => !q || k.includes(q));
+  const info = k => { const c = scan.get(k) || scan.get(k.replace(/^1000/, '')); return c; };
+  rows.sort((a, b) => (+!!info(b[0]) - +!!info(a[0])) || ((b[1].vol || 0) - (a[1].vol || 0)));
+  const inS = rows.filter(([k]) => info(k)).length;
+  el.innerHTML = '<p class="hint">' + rows.length + ' shown, ' + inS + ' of them covered by the scanners.</p><div style="max-height:70vh;overflow:auto"><table class="gtab" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>WEEX price</th><th>24h change</th><th>24h volume</th><th>In the scanners</th></tr></thead><tbody>' + rows.slice(0, 400).map(([k, v]) => { const c = info(k), nm = c ? c.name : null; return '<tr><td style="text-align:left"><b>' + esc(k) + '</b></td><td>' + (v.px > 0 ? esc(fmtPx(v.px)) : '-') + '</td><td class="' + (isNum(v.chg) ? (v.chg >= 0 ? 'up' : 'dn') : '') + '">' + (isNum(v.chg) ? v.chg.toFixed(2) + '%' : '-') + '</td><td>' + (v.vol > 0 ? esc(fmtUsd(v.vol)) : '-') + '</td><td>' + (nm ? '<a href="#" data-chart="' + esc(nm) + '" style="color:var(--accent)">' + esc(nm) + '</a>' + (c.ev && c.ev.ok ? ' <b class="up">qualifies</b>' : '') : '<span class="hint">not covered</span>') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+}
+setTimeout(() => wxLoad(false), 6000); setInterval(() => wxLoad(false), 600000);
+
 async function evUsdKrw(){ if (EV.krw && Date.now() - EV.krwAt < 3600000) return EV.krw; const j = await ext('https://api.frankfurter.app/latest?from=USD&to=KRW', null, 12000); if (!(j.rates && j.rates.KRW > 0)) throw new Error('no USD/KRW rate'); EV.krw = j.rates.KRW; EV.krwAt = Date.now(); return EV.krw; }
 const EVS = { /* spot: one call per coin, price in USD */
   async coinbase(p){ const j = await evget('coinbase', 'https://api.exchange.coinbase.com/products/' + p + '-USD/ticker'), mark = vnum(j.price); if (!(mark > 0)) throw new Error('not listed'); return {sym:p + '-USD', mark, funding:null, oi:null, vol:vnum(j.volume) * mark}; },
@@ -10105,10 +10160,10 @@ function cselRender(redo){
   setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300);
 }
 setInterval(() => { try { if (state.view === 'csel') cselRender(); } catch(e){} }, 20000);
-/* ===== DATA RELEASE PREDICTOR (V8.8): nowcast of CPI / core CPI / jobs / unemployment, surprise vs consensus, market reaction map, own track record ===== */
+/* ===== DATA RELEASE PREDICTOR (V8.9): nowcast of CPI / core CPI / jobs / unemployment, surprise vs consensus, market reaction map, own track record ===== */
 const NC_REL = {
   cpi: { n: 'CPI headline (monthly %)', u: '%', se: 0.10, dec: 2, dir: 1,
-    f: [['core3', 'Core CPI, average of the last 3 months (monthly %)', 0.28], ['gas', 'Gasoline price, this month average vs last month (%)', 0], ['food', 'Food prices, last monthly change (%)', 0.30], ['now', 'Cleveland Fed nowcast for this month (optional, monthly %)', '']],
+    f: [['core3', 'Core CPI, average of the last 3 months (monthly %)', 0.28], ['gas', 'Gasoline price, this month average vs last month (%)', 0], ['food', 'Food prices, average of the last 3 months (monthly %)', 0.30], ['now', 'Cleveland Fed nowcast for this month (optional, monthly %)', '']],
     calc: v => { const own = 0.80 * v.core3 + 0.035 * v.gas + 0.135 * v.food; return v.now !== null ? 0.5 * own + 0.5 * v.now : own; },
     how: 'Own model = 0.80 x core + 0.035 x gasoline + 0.135 x food (rough CPI weights). If you type the Cleveland Fed nowcast, the result is half your model and half theirs.' },
   core: { n: 'Core CPI (monthly %)', u: '%', se: 0.10, dec: 2, dir: 1,
@@ -10121,10 +10176,10 @@ const NC_REL = {
     how: 'Jobs = 0.30 x ADP + 0.50 x recent trend - 1.5 for every 1k claims above 230k + 3 for every ISM point above 50.' },
   ur: { n: 'Unemployment rate (%)', u: '%', se: 0.10, dec: 1, dir: -1,
     f: [['last', 'Last reported unemployment rate (%)', 4.3], ['cl', 'Initial jobless claims, 4-week average (thousand)', 230], ['nf', 'Payroll estimate (thousand): leave empty to use the one from the jobs box', '']],
-    calc: v => { const nf = v.nf !== null ? v.nf : (NC.last.nfp !== undefined ? NC.last.nfp : 100); return v.last + 0.0015 * (v.cl - 230) - 0.0005 * (nf - 100); },
+    calc: v => { const nf = v.nf !== null ? v.nf : ncCalc('nfp').est; return v.last + 0.0015 * (v.cl - 230) - 0.0005 * (nf - 100); },
     how: 'Rate = last rate + 0.0015 for every 1k claims above 230k - 0.0005 for every 1k jobs above 100k.' }
 };
-const NC = Object.assign({ rel: 'cpi', vals: {}, cons: {}, last: {}, log: LS.get('elpp_nowcast_log') || [] }, {});
+const NC = { rel: 'cpi', vals: {}, cons: {}, last: {}, auto: {}, touched: {}, open: {}, prev: {}, info: {}, data: null, st: 'idle', msg: '', at: 0, log: LS.get('elpp_nowcast_log') || [] };
 function ncNum(v){ const s = String(v === undefined ? '' : v).trim(); if (s === '') return null; const x = +s; return isFinite(x) ? x : null; }
 function ncCalc(rel){
   const R = NC_REL[rel], v = {}; let filled = 0;
@@ -10147,53 +10202,118 @@ function ncStats(){
   Object.keys(NC_REL).forEach(k => { const a = L.filter(x => x.rel === k); if (!a.length) return; const mine = a.reduce((s, x) => s + Math.abs(x.est - x.act), 0) / a.length, con = a.reduce((s, x) => s + Math.abs(x.cons - x.act), 0) / a.length, win = a.filter(x => Math.abs(x.est - x.act) < Math.abs(x.cons - x.act)).length; out.push({ k, n: a.length, mine, con, win }); });
   return out;
 }
+
+/* ----- live data: FRED CSV through the same route the Outside-markets page uses (proxy.php first, then fallbacks) ----- */
+const NC_SER = { core: 'CPILFESL', head: 'CPIAUCSL', food: 'CPIUFDSL', shel: 'CUSR0000SAH1', gas: 'GASREGW', pay: 'PAYEMS', adp: 'ADPMNUSNERSA', cl: 'IC4WSA', ur: 'UNRATE' };
+function ncRows(t){ return String(t).trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && isFinite(+a[1])).map(a => [a[0], +a[1]]); }
+const ncMom = r => r.slice(1).map((x, i) => [x[0], (x[1] / r[i][1] - 1) * 100]), ncAvg = a => a.reduce((s, x) => s + x, 0) / (a.length || 1), ncMon = d => String(d).slice(0, 7);
+const ncMonName = m => { const [y, mo] = m.split('-'); return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+mo - 1] + ' ' + y; };
+const ncNext = m => { let [y, mo] = m.split('-').map(Number); mo++; if (mo > 12){ mo = 1; y++; } return y + '-' + String(mo).padStart(2, '0'); };
+const ncPrev = m => { let [y, mo] = m.split('-').map(Number); mo--; if (mo < 1){ mo = 12; y--; } return y + '-' + String(mo).padStart(2, '0'); };
+function ncBuild(R){
+  const r2 = x => +x.toFixed(3), d = {}, info = {}, prev = {};
+  const core = ncMom(R.core), food = ncMom(R.food), shel = ncMom(R.shel), head = ncMom(R.head);
+  const lastCpi = ncMon(R.core[R.core.length - 1][0]), target = ncNext(lastCpi), tgtName = ncMonName(target);
+  const L3 = a => a.slice(-3).map(x => x[1]);
+  /* gasoline: average of the weeks in the target month vs the month before (falls back to latest 4 weeks vs the 4 before) */
+  const gw = R.gas, inM = m => gw.filter(x => ncMon(x[0]) === m).map(x => x[1]);
+  let gas = null, gnote = '';
+  if (inM(target).length >= 1 && inM(ncPrev(target)).length >= 3){ gas = (ncAvg(inM(target)) / ncAvg(inM(ncPrev(target))) - 1) * 100; gnote = inM(target).length + ' weeks of ' + ncMonName(target); }
+  else if (gw.length >= 8){ gas = (ncAvg(gw.slice(-4).map(x => x[1])) / ncAvg(gw.slice(-8, -4).map(x => x[1])) - 1) * 100; gnote = 'latest 4 weeks vs the 4 before'; }
+  const coreXs = core.slice(-3).map((c, i) => { const k = core.length - 3 + i, sh = shel.find(x => x[0] === c[0]); return sh ? (c[1] - 0.44 * sh[1]) / 0.56 : c[1]; });
+  d.cpi = { core3: r2(ncAvg(L3(core))), food: r2(ncAvg(L3(food))) }; if (gas !== null) d.cpi.gas = r2(gas);
+  d.core = { shel: r2(ncAvg(L3(shel))), xs: r2(ncAvg(coreXs)) };
+  const pay = R.pay.slice(1).map((x, i) => [x[0], x[1] - R.pay[i][1]]), adpD = R.adp && R.adp.length > 2 ? R.adp.slice(1).map((x, i) => [x[0], x[1] - R.adp[i][1]]) : [], claims = R.cl.length ? R.cl[R.cl.length - 1] : null, adpLast = adpD.length ? adpD[adpD.length - 1] : null;
+  const scale = adpLast && Math.abs(adpLast[1]) > 5000 ? 1000 : 1;
+  d.nfp = { tr: Math.round(ncAvg(pay.slice(-3).map(x => x[1]))) }; if (adpLast) d.nfp.adp = Math.round(adpLast[1] / scale); if (claims) d.nfp.cl = Math.round(claims[1] / (claims[1] > 5000 ? 1000 : 1));
+  d.ur = { last: R.ur[R.ur.length - 1][1] }; if (claims) d.ur.cl = d.nfp.cl;
+  prev.cpi = head[head.length - 1][1]; prev.core = core[core.length - 1][1]; prev.nfp = pay[pay.length - 1][1]; prev.ur = R.ur[R.ur.length - 1][1];
+  info.cpi = 'CPI data through ' + ncMonName(lastCpi) + ', predicting ' + tgtName + '. Gasoline: ' + (gnote || 'not available') + '.';
+  info.core = 'CPI data through ' + ncMonName(lastCpi) + ', predicting ' + tgtName + '. Used-car index has no free feed, so it is left neutral.';
+  info.nfp = 'Payrolls through ' + ncMonName(ncMon(R.pay[R.pay.length - 1][0])) + (adpLast ? ', ADP for ' + ncMonName(ncMon(adpLast[0])) : ', ADP not available') + (claims ? ', jobless claims week of ' + claims[0] : '') + '. ISM employment has no free feed, so it is left neutral.';
+  info.ur = 'Unemployment rate through ' + ncMonName(ncMon(R.ur[R.ur.length - 1][0])) + '.';
+  return { d, info, prev };
+}
+function ncApply(b, force){
+  NC.data = b; NC.info = b.info; NC.prev = b.prev;
+  Object.keys(b.d).forEach(rel => { const vv = NC.vals[rel] || (NC.vals[rel] = {}), au = NC.auto[rel] || (NC.auto[rel] = {}), tc = NC.touched[rel] || (NC.touched[rel] = {});
+    Object.keys(b.d[rel]).forEach(k => { if (!tc[k] || force){ vv[k] = String(b.d[rel][k]); au[k] = 1; if (force) delete tc[k]; } }); });
+}
+async function ncLoad(force){
+  if (NC.st === 'busy') return;
+  const C = LS.get('elpp_nc_data');
+  if (!force && C && C.b && Date.now() - C.at < 3 * 3600e3){ NC.at = C.at; NC.st = 'ok'; ncApply(C.b, false); ncDraw(); return; }
+  NC.st = 'busy'; NC.msg = 'Loading live data…'; ncDraw();
+  try {
+    const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
+    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); } catch(e){ bad.push(k); } }));
+    const need = ['core', 'food', 'shel', 'head', 'gas', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (!R.adp) R.adp = []; if (need.length) throw new Error('missing ' + need.join(', '));
+    const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });
+  } catch(e){ NC.st = 'err'; NC.msg = 'Live data could not be loaded (' + (e && e.message || 'blocked') + '). The boxes show usual values instead. Open the app from your own site with proxy.php, or press Reload live data later.'; }
+  ncDraw();
+}
+function ncSumHtml(){
+  const rows = Object.keys(NC_REL).map(k => { const R = NC_REL[k], c = ncCalc(k), p = NC.prev[k], f = x => x.toFixed(R.dec); return '<tr><td style="padding:3px 14px 3px 0">' + esc(R.n) + '</td><td align="center">' + (p === undefined ? '-' : f(p)) + '</td><td align="center"><b>' + f(c.est) + ' ' + R.u + '</b></td><td align="center" class="' + (p === undefined ? '' : (c.est - p) * R.dir > 0.0001 ? 'dn' : (c.est - p) * R.dir < -0.0001 ? 'up' : '') + '">' + (p === undefined ? '-' : (+f(c.est) - +f(p) >= 0 ? '+' : '') + (+f(c.est) - +f(p)).toFixed(R.dec)) + '</td></tr>'; }).join('');
+  return '<table style="border-collapse:collapse;margin:4px 0"><tr><th align="left" style="padding-right:14px">Next release</th><th style="padding-right:14px">Last published</th><th style="padding-right:14px">Predicted</th><th>Change</th></tr>' + rows + '</table>';
+}
+function ncResHtml(){
+  const rel = NC.rel, R = NC_REL[rel], c = ncCalc(rel), f = x => x.toFixed(R.dec), p = NC.prev[rel];
+  const base = c.cons !== null ? c.cons : (p !== undefined ? p : null), z = base !== null ? (c.est - base) / R.se : null, m = z !== null ? ncMap(rel, z) : null;
+  return '<b style="font-size:15px">Predicted ' + esc(R.n) + ': ' + f(c.est) + ' ' + R.u + '</b>' + (p !== undefined ? ' &nbsp; Last published: ' + f(p) + ' ' + R.u : '') +
+    (base !== null ? '<div>' + (c.cons !== null ? 'Market expects: ' + f(c.cons) : 'No consensus typed: comparing with the last published number, which is only a rough stand-in') + ' &nbsp; Gap: ' + (c.est - base >= 0 ? '+' : '') + f(c.est - base) + ' (' + (z >= 0 ? '+' : '') + z.toFixed(1) + ' typical misses)</div>' : '') +
+    '<div class="hint">' + (NC.info[rel] ? esc(NC.info[rel]) + ' ' : '') + 'Boxes filled automatically are marked "live". Type in a box to override it.</div>' +
+    (m ? '<div style="margin-top:6px"><b>' + m.size + '</b></div>' + (m.rows.length ? '<table style="border-collapse:collapse;margin:4px 0">' + m.rows.map(r => '<tr><td style="padding:2px 14px 2px 0">' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('') + '</table>' : '') + '<div class="hint">' + m.note + '</div>' : '');
+}
+function ncStatusHtml(){
+  const t = NC.at ? new Date(NC.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+  return NC.st === 'busy' ? '<span class="hint">Loading live data from FRED…</span>' : NC.st === 'ok' ? '<span class="hint">Live data from FRED (US government series), updated ' + t + '.</span>' : NC.st === 'err' ? '<span class="warn">' + esc(NC.msg) + '</span>' : '';
+}
 function ncHtml(){
-  const rel = NC.rel, R = NC_REL[rel], vv = NC.vals[rel] || (NC.vals[rel] = {}), c = ncCalc(rel), f = x => x.toFixed(R.dec);
+  const rel = NC.rel, R = NC_REL[rel], vv = NC.vals[rel] || (NC.vals[rel] = {}), au = NC.auto[rel] || {};
   const tabs = Object.keys(NC_REL).map(k => '<button type="button" class="btn sm' + (k === rel ? ' primary' : '') + '" data-nc-rel="' + k + '">' + esc(NC_REL[k].n) + '</button>').join(' ');
-  const inputs = R.f.map(([k, lab, d]) => '<label class="hint" style="display:block;margin:4px 0">' + esc(lab) + '<br><input type="text" inputmode="decimal" data-nc-in="' + k + '" value="' + esc(vv[k] === undefined ? '' : vv[k]) + '" placeholder="' + esc(d === '' ? 'optional' : 'usual: ' + d) + '" style="width:150px;font-family:var(--mono)"></label>').join('');
-  const m = c.z !== null ? ncMap(rel, c.z) : null;
-  const res = '<div class="nsec" style="margin-top:8px"><b>Your estimate: ' + f(c.est) + ' ' + R.u + '</b>' + (c.cons !== null ? ' &nbsp; Market expects: ' + f(c.cons) + ' ' + R.u + ' &nbsp; Gap: ' + (c.est - c.cons >= 0 ? '+' : '') + f(c.est - c.cons) + ' (' + (c.z >= 0 ? '+' : '') + c.z.toFixed(1) + ' typical misses)' : '<span class="hint"> &nbsp; Type the market consensus below to see the surprise.</span>') +
-    '<div class="hint">Inputs you typed: ' + c.filled + ' of ' + c.total + '. Fields left empty use the usual value shown in grey, so the more you fill with real numbers, the more the estimate means.</div>' +
-    (m ? '<div style="margin-top:6px"><b>' + m.size + '</b></div>' + (m.rows.length ? '<table style="border-collapse:collapse;margin:4px 0">' + m.rows.map(r => '<tr><td style="padding:2px 14px 2px 0">' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('') + '</table>' : '') + '<div class="hint">' + m.note + '</div>' : '') + '</div>';
+  const inputs = R.f.map(([k, lab, d]) => '<label class="hint" style="display:block;margin:4px 0">' + esc(lab) + (au[k] ? ' <b class="up">live</b>' : '') + '<br><input type="text" inputmode="decimal" data-nc-in="' + k + '" value="' + esc(vv[k] === undefined ? '' : vv[k]) + '" placeholder="' + esc(d === '' ? 'optional' : 'usual: ' + d) + '" style="width:150px;font-family:var(--mono)"></label>').join('');
   const logRows = NC.log.slice(-12).reverse().map((x, i) => { const idx = NC.log.length - 1 - i; return '<tr><td>' + esc(NC_REL[x.rel] ? NC_REL[x.rel].n : x.rel) + '</td><td>' + esc(x.date) + '</td><td>' + x.est.toFixed(2) + '</td><td>' + (x.cons === null ? '-' : x.cons) + '</td><td>' + (x.act === null || x.act === undefined ? '<input type="text" inputmode="decimal" data-nc-act="' + idx + '" placeholder="actual" style="width:70px"> <button type="button" class="btn sm" data-nc-setact="' + idx + '">Save</button>' : x.act) + '</td><td><button type="button" class="btn sm" data-nc-del="' + idx + '">x</button></td></tr>'; }).join('');
   const st = ncStats(), stHtml = st.length ? '<table style="border-collapse:collapse;margin:6px 0"><tr><th align="left" style="padding-right:14px">Release</th><th>Releases</th><th>My average miss</th><th>Consensus average miss</th><th>I was closer</th></tr>' + st.map(s => '<tr><td style="padding-right:14px">' + esc(NC_REL[s.k].n) + '</td><td align="center">' + s.n + '</td><td align="center">' + s.mine.toFixed(2) + '</td><td align="center">' + s.con.toFixed(2) + '</td><td align="center"><b class="' + (s.win * 2 > s.n ? 'up' : 'dn') + '">' + s.win + ' of ' + s.n + '</b></td></tr>').join('') + '</table><div class="hint">If you are not closer than the consensus in more than half of the releases after 10 or more tries, do not trade on your own estimate. Use it only as a check.</div>' : '<div class="hint">No finished entries yet. Save an estimate, then type the real number after the release.</div>';
-  const edu = (t, b) => '<details class="nsec" style="margin-top:6px"><summary><b>' + t + '</b></summary><div class="hint" style="line-height:1.55;margin-top:4px">' + b + '</div></details>';
+  const O = id => NC.open[id] ? ' open' : '', edu = (id, t, b) => '<details class="nsec" data-nc-d="' + id + '"' + O(id) + ' style="margin-top:6px"><summary><b>' + t + '</b></summary><div class="hint" style="line-height:1.55;margin-top:4px">' + b + '</div></details>';
   return '<div class="nsec"><h3>📊 Data Release Predictor: how people see CPI and jobs numbers coming</h3>' +
-    '<p class="hint"><b>The honest version:</b> nobody can know the number before it is published. What traders do is <b>nowcast</b>: they combine leading data that is already public (gasoline prices, jobless claims, ADP, surveys, rents, used-car prices, card spending) into their own estimate. The market price already contains the average of those guesses, called the <b>consensus</b>. Prices move on the <b>surprise</b>: actual number minus consensus. Anyone who really sees the number early is trading on stolen information, which is illegal. Most "I knew it" stories are people who guessed right a few times.</p>' +
-    '<div class="row">' + tabs + '</div><div style="margin-top:8px">' + inputs +
-    '<label class="hint" style="display:block;margin:4px 0">Market consensus (the forecast shown on the economic calendar)<br><input type="text" inputmode="decimal" data-nc-cons value="' + esc(NC.cons[rel] === undefined ? '' : NC.cons[rel]) + '" style="width:150px;font-family:var(--mono)"></label></div>' +
-    '<div class="hint">' + esc(R.how) + ' These weights are my rough starting values, not fitted to history. The track record below shows whether they work for you.</div>' + res +
+    '<p class="hint"><b>The honest version:</b> nobody can know the number before it is published. What traders do is <b>nowcast</b>: they combine leading data that is already public (gasoline prices, jobless claims, ADP, rents, used-car prices) into their own estimate. The market price already contains the average of those guesses, called the <b>consensus</b>. Prices move on the <b>surprise</b>: actual number minus consensus. Anyone who really sees the number early is trading on stolen information, which is illegal.</p>' +
+    '<div class="row"><b>Predictions for the next releases</b> <button type="button" class="btn sm" data-nc-reload>Reload live data</button> <button type="button" class="btn sm" data-nc-reset>Reset my edits</button></div><div id="ncStatus">' + ncStatusHtml() + '</div><div id="ncSum">' + ncSumHtml() + '</div></div>' +
+    '<div class="nsec" style="margin-top:8px"><div class="row">' + tabs + '</div><div style="margin-top:8px">' + inputs +
+    '<label class="hint" style="display:block;margin:4px 0">Market consensus, optional (the forecast shown on the economic calendar; no free feed exists for it)<br><input type="text" inputmode="decimal" data-nc-cons value="' + esc(NC.cons[rel] === undefined ? '' : NC.cons[rel]) + '" style="width:150px;font-family:var(--mono)"></label></div>' +
+    '<div class="hint">' + esc(R.how) + ' These weights are my rough starting values, not fitted to history. The track record below shows whether they work for you.</div>' +
+    '<div class="nsec" id="ncRes" style="margin-top:8px">' + ncResHtml() + '</div>' +
     '<div class="row" style="margin-top:6px"><button type="button" class="btn sm primary" data-nc-save>Save this estimate to my record</button></div></div>' +
     '<div class="nsec" style="margin-top:8px"><h3>My track record</h3>' + stHtml + (logRows ? '<table style="border-collapse:collapse;font-size:12px"><tr><th align="left">Release</th><th>Date</th><th>My estimate</th><th>Consensus</th><th>Actual</th><th></th></tr>' + logRows + '</table>' : '') + '</div>' +
-    '<div class="nsec" style="margin-top:8px"><h3>Free places to get the leading numbers</h3><div class="hint" style="line-height:1.6">' +
-    'Inflation nowcast: Cleveland Fed "Inflation Nowcasting" page. Truflation (daily price index). Gasoline: AAA or EIA weekly prices. Used cars: Manheim index. Rents: Zillow or Apartment List (they lead official rent numbers by about a year).<br>' +
-    'Jobs: ADP report (Wednesday before payrolls), weekly jobless claims (US Labor Department, Thursdays), ISM employment sub-index, Indeed job postings.<br>' +
-    'Rates path: CME FedWatch (what futures imply for the next Fed meeting). Prediction markets such as Kalshi list CPI, jobs and Fed outcomes with live odds, which is the crowd forecast in one number.</div></div>' +
+    '<div class="nsec" style="margin-top:8px"><h3>Where the numbers come from</h3><div class="hint" style="line-height:1.6">' +
+    'Filled automatically from FRED (the St. Louis Fed database of US government data): CPI, core CPI, food and shelter prices, gasoline, payrolls, ADP, jobless claims and the unemployment rate. Not free anywhere, so you type them if you want them: the consensus, the Manheim used-car index, the ISM employment index and the Cleveland Fed nowcast.<br>Rates path: CME FedWatch. Prediction markets such as Kalshi list CPI, jobs and Fed outcomes with live odds, which is the crowd forecast in one number.</div></div>' +
     '<div class="nsec" style="margin-top:8px"><h3>The same idea in each market</h3>' +
-    edu('Crypto', 'Leading signs: funding rates and open interest building one way before an event, spot ETF inflows or outflows, stablecoin supply growth, exchange net flows, token unlocks, and the Fed path (crypto trades like a liquidity asset: hot data usually hits it, cool data usually helps). Crowded long positioning before a hot print is the usual flush setup.') +
-    edu('Stocks', 'Before earnings: estimate revisions in the weeks before, the options-implied move, short interest, web traffic, card-spend data, and what suppliers and customers said. Stocks usually move on guidance and the gap to the whisper number, not on the headline beat.') +
-    edu('Commodities', 'Oil and gas: weekly API (Tuesday) and EIA (Wednesday) stock reports, OPEC+ output, refinery use, ship and satellite tracking. Farm goods: weather and the monthly WASDE crop report. Metals: China demand, dollar and real yields. Funds\' positions: the CFTC COT report.') +
-    edu('Forex', 'A currency follows the gap in interest rates and inflation between two countries: rising expected rates in one country lifts its currency. Watch 2-year yield spreads, central bank speeches, CFTC positioning and option risk reversals before big events.') +
-    edu('Treasuries and bonds', 'Yields follow expected Fed rates, inflation and supply. Watch the 2-year yield, inflation breakevens, auction results (a weak "tail" pushes yields up), Treasury issuance plans, the Fed balance sheet and the MOVE volatility index. A bond price moves opposite to its yield.') +
-    edu('Dividends', 'Cuts and raises are predictable from cash: payout ratio, free cash flow covering the dividend, debt to earnings, and the company\'s record of raises. Free cash flow below the dividend for several quarters is the classic warning of a cut. Prices often drift up before the ex-dividend date and drop by about the dividend after it.') +
+    edu('crypto', 'Crypto', 'Leading signs: funding rates and open interest building one way before an event, spot ETF inflows or outflows, stablecoin supply growth, exchange net flows, token unlocks, and the Fed path (crypto trades like a liquidity asset: hot data usually hits it, cool data usually helps). Crowded long positioning before a hot print is the usual flush setup.') +
+    edu('stocks', 'Stocks', 'Before earnings: estimate revisions in the weeks before, the options-implied move, short interest, web traffic, card-spend data, and what suppliers and customers said. Stocks usually move on guidance and the gap to the whisper number, not on the headline beat.') +
+    edu('comm', 'Commodities', 'Oil and gas: weekly API (Tuesday) and EIA (Wednesday) stock reports, OPEC+ output, refinery use, ship and satellite tracking. Farm goods: weather and the monthly WASDE crop report. Metals: China demand, dollar and real yields. Funds\' positions: the CFTC COT report.') +
+    edu('fx', 'Forex', 'A currency follows the gap in interest rates and inflation between two countries: rising expected rates in one country lifts its currency. Watch 2-year yield spreads, central bank speeches, CFTC positioning and option risk reversals before big events.') +
+    edu('bonds', 'Treasuries and bonds', 'Yields follow expected Fed rates, inflation and supply. Watch the 2-year yield, inflation breakevens, auction results (a weak "tail" pushes yields up), Treasury issuance plans, the Fed balance sheet and the MOVE volatility index. A bond price moves opposite to its yield.') +
+    edu('div', 'Dividends', 'Cuts and raises are predictable from cash: payout ratio, free cash flow covering the dividend, debt to earnings, and the company\'s record of raises. Free cash flow below the dividend for several quarters is the classic warning of a cut. Prices often drift up before the ex-dividend date and drop by about the dividend after it.') +
     '</div>';
 }
-function ncRender(){
+/* only the numbers that change are redrawn while typing, so the cursor and the open sections stay where they are */
+function ncDraw(){ const el = $('viewNowcast'); if (!el || !el._built) return; const a = $('ncStatus'), b = $('ncSum'), c = $('ncRes'); if (a) a.innerHTML = ncStatusHtml(); if (b) b.innerHTML = ncSumHtml(); if (c) c.innerHTML = ncResHtml(); el.querySelectorAll('[data-nc-in]').forEach(i => { if (document.activeElement !== i){ const v = (NC.vals[NC.rel] || {})[i.getAttribute('data-nc-in')]; i.value = v === undefined ? '' : v; } }); el.querySelectorAll('label').forEach(l => { const i = l.querySelector('[data-nc-in]'); if (!i) return; const on = (NC.auto[NC.rel] || {})[i.getAttribute('data-nc-in')], t = l.querySelector('b.up'); if (on && !t){ const bt = document.createElement('b'); bt.className = 'up'; bt.textContent = 'live'; l.insertBefore(document.createTextNode(' '), l.querySelector('br')); l.insertBefore(bt, l.querySelector('br')); } else if (!on && t) t.remove(); }); }
+function ncRender(force){
   const el = $('viewNowcast'); if (!el) return;
-  const focus = document.activeElement && document.activeElement.getAttribute && (document.activeElement.getAttribute('data-nc-in') || (document.activeElement.hasAttribute('data-nc-cons') ? '@cons' : null));
-  el.innerHTML = ncHtml();
+  if (el._built && !force){ if (!NC.at || Date.now() - NC.at > 3 * 3600e3) ncLoad(false); return; }
+  el._built = 1; el.innerHTML = ncHtml();
   if (!el._b){ el._b = 1;
-    el.addEventListener('input', e => { const t = e.target, rel = NC.rel; if (t.hasAttribute('data-nc-in')) { (NC.vals[rel] || (NC.vals[rel] = {}))[t.getAttribute('data-nc-in')] = t.value; ncPart(t); } else if (t.hasAttribute('data-nc-cons')) { NC.cons[rel] = t.value; ncPart(t); } });
+    el.addEventListener('input', e => { const t = e.target, rel = NC.rel; if (t.hasAttribute('data-nc-in')){ const k = t.getAttribute('data-nc-in'); (NC.vals[rel] || (NC.vals[rel] = {}))[k] = t.value; (NC.touched[rel] || (NC.touched[rel] = {}))[k] = 1; if (NC.auto[rel]) delete NC.auto[rel][k]; ncDraw(); } else if (t.hasAttribute('data-nc-cons')){ NC.cons[rel] = t.value; ncDraw(); } });
+    el.addEventListener('toggle', e => { const d = e.target.getAttribute && e.target.getAttribute('data-nc-d'); if (d) NC.open[d] = e.target.open; }, true);
     el.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-      if (b.hasAttribute('data-nc-rel')) { NC.rel = b.getAttribute('data-nc-rel'); ncRender(); }
-      else if (b.hasAttribute('data-nc-save')) { const c = ncCalc(NC.rel); NC.log.push({ rel: NC.rel, date: new Date().toISOString().slice(0, 10), est: +c.est.toFixed(3), cons: c.cons, act: null }); NC.log = NC.log.slice(-200); LS.set('elpp_nowcast_log', NC.log); toast('Saved to your record'); ncRender(); }
-      else if (b.hasAttribute('data-nc-setact')) { const i = +b.getAttribute('data-nc-setact'), inp = el.querySelector('[data-nc-act="' + i + '"]'), x = inp ? ncNum(inp.value) : null; if (x === null) { toast('Type the actual number first'); return; } NC.log[i].act = x; LS.set('elpp_nowcast_log', NC.log); ncRender(); }
-      else if (b.hasAttribute('data-nc-del')) { NC.log.splice(+b.getAttribute('data-nc-del'), 1); LS.set('elpp_nowcast_log', NC.log); ncRender(); } });
+      if (b.hasAttribute('data-nc-rel')){ NC.rel = b.getAttribute('data-nc-rel'); el.innerHTML = ncHtml(); }
+      else if (b.hasAttribute('data-nc-reload')) ncLoad(true);
+      else if (b.hasAttribute('data-nc-reset')){ NC.touched = {}; if (NC.data) ncApply(NC.data, true); else ncLoad(true); el.innerHTML = ncHtml(); }
+      else if (b.hasAttribute('data-nc-save')){ const c = ncCalc(NC.rel); NC.log.push({ rel: NC.rel, date: new Date().toISOString().slice(0, 10), est: +c.est.toFixed(3), cons: c.cons, act: null }); NC.log = NC.log.slice(-200); LS.set('elpp_nowcast_log', NC.log); toast('Saved to your record'); el.innerHTML = ncHtml(); }
+      else if (b.hasAttribute('data-nc-setact')){ const i = +b.getAttribute('data-nc-setact'), inp = el.querySelector('[data-nc-act="' + i + '"]'), x = inp ? ncNum(inp.value) : null; if (x === null){ toast('Type the actual number first'); return; } NC.log[i].act = x; LS.set('elpp_nowcast_log', NC.log); el.innerHTML = ncHtml(); }
+      else if (b.hasAttribute('data-nc-del')){ NC.log.splice(+b.getAttribute('data-nc-del'), 1); LS.set('elpp_nowcast_log', NC.log); el.innerHTML = ncHtml(); } });
   }
-  if (focus){ const t = focus === '@cons' ? el.querySelector('[data-nc-cons]') : el.querySelector('[data-nc-in="' + focus + '"]'); if (t){ t.focus(); try { const n = t.value.length; t.setSelectionRange(n, n); } catch (e) {} } }
+  ncLoad(false);
 }
-/* typing in a box recomputes only the result part so the cursor is not lost */
-function ncPart(t){ const el = $('viewNowcast'); if (!el) return; const key = t.hasAttribute('data-nc-cons') ? '@cons' : t.getAttribute('data-nc-in'), pos = t.selectionStart; ncRender(); const n = key === '@cons' ? el.querySelector('[data-nc-cons]') : el.querySelector('[data-nc-in="' + key + '"]'); if (n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} } }
 
 /* ===== TRADING (V8.5): paper, test network and live orders on 14 exchanges, algo orders, multi-TP, trailing, OCO, IOC/FOK ===== */
 const TRD = {ex: 'hyperliquid', coin: '', side: 'long', type: 'market', price: '', trigger: '', sl: '', tp: '', lev: '', risk: '', creds: {}, liveOK: false, pos: [], ords: [], bal: null, busy: false, log: [], lastPlan: null, arms: [], tp2: '', tp3: '', s1: '', s2: '', s3: '', trail: '', price2: '', n: '5', mins: '10', vis: '20', algo: null, algoStop: false, tif: 'gtc', trails: [], preQty: 0, ocoTp: '', ocoSl: ''};
@@ -10505,7 +10625,7 @@ function cselNoop(){}
 setInterval(() => { try { trdPaperTick(); if (state.view === 'trading') trdPage(); } catch(e){} }, 5000);
 setInterval(() => { try { trdArmTick(); trdTrailTick(); } catch(e){} }, 6000);
 function applyView(){
-  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vt = $('viewTmw'); if (vt) vt.hidden = state.view !== 'tomorrow'; const vcs = $('viewCsel'); if (vcs) vcs.hidden = state.view !== 'csel'; const vtr = $('viewTrd'); if (vtr) vtr.hidden = state.view !== 'trading'; const vnc = $('viewNowcast'); if (vnc) vnc.hidden = state.view !== 'nowcast'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
+  { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vt = $('viewTmw'); if (vt) vt.hidden = state.view !== 'tomorrow'; const vcs = $('viewCsel'); if (vcs) vcs.hidden = state.view !== 'csel'; const vtr = $('viewTrd'); if (vtr) vtr.hidden = state.view !== 'trading'; const vnc = $('viewNowcast'); if (vnc) vnc.hidden = state.view !== 'nowcast'; const vwx = $('viewWeex'); if (vwx) vwx.hidden = state.view !== 'weexcoins'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
   const tableOnly = state.view === 'table';
   $('panel').style.display = tableOnly ? '' : 'none';
@@ -12214,7 +12334,8 @@ function renderBt(){
 /* ===== V4.34: beginner guide on every page: what each number means and where good / neutral / bad starts ===== */
 const VG_VERDICT = ['Verdict (Strong long / Lean long / Avoid / Lean short / Strong short)', 'The scanner adds points for and against a trade (trend, flow, positioning, levels, data quality). The total is the score.', 'Perp scalp: score +35 or more = Strong long, +15 to +34 = Lean long, -15 to -34 = Lean short, -35 or less = Strong short, in between = Wait. Spot, swing and positional use +28 / +10. Avoid means a hard block (very low volume, big event). Only trade Strong when the plan and the chart agree.'];
 const VIEW_GUIDE = {
-  nowcast: [['What this page is', 'A calculator that turns public leading numbers into your own estimate of CPI, core CPI, payrolls or the unemployment rate before the release, then compares it with the market consensus.', 'Nobody can know the number early. The value is in judging the surprise and checking whether your estimates beat the consensus.'], ['How to use it', 'Pick the release, type the real numbers from the free sources listed on the page, then type the consensus from the economic calendar. The page shows the gap and the usual reaction of the dollar, yields, gold, stocks and crypto.', 'Fields left empty use usual values, so fill as many as you can.'], ['My track record', 'Save each estimate, then type the actual number after the release. The page compares your average miss with the consensus miss.', 'Trade on your own estimate only if you were closer than the consensus in more than half of 10 or more releases.']],
+  weexcoins: [['What this page is', 'The list of every perpetual coin on the WEEX exchange, with price, 24h change and volume, and whether the scanners cover it.', 'A coin on WEEX shows a small W badge next to its name in every scanner. Use Filters, Only coins on WEEX, to keep only those.'], ['Limits', 'The scanners read candles from Hyperliquid, Binance and other open feeds. A WEEX coin those feeds do not list is shown here but cannot be scanned.', 'WEEX trading itself is on the TRADING page (beta).']],
+  nowcast: [['What this page is', 'A calculator that turns public leading numbers into your own estimate of CPI, core CPI, payrolls or the unemployment rate before the release, then compares it with the market consensus.', 'Nobody can know the number early. The value is in judging the surprise and checking whether your estimates beat the consensus.'], ['How to use it', 'The page fills the boxes by itself from live US government data (FRED) and shows the predicted next CPI, core CPI, payrolls and unemployment rate at the top. Optionally type the consensus from the economic calendar to see the surprise and the usual reaction of the dollar, yields, gold, stocks and crypto.', 'Boxes marked live came from the data feed. Type in a box to override it. The consensus, used-car index and ISM have no free feed, so they stay manual.'], ['My track record', 'Save each estimate, then type the actual number after the release. The page compares your average miss with the consensus miss.', 'Trade on your own estimate only if you were closer than the consensus in more than half of 10 or more releases.']],
   trading: [['Mode and exchange', 'Paper = fake money inside this page. Test network = the exchange\'s own test money. LIVE = real money. Fourteen exchanges: Hyperliquid, Binance, Bybit, OKX, Bitget, Gate, MEXC, BingX, KuCoin Futures, Kraken Futures, HTX, Deribit, Phemex, WEEX.', 'Start in Paper, move to Test network, and go LIVE only after the same trades work there. Every exchange except Hyperliquid, Binance, Bybit and OKX is BETA: not yet checked with a live account (Kraken, HTX, Deribit and Phemex are low confidence). Beta exchanges are limited to 50 USDT per order until you tick that you verified them. MEXC and HTX have no test network.'], ['Order types', 'Market, Limit, Post-only (maker), Stop-market entry, Stop-limit entry, plus Chase (a limit that follows the price), Iceberg (small visible parts), TWAP (market slices over time) and Scale (a ladder of limits). Every order or part carries a stop loss and a take profit.', 'If an exchange cannot protect an order type with a stop, the page blocks that type instead of leaving you unprotected.'], ['Settings', 'Minimum balance to keep, cross or isolated margin, one-way or hedge mode, amount by risk %, fixed margin, fixed position size or fixed coins, leverage cap, R:R target and minimum, daily loss limit, max trades per day, cooldown, price-move guard.', 'Isolated margin, risk 1% or less, minimum R:R 1.5 to 2, leverage at most 10x.'], ['Several take profits and trailing stop', 'Add TP2 and TP3 and split the size between them (for example 50/30/20). A trailing stop follows the price by a percent once the trade is 1R in profit.', 'Trailing is native on Binance and Bybit (Bybit: market entry). On every other exchange the page watches the price and closes the position at market when price falls back, so keep it open; your fixed stop stays as backup. Several take profits work with Market, Limit, Post-only and Stop orders.'], ['Order ticket', 'Coin, side, order type, stop loss and take profit. Leave Take profit empty to have it set from your R:R target. "Fill from scanner plan" copies the scanner\'s side, stop and Target 1.', 'Stop at least 1% away, reward 2R or more after fees. The page warns when fees would eat the profit or liquidation is close to the stop.'], ['OCO exit and time in force', 'OCO exit sets a take profit and a stop together on an open position (a real OCO on OKX, Bybit, HTX and Hyperliquid; two linked exits elsewhere). Limit orders can be IOC (fill now or cancel) or FOK (all now or nothing).', 'Check the exchange app that both exits exist.'], ['Open orders and positions', 'Real accounts show balance, positions with a liquidation price, and waiting orders you can cancel. Positions can be closed fully or 50%. After a market order the page checks that the position size matches what you asked for.', 'Check the exchange app after your first order on any exchange.'], ['Safety', 'Keys are encrypted in this browser, trade-only keys are recommended, every live order needs a typed confirmation, and there is a kill switch. Trade history downloads as CSV.', 'Never use keys that can withdraw. Never use this on a shared device.']],
   csel: [['Combined score (0-100)', 'The 10 best coins after every scanner has been checked: Power Scanner, Prediction Radar, SMC/ICT, funding and crowd, flush, OTE zone, buying/selling pressure and data quality.', '75+ strong · 60-75 good · under 60 weak. Strong verdict adds weight, blockers remove 5.'], ['Phase', 'Accumulation, Distribution, Manipulation, Consolidation (chop) or Trending, from the 4h.', 'Accumulation with a long and Distribution with a short agree. Manipulation: wait for the reclaim. Consolidation: avoid.'], ['Verdict', 'STRONG LONG or STRONG SHORT. LEAN means the verdict is not strong yet. The small line under it is buying or selling pressure: BUILDING, READY or GO.', 'GO or READY with the same side as the verdict is best. LATE: do not chase.'], ['Disc / Prem zone', 'DISCOUNT / OTE (buy zone) or PREMIUM / OTE (sell zone) when price is in the golden 62-79% pullback, otherwise Discount, Premium or Equilibrium from the 4h range.', 'A tick means the zone matches the side. Too deep (over 79%) means the set-up is failing.']],
   tomorrow: [['Tomorrow verdict: LONG / SHORT and A-LIST / WATCH / LEAN', 'The side comes from three scanners voting (Power Scanner, Prediction Radar 12h, SMC/ICT). The tier comes from the Tomorrow score.', 'A-LIST = score 70+ and at least 2 scanners agree. WATCH = 58+. LEAN = 46+. Below 46 is skipped.'], ['Tomorrow score (0-100)', 'A weighted blend: Power rank 28%, Prediction Radar 20%, SMC/ICT 27%, crowd position 10%, tradability 15%. Penalties apply when scanners disagree, for token unlocks and for news risk. The detail panel shows each part.', 'While SMC/ICT is still scanning, the score is capped at 82 and says ICT pending.'], ['Where to enter, stop, target', 'The SMC/ICT key area when it agrees with the side, otherwise the Power Scanner plan.', 'Never enter at the open. Wait for price to reach the area, then a sweep and a 15m shift.'], ['Crowd and watch-out', 'Funding, long/short ratio and crowd mood. A crowded side is the one that gets flushed.', 'Funding above +0.03% per 8h = crowded longs. Below -0.03% = crowded shorts.']],
@@ -12731,7 +12852,7 @@ function cdFmt(ms){ const neg = ms < 0; let t = Math.floor(Math.abs(ms) / 1000);
 function cdWhen(t){ try { const dt = new Date(t), pk = dt.toLocaleString('en-GB', {timeZone:'Asia/Karachi', weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true}); return pk + ' Pakistan time (PKT) · ' + dt.toISOString().slice(11, 19) + ' UTC'; } catch(e){ return ''; } }
 function cdHtml(t, big){ return `<span data-cd="${t}"${big ? ' style="font-size:15px;font-weight:700"' : ''}>${esc(cdFmt(t - Date.now()))}</span><br><span class="dim">${esc(cdWhen(t))}</span>`; }
 function cdTick(){ const n = Date.now(); for (const e of document.querySelectorAll('[data-cd]')){ const t = +e.dataset.cd, txt = cdFmt(t - n); if (e.textContent !== txt) e.textContent = txt; } }
-setInterval(() => { try { cdTick(); } catch(e){} }, 1000);
+setInterval(() => { if (document.hidden) return; try { cdTick(); } catch(e){} }, 1000);
 /* ===== V4.46: stop placement beyond the sweep wick, stop-hunt tracking, MAE/MFE diagnosis, alternative-stop comparison ===== */
 let PLAN_MODE = null;
 function stSweepStop(c, long, px, a){
@@ -13155,7 +13276,8 @@ window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return '
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
 /* ---------- V5: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
-  nowcast:['Open the page and pick a release (CPI, core CPI, payrolls or unemployment).','Type the leading numbers from the free sources listed lower on the page.','Type the consensus forecast from the economic calendar to see the surprise and the usual market reaction.','Press Save, and after the release type the actual number to build your track record.'],
+  weexcoins:['Open the page; the WEEX list loads by itself.','Search a coin to see if it trades on WEEX.','In any scanner, look for the small W badge next to the coin name, or tick Only coins on WEEX in Filters.'],
+  nowcast:['Open the page and pick a release (CPI, core CPI, payrolls or unemployment).','Boxes fill by themselves from live FRED data; the predicted values show at the top. Type in a box only to override it.','Type the consensus forecast from the economic calendar to see the surprise and the usual market reaction.','Press Save, and after the release type the actual number to build your track record.'],
   trading:['Leave Mode on Paper (practice) to learn. Pick the exchange you plan to use.','Open Settings once: set the minimum balance to keep, cross or isolated, one-way or hedge, how the amount is worked out, max leverage, R:R target and your safety limits.','Type a coin (for example BTC) or pick one from Coin\'s selection, then press Fill from scanner plan. Choose the order type: Market now, or Limit, Post-only or Stop entry to wait for a price, or Chase, Iceberg, TWAP or Scale for algorithm orders that this page runs (keep it open). Add TP2, TP3 and a trailing stop if you want them.','Check the preview: position size, leverage, margin, fees and reward after fees. Fix any warning.','Press Review and place order, read the confirmation, and confirm. In paper mode the position (or waiting order) appears below and closes by itself at the stop or target.','For a real exchange: choose Test network, create trade-only test keys, paste them under Connect, press Use for this session (or Save encrypted), then Test connection.','Place the same trade on the test network and make sure the entry, stop and take profit all appear on the exchange. Bitget, Gate and MEXC are beta, so check them extra carefully.','Only then choose LIVE, type LIVE to unlock it, and start with the smallest size. Every live order asks you to type the coin to confirm.','Use Close all or Close 50% in the positions list, Cancel on waiting orders, or the Kill switch to block all new orders. Download the trade history as CSV any time.'],
   csel:['Open the page. It reads every scanner by itself and keeps only the 10 best coins.','Read Combined score first. 75+ is strong. The SMC/ICT reads fill in over the first minute, so scores can change a little.','Check Verdict: STRONG LONG or STRONG SHORT. LEAN rows have no strong verdict yet.','Read the small line under the verdict: buying or selling pressure (BUILDING, READY, GO or LATE). Prefer GO or READY on the same side.','Check Phase and Disc / Prem zone. A tick on the zone means price is in the best-value area for the side.','Open the coin in the Power Scanner or SMC/ICT Scanner for the entry, stop and target before you trade.'],
   tomorrow:['Open this page in the evening. Read the market mood in the game plan at the bottom.','Look at the top 10. A-LIST rows are the strongest. Press What to do on the 3 you like.','Read what to do, what to check, what to keep an eye on and when not to trade it.','Set price alerts at each entry area. Tick the steps in the to-do list as you finish them.','Tomorrow: wait for price to reach the area, then a sweep and a 15m shift, then enter. Press Rescan at the daily open.','Use Copy the plan to paste it into your journal.'],
@@ -13431,7 +13553,7 @@ function ccTick(){
   spans.forEach(sp => { const k = sp.dataset.cc, s = cache[k]; if (s == null) return; sp.textContent = ccFmt(s); const par = sp.parentNode; if (par && par.classList) par.classList.toggle('soon', s <= 10); });
   const hd = document.getElementById('ccHead'); if (hd){ const t = CC_TFS.find(x => x[0] === '15m'); hd.textContent = '15m ' + ccFmt(ccLeft(t[1], t[2])); }
 }
-setInterval(() => { try { ccTick(); } catch(e){} }, 1000);
+setInterval(() => { if (document.hidden) return; try { ccTick(); } catch(e){} }, 1000);
 
 /* ---------- V5: PREDICTION RADAR - institutional data + retail psychology + liquidity, per coin, per horizon, with its own track record ---------- */
 const PR = {hz:'4h', cache:null, at:0, open:new Set(), log:null, lastLog:0, busy:false, lastRender:0};
@@ -15360,6 +15482,7 @@ function bindToolbar(){
   $('guideClose').addEventListener('click', () => $('guideDlg').close());
   $('guideDlg').addEventListener('click', e => { if (e.target === $('guideDlg')) $('guideDlg').close(); });
   $('onlyPass').addEventListener('change', e => { state.onlyPass = e.target.checked; saveState(); requestRender(); });
+  $('onlyWeex').addEventListener('change', e => { state.onlyWeex = e.target.checked; saveState(); requestRender(); });
   $('minShow').addEventListener('change', e => { const v = Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0)); state.minShow = v; e.target.value = v; saveState(); requestRender(); });
   $('search').addEventListener('input', e => { state.search = e.target.value; saveState(); requestRender(); });
   $('btnPause').addEventListener('click', () => { state.paused = !state.paused; $('btnPause').textContent = state.paused ? 'Resume' : 'Pause'; requestRender(); });
@@ -15443,7 +15566,7 @@ function applyStateToUI(){
   $('minSoft').value = state.minSoft; $('aSoft').value = state.aSoft; $('missing').value = state.missing;
   $('closedOnly').checked = state.closedOnly; $('refreshSec').value = String(state.refreshSec); $('sweepBars').value = String(state.sweepBars);
   $('statsTf').value = state.statsTf; $('readTf').value = state.readTf; $('topN').value = String(state.topN); $('venueSel').value = $('venueSelTop').value = state.venueMode || 'auto';
-  $('onlyPass').checked = state.onlyPass; $('minShow').value = state.minShow === undefined ? 10 : state.minShow; $('search').value = state.search || '';
+  $('onlyWeex').checked = !!state.onlyWeex; $('onlyPass').checked = state.onlyPass; $('minShow').value = state.minShow === undefined ? 10 : state.minShow; $('search').value = state.search || '';
 }
 
 /* ---------- boot ---------- */
@@ -15460,7 +15583,8 @@ addMenuTabLinks();
 render();
 ctxTick();
 setInterval(ctxTick, 10000);
-setInterval(() => { if (!renderT) requestRender(); }, 1000);
+setInterval(() => { if (!renderT && !document.hidden) requestRender(); }, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) requestRender(); });
 setInterval(persistOi, 60000);
 addEventListener('pagehide', persistOi);
 for (let i = 0; i < 3; i++) candleWorker();
@@ -15516,7 +15640,7 @@ loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(l
   back.addEventListener('click', function(){ openMenu(false); });
   side.addEventListener('click', function(e){ if (e.target.closest('.nv')) setTimeout(function(){ openMenu(false); window.scrollTo(0, 0); }, 60); });
   tab.addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; var go = b.dataset.go; if (go === 'more'){ openMenu(!document.body.classList.contains('mb-open')); return; } var n = navBtn(go); if (n){ n.click(); openMenu(false); window.scrollTo(0, 0); } });
-  setInterval(function(){ var any = false; tab.querySelectorAll('button[data-go]').forEach(function(b){ var n = navBtn(b.dataset.go), on = !!(n && n.classList.contains('on')); if (on) any = true; b.classList.toggle('on', on); }); var more = tab.querySelector('[data-go="more"]'); if (more) more.classList.toggle('on', !any || document.body.classList.contains('mb-open')); }, 600);
+  setInterval(function(){ if (document.hidden) return; var any = false; tab.querySelectorAll('button[data-go]').forEach(function(b){ var n = navBtn(b.dataset.go), on = !!(n && n.classList.contains('on')); if (on) any = true; b.classList.toggle('on', on); }); var more = tab.querySelector('[data-go="more"]'); if (more) more.classList.toggle('on', !any || document.body.classList.contains('mb-open')); }, 1200);
   var panel = document.getElementById('panel'), pb = document.getElementById('btnPanel');
   if (panel && pb){ var c = document.createElement('button'); c.id = 'mbPanelClose'; c.type = 'button'; c.className = 'btn primary'; c.textContent = 'Done: show results'; c.addEventListener('click', function(){ pb.click(); window.scrollTo(0, 0); }); panel.insertBefore(c, panel.firstChild); }
   var tb = document.querySelector('.toolbar'), cols = document.getElementById('btnCols');
@@ -15546,7 +15670,7 @@ loadCmeGaps(); setInterval(loadCmeGaps, 3600000); loadInsurance(); setInterval(l
     try { history.pushState({i:cur, k:k}, '', location.pathname + location.search + '#' + k.replace(':', '-')); } catch(e){}
     upd();
   }
-  setInterval(tick, 250);
+  setInterval(function(){ if (!document.hidden) tick(); }, 400);
   window.addEventListener('popstate', function(e){
     var st = e.state, i = st && typeof st.i === 'number' ? st.i : 0, k = (st && st.k) || first;
     cur = i; last = k; var b = btn(k); if (b) b.click(); upd();
@@ -16523,7 +16647,7 @@ function miniUpd(){
   if (!root || root.hidden) return; root.querySelectorAll('.ta-fav').forEach(el => { const sym = el.dataset.sym; let cv = el.querySelector('canvas'); if (!cv){ cv = document.createElement('canvas'); cv.width = 64; cv.height = 22; cv.style.cssText = 'width:64px;height:22px;display:block'; el.insertBefore(cv, el.firstChild); el.style.cssText += ';display:inline-flex;align-items:center;gap:6px'; let pc = document.createElement('span'); pc.className = 'ta-fpc'; pc.style.cssText = 'font-size:10px'; el.insertBefore(pc, el.querySelector('u')); }
     const f = getFeed(sym, '1h'), bars = f.bars.slice(-48); if (!bars.length) return; if (f.src && Date.now() - (f._tk || 0) > 60000){ f._tk = Date.now(); f.tick(); } const key = f.ver + '|' + bars.length; if (cv._k === key) return; cv._k = key; const ch = (bars[bars.length - 1].c / bars[0].c - 1) * 100; spark(cv, bars, ch >= 0); const pc = el.querySelector('.ta-fpc'); pc.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(1) + '%'; pc.style.color = ch >= 0 ? 'var(--up)' : 'var(--down)'; });
 }
-setInterval(() => { try { miniUpd(); } catch(e){} }, 2500);
+setInterval(() => { if (document.hidden) return; try { miniUpd(); } catch(e){} }, 2500);
 /* ---------- extra drawing tools ---------- */
 Object.assign(NEED, {info:2, arrow:2, hray:1, cross:1, ellipse:2, triangle:3, fork:3, fibext:3, flag:1, arrup:1, arrdn:1, vrange:2, prange:2});
 const NEWT = new Set(Object.keys({info:1, arrow:1, hray:1, cross:1, ellipse:1, triangle:1, fork:1, fibext:1, flag:1, arrup:1, arrdn:1, vrange:1, prange:1}));
@@ -16920,7 +17044,7 @@ function loop(){
   raf = requestAnimationFrame(loop); if (!root || root.hidden){ TA.visible = false; return; } if (!TA.visible){ TA.visible = true; try { const t = $q('.ta-wrap', root) || root; window.scrollTo({top:Math.max(0, t.getBoundingClientRect().top + window.scrollY - 70)}); } catch(e){} }
   for (const c of charts){ if (c.feed && c.feed.ver !== c.ver) c.dirty = true; if (c.dirty){ c.dirty = false; try { c.draw(); } catch(e){ if (!c.errd){ c.errd = 1; console.error('TA draw', e); } } } }
 }
-setInterval(() => { charts.forEach(c => { c.dirty = true; }); }, 1000);
+setInterval(() => { if (document.hidden || !TA.visible) return; charts.forEach(c => { c.dirty = true; }); }, 1000);
 setInterval(() => { if (TA.visible) charts.forEach(c => { try { anaUpd(c); } catch(e){} }); }, 1500);
 setInterval(() => { if (root && !root.hidden){ pollPlan(); fillList(); } }, 5000);
 const TA = window.TA = {

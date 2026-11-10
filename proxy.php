@@ -41,6 +41,7 @@ $ALLOW = [
   'query1.finance.yahoo.com' => ['#^/v8/finance/chart/[A-Za-z0-9\^\.\-=]+$#', 60],
   'cftc.gov'                 => ['#^/dea/newcot/#', 21600],
   'www.cftc.gov'             => ['#^/dea/newcot/#', 21600],
+  'api-contract.weex.com'    => ['#^/capi/v3/market/(exchangeInfo|ticker/24hr)$#', 300],
 ];
 if (!isset($ALLOW[$host]) || !preg_match($ALLOW[$host][0], $path)) fail(403, 'host or path not allowed');
 $ttl = $ALLOW[$host][1];
