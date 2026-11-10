@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.16</title>
+<title>ELPP CRYPTO SCANNER PRO V9.17</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.16</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.17</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -17678,6 +17678,15 @@ const TA = window.TA = {
   window.addEventListener('appinstalled', function(){ b.hidden = true; });
   var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; if (ios) b.hidden = false;
   b.addEventListener('click', function(){ if (dp){ dp.prompt(); dp.userChoice.finally(function(){ dp = null; b.hidden = true; }); } else if (ios){ alert('To install on iPhone or iPad: tap the Share button in Safari, then "Add to Home Screen". The app then updates by itself.'); } });
+})();
+</script>
+<script>
+/* Click the ELPP logo / title = go back to the home page (the Today view) */
+(function(){
+  var b = document.querySelector('header.top .brand'); if (!b) return;
+  b.style.cursor = 'pointer'; b.setAttribute('role', 'link'); b.setAttribute('tabindex', '0'); b.title = 'Home';
+  function home(){ var t = document.querySelector('button.nv[data-view="today"]'); if (t) t.click(); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){ window.scrollTo(0, 0); } }
+  b.addEventListener('click', home); b.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); home(); } });
 })();
 </script>
 </body>
