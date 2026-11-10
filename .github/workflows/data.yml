@@ -28,19 +28,7 @@ jobs:
             if [ -n "$FRED_API_KEY" ]; then
               code=$(curl -s -o data/tmp.json -w '%{http_code}' --max-time 40 "https://api.stlouisfed.org/fred/series/observations?series_id=$id&api_key=$FRED_API_KEY&file_type=json&observation_start=2023-01-01")
               echo "FRED $id -> HTTP $code"
-              if [ "$code" = "200" ]; then
-                python3 - "$id" <<'PY'
-import json,sys
-i=sys.argv[1]
-j=json.load(open('data/tmp.json'))
-rows=[o for o in j.get('observations',[]) if o.get('value') not in ('.','',None)]
-if len(rows)>=3:
-    open('data/fred_%s.csv'%i,'w').write('observation_date,%s\n'%i+''.join('%s,%s\n'%(o['date'],o['value']) for o in rows))
-    print('saved',i,len(rows),'rows, last',rows[-1]['date'])
-else:
-    print('no usable rows for',i, str(j)[:120])
-PY
-              else head -c 200 data/tmp.json; echo; fi
+              if [ "$code" = "200" ]; then python3 .github/fred2csv.py "$id"; else head -c 200 data/tmp.json; echo; fi
             fi
             rm -f data/tmp.json
           done
@@ -50,4 +38,4 @@ PY
           git config user.name "elpp-data-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git diff --cached --quiet || (git commit -m "data refresh" && git push)
+          git diff --cached --quiet || (git commit -m "data refresh" && git pull --rebase -q && git push)
