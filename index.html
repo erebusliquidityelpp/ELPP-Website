@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.6</title>
+<title>ELPP CRYPTO SCANNER PRO V9.7</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.6</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.7</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10210,8 +10210,10 @@ async function ncCalLoad(force){
   if (NC.calBusy || (!force && NC.calAt && Date.now() - NC.calAt < 20 * 60000)) return; NC.calBusy = true;
   try {
     let rows = MAC.raw && MAC.rawAt && Date.now() - MAC.rawAt < 20 * 60000 ? MAC.raw.slice() : [];
+    const loc = async f => { const r = await fetch('data/' + f + '?t=' + Math.floor(Date.now() / 600000), {cache: 'no-store'}); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); if (!Array.isArray(j) || !j.length) throw new Error('empty'); return j; };
+    let localOk = false; try { const a = await loc('ff_thisweek.json'); rows = a; localOk = true; try { rows = rows.concat(await loc('ff_nextweek.json')); } catch(e){} } catch(e){}
     if (!rows.length){ const j = await ext(MAC_URL, null, 15000); rows = Array.isArray(j) ? j : []; MAC.raw = rows.slice(); MAC.rawAt = Date.now(); }
-    try { const j2 = await ext('https://nfs.faireconomy.media/ff_calendar_nextweek.json', null, 12000); if (Array.isArray(j2)) rows = rows.concat(j2); } catch(e){}
+    if (!localOk) try { const j2 = await ext('https://nfs.faireconomy.media/ff_calendar_nextweek.json', null, 12000); if (Array.isArray(j2)) rows = rows.concat(j2); } catch(e){}
     const out = {}, now = Date.now();
     Object.keys(NC_TITLE).forEach(k => { const ev = rows.filter(e => String(e.country || '').toUpperCase() === 'USD' && NC_TITLE[k].test(String(e.title || '').trim()) && isFinite(Date.parse(e.date))).sort((a, b) => Date.parse(a.date) - Date.parse(b.date)); const up = ev.find(e => Date.parse(e.date) >= now - 36 * 3600e3) || null; if (up) out[k] = { t: Date.parse(up.date), title: up.title, f: ncParseVal(up.forecast), p: ncParseVal(up.previous), a: ncParseVal(up.actual), fs: up.forecast || '' }; });
     NC.cal = out; NC.calAt = Date.now(); NC.calErr = '';
@@ -10282,6 +10284,7 @@ async function ncLoad(force){
   try {
     const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
     await Promise.all(Object.keys(NC_BLS).map(async k => { try { const x = await ncBls(NC_BLS[k]); if (x.length < 6) throw new Error('short'); R[k] = x; NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_BLS).length; ncDraw(); } catch(e){ NC.diagB = (e && e.message) || 'blocked'; } }));
+    await Promise.all(['gas', 'adp', 'cl'].map(async k => { try { const r = await fetch('data/fred_' + NC_SER[k] + '.csv?t=' + Math.floor(Date.now() / 600000)); if (!r.ok) return; const x = ncRows(await r.text()); if (x.length >= 3) R[k] = x; } catch(e){} }));
     if (!['core', 'shel', 'pay', 'ur'].every(k => R[k])) await Promise.all(Object.keys(NC_SER).filter(k => !R[k]).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); NC.diag = (e && e.message) || ''; } }));
     const need = ['core', 'shel', 'pay', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + need.join(', ') + '. BLS: ' + (NC.diagB || 'ok') + '. FRED routes: ' + (NC.diag || 'none') + '. Your network may block both api.bls.gov and FRED'); ['adp', 'food', 'head', 'gas', 'cl'].forEach(k => { if (!R[k]) R[k] = []; });
     const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });

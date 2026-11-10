@@ -1,0 +1,34 @@
+name: refresh-data
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download calendar and FRED series
+        run: |
+          mkdir -p data
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+          for w in thisweek nextweek; do
+            for i in 1 2 3; do
+              curl -sfL -A "$UA" --max-time 30 "https://nfs.faireconomy.media/ff_calendar_$w.json" -o "data/tmp_$w.json" && python3 -c "import json;assert isinstance(json.load(open('data/tmp_$w.json')),list)" && mv "data/tmp_$w.json" "data/ff_$w.json" && break
+              sleep 20
+            done
+            rm -f "data/tmp_$w.json"
+          done
+          for id in GASREGW ADPMNUSNERSA IC4WSA; do
+            curl -sfL -A "$UA" --max-time 40 "https://fred.stlouisfed.org/graph/fredgraph.csv?id=$id&cosd=2023-01-01" -o "data/tmp.csv" && head -1 data/tmp.csv | grep -q observation_date && mv data/tmp.csv "data/fred_$id.csv"
+            rm -f data/tmp.csv
+          done
+          date -u +%FT%TZ > data/updated.txt
+      - name: Commit
+        run: |
+          git config user.name "elpp-data-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "data refresh" && git push)
