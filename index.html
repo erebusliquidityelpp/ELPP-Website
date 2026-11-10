@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.2</title>
+<title>ELPP CRYPTO SCANNER PRO V9.3</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.2</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.3</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10221,13 +10221,13 @@ function ncBuild(R){
   if (inM(target).length >= 1 && inM(ncPrev(target)).length >= 3){ gas = (ncAvg(inM(target)) / ncAvg(inM(ncPrev(target))) - 1) * 100; gnote = inM(target).length + ' weeks of ' + ncMonName(target); }
   else if (gw.length >= 8){ gas = (ncAvg(gw.slice(-4).map(x => x[1])) / ncAvg(gw.slice(-8, -4).map(x => x[1])) - 1) * 100; gnote = 'latest 4 weeks vs the 4 before'; }
   const coreXs = core.slice(-3).map((c, i) => { const k = core.length - 3 + i, sh = shel.find(x => x[0] === c[0]); return sh ? (c[1] - 0.44 * sh[1]) / 0.56 : c[1]; });
-  d.cpi = { core3: r2(ncAvg(L3(core))), food: r2(ncAvg(L3(food))) }; if (gas !== null) d.cpi.gas = r2(gas);
+  d.cpi = { core3: r2(ncAvg(L3(core))) }; if (food.length) d.cpi.food = r2(ncAvg(L3(food))); if (gas !== null) d.cpi.gas = r2(gas);
   d.core = { shel: r2(ncAvg(L3(shel))), xs: r2(ncAvg(coreXs)) };
   const pay = R.pay.slice(1).map((x, i) => [x[0], x[1] - R.pay[i][1]]), adpD = R.adp && R.adp.length > 2 ? R.adp.slice(1).map((x, i) => [x[0], x[1] - R.adp[i][1]]) : [], claims = R.cl.length ? R.cl[R.cl.length - 1] : null, adpLast = adpD.length ? adpD[adpD.length - 1] : null;
   const scale = adpLast && Math.abs(adpLast[1]) > 5000 ? 1000 : 1;
   d.nfp = { tr: Math.round(ncAvg(pay.slice(-3).map(x => x[1]))) }; if (adpLast) d.nfp.adp = Math.round(adpLast[1] / scale); if (claims) d.nfp.cl = Math.round(claims[1] / (claims[1] > 5000 ? 1000 : 1));
   d.ur = { last: R.ur[R.ur.length - 1][1] }; if (claims) d.ur.cl = d.nfp.cl;
-  prev.cpi = head[head.length - 1][1]; prev.core = core[core.length - 1][1]; prev.nfp = pay[pay.length - 1][1]; prev.ur = R.ur[R.ur.length - 1][1];
+  if (head.length) prev.cpi = head[head.length - 1][1]; prev.core = core[core.length - 1][1]; prev.nfp = pay[pay.length - 1][1]; prev.ur = R.ur[R.ur.length - 1][1];
   info.cpi = 'CPI data through ' + ncMonName(lastCpi) + ', predicting ' + tgtName + '. Gasoline: ' + (gnote || 'not available') + '.';
   info.core = 'CPI data through ' + ncMonName(lastCpi) + ', predicting ' + tgtName + '. Used-car index has no free feed, so it is left neutral.';
   info.nfp = 'Payrolls through ' + ncMonName(ncMon(R.pay[R.pay.length - 1][0])) + (adpLast ? ', ADP for ' + ncMonName(ncMon(adpLast[0])) : ', ADP not available') + (claims ? ', jobless claims week of ' + claims[0] : '') + '. ISM employment has no free feed, so it is left neutral.';
@@ -10239,6 +10239,14 @@ function ncApply(b, force){
   Object.keys(b.d).forEach(rel => { const vv = NC.vals[rel] || (NC.vals[rel] = {}), au = NC.auto[rel] || (NC.auto[rel] = {}), tc = NC.touched[rel] || (NC.touched[rel] = {});
     Object.keys(b.d[rel]).forEach(k => { if (!tc[k] || force){ vv[k] = String(b.d[rel][k]); au[k] = 1; if (force) delete tc[k]; } }); });
 }
+/* try every route at the same time (direct, your proxy.php, relay, public proxies) and take the first real FRED answer */
+function ncFetch(url){
+  const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), rel = String(state.mxRelay || '').trim().replace(/\/+$/, ''), mm = /^https:\/\/([^\/]+)(\/.*)$/.exec(url), tries = [];
+  const one = (u, ms, hdr) => new Promise((ok, no) => { const ctl = new AbortController(), to = setTimeout(() => { ctl.abort(); no(new Error('timeout')); }, ms); fetch(u, {signal: ctl.signal, cache: 'no-store'}).then(async r => { if (hdr && !r.headers.get('x-elpp-proxy')) throw new Error('not proxy'); if (!r.ok) throw new Error('HTTP ' + r.status); const t = await r.text(); if (!/^(observation_date|DATE)/i.test(t.trim().slice(0, 20))) throw new Error('not csv'); clearTimeout(to); ok(t); }).catch(e => { clearTimeout(to); no(e); }); });
+  tries.push(one(url, 7000)); if (base) tries.push(one(base + '/proxy.php?u=' + encodeURIComponent(url), 9000, true)); tries.push(one('proxy.php?u=' + encodeURIComponent(url), 6000, true));
+  if (rel && mm) tries.push(one(rel + '/x/' + mm[1] + mm[2], 9000)); if (state.pubProxy !== false) PXW.forEach(f => tries.push(one(f(url), 12000)));
+  return Promise.any(tries).catch(() => { throw new Error('no route answered'); });
+}
 async function ncLoad(force){
   if (NC.st === 'busy') return;
   const C = LS.get('elpp_nc_data');
@@ -10246,8 +10254,8 @@ async function ncLoad(force){
   NC.st = 'busy'; NC.msg = 'Loading live data…'; ncDraw();
   try {
     const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
-    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); } catch(e){ bad.push(k); } }));
-    const need = ['core', 'food', 'shel', 'head', 'gas', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (!R.adp) R.adp = []; if (need.length) throw new Error('missing ' + need.join(', '));
+    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); } }));
+    const need = ['core', 'shel', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + bad.join(', ') + '. No route to FRED answered; your proxy.php may not be uploaded, or the network blocks FRED'); ['adp', 'food', 'head', 'gas'].forEach(k => { if (!R[k]) R[k] = []; });
     const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });
   } catch(e){ NC.st = 'err'; NC.msg = 'Live data could not be loaded (' + (e && e.message || 'blocked') + '). The boxes show usual values instead. Open the app from your own site with proxy.php, or press Reload live data later.'; }
   ncDraw();
@@ -10255,7 +10263,7 @@ async function ncLoad(force){
 function ncCryptoHtml(){
   const W = { cpi: 1, core: 1.2, nfp: 0.6, ur: 0.5 }; let sc = 0, ws = 0; const rows = [];
   Object.keys(NC_REL).forEach(k => { const R = NC_REL[k], c = ncCalc(k), p = NC.prev[k], base = c.cons !== null ? c.cons : p; if (base === undefined || base === null) return; const z = Math.max(-3, Math.min(3, (c.est - base) / R.se)), hot = z * R.dir; sc += -hot * W[k]; ws += W[k]; rows.push([R.n, z, hot, c.cons !== null]); });
-  if (!ws) return '<div class="hint">Waiting for the data. The crypto read appears when the predictions are ready.</div>';
+  if (!ws) return NC.st === 'err' ? '<div class="warn">The crypto read needs the live data, which did not load: ' + esc(NC.msg) + '</div>' : '<div class="hint">' + (NC.st === 'busy' ? esc(NC.msg || 'Loading live data…') : 'Type a consensus or wait for the live data; the crypto read appears when the predictions are ready.') + '</div>';
   const v = sc / ws, a = Math.abs(v), lean = a < 0.25 ? 'Neutral' : v > 0 ? 'Leans bullish for crypto' : 'Leans bearish for crypto', cls = a < 0.25 ? '' : v > 0 ? 'up' : 'dn', size = a < 0.25 ? 'little surprise expected' : a < 0.8 ? 'small surprise' : a < 1.6 ? 'medium surprise' : 'large surprise';
   const rd = h => Math.abs(h) < 0.4 ? 'No clear push' : h > 0 ? '<b class="dn">Bearish for crypto</b>' : '<b class="up">Bullish for crypto</b>';
   let ctx = ''; try { const b = state.coins.get('BTC'), f = b && b.m ? b.m.funding : null; if (isNum(f)) ctx = f > CROWD_LONG ? 'BTC funding is high (' + f.toFixed(4) + '%/h): longs are crowded, so a hot print can flush them harder and faster.' : f < CROWD_SHORT ? 'BTC funding is negative (' + f.toFixed(4) + '%/h): shorts are crowded, so a cool print can squeeze them up faster.' : 'BTC funding is balanced (' + f.toFixed(4) + '%/h): no crowded side right now, so moves are less likely to be exaggerated by liquidations.'; } catch(e){}
