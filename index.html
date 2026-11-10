@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.14</title>
+<title>ELPP CRYPTO SCANNER PRO V9.15</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.14</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.15</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -17659,6 +17659,10 @@ const TA = window.TA = {
     var td = document.getElementById('saTgDel'); if (td) td.onclick = function(){ if (confirm('Disconnect Telegram? Your alerts will stop sending.')) api('/telegram', { method: 'DELETE' }).then(load); };
     document.getElementById('saAdd').onclick = function(){ err(); api('/alerts', { method: 'POST', body: { coin: document.getElementById('saCoin').value, kind: document.getElementById('saKind').value, op: document.getElementById('saOp').value, value: document.getElementById('saVal').value } }).then(load).catch(function(e){ err(e.message); }); };
     b.querySelectorAll('[data-d]').forEach(function(x){ x.onclick = function(){ api('/alerts/' + x.getAttribute('data-d'), { method: 'DELETE' }).then(load); }; });
+    var u = A.user || (function(){ try { return JSON.parse(localStorage.getItem('elpp_user') || 'null'); } catch(e){ return null; } })();
+    if (u && u.role === 'admin'){ var rb = document.createElement('div'); rb.style.cssText = 'margin-top:18px;border-top:1px solid var(--line,#243040);padding-top:12px'; rb.innerHTML = '<h4 style="margin:0 0 6px">Run the whole scanner on the server (24/7)</h4><p class="hint" style="margin:0 0 8px">A runner on Railway keeps the real scanner open all day, so your signal, watchlist and morning-brief alerts keep working with every tab closed. It uses the settings from this device. Exchange keys in the Trading menu are never sent.</p><div id="saRun" class="hint">Checking…</div><div style="margin-top:8px"><button class="btn" id="saSend" type="button">Send my scanner settings to the server</button></div>'; b.appendChild(rb);
+      var show = function(){ api('/runner/status').then(function(s){ var t = document.getElementById('saRun'); if (!t) return; t.innerHTML = !s.tokenSet ? '<b style="color:var(--dn,#f85149)">RUNNER_TOKEN is not set on the backend service yet.</b>' : (s.alive ? '<b style="color:var(--up,#3fb950)">Runner is alive</b>, ' + (s.info && s.info.coins ? s.info.coins + ' coins loaded, ' : '') + 'last seen ' + new Date(s.heartbeat).toLocaleTimeString() : (s.heartbeat ? '<b style="color:var(--dn,#f85149)">Runner not seen since ' + new Date(s.heartbeat).toLocaleString() + '</b>' : 'Runner has not connected yet. Create the runner service on Railway.')) + (s.hasState ? '. Settings sent ' + new Date(s.stateAt).toLocaleString() + '.' : '. No settings sent yet.'); }).catch(function(e){ var t = document.getElementById('saRun'); if (t) t.textContent = e.message; }); }; show();
+      document.getElementById('saSend').onclick = function(){ var st = null; try { st = JSON.parse(localStorage.getItem('elpp_scan_state_v1') || 'null'); } catch(e){} if (!st){ err('No scanner settings found on this device yet. Change a setting first, then try again.'); return; } if (!confirm('Send this device\'s scanner settings (including any Telegram and data API keys saved in them) to your server? Trading exchange keys are not included.')) return; api('/runner/state', { method: 'POST', body: { state: st } }).then(function(){ err(''); show(); document.getElementById('saSend').textContent = 'Sent. The runner restarts with them within 5 minutes'; }).catch(function(e){ err(e.message); }); }; }
     b.querySelectorAll('[data-t]').forEach(function(x){ x.onclick = function(){ api('/alerts/' + x.getAttribute('data-t') + '/toggle', { method: 'POST', body: { active: x.getAttribute('data-a') === '1' } }).then(load); }; });
   }
   btn.addEventListener('click', function(){ if (ov) return; build(); load(); });
