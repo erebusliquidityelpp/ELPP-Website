@@ -42,7 +42,7 @@ async function session(c) {
     await sleep(60000);
     if (closed) throw new Error('browser closed');
     let h = null;
-    try { h = await page.evaluate(() => { try { let n = 0, newest = 0; if (typeof state !== 'undefined' && state.coins) { n = state.coins.size; } return { coins: n, hidden: document.hidden, url: location.pathname, title: document.title.slice(0, 60), mem: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : 0 }; } catch (e) { return { err: String(e.message) }; } }); } catch (e) { throw new Error('page not responding: ' + e.message); }
+    try { h = await page.evaluate(() => { try { const hh = window.__elppHealth ? window.__elppHealth() : { coins: 0 }; return { coins: hh.coins || 0, view: hh.view, hidden: document.hidden, url: location.pathname, title: document.title.slice(0, 60), mem: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : 0 }; } catch (e) { return { err: String(e.message) }; } }); } catch (e) { throw new Error('page not responding: ' + e.message); }
     if (/welcome/.test(h.url || '')) throw new Error('login gate sent the runner to the landing page (token rejected)');
     status.coins = h.coins || 0; status.pageOk = true; status.lastError = status.lastError;
     if (h.coins !== lastCoins) { lastCoins = h.coins; lastChange = Date.now(); }

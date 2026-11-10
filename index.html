@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.17</title>
+<title>ELPP CRYPTO SCANNER PRO V9.18</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.17</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.18</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10702,6 +10702,7 @@ function trdPage(){ trdRender(false); trdAlgoDraw(); const pb = $('trdPaperBox')
 function cselNoop(){}
 setInterval(() => { try { trdPaperTick(); if (state.view === 'trading') trdPage(); } catch(e){} }, 5000);
 setInterval(() => { try { trdArmTick(); trdTrailTick(); } catch(e){} }, 6000);
+window.__elppHealth = () => ({coins: state.coins ? state.coins.size : 0, view: state.view});
 function applyView(){
   { const vp = $('viewPower'); if (vp) vp.hidden = state.view !== 'power'; const va = $('viewAcademy'); if (va) va.hidden = state.view !== 'academy'; const vi = $('viewIct'); if (vi) vi.hidden = state.view !== 'ictscan'; const vt = $('viewTmw'); if (vt) vt.hidden = state.view !== 'tomorrow'; const vcs = $('viewCsel'); if (vcs) vcs.hidden = state.view !== 'csel'; const vtr = $('viewTrd'); if (vtr) vtr.hidden = state.view !== 'trading'; const vnc = $('viewNowcast'); if (vnc) vnc.hidden = state.view !== 'nowcast'; const vwx = $('viewWeex'); if (vwx) vwx.hidden = state.view !== 'weexcoins'; const vq = $('viewPredict'); if (vq) vq.hidden = state.view !== 'predict'; }
   $('viewTable').hidden = state.view !== 'table'; $('viewOverview').hidden = state.view !== 'overview'; $('viewListings').hidden = state.view !== 'listings'; $('viewJournal').hidden = state.view !== 'journal'; $('viewPrep').hidden = state.view !== 'prep'; $('viewEI').hidden = state.view !== 'ei'; $('viewApi').hidden = state.view !== 'api'; $('viewBt').hidden = state.view !== 'bt'; $('viewToday').hidden = state.view !== 'today'; $('viewDecide').hidden = state.view !== 'decide'; $('viewProof').hidden = state.view !== 'proof'; $('viewNews').hidden = state.view !== 'news'; $('viewFlows').hidden = state.view !== 'flows'; $('viewDrops').hidden = state.view !== 'drops'; $('viewWhales').hidden = state.view !== 'whales'; $('viewMovers').hidden = state.view !== 'movers'; $('viewLookup').hidden = state.view !== 'lookup'; $('viewElite').hidden = state.view !== 'elite'; $('viewCharts').hidden = state.view !== 'charts'; $('viewTa').hidden = state.view !== 'ta'; $('viewMap').hidden = state.view !== 'map'; $('viewSdesk').hidden = state.view !== 'sdesk'; $('viewMemes').hidden = state.view !== 'memes'; $('viewOptions').hidden = state.view !== 'options'; $('viewOrderflow').hidden = state.view !== 'orderflow'; $('viewSignals').hidden = state.view !== 'signals'; $('viewWatch').hidden = state.view !== 'watch'; $('viewScreener').hidden = state.view !== 'screener'; $('viewInst').hidden = state.view !== 'inst'; $('viewInstSpot').hidden = state.view !== 'instspot'; $('viewX').hidden = state.view !== 'news'; if (state.view === 'news') xFeedMaybe();
