@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.18</title>
+<title>ELPP CRYPTO SCANNER PRO V9.19</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.18</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.19</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -2444,7 +2444,7 @@ function vAlign(rows, v){
 }
 async function vTickers(v){
   const st = VS[v] || (VS[v] = {});
-  try { let rows = await VT[v](); rows = rows.filter(r => r.key && isFinite(r.mark) && r.mark > 0 && isFinite(r.vol)); if (v !== 'hyperliquid') vAlign(rows, v); if (!rows.length) throw new Error(VN[v].n + ' returned no markets'); st.ok = true; st.at = Date.now(); st.n = rows.length; st.err = ''; return rows; }
+  try { let rows = await VT[v](); rows = rows.filter(r => r.key && isFinite(r.mark) && r.mark > 0 && isFinite(r.vol)); if (v !== 'hyperliquid') vAlign(rows, v); if (!rows.length) throw new Error(VN[v].n + ' returned no markets'); st.ok = true; st.at = Date.now(); st.n = rows.length; st.err = ''; st.rows = rows; return rows; }
   catch(e){ st.ok = false; st.err = vErr(v, e); if (e && /rate limit|429/.test(e.message || '')) st.err = e.message; return null; }
 }
 let ctxBusy = false;
@@ -2465,7 +2465,12 @@ async function ctxTick(){
 }
 async function ctxTickV(){
   const mode = state.venueMode || 'auto', now = Date.now(); let plan = vPlan(), R = {}, got = 0;
-  const run = async list => { const res = await Promise.all(list.map(v => vTickers(v))); list.forEach((v, i) => { if (res[i]) { R[v] = res[i]; got++; } }); };
+  /* do not wait for the slowest exchange: once one has answered, give the others a few seconds, then go on. Late ones are used from their last good answer (up to 2 minutes old) and refresh the next round. */
+  const run = async list => {
+    const out = new Array(list.length).fill(undefined), ps = list.map((v, i) => vTickers(v).then(r => { out[i] = r; return r; }));
+    await new Promise(res => { let n = 0, tm = null; ps.forEach(p => p.then(r => { n++; if (n === ps.length) { if (tm) clearTimeout(tm); res(); } else if (r && !tm) tm = setTimeout(res, 3500); })); });
+    list.forEach((v, i) => { let r = out[i]; if (r === undefined){ const st = VS[v]; r = st && st.rows && Date.now() - (st.at || 0) < 120000 ? st.rows : null; } if (r){ R[v] = r; got++; } });
+  };
   await run(plan);
   if (mode === 'auto'){
     if (!V.fb){
