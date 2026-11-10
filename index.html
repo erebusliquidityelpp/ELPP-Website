@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.4</title>
+<title>ELPP CRYPTO SCANNER PRO V9.5</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.4</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.5</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10257,11 +10257,13 @@ function ncApply(b, force){
 }
 /* try every route at the same time (direct, your proxy.php, relay, public proxies) and take the first real FRED answer */
 function ncFetch(url){
-  const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), rel = String(state.mxRelay || '').trim().replace(/\/+$/, ''), mm = /^https:\/\/([^\/]+)(\/.*)$/.exec(url), tries = [];
-  const one = (u, ms, hdr) => new Promise((ok, no) => { const ctl = new AbortController(), to = setTimeout(() => { ctl.abort(); no(new Error('timeout')); }, ms); fetch(u, {signal: ctl.signal, cache: 'no-store'}).then(async r => { if (hdr && !r.headers.get('x-elpp-proxy')) throw new Error('not proxy'); if (!r.ok) throw new Error('HTTP ' + r.status); const t = await r.text(); if (!/^(observation_date|DATE)/i.test(t.trim().slice(0, 20))) throw new Error('not csv'); clearTimeout(to); ok(t); }).catch(e => { clearTimeout(to); no(e); }); });
-  tries.push(one(url, 7000)); if (base) tries.push(one(base + '/proxy.php?u=' + encodeURIComponent(url), 9000, true)); tries.push(one('proxy.php?u=' + encodeURIComponent(url), 6000, true));
-  if (rel && mm) tries.push(one(rel + '/x/' + mm[1] + mm[2], 9000)); if (state.pubProxy !== false) PXW.forEach(f => tries.push(one(f(url), 12000)));
-  return Promise.any(tries).catch(() => { throw new Error('no route answered'); });
+  const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''), rel = String(state.mxRelay || '').trim().replace(/\/+$/, ''), mm = /^https:\/\/([^\/]+)(\/.*)$/.exec(url), tries = [], lab = [], enc = encodeURIComponent(url);
+  const one = (u, ms, hdr) => new Promise((ok, no) => { const ctl = new AbortController(), to = setTimeout(() => { ctl.abort(); no(new Error('timeout')); }, ms); fetch(u, {signal: ctl.signal, cache: 'no-store'}).then(async r => { if (hdr && !r.headers.get('x-elpp-proxy')) throw new Error('reply is not from proxy.php (HTTP ' + r.status + ')'); if (!r.ok) throw new Error('HTTP ' + r.status); const t = await r.text(); if (!/^(observation_date|DATE)/i.test(t.trim().slice(0, 20))) throw new Error('not FRED data'); clearTimeout(to); ok(t); }).catch(e => { clearTimeout(to); no(new Error(e && e.name === 'TypeError' ? 'blocked' : (e && e.message) || 'failed')); }); });
+  const add = (l, p) => { lab.push(l); tries.push(p); };
+  add('direct', one(url, 7000)); if (base) add('your proxy.php', one(base + '/proxy.php?u=' + enc, 9000, true)); add('proxy.php here', one('proxy.php?u=' + enc, 6000, true));
+  if (rel && mm) add('relay', one(rel + '/x/' + mm[1] + mm[2], 9000));
+  if (state.pubProxy !== false) [['corsproxy', 'https://corsproxy.io/?url=' + enc], ['corsproxy2', 'https://corsproxy.io/?' + enc], ['allorigins', 'https://api.allorigins.win/raw?url=' + enc], ['codetabs', 'https://api.codetabs.com/v1/proxy?quest=' + enc], ['thingproxy', 'https://thingproxy.freeboard.io/fetch/' + url], ['yacdn', 'https://yacdn.org/proxy/' + url]].forEach(([l, u]) => add(l, one(u, 12000)));
+  return Promise.any(tries).catch(e => { throw new Error((e.errors || []).map((x, i) => lab[i] + ': ' + x.message).join('; ')); });
 }
 async function ncLoad(force){
   if (NC.st === 'busy') return;
@@ -10270,8 +10272,8 @@ async function ncLoad(force){
   NC.st = 'busy'; NC.msg = 'Loading live data…'; ncDraw();
   try {
     const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
-    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); } }));
-    const need = ['core', 'shel', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + bad.join(', ') + '. No route to FRED answered; your proxy.php may not be uploaded, or the network blocks FRED'); ['adp', 'food', 'head', 'gas'].forEach(k => { if (!R[k]) R[k] = []; });
+    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); NC.diag = (e && e.message) || ''; } }));
+    const need = ['core', 'shel', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + bad.join(', ') + '. Every route failed. ' + (NC.diag || '') + '. Your proxy.php may not be uploaded next to index.html, or the network blocks FRED'); ['adp', 'food', 'head', 'gas'].forEach(k => { if (!R[k]) R[k] = []; });
     const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });
   } catch(e){ NC.st = 'err'; NC.msg = 'Live data could not be loaded (' + (e && e.message || 'blocked') + '). The boxes show usual values instead. Open the app from your own site with proxy.php, or press Reload live data later.'; }
   ncDraw();
