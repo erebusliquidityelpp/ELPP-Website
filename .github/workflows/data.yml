@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download calendar and FRED series
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
           mkdir -p data
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
@@ -21,9 +23,26 @@ jobs:
             done
             rm -f "data/tmp_$w.json"
           done
+          if [ -z "$FRED_API_KEY" ]; then echo "FRED_API_KEY secret is missing or empty"; fi
           for id in GASREGW ADPMNUSNERSA IC4WSA; do
-            curl -sfL -A "$UA" --max-time 40 "https://fred.stlouisfed.org/graph/fredgraph.csv?id=$id&cosd=2023-01-01" -o "data/tmp.csv" && head -1 data/tmp.csv | grep -q observation_date && mv data/tmp.csv "data/fred_$id.csv"
-            rm -f data/tmp.csv
+            if [ -n "$FRED_API_KEY" ]; then
+              code=$(curl -s -o data/tmp.json -w '%{http_code}' --max-time 40 "https://api.stlouisfed.org/fred/series/observations?series_id=$id&api_key=$FRED_API_KEY&file_type=json&observation_start=2023-01-01")
+              echo "FRED $id -> HTTP $code"
+              if [ "$code" = "200" ]; then
+                python3 - "$id" <<'PY'
+import json,sys
+i=sys.argv[1]
+j=json.load(open('data/tmp.json'))
+rows=[o for o in j.get('observations',[]) if o.get('value') not in ('.','',None)]
+if len(rows)>=3:
+    open('data/fred_%s.csv'%i,'w').write('observation_date,%s\n'%i+''.join('%s,%s\n'%(o['date'],o['value']) for o in rows))
+    print('saved',i,len(rows),'rows, last',rows[-1]['date'])
+else:
+    print('no usable rows for',i, str(j)[:120])
+PY
+              else head -c 200 data/tmp.json; echo; fi
+            fi
+            rm -f data/tmp.json
           done
           date -u +%FT%TZ > data/updated.txt
       - name: Commit
