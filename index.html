@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.11</title>
+<title>ELPP CRYPTO SCANNER PRO V9.12</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.11</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.12</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -17607,6 +17607,24 @@ const TA = window.TA = {
 (function(){ var b = document.getElementById('btnLogout'); if (!b) return; b.hidden = false; if (!window.ELPP_AUTH) { b.textContent = 'Account'; b.title = 'Login is not switched on yet. Opens the login / sign-up page.'; b.addEventListener('click', function(){ location.href = 'welcome.html'; }); return; }
   function nm(){ var u = window.ELPP_AUTH.user; if (!u) { try { u = JSON.parse(localStorage.getItem('elpp_user') || 'null'); } catch(e){} } var w = document.getElementById('welcomeChip'); if (w && u && u.name) { w.textContent = 'Welcome ' + u.name; w.title = u.email || ''; w.hidden = false; } if (u && u.name) b.title = 'Signed in as ' + u.name + ' (' + u.email + '). Click to log out.'; } nm(); document.addEventListener('elpp-auth', nm);
   b.addEventListener('click', function(){ if (confirm('Log out of ELPP on this device?')) window.ELPP_AUTH.logout(false); }); })();
+</script>
+<script>
+/* Show / Hide button on every password box (also boxes the app draws later) */
+(function(){
+  var css = document.createElement('style'); css.textContent = '.pwx{position:relative;display:inline-block;max-width:100%;vertical-align:middle}.pwx>input{padding-right:54px!important;box-sizing:border-box}.pwx>button.pwb{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--muted,#8393a7);font:600 11px system-ui,sans-serif;cursor:pointer;padding:4px 6px;border-radius:6px}.pwx>button.pwb:hover{color:var(--accent,#58a6ff)}'; document.head.appendChild(css);
+  function wrap(i){
+    if (i.__pwx || !i.parentNode) return; i.__pwx = 1;
+    var w = document.createElement('span'), cs = getComputedStyle(i), st = i.getAttribute('style') || '', fw = /width\s*:\s*100%/.test(st) || cs.display === 'block';
+    w.className = 'pwx'; if (fw) w.style.cssText = 'display:block;width:100%;' + (/max-width\s*:\s*[^;]+/.exec(st) || [''])[0]; else if (/min-width\s*:\s*[^;]+/.test(st)) w.style.minWidth = /min-width\s*:\s*([^;]+)/.exec(st)[1];
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'pwb'; b.textContent = 'Show'; b.setAttribute('aria-label', 'Show or hide the password'); b.tabIndex = -1;
+    i.parentNode.insertBefore(w, i); w.appendChild(i); w.appendChild(b);
+    if (fw) { i.style.width = '100%'; i.style.maxWidth = 'none'; }
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var show = i.type === 'password'; i.type = show ? 'text' : 'password'; b.textContent = show ? 'Hide' : 'Show'; i.focus(); });
+  }
+  var q = 0; function scan(){ q = 0; document.querySelectorAll('input[type="password"]').forEach(wrap); }
+  function sched(){ if (!q) q = requestAnimationFrame(scan); }
+  scan(); new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
+})();
 </script>
 </body>
 </html>
