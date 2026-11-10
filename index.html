@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.7</title>
+<title>ELPP CRYPTO SCANNER PRO V9.8</title>
+<script src="auth-config.js"></script>
+<script>
+/* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
+(function(){
+  var API = String(window.ELPP_API || '').replace(/\/+$/, ''); if (!API) return;
+  var K = 'elpp_token', U = 'elpp_user', V = 'elpp_user_at', t = null;
+  try { t = localStorage.getItem(K); } catch(e){}
+  function out(){ try { localStorage.removeItem(K); localStorage.removeItem(U); localStorage.removeItem(V); } catch(e){} location.replace('welcome.html'); }
+  if (!t) { document.documentElement.style.visibility = 'hidden'; out(); return; }
+  window.ELPP_AUTH = { api: API, token: t, logout: function(everywhere){ var done = function(){ out(); }; if (!everywhere) return done(); fetch(API + '/api/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t } }).then(done, done); } };
+  fetch(API + '/api/me', { headers: { Authorization: 'Bearer ' + t } }).then(function(r){
+    if (r.status === 401) { out(); return null; } return r.ok ? r.json() : null;
+  }).then(function(j){ if (j && j.user) { try { localStorage.setItem(U, JSON.stringify(j.user)); localStorage.setItem(V, String(Date.now())); } catch(e){} window.ELPP_AUTH.user = j.user; document.dispatchEvent(new Event('elpp-auth')); } }).catch(function(){ /* offline or server asleep: keep the saved login */ });
+})();
+</script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.7</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.8</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -840,6 +855,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
     <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
+    <button class="btn sm" id="btnLogout" type="button" hidden title="Log out of your ELPP account">Log out</button>
   </div>
 </header>
 
@@ -17585,6 +17601,11 @@ const TA = window.TA = {
   g.ELPPX = { EX: { hyperliquid: HL, binance: BN, bybit: BY, okx: OK, bitget: BG, gate: GT, mexc: MX, bingx: BX, kucoin: KC, kraken: KR, htx: HX, deribit: DR, phemex: PX, weex: WX }, hmacHex, hmacB64, msgpack, wire, hlPx, hlSz, hlSign, floorStep, roundStep, vaultSeal, vaultOpen, decs, sha512Hex };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+</script>
+<script>
+(function(){ var b = document.getElementById('btnLogout'); if (!b || !window.ELPP_AUTH) return; b.hidden = false;
+  function nm(){ var u = window.ELPP_AUTH.user; if (u && u.name) b.title = 'Signed in as ' + u.name + ' (' + u.email + '). Click to log out.'; } nm(); document.addEventListener('elpp-auth', nm);
+  b.addEventListener('click', function(){ if (confirm('Log out of ELPP on this device?')) window.ELPP_AUTH.logout(false); }); })();
 </script>
 </body>
 </html>
