@@ -40,7 +40,7 @@ const DUMMY = bcrypt.hashSync('not-a-real-password', 11);
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors({ origin: (o, cb) => cb(null, !o || ORIGINS.includes(o) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o) && process.env.ALLOW_LOCALHOST === 'true'), methods: ['GET', 'POST'], allowedHeaders: ['Content-Type', 'Authorization'], maxAge: 600 }));
+app.use(cors({ origin: (o, cb) => cb(null, !o || ORIGINS.includes(o) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o) && process.env.ALLOW_LOCALHOST === 'true'), methods: ['GET', 'POST', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'], exposedHeaders: ['X-ELPP-Proxy'], maxAge: 600 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(rateLimit({ windowMs: 15 * 60e3, limit: 300, standardHeaders: true, legacyHeaders: false }));
 const authLimit = rateLimit({ windowMs: 15 * 60e3, limit: 15, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many attempts. Wait 15 minutes and try again.' } });
@@ -98,6 +98,9 @@ app.post('/api/password', authLimit, auth, async (req, res) => {
 });
 
 app.get('/api/admin/users', auth, (req, res) => req.user.role === 'admin' ? res.json({ users: q.list.all() }) : res.status(403).json({ error: 'Admin only.' }));
+
+app.use(require('./proxy').router);
+app.use(require('./alerts')(db, auth, SECRET, authLimit));
 
 app.use((req, res) => res.status(404).json({ error: 'Not found.' }));
 app.use((err, req, res, next) => { if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Bad request.' }); console.error(err); res.status(500).json({ error: 'Server error.' }); });

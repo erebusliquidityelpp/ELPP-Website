@@ -30,6 +30,10 @@ Signup, login and sessions for the ELPP scanner. Node.js, Express, SQLite.
 
 Passwords are stored as bcrypt hashes. Attempts are rate-limited. Tokens last 30 days.
 
+## Always-on features (run on the server, no browser needed)
+- **Data proxy** (`/proxy.php?u=...`): fetches public data that browsers or GitHub block (FRED, the economic calendar, Farside ETF flows, DefiLlama, CFTC and more) from an allow-list. Add `FRED_API_KEY` in Railway Variables so FRED goes through the official API.
+- **24/7 alerts** (`/api/alerts`, `/api/telegram`): price, funding, 24h move and open-interest alerts for Hyperliquid coins, checked every minute and sent to your Telegram bot. Telegram tokens are stored encrypted.
+
 ## Not included yet
 Email verification and "forgot password" (they need an email service). Payments.
 

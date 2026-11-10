@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.12</title>
+<title>ELPP CRYPTO SCANNER PRO V9.14</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.12</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.14</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -856,6 +856,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
     <span class="chip" id="welcomeChip" hidden style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <button class="btn sm" id="btnSrvAl" type="button" hidden title="Alerts that keep running on the ELPP server, even when this page is closed">24/7 alerts</button>
     <button class="btn sm" id="btnLogout" type="button" hidden title="Log out of your ELPP account">Log out</button>
   </div>
 </header>
@@ -10301,7 +10302,8 @@ async function ncLoad(force){
   try {
     const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
     await Promise.all(Object.keys(NC_BLS).map(async k => { try { const x = await ncBls(NC_BLS[k]); if (x.length < 6) throw new Error('short'); R[k] = x; NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_BLS).length; ncDraw(); } catch(e){ NC.diagB = (e && e.message) || 'blocked'; } }));
-    await Promise.all(['gas', 'adp', 'cl'].map(async k => { try { const r = await fetch('data/fred_' + NC_SER[k] + '.csv?t=' + Math.floor(Date.now() / 600000)); if (!r.ok) return; const x = ncRows(await r.text()); if (x.length >= 3) R[k] = x; } catch(e){} }));
+    await Promise.all(['gas', 'adp', 'cl'].map(async k => { try { const r = await fetch('data/fred_' + NC_SER[k] + '.csv?t=' + Math.floor(Date.now() / 600000)); if (r.ok){ const x = ncRows(await r.text()); if (x.length >= 3){ R[k] = x; return; } } } catch(e){}
+      try { const base = String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, ''); if (!base) return; const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000); try { const r = await fetch(base + '/proxy.php?u=' + encodeURIComponent('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd), {signal: ctl.signal, cache: 'no-store'}); if (r.ok && r.headers.get('x-elpp-proxy')){ const x = ncRows(await r.text()); if (x.length >= 3) R[k] = x; } } finally { clearTimeout(to); } } catch(e){} }));
     if (!['core', 'shel', 'pay', 'ur'].every(k => R[k])) await Promise.all(Object.keys(NC_SER).filter(k => !R[k]).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); NC.diag = (e && e.message) || ''; } }));
     const need = ['core', 'shel', 'pay', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + need.join(', ') + '. BLS: ' + (NC.diagB || 'ok') + '. FRED routes: ' + (NC.diag || 'none') + '. Your network may block both api.bls.gov and FRED'); ['adp', 'food', 'head', 'gas', 'cl'].forEach(k => { if (!R[k]) R[k] = []; });
     const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });
@@ -17624,6 +17626,42 @@ const TA = window.TA = {
   var q = 0; function scan(){ q = 0; document.querySelectorAll('input[type="password"]').forEach(wrap); }
   function sched(){ if (!q) q = requestAnimationFrame(scan); }
   scan(); new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+<script>
+/* 24/7 server alerts panel (works only when logged in; the checks run on the Railway server) */
+(function(){
+  var A = window.ELPP_AUTH, btn = document.getElementById('btnSrvAl'); if (!A || !btn) return; btn.hidden = false;
+  var ov = null, KIND = { price: 'Price', funding: 'Funding rate (% per hour)', chg24: '24h move (%)', oi1h: 'Open interest change in 1h (%)' };
+  function api(path, opt){ opt = opt || {}; return fetch(A.api + '/api' + path, { method: opt.method || 'GET', headers: { Authorization: 'Bearer ' + A.token, 'Content-Type': 'application/json' }, body: opt.body ? JSON.stringify(opt.body) : undefined }).then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (!r.ok) throw new Error(j.error || 'Server error'); return j; }); }); }
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function build(){
+    ov = document.createElement('div'); ov.id = 'srvAlOv'; ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99990;display:flex;align-items:center;justify-content:center;padding:14px';
+    ov.innerHTML = '<div style="background:var(--surface,#121820);color:var(--fg,#d6dee9);border:1px solid var(--line,#243040);border-radius:14px;width:100%;max-width:620px;max-height:calc(100vh - 28px);overflow:auto;padding:18px;position:relative"><button id="saX" type="button" class="btn sm" style="position:absolute;right:12px;top:12px">Close</button><h3 style="margin:0 0 4px">24/7 server alerts</h3><p class="hint" style="margin:0 0 12px">These alerts are checked every minute on the ELPP server and sent to your Telegram, even when this page or the app is closed. They watch Hyperliquid coins.</p><div id="saBody">Loading…</div></div>';
+    document.body.appendChild(ov); ov.addEventListener('mousedown', function(e){ if (e.target === ov) close(); }); ov.querySelector('#saX').onclick = close;
+  }
+  function close(){ if (ov){ ov.remove(); ov = null; } }
+  function load(){ api('/alerts').then(draw).catch(function(e){ var b = document.getElementById('saBody'); if (b) b.innerHTML = '<p style="color:var(--dn,#f85149)">' + esc(e.message) + '</p>'; }); }
+  function draw(d){
+    var b = document.getElementById('saBody'); if (!b) return; var srv = d.server || {}, ok = srv.lastCheck && !srv.error;
+    var rows = d.alerts.map(function(a){ var w = (a.kind === 'price' || a.kind === 'funding' ? a.op + ' ' : 'moves more than ') + a.value + (a.kind === 'chg24' || a.kind === 'oi1h' ? '%' : a.kind === 'funding' ? '%/h' : ''); return '<tr><td style="padding:4px 8px 4px 0"><b>' + esc(a.coin) + '</b></td><td style="padding:4px 8px 4px 0">' + esc(KIND[a.kind] || a.kind) + ' ' + esc(w) + '</td><td style="padding:4px 0;white-space:nowrap"><button class="btn sm" data-t="' + a.id + '" data-a="' + (a.active ? 0 : 1) + '">' + (a.active ? 'Pause' : 'Resume') + '</button> <button class="btn sm" data-d="' + a.id + '">Delete</button></td></tr>'; }).join('');
+    b.innerHTML = '<div class="hint" style="margin-bottom:10px">Server: ' + (ok ? '<b style="color:var(--up,#3fb950)">running</b>, last check ' + new Date(srv.lastCheck).toLocaleTimeString() + ', watching ' + srv.coins + ' coins' : '<b style="color:var(--dn,#f85149)">waiting for data</b>' + (srv.error ? ' (' + esc(srv.error) + ')' : '')) + '</div>' +
+    '<h4 style="margin:10px 0 6px">1. Your Telegram bot</h4>' + (d.telegram.set ? '<p class="hint">Connected to chat ' + esc(d.telegram.chat) + '. <button class="btn sm" id="saTest" type="button">Send test</button> <button class="btn sm" id="saTgDel" type="button">Disconnect</button></p>' : '<p class="hint">Make a bot with @BotFather, press Start in its chat, and get your chat id from @userinfobot. The token is stored encrypted on the server.</p>') +
+    '<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input type="password" id="saTok" placeholder="Bot token 123456:ABC…" style="min-width:230px;flex:1"><input id="saChat" placeholder="Chat id" style="width:140px"><button class="btn" id="saSave" type="button">' + (d.telegram.set ? 'Replace' : 'Save') + '</button></div>' +
+    '<h4 style="margin:16px 0 6px">2. Add an alert</h4><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="saCoin" placeholder="Coin e.g. BTC" style="width:110px" list="saCoins"><datalist id="saCoins"></datalist><select id="saKind"><option value="price">Price</option><option value="funding">Funding rate (% per hour)</option><option value="chg24">24h move (%)</option><option value="oi1h">Open interest change 1h (%)</option></select><select id="saOp"><option value="above">goes above</option><option value="below">goes below</option></select><input id="saVal" type="number" step="any" placeholder="Value" style="width:110px"><button class="btn" id="saAdd" type="button">Add</button></div><div class="hint" id="saHint" style="margin-top:4px"></div>' +
+    '<p id="saErr" style="color:var(--dn,#f85149);min-height:18px;margin:8px 0 0"></p><h4 style="margin:10px 0 6px">Your alerts</h4>' + (rows ? '<table style="border-collapse:collapse;font-size:13px">' + rows + '</table>' : '<p class="hint">None yet. Each alert fires once, then waits 30 minutes before it can fire again.</p>');
+    var err = function(m){ document.getElementById('saErr').textContent = m || ''; };
+    function kindUi(){ var k = document.getElementById('saKind').value, two = k === 'price' || k === 'funding'; document.getElementById('saOp').style.display = two ? '' : 'none'; document.getElementById('saHint').textContent = k === 'chg24' ? 'Fires when the coin has moved this much, up or down, over 24 hours.' : k === 'oi1h' ? 'Fires when open interest changed this much, up or down, in the last hour (needs about 20 minutes of server history).' : k === 'funding' ? 'Hyperliquid funding per hour in percent. 0.01 means 0.01% per hour.' : ''; }
+    document.getElementById('saKind').onchange = kindUi; kindUi();
+    api('/alerts/coins').then(function(c){ var dl = document.getElementById('saCoins'); if (dl) dl.innerHTML = c.coins.map(function(x){ return '<option value="' + esc(x) + '">'; }).join(''); }).catch(function(){});
+    document.getElementById('saSave').onclick = function(){ err(); api('/telegram', { method: 'POST', body: { token: document.getElementById('saTok').value.trim(), chat: document.getElementById('saChat').value.trim() } }).then(load).catch(function(e){ err(e.message); }); };
+    var t = document.getElementById('saTest'); if (t) t.onclick = function(){ err(); t.disabled = true; api('/telegram/test', { method: 'POST' }).then(function(){ err(''); t.textContent = 'Sent. Check Telegram'; }).catch(function(e){ err(e.message); t.disabled = false; }); };
+    var td = document.getElementById('saTgDel'); if (td) td.onclick = function(){ if (confirm('Disconnect Telegram? Your alerts will stop sending.')) api('/telegram', { method: 'DELETE' }).then(load); };
+    document.getElementById('saAdd').onclick = function(){ err(); api('/alerts', { method: 'POST', body: { coin: document.getElementById('saCoin').value, kind: document.getElementById('saKind').value, op: document.getElementById('saOp').value, value: document.getElementById('saVal').value } }).then(load).catch(function(e){ err(e.message); }); };
+    b.querySelectorAll('[data-d]').forEach(function(x){ x.onclick = function(){ api('/alerts/' + x.getAttribute('data-d'), { method: 'DELETE' }).then(load); }; });
+    b.querySelectorAll('[data-t]').forEach(function(x){ x.onclick = function(){ api('/alerts/' + x.getAttribute('data-t') + '/toggle', { method: 'POST', body: { active: x.getAttribute('data-a') === '1' } }).then(load); }; });
+  }
+  btn.addEventListener('click', function(){ if (ov) return; build(); load(); });
 })();
 </script>
 </body>
