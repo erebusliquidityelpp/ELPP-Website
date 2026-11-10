@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.0</title>
+<title>ELPP CRYPTO SCANNER PRO V9.1</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.0</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.1</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10205,8 +10205,8 @@ function ncStats(){
 
 /* ----- live data: FRED CSV through the same route the Outside-markets page uses (proxy.php first, then fallbacks) ----- */
 const NC_SER = { core: 'CPILFESL', head: 'CPIAUCSL', food: 'CPIUFDSL', shel: 'CUSR0000SAH1', gas: 'GASREGW', pay: 'PAYEMS', adp: 'ADPMNUSNERSA', cl: 'IC4WSA', ur: 'UNRATE' };
-function ncRows(t){ return String(t).trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && isFinite(+a[1])).map(a => [a[0], +a[1]]); }
-const ncMom = r => r.slice(1).map((x, i) => [x[0], (x[1] / r[i][1] - 1) * 100]), ncAvg = a => a.reduce((s, x) => s + x, 0) / (a.length || 1), ncMon = d => String(d).slice(0, 7);
+function ncRows(t){ return String(t).trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && a[1].trim() !== '' && isFinite(+a[1])).map(a => [a[0], +a[1]]); }
+const ncMom = r => r.slice(1).map((x, i) => [x[0], (x[1] / r[i][1] - 1) * 100, ncMon(x[0]) === ncNext(ncMon(r[i][0]))]).filter(x => x[2]).map(x => [x[0], x[1]]), ncAvg = a => a.reduce((s, x) => s + x, 0) / (a.length || 1), ncMon = d => String(d).slice(0, 7);
 const ncMonName = m => { const [y, mo] = m.split('-'); return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+mo - 1] + ' ' + y; };
 const ncNext = m => { let [y, mo] = m.split('-').map(Number); mo++; if (mo > 12){ mo = 1; y++; } return y + '-' + String(mo).padStart(2, '0'); };
 const ncPrev = m => { let [y, mo] = m.split('-').map(Number); mo--; if (mo < 1){ mo = 12; y--; } return y + '-' + String(mo).padStart(2, '0'); };
@@ -13957,7 +13957,7 @@ async function frLoad(force){
   if (FR.busy) return; const now = Date.now(); if (!force && FR.at && now - FR.at < 7200000) return; if (!force && FR.s && FR.s._at && now - FR.s._at < 7200000){ FR.at = FR.s._at; return; }
   FR.busy = true; const cosd = new Date(now - 420 * 864e5).toISOString().slice(0, 10), out = {}; let ok = 0;
   await Promise.all(FRED_S.map(async ([id]) => { try {
-    const t = await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + id + '&cosd=' + cosd), rows = t.trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && isFinite(+a[1])).map(a => [a[0], +a[1]]);
+    const t = await pxText('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + id + '&cosd=' + cosd), rows = t.trim().split(/\r?\n/).slice(1).map(l => l.split(',')).filter(a => a.length >= 2 && a[1] !== '.' && a[1].trim() !== '' && isFinite(+a[1])).map(a => [a[0], +a[1]]);
     if (rows.length < 25) throw new Error('short'); const last = rows[rows.length - 1], at = k => rows[Math.max(0, rows.length - 1 - k)][1];
     out[id] = Object.assign(frCalc(rows), {src:'own'}); ok++;
   } catch(e){} }));
