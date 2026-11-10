@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.5</title>
+<title>ELPP CRYPTO SCANNER PRO V9.6</title>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
 <link rel="icon" type="image/png" href="eagle-favicon.png">
@@ -817,7 +817,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.5</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.6</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10265,6 +10265,15 @@ function ncFetch(url){
   if (state.pubProxy !== false) [['corsproxy', 'https://corsproxy.io/?url=' + enc], ['corsproxy2', 'https://corsproxy.io/?' + enc], ['allorigins', 'https://api.allorigins.win/raw?url=' + enc], ['codetabs', 'https://api.codetabs.com/v1/proxy?quest=' + enc], ['thingproxy', 'https://thingproxy.freeboard.io/fetch/' + url], ['yacdn', 'https://yacdn.org/proxy/' + url]].forEach(([l, u]) => add(l, one(u, 12000)));
   return Promise.any(tries).catch(e => { throw new Error((e.errors || []).map((x, i) => lab[i] + ': ' + x.message).join('; ')); });
 }
+/* BLS public API answers browsers directly (no proxy needed): same CPI / payroll / unemployment numbers FRED republishes */
+const NC_BLS = { core: 'CUSR0000SA0L1E', head: 'CUSR0000SA0', food: 'CUSR0000SAF1', shel: 'CUSR0000SAH1', pay: 'CES0000000001', ur: 'LNS14000000' };
+async function ncBls(id){
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
+  try { const r = await fetch('https://api.bls.gov/publicAPI/v1/timeseries/data/' + id, {signal: ctl.signal}); const j = await r.json(), d = j && j.Results && j.Results.series && j.Results.series[0] ? j.Results.series[0].data : [];
+    if (!d.length) throw new Error((j && j.message && j.message[0]) || 'no data');
+    return d.filter(x => /^M(0[1-9]|1[0-2])$/.test(x.period) && isFinite(+x.value)).map(x => [x.year + '-' + x.period.slice(1) + '-01', +x.value]).sort((p, q) => p[0] < q[0] ? -1 : 1);
+  } finally { clearTimeout(to); }
+}
 async function ncLoad(force){
   if (NC.st === 'busy') return;
   const C = LS.get('elpp_nc_data');
@@ -10272,8 +10281,9 @@ async function ncLoad(force){
   NC.st = 'busy'; NC.msg = 'Loading live data…'; ncDraw();
   try {
     const cosd = new Date(Date.now() - 900 * 864e5).toISOString().slice(0, 10), R = {}, bad = [];
-    await Promise.all(Object.keys(NC_SER).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); NC.diag = (e && e.message) || ''; } }));
-    const need = ['core', 'shel', 'pay', 'cl', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + bad.join(', ') + '. Every route failed. ' + (NC.diag || '') + '. Your proxy.php may not be uploaded next to index.html, or the network blocks FRED'); ['adp', 'food', 'head', 'gas'].forEach(k => { if (!R[k]) R[k] = []; });
+    await Promise.all(Object.keys(NC_BLS).map(async k => { try { const x = await ncBls(NC_BLS[k]); if (x.length < 6) throw new Error('short'); R[k] = x; NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_BLS).length; ncDraw(); } catch(e){ NC.diagB = (e && e.message) || 'blocked'; } }));
+    if (!['core', 'shel', 'pay', 'ur'].every(k => R[k])) await Promise.all(Object.keys(NC_SER).filter(k => !R[k]).map(async k => { try { R[k] = ncRows(await ncFetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=' + NC_SER[k] + '&cosd=' + cosd)); if (R[k].length < 3) throw new Error('short'); NC.msg = 'Loading live data… ' + Object.keys(R).length + ' of ' + Object.keys(NC_SER).length; ncDraw(); } catch(e){ bad.push(k); NC.diag = (e && e.message) || ''; } }));
+    const need = ['core', 'shel', 'pay', 'ur'].filter(k => !R[k]); if (need.length) throw new Error('these series did not load: ' + need.join(', ') + '. BLS: ' + (NC.diagB || 'ok') + '. FRED routes: ' + (NC.diag || 'none') + '. Your network may block both api.bls.gov and FRED'); ['adp', 'food', 'head', 'gas', 'cl'].forEach(k => { if (!R[k]) R[k] = []; });
     const b = ncBuild(R); NC.at = Date.now(); NC.st = 'ok'; NC.msg = ''; ncApply(b, !!force); LS.set('elpp_nc_data', { at: NC.at, b });
   } catch(e){ NC.st = 'err'; NC.msg = 'Live data could not be loaded (' + (e && e.message || 'blocked') + '). The boxes show usual values instead. Open the app from your own site with proxy.php, or press Reload live data later.'; }
   ncDraw();
@@ -10310,7 +10320,7 @@ function ncResHtml(){
 }
 function ncStatusHtml(){
   const t = NC.at ? new Date(NC.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-  return NC.st === 'busy' ? '<span class="hint">Loading live data from FRED…</span>' : NC.st === 'ok' ? '<span class="hint">Live data from FRED (US government series), updated ' + t + '.</span>' : NC.st === 'err' ? '<span class="warn">' + esc(NC.msg) + '</span>' : '';
+  return NC.st === 'busy' ? '<span class="hint">Loading live data from FRED…</span>' : NC.st === 'ok' ? '<span class="hint">Live data from US government series (BLS), updated ' + t + '.</span>' : NC.st === 'err' ? '<span class="warn">' + esc(NC.msg) + '</span>' : '';
 }
 function ncHtml(){
   const rel = NC.rel, R = NC_REL[rel], vv = NC.vals[rel] || (NC.vals[rel] = {}), au = NC.auto[rel] || {};
