@@ -1,0 +1,7 @@
+{
+  "appId": "com.elpp.scanner",
+  "appName": "ELPP Scanner",
+  "webDir": "www",
+  "server": { "url": "https://erebusliquidityelpp.github.io/ELPP-Website/", "cleartext": false },
+  "android": { "allowMixedContent": false }
+}

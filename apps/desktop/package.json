@@ -1,0 +1,18 @@
+{
+  "name": "elpp-scanner-desktop",
+  "version": "1.0.0",
+  "description": "ELPP Crypto Scanner Pro desktop app. It opens the live site, so every update you push appears the next time the app opens or refreshes.",
+  "main": "main.js",
+  "author": "ELPP",
+  "private": true,
+  "devDependencies": { "electron": "33.2.1", "electron-builder": "25.1.8" },
+  "build": {
+    "appId": "com.elpp.scanner",
+    "productName": "ELPP Scanner",
+    "files": ["main.js", "offline.html", "package.json"],
+    "win": { "target": ["nsis", "portable"], "icon": "build/icon.png", "artifactName": "ELPP-Scanner-Setup.${ext}" },
+    "nsis": { "oneClick": true, "perMachine": false, "createDesktopShortcut": true, "createStartMenuShortcut": true },
+    "portable": { "artifactName": "ELPP-Scanner-Portable.exe" },
+    "directories": { "buildResources": "build" }
+  }
+}
