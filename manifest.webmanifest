@@ -27,5 +27,9 @@
       "purpose": "maskable"
     }
   ],
-  "id": "/ELPP-Website/"
+  "id": "/ELPP-Website/",
+  "categories": [
+    "finance"
+  ],
+  "lang": "en"
 }
