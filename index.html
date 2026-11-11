@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.39</title>
+<title>ELPP CRYPTO SCANNER PRO V9.40</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.39</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.40</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11655,6 +11655,14 @@ function jrReconcile(src, openIds){
     else if (Date.now() - s.gone > 3 * 864e5){ JR.trades = JR.trades.filter(x => x !== s); }
   }
 }
+/* V9.40: Hyperliquid account = perps account value + free USDC in the spot wallet (this is the "Available to Trade" box on a unified account) */
+async function jrAcctSet(r, a){
+  const ms = r.marginSummary || {}; let spot = 0, hold = 0;
+  try { const sp = await hl({type:'spotClearinghouseState', user:a}, 2), u = ((sp && sp.balances) || []).find(b => b.coin === 'USDC'); if (u){ spot = +u.total || 0; hold = +u.hold || 0; } } catch(e){}
+  const sf = Math.max(0, spot - hold), perp = +ms.accountValue, wd = +r.withdrawable || 0;
+  JR.acct = {value:(isFinite(perp) ? perp : 0) + sf, perp, spot:sf, used:+ms.totalMarginUsed, free:wd + sf, ntl:+ms.totalNtlPos, at:Date.now()};
+  JR.bal.hl = {v:JR.acct.value, free:JR.acct.free, at:Date.now()};
+}
 async function jrSyncHL(){
   const a = String((state.pf || {}).addr || '').trim(); if (!a) return null;
   if (!/^0x[0-9a-fA-F]{40}$/.test(a)) throw new Error('That does not look like a wallet address (0x and 40 characters).');
@@ -11664,7 +11672,7 @@ async function jrSyncHL(){
     for (const ap of (r.assetPositions || [])){ const p = ap.position || {}, sz = +p.szi; if (!sz) continue; live.set(p.coin, {sz, entry:+p.entryPx, upnl:+p.unrealizedPnl, lev:p.leverage ? +p.leverage.value : null, liq:+p.liquidationPx || null, mgn:+p.marginUsed || null}); }
     for (const [coin, v] of live){ let t = closed.openList.find(x => x.coin === coin && (x.side === 'long') === (v.sz > 0)); const o = {entry:v.entry, size:Math.abs(v.sz), pnl:v.upnl, lev:v.lev, liqPx:v.liq, mgn:v.mgn};
       if (t) open.push(Object.assign(t, o)); else open.push(Object.assign({id:'hl:' + coin + ':open', src:'hl', status:'open', coin, side:v.sz > 0 ? 'long' : 'short', exit:null, open:null, close:null, fees:0, mkt:'perp'}, o)); }
-    { const ms = r.marginSummary || {}; JR.acct = {value:+ms.accountValue, used:+ms.totalMarginUsed, free:+r.withdrawable, ntl:+ms.totalNtlPos, at:Date.now()}; if (isFinite(JR.acct.value)) JR.bal.hl = {v:JR.acct.value, free:JR.acct.free, at:Date.now()}; try { jrApplyOrders(open, await hl({type:'frontendOpenOrders', user:a}, 20)); } catch(e){} }
+    { const ms = r.marginSummary || {}; await jrAcctSet(r, a); try { jrApplyOrders(open, await hl({type:'frontendOpenOrders', user:a}, 20)); } catch(e){} }
   } catch(e){ open = null; }
   return {closed, open};
 }
@@ -11702,6 +11710,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.40: Hyperliquid account includes free spot USDC (Available to Trade) ===== */
 /* ===== V9.39: relay also reads Kraken Futures, BitMEX, Deribit, Phemex, Lighter ===== */
 /* ===== V9.38: total balance across exchanges (Hyperliquid, dYdX wallet; relay exchanges). journal reads Aster, MEXC, BingX, KuCoin Futures and Coinbase through the relay (read-only keys stay in the relay) ===== */
 /* ===== V9.37: journal live tracking: stop / target read from your open orders, account size, margin, BSL / SSL, distance to stop and target, R:R, P&L in % and $, time, and a report of where you go wrong ===== */
@@ -11800,7 +11809,7 @@ async function jrLive(force){
   if (!force && !openHl.length && state.view !== 'journal') return;
   JR.live.busy = true;
   try {
-    const r = await hl({type:'clearinghouseState', user:a}, 2), ms = r.marginSummary || {}; JR.acct = {value:+ms.accountValue, used:+ms.totalMarginUsed, free:+r.withdrawable, ntl:+ms.totalNtlPos, at:Date.now()}; if (isFinite(JR.acct.value)) JR.bal.hl = {v:JR.acct.value, free:JR.acct.free, at:Date.now()};
+    const r = await hl({type:'clearinghouseState', user:a}, 2), ms = r.marginSummary || {}; await jrAcctSet(r, a);
     let ords = null; try { ords = await hl({type:'frontendOpenOrders', user:a}, 20); } catch(e){}
     const live = new Map(); for (const ap of (r.assetPositions || [])){ const p = ap.position || {}, sz = +p.szi; if (!sz) continue; live.set(p.coin, {sz, entry:+p.entryPx, upnl:+p.unrealizedPnl, lev:p.leverage ? +p.leverage.value : null, liq:+p.liquidationPx || null, mgn:+p.marginUsed || null}); }
     let diff = false; for (const t of openHl){ const v = live.get(t.coin); if (!v || (v.sz > 0) !== (t.side === 'long')) diff = true; }
