@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.31</title>
+<title>ELPP CRYPTO SCANNER PRO V9.32</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -833,7 +833,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.31</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.32</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10870,6 +10870,42 @@ function trdPage(){ trdRender(false); trdAlgoDraw(); const pb = $('trdPaperBox')
 const CONS = {ph: 'all', side: 'all', q: '', sort: {id: 'pRank', dir: -1}};
 const CONS_PH = {0: ['Consolidating', 'warn'], 1: ['Accumulating', 'up'], 2: ['Distributing', 'dn']};
 const CONS_COLS = ['pRank', 'pSide', 'pPress', 'pressTh', 'verdict', 'pTag', 'pGrade', 'pVen', 'bslSsl', 'irlErl', 'px', 'chg_1h', 'pV24'];
+const CONS_X = [
+  ['Manipulation', 'Signs the big players hunted stops: a swept level that price reclaimed (2nd test), a sweep followed by a breakout, or a crowded side that was flushed.', (c, cols) => {
+    const parts = [['swpRe', 'Sweep'], ['bo', 'Breakout'], ['pFlush', 'Flush']].map(([id, lab]) => { const k = cols.get(id); if (!k) return ''; let r; try { r = k.cell(c); } catch(e){ return ''; } return r && r[0] && r[0] !== '—' && !/^(no |…|\.\.\.|none)/i.test(String(r[0]).replace(/<[^>]*>/g, '').trim()) ? '<div><small class="dim">' + lab + '</small> ' + r[0] + '</div>' : ''; }).filter(Boolean);
+    return parts.length ? [parts.join(''), '', 'text-align:left;white-space:normal;min-width:200px'] : ['no sign', 'dim'];
+  }],
+  ['Markup / Markdown', 'Derived outlook, not a prediction: accumulation with a confirmed upside breakout = markup starting; distribution with a confirmed downside break = markdown starting; a swept and reclaimed level = likely; otherwise waiting.', (c, cols) => {
+    const m = c.m, b = m.bo || {}, bs = [b['15m'], b['1h']], sw = (m.swp && typeof swpPick === 'function') ? swpPick(m) : null, ph = m.regime;
+    const up = bs.includes(2), dn = bs.includes(4), upW = bs.includes(1) || (sw && sw[1].dir > 0), dnW = bs.includes(3) || (sw && sw[1].dir < 0);
+    let t, cl = 'dim';
+    if (up && ph !== 2){ t = '▲ Markup starting (breakout confirmed)'; cl = 'up'; }
+    else if (dn && ph !== 1){ t = '▼ Markdown starting (breakdown confirmed)'; cl = 'dn'; }
+    else if (ph === 1 && upW){ t = '▲ Markup likely (low swept and reclaimed)'; cl = 'up'; }
+    else if (ph === 2 && dnW){ t = '▼ Markdown likely (high swept and reclaimed)'; cl = 'dn'; }
+    else if (ph === 1) t = 'Markup possible, no trigger yet';
+    else if (ph === 2) t = 'Markdown possible, no trigger yet';
+    else t = 'Undecided, wait for a break';
+    return [t, cl, 'white-space:normal;min-width:150px'];
+  }],
+  ['CVD / OI data', 'CVD = buyers minus sellers volume against price. OI = open interest against price. Shown for 1h.', (c, cols) => {
+    const parts = [['cvdDiv_1h', 'CVD'], ['oiPx_1h', 'OI vs price'], ['oiChg_1h', 'OI change'], ['oiUsd', 'OI']].map(([id, lab]) => { const k = cols.get(id); if (!k) return ''; let r; try { r = k.cell(c); } catch(e){ return ''; } return r && r[0] && r[0] !== '—' ? '<div><small class="dim">' + lab + '</small> <span class="' + (r[1] || '') + '">' + r[0] + '</span></div>' : ''; }).filter(Boolean);
+    return parts.length ? [parts.join(''), '', 'text-align:left;white-space:nowrap'] : ['—', 'dim'];
+  }],
+  ['Untested pool', 'The biggest liquidity pools that price has not touched yet: sell-stops above (BSL) and buy-stops below (SSL), by size in USD.', (c) => {
+    const pl = (c.m.pools || []).filter(q => isNum(q.p)), px = c.m.px; if (!pl.length || !isNum(px)) return ['—', 'dim'];
+    const big = side => pl.filter(q => side === 1 ? q.p > px : q.p < px).sort((a, b) => (b.usd || 0) - (a.usd || 0))[0];
+    const one = (lab, q, cl) => q ? '<div title="' + esc(q.name || '') + '"><b class="' + cl + '">' + lab + '</b> ' + esc(fmtPx(q.p)) + ' <small class="dim">' + (q.usd ? esc(fmtUsd(q.usd, true)) + ' · ' : '') + ((q.p / px - 1) * 100).toFixed(1) + '%</small></div>' : '';
+    const h = one('BSL', big(1), 'dn') + one('SSL', big(2), 'up'); return h ? [h, '', 'text-align:left;white-space:nowrap'] : ['—', 'dim'];
+  }],
+  ['Liquidity map', 'Nearest liquidity pool above and below, with its distance. Click to open the full map.', (c, cols) => { const k = cols.get('liqMap'); try { return k ? k.cell(c) : ['—', 'dim']; } catch(e){ return ['—', 'dim']; } }],
+  ['Actual reclaim', 'Whether price really took a level back: a broken order block reclaimed (SMC/ICT read) or a swept swing level closed back over (sweep read).', (c, cols) => {
+    const ir = (typeof ICTS !== 'undefined' && ICTS.data) ? ICTS.data.get(c.name) : null, rc = ir && ir.conf && ir.conf.reclaim, sw = c.m.swp && typeof swpPick === 'function' ? swpPick(c.m) : null, out = [];
+    if (rc) out.push('<div class="' + (ir.dir > 0 ? 'up' : ir.dir < 0 ? 'dn' : '') + '"><b>✔ Order block reclaimed</b> <small>' + esc((rc.tf || '') + ' ' + fmtPx(rc.lo) + ' – ' + fmtPx(rc.hi)) + '</small></div>');
+    if (sw) out.push('<div class="' + (sw[1].dir > 0 ? 'up' : 'dn') + '"><b>✔ ' + (sw[1].dir > 0 ? 'Low' : 'High') + ' reclaimed</b> <small>' + sw[0] + ' ' + esc(fmtPx(sw[1].level)) + (sw[1].age ? ', ' + sw[1].age + ' bar' + (sw[1].age > 1 ? 's' : '') + ' ago' : ', now') + (sw[1].retest ? ' · 2nd test held' : '') + '</small></div>');
+    return out.length ? [out.join(''), '', 'text-align:left;white-space:normal;min-width:190px'] : ['not reclaimed', 'dim'];
+  }]
+];
 function consRows(){
   const D = psData(false), cols = psCols(), el = c => D.E.get(c.name) || {};
   let rows = D.live.filter(c => isNum(c.m.regime) && CONS_PH[c.m.regime]); const counts = {all: rows.length, 0: 0, 1: 0, 2: 0}; rows.forEach(c => { counts[c.m.regime]++; });
@@ -10886,12 +10922,13 @@ function consHtml(){
   const bar = '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0">' + btn('all', 'All three', R.counts.all) + btn('0', 'Consolidating', R.counts[0]) + btn('1', 'Accumulating', R.counts[1]) + btn('2', 'Distributing', R.counts[2]) +
     '<span class="dim">Lean</span><select id="consSide" aria-label="Side">' + [['all', 'Any side'], ['long', 'Long only'], ['short', 'Short only']].map(o => '<option value="' + o[0] + '"' + (CONS.side === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select><input id="consQ" type="search" placeholder="Find a coin…" value="' + esc(CONS.q) + '" style="width:130px"></div>';
   const th = (id, lab, ttl) => '<th class="pss' + (CONS.sort.id === id ? ' on' : '') + '" data-consort="' + id + '" title="' + esc((ttl || lab) + ' (click to sort)') + '">' + esc(lab) + (CONS.sort.id === id ? (CONS.sort.dir < 0 ? ' ▼' : ' ▲') : '') + '</th>';
-  const head = '<tr><th style="text-align:left">Coin</th>' + th('phase', 'Phase', 'Consolidating, accumulating or distributing, from the 4h coin-regime read') + CONS_COLS.map(id => { const c = R.cols.get(id); return c ? th(id, id === 'pPress' ? 'Pressure' : id === 'pressTh' ? 'Buy/sell %' : c.label, c.tip || c.label) : ''; }).join('') + '</tr>';
+  const head = '<tr><th style="text-align:left">Coin</th>' + th('phase', 'Phase', 'Consolidating, accumulating or distributing, from the 4h coin-regime read') + CONS_COLS.map(id => { const c = R.cols.get(id); return c ? th(id, id === 'pPress' ? 'Pressure' : id === 'pressTh' ? 'Buy/sell %' : c.label, c.tip || c.label) : ''; }).join('') + CONS_X.map(x => '<th title="' + esc(x[1]) + '">' + esc(x[0]) + '</th>').join('') + '</tr>';
   const body = R.rows.slice(0, 200).map(c => {
     const ph = CONS_PH[c.m.regime], rp = c.m.rangePos && isNum(c.m.rangePos['4h']) ? c.m.rangePos['4h'] : null;
     let tds = '<td style="text-align:left"><a href="#" class="cnl" data-chart="' + esc(c.name) + '" title="Open the chart in a new tab"><b>' + esc(c.name) + '</b></a> ' + (typeof liMini === 'function' ? '' : '') + '</td>' +
       '<td class="' + ph[1] + '"><b>' + ph[0] + '</b>' + (rp != null ? '<br><small class="dim">4h range: ' + (rp <= 40 ? 'discount' : rp >= 60 ? 'premium' : 'middle') + ' (' + Math.round(rp) + '%)</small>' : '') + '</td>';
     for (const id of CONS_COLS){ const col = R.cols.get(id); if (!col) continue; let r; try { r = col.cell(c); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
+    for (const x of CONS_X){ let r; try { r = x[2](c, R.cols); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
     return '<tr>' + tds + '</tr>';
   }).join('');
   return bar + (R.rows.length ? '<div style="overflow:auto"><table class="pst" style="width:100%"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' + (R.rows.length > 200 ? '<p class="hint">Showing the first 200 of ' + R.rows.length + '. Use the filters to narrow it.</p>' : '') : '<p class="hint">' + (R.D.live.length ? 'No coin matches these filters right now.' : 'Reading every scanner… the list appears as soon as the first coins have data.') + '</p>') +
