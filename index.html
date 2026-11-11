@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.43</title>
+<title>ELPP CRYPTO SCANNER PRO V9.44</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.43</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.44</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11710,6 +11710,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.44: chart Data window: BSL / SSL by Thick, Medium, Thin ===== */
 /* ===== V9.43: star (watchlist) button on every coin in Consolidating coins ===== */
 /* ===== V9.42: order-book walls Thick / Medium / Thin for bid and ask ===== */
 /* ===== V9.41: chart Data window always shows the Thick / Medium / Thin boxes ===== */
@@ -17208,7 +17209,9 @@ function cmpMenu(c, btn){
 const XDFT = {pools:1, hist:1, evt:1};
 const xOn = (p, k) => p.x && k in p.x ? !!p.x[k] : !!XDFT[k];
 const plKey = q => (q.name || q.label) + '|' + (+q.p).toPrecision(5);
-function plShow(p, q){ const o = p.pl || {}, ty = q.types || []; if (o.tiers && q.tier && o.tiers[q.tier] === false) return false; if (o.t && ty.length && ty.every(t => o.t[t] === false)) return false; if (o.h && o.h[plKey(q)]) return false; return true; }
+function plShow(p, q){ const o = p.pl || {}, ty = q.types || []; if (o.tiers && q.tier && o.tiers[q.tier] === false) return false; if (o.bs && q.tier && (q.side === 1 || q.side === 2) && o.bs[(q.side === 1 ? 'bsl' : 'ssl') + '_' + q.tier] === false) return false; if (o.t && ty.length && ty.every(t => o.t[t] === false)) return false; if (o.h && o.h[plKey(q)]) return false; return true; }
+function plBsGrid(pls, o){ const cn = (sd, t) => pls.filter(q => q.side === sd && q.tier === t).length, row = (key, sd, nm, tip) => '<div style="margin:2px 0" title="' + tip + '"><b style="font-size:11px;display:inline-block;width:34px">' + nm + '</b>' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px;margin-right:10px"><input type="checkbox" data-pbs="' + key + '_' + t + '"' + ((o.bs || {})[key + '_' + t] === false ? '' : ' checked') + '> ' + t[0].toUpperCase() + t.slice(1) + ' <span style="color:var(--muted)">' + cn(sd, t) + '</span></label>').join('') + '</div>';
+  return '<div style="font-size:10px;color:var(--muted);margin-top:6px">BSL / SSL BY STRENGTH (BSL = buy-side liquidity, the pools above price; SSL = sell-side liquidity, the pools below price)</div>' + row('bsl', 1, 'BSL', 'Pools above the current price (stops of shorts, buy-side liquidity)') + row('ssl', 2, 'SSL', 'Pools below the current price (stops of longs, sell-side liquidity)'); }
 function bnSymOf(f){ if (f.src && f.src.src === 'bn') return f.src.s; const v = venSyms('bn', f.sym)[0]; return v ? v[1] : null; }
 const AUXP = {'5m':1, '15m':1, '30m':1, '1h':1, '2h':1, '4h':1, '1d':1};
 const auxPeriod = tf => AUXP[tf] ? tf : (TFSEC[tf] < 300 ? '5m' : '1d');
@@ -17281,12 +17284,12 @@ function dataMenu(c, btn){
   const plBlock = () => {
     const pls = (() => { try { return (HOOK().pools(p.sym) || []).slice().sort((a, b) => b.p - a.p); } catch(e){ return []; } })(), LQ = (() => { try { return HOOK().liqt() || {}; } catch(e){ return {}; } })(), o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.h = o.h || {};
     if (!pls.length){ const dis0 = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
-      return '<div' + dis0 + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(0 found for ' + esc(p.sym) + ')</span><div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">0</span></label>').join('') + '</div><p class="hint" style="margin:6px 0">The scanner has no pools for ' + esc(p.sym) + ' yet. It finds pools only for coins it has loaded and scanned, so open this coin in a scanner first. Your tick boxes are remembered and apply as soon as pools appear.</p></div>'; }
+      return '<div' + dis0 + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(0 found for ' + esc(p.sym) + ')</span><div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">0</span></label>').join('') + '</div>' + plBsGrid([], o) + '<p class="hint" style="margin:6px 0">The scanner has no pools for ' + esc(p.sym) + ' yet. It finds pools only for coins it has loaded and scanned, so open this coin in a scanner first. Your tick boxes are remembered and apply as soon as pools appear.</p></div>'; }
     const fp = v => v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v.toPrecision(4), cats = {}, tc = {}; for (const q of pls){ for (const t of q.types) cats[t] = (cats[t] || 0) + 1; if (q.tier) tc[q.tier] = (tc[q.tier] || 0) + 1; }
     const nOn = pls.filter(q => plShow(p, q)).length, dis = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
     return '<div' + dis + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(' + nOn + ' of ' + pls.length + ' shown)</span>'
       + '<div class="row" style="gap:4px;margin:4px 0;flex-wrap:wrap"><button class="ta-b" data-pq="all">All</button><button class="ta-b" data-pq="none">None</button><button class="ta-b" data-pq="above">Above price</button><button class="ta-b" data-pq="below">Below price</button><button class="ta-b" data-pq="inst">Institutional only</button></div>'
-      + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">' + (tc[t] || 0) + '</span></label>').join('') + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">' + (tc[t] || 0) + '</span></label>').join('') + '</div>' + plBsGrid(pls, o)
       + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY TYPE</div><div style="display:flex;flex-wrap:wrap;gap:2px 10px">' + Object.keys(cats).sort((a, b) => a - b).map(t => '<label style="font-size:11px"><input type="checkbox" data-pt="' + t + '"' + (o.t[t] === false ? '' : ' checked') + '> ' + esc(LQ[t] || ('Type ' + t)) + ' <span style="color:var(--muted)">' + cats[t] + '</span></label>').join('') + '</div>'
       + '<div style="font-size:10px;color:var(--muted);margin-top:6px">EACH POOL (highest price first)</div><div style="max-height:220px;overflow:auto">' + pls.map(q => '<label style="display:flex;gap:6px;align-items:baseline;font-size:11px;padding:1px 0"><input type="checkbox" data-pk="' + esc(plKey(q)) + '"' + (plShow(p, q) ? ' checked' : '') + '> <span style="font-family:var(--mono)">' + fp(q.p) + '</span> <b>' + esc(q.name || ('pool ' + q.label)) + '</b> <span style="color:var(--muted)">' + (Number.isFinite(q.d) ? (q.d > 0 ? '+' : '') + q.d.toFixed(2) + '%' : '') + (q.usd ? ' · $' + fmtV(q.usd) : '') + (q.inst ? ' · institutional' : '') + (q.tier ? ' · ' + q.tier : '') + '</span></label>').join('') + '</div></div>';
   };
@@ -17295,10 +17298,10 @@ function dataMenu(c, btn){
   openPop(btn, html, pp => {
     const plBox = pp.querySelector('.ta-pl'); if (plBox) plBox.innerHTML = plBlock() + wlBlock();
     pp.addEventListener('change', e => { const w = e.target.dataset.wt; if (!w) return; p.wl = p.wl || {}; p.wl[w] = e.target.checked; save(); c.dirty = true; });
-    pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {}; o.tiers = {};
+    pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {}; o.tiers = {}; o.bs = {};
       for (const q of pls){ const a = b.dataset.pq, keep = a === 'all' ? true : a === 'none' ? false : a === 'above' ? q.side === 1 : a === 'below' ? q.side === 2 : !!q.inst; if (!keep) o.h[plKey(q)] = true; }
       save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); });
-    pp.addEventListener('change', e => { if (e.target.dataset.ptier != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.tiers = o.tiers || {}; o.tiers[e.target.dataset.ptier] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; }
+    pp.addEventListener('change', e => { if (e.target.dataset.pbs != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.bs = o.bs || {}; o.bs[e.target.dataset.pbs] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; } if (e.target.dataset.ptier != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.tiers = o.tiers || {}; o.tiers[e.target.dataset.ptier] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; }
       if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; }
       if (e.target.dataset.pk != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.h = o.h || {}; if (e.target.checked) delete o.h[e.target.dataset.pk]; else o.h[e.target.dataset.pk] = true; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; } });
     pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; if ((k === 'pools' || k === 'walls') && plBox) plBox.innerHTML = plBlock() + wlBlock(); });
