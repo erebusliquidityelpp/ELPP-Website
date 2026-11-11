@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.28</title>
+<title>ELPP CRYPTO SCANNER PRO V9.29</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -833,7 +833,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.28</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.29</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -15950,7 +15950,7 @@ const HOOK = () => window.__elppTaHook || {};
 const TFSEC = {'1m':60,'3m':180,'5m':300,'15m':900,'30m':1800,'1h':3600,'2h':7200,'4h':14400,'1d':86400,'1w':604800};
 const TFQUICK = ['1m','5m','15m','1h','4h','1d'];
 const MAXPANES = 24;
-const LAYOUTS = {'1':{n:1,cols:'1fr',rows:1,lab:'1'},'2':{n:2,cols:'1fr 1fr',rows:1,lab:'2'},'2v':{n:2,cols:'1fr',rows:2,lab:'2↕'},'3':{n:3,cols:'1fr 1fr 1fr',rows:1,lab:'3'},'4':{n:4,cols:'1fr 1fr',rows:2,lab:'4'},'6':{n:6,cols:'1fr 1fr 1fr',rows:2,lab:'6'},'8':{n:8,cols:'repeat(4,1fr)',rows:2,lab:'8'},'9':{n:9,cols:'repeat(3,1fr)',rows:3,lab:'9'},'12':{n:12,cols:'repeat(4,1fr)',rows:3,lab:'12'},'16':{n:16,cols:'repeat(4,1fr)',rows:4,lab:'16'},'20':{n:20,cols:'repeat(5,1fr)',rows:4,lab:'20'},'24':{n:24,cols:'repeat(6,1fr)',rows:4,lab:'24'}};
+const LAYOUTS = {'1':{n:1,cols:'1fr',rows:1,lab:'1'},'2':{n:2,cols:'1fr 1fr',rows:1,lab:'2'},'2v':{n:2,cols:'1fr',rows:2,lab:'2↕'},'3':{n:3,cols:'1fr 1fr 1fr',rows:1,lab:'3'},'4':{n:4,cols:'1fr 1fr',rows:2,lab:'4'},'6':{n:6,cols:'1fr 1fr 1fr',rows:2,lab:'6'},'8':{n:8,cols:'repeat(4,1fr)',rows:2,lab:'8'},'5':{n:5,cols:'repeat(3,1fr)',rows:2,lab:'5'},'7':{n:7,cols:'repeat(4,1fr)',rows:2,lab:'7'},'9':{n:9,cols:'repeat(3,1fr)',rows:3,lab:'9'},'10':{n:10,cols:'repeat(5,1fr)',rows:2,lab:'10'},'11':{n:11,cols:'repeat(4,1fr)',rows:3,lab:'11'},'12':{n:12,cols:'repeat(4,1fr)',rows:3,lab:'12'},'16':{n:16,cols:'repeat(4,1fr)',rows:4,lab:'16'},'20':{n:20,cols:'repeat(5,1fr)',rows:4,lab:'20'},'24':{n:24,cols:'repeat(6,1fr)',rows:4,lab:'24'}};
 const DEFSYMS = ['BTC','ETH','SOL','XRP','BNB','TAO','DOGE','SUI','AVAX','LINK','INJ','WLD','ONDO','AAVE','HYPE','PEPE','kPEPE','CL','BZ','XAU','XAG','NVDA','TSLA','SKHY'];
 function mkPane(sym, tf){ return {sym, tf, ven:'auto', pool:null, type:'candle', log:false, vol:true, plan:false, liq:false, fvg:false, smc:{}, ind:[]}; }
 function defState(){ return {layout:'2', sync:true, link:false, magnet:true, tz:'Asia/Karachi', stars:['BTC','ETH','SOL','TAO','BNB','XRP','CL','BZ'], draws:{}, active:0, panes:[mkPane('BTC','15m'), mkPane('BTC','1h')], tpl:{}}; }
@@ -17178,7 +17178,7 @@ function cellHtml(i){
     '<button class="ta-b ta-x" data-a="smcs" title="Show or hide the institutional / smart-money (SMC) buttons">SMC ▾</button>' +
     '<button class="ta-b ta-x" data-a="rep" title="Bar replay: practise on past candles, step forward and paper-trade">⏪ Replay</button>' +
     '<span class="ta-badge ta-x" title="What the ELPP scanner says about this coin right now"></span><span class="ta-spc"></span>' +
-    '<button class="ta-b ta-x" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button><button class="ta-b ta-hc" data-a="hc" title="Show more or fewer controls on this chart: Full, Compact, Mini">☰ <span>Full</span></button></div>' +
+    '<button class="ta-b ta-x" data-a="png" title="Screenshot: download, copy or open the whole chart as an image, or export the candles">📷</button><button class="ta-b" data-a="addpane" title="Add another chart pane next to this one (up to ' + PANE_MAX + '). The new pane copies this chart\'s coin and indicators on the next free timeframe; every pane then keeps its own coin, timeframe, indicators, drawings and SMC settings.">＋ Pane ' + S.panes.length + '/' + PANE_MAX + '</button>' + (S.panes.length > 1 ? '<button class="ta-b" data-a="delpane" title="Close this pane">✕ Pane</button>' : '') + '<button class="ta-b" data-a="fit" title="Fit the chart to the screen (also: double-click)">⤢ Fit</button><button class="ta-b" data-a="fs" title="Full screen for this chart">⛶</button><button class="ta-b ta-hc" data-a="hc" title="Show more or fewer controls on this chart: Full, Compact, Mini">☰ <span>Full</span></button></div>' +
     '<div class="ta-ana"><button class="ta-conf" data-a="plan2" title="How many smart-money signals line up right now. Click to build a full trade plan from them.">Confluence…</button><button class="ta-b" data-a="plan2" title="Entry, stop, targets, leverage, margin and risk built from the signals">📋 Trade plan</button><span class="ta-mtf" title="Trend bias on 15m, 1h, 4h and Daily (green up, red down, amber mixed). Hover a light for the phase and institutional status"></span><span class="ta-phase" title="Market phase on this timeframe"></span><span class="ta-inst" title="Latest institutional entry on this timeframe"></span><button class="ta-b" data-a="stats" title="What usually happens on this coin after a sweep, break of structure, volume spike or Asia-low sweep">📈 Stats</button><button class="ta-b" data-a="alert" title="Alerts: price, sweep, CHoCH, OB/FVG tap, confluence score">🔔 Alerts</button><button class="ta-b" data-a="cmp" title="Compare with BTC or any coin">⚖ Compare</button><button class="ta-b" data-a="data" title="Open interest, funding, long/short, order-book walls, liquidation map, scanner pools, signal history, events">🗂 Data</button><button class="ta-b" data-a="score" title="Your replay win rate and average R by setup">🏆 Scorecard</button><span class="ta-cmps"></span></div>' +
     smcStrip() + '<div class="ta-body"><div class="ta-tools"><button class="ta-b" data-a="tbar" title="Shrink or expand the drawing toolbar">«</button>' + TOOLS.map(t => '<button class="ta-b" data-a="tool" data-t="' + t[0] + '" title="' + esc(t[2]) + '">' + t[1] + '</button>').join('') + '<button class="ta-b" data-a="mag" title="Magnet: snap drawings to candle highs, lows, opens and closes">🧲</button><button class="ta-b" data-a="undo" title="Delete the selected drawing (or the last one)">⌫</button></div>' +
     '<div class="ta-cv"><canvas></canvas><div class="ta-lg"></div><div class="ta-msg"></div><div class="ta-db" hidden></div>' +
@@ -17247,6 +17247,7 @@ function build(){ try { uniLoad(); } catch(e){}
     if (a === 'rep'){ if (c.rep.on) c.exitReplay(); else c.enterReplay(); return; }
     if (a === 'rp-play'){ c.playRep(); return; } if (a === 'rp-step'){ c.stepRep(); return; } if (a === 'rp-long'){ c.openPos('long'); return; } if (a === 'rp-short'){ c.openPos('short'); return; } if (a === 'rp-close'){ c.closePos(); return; } if (a === 'rp-exit'){ c.exitReplay(); return; } if (a === 'rp-pick'){ c.stopPlay(); c.rep.pick = true; c.dirty = true; refresh(c); return; }
     if (a === 'png'){ camMenu(c, b); return; }
+    if (a === 'addpane'){ addPane(c.i); return; } if (a === 'delpane'){ delPane(c.i); return; }
     if (a === 'fit'){ c.fit(); c.dirty = true; return; }
     if (a === 'hc'){ const p = c.pane; p.hc = (hcOf(p) + 1) % 3; save(); refresh(c); setTimeout(() => { c.dirty = true; }, 30); return; }
     if (a === 'fs'){ cell.classList.toggle('ta-full'); setTimeout(() => { c.dirty = true; }, 30); return; }
@@ -17260,6 +17261,16 @@ function build(){ try { uniLoad(); } catch(e){}
   });
   buildGrid();
 }
+const PANE_MAX = 10;
+const paneLayout = n => LAYOUTS[String(n)] ? String(n) : (Object.keys(LAYOUTS).find(k => LAYOUTS[k].n >= n) || '24');
+/* add a pane (up to 10): copies the chart you clicked from, on the next timeframe not already open for that coin; each pane keeps its own settings afterwards */
+function addPane(from){
+  const n = S.panes.length; if (n >= PANE_MAX){ try { toast('The limit is ' + PANE_MAX + ' panes. Close one with ✕ Pane first.'); } catch(e){} return; }
+  const src = S.panes[from != null ? from : S.active] || S.panes[0], used = new Set(S.panes.filter(p => p.sym === src.sym).map(p => p.tf));
+  const np = JSON.parse(JSON.stringify(src)); np.tf = CELL_TF.concat(TFQUICK, Object.keys(TFSEC)).find(t => !used.has(t)) || src.tf; delete np.hc;
+  S.panes.push(np); S.layout = paneLayout(n + 1); S.active = n; save(); buildGrid();
+}
+function delPane(i){ if (S.panes.length <= 1) return; S.panes.splice(i, 1); S.layout = paneLayout(S.panes.length); S.active = Math.min(S.active, S.panes.length - 1); save(); buildGrid(); }
 function setLayout(k){ S.layout = k; const n = LAYOUTS[k].n; while (S.panes.length < n){ const b = S.panes[0]; S.panes.push(Object.assign(mkPane(b.sym, CELL_TF[S.panes.length % CELL_TF.length]), {type:b.type})); } if (S.panes.length > n) S.panes.length = n; S.active = Math.min(S.active, n - 1); save(); buildGrid(); }
 function fillHow(h){ try { let d = $q('.ta-how', h); if (!d){ d = mk('div', 'ta-how'); h.appendChild(d); } const g = HOOK().guide && HOOK().guide(); if (!g) return; d.innerHTML = '<b>How to use this screen, step by step</b><ol>' + (g.how || []).map(x => '<li>' + esc(x) + '</li>').join('') + '<li>Press <b>⛶ Workspace</b> to fill the whole window, then use the Layout buttons (1 to 12 panes) to add panes. <b>↗ New analysis tab</b> opens a clean analysis-only window you can place on another monitor.</li><li>Tick <b>Market now</b> to keep the regime and BTC / ETH verdict in view while you analyse.</li><li>Thresholds and every word are explained under 📚 Vocabulary &amp; Academy in the main menu.</li></ol>' + ((g.rows || []).length ? '<table class="gtab sm" style="width:100%"><tbody>' + g.rows.map(r => '<tr><td style="text-align:left;vertical-align:top"><b>' + esc(r[0]) + '</b></td><td style="text-align:left">' + esc(r[1]) + '</td><td style="text-align:left">' + esc(r[2]) + '</td></tr>').join('') + '</tbody></table>' : ''); } catch(e){} }
 /* analysis tab with one pane: hide the layout / favourites / clock / market strips so the chart fills the window, like TradingView. The small ☰ button (bottom right) brings them back. */
