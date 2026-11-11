@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.23</title>
+<title>ELPP CRYPTO SCANNER PRO V9.24</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.23</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.24</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10262,6 +10262,8 @@ function cselLevels(r){
   if (cf.sweep && isNum(cf.sweep.level)) o.swept = {kind: side > 0 ? 'SSL' : 'BSL', p: cf.sweep.level, age: cf.sweep.age, tf: ICT.TFN[cf.sweep.tf] || cf.sweep.tf, shift: !!ict.shiftAfter, shiftKind: cf.shift ? cf.shift.kind : ''};
   const k = mine ? ict.key : null; if (k) o.irl = {lo: k.lo, hi: k.hi, what: k.comps.slice(0, 3).map(c => ICT.TFN[c.tf] + ' ' + c.type + (c.status === 'fresh' ? ' (fresh)' : '')).join(' + '), at: !!(ict.inZone || ict.near)};
   if (ict && ict.perTf){ for (const tf of ['4h', '1h']){ const A = ict.perTf[tf]; if (A && A.ok && A.rng && isNum(A.rng.hi) && isNum(A.rng.lo)){ o.erl = {hi: A.rng.hi, lo: A.rng.lo, eq: A.rng.eq, tf: ICT.TFN[tf] || tf}; break; } } }
+  if (!o.erl && above.length && below.length){ const hi = Math.max(...pools.map(q => q.p)), lo = Math.min(...pools.map(q => q.p)); if (hi > lo) o.erl = {hi, lo, tf: 'liquidity map', approx: true}; }
+  if (!o.irl && o.erl){ const h = o.erl.hi, l = o.erl.lo, g = h - l; o.irl = side > 0 ? {lo: h - 0.79 * g, hi: h - 0.62 * g} : {lo: l + 0.62 * g, hi: l + 0.79 * g}; o.irl.what = 'OTE zone (62–79%) of the range · approx, SMC/ICT read still loading'; o.irl.at = side > 0 ? px <= o.irl.hi && px >= o.irl.lo : px >= o.irl.lo && px <= o.irl.hi; o.irl.approx = true; }
   const pl = mine && ict.entry ? ict.entry : r.plan; if (pl && isNum(pl.sl)){ o.pl = {ref: isNum(pl.ref) ? pl.ref : px, sl: pl.sl, tp1: pl.tp1, tp2: pl.tp2, rr: isNum(pl.rr) ? pl.rr : null, n1: pl.tp1n || '', n2: pl.tp2n || '', src: mine && ict.entry ? 'SMC/ICT' : 'Power Scanner'}; }
   o.px = px; return o;
 }
@@ -10282,7 +10284,7 @@ function cselLvCells(r){
   if (o.swept) c1 += '<div class="up"><small>✓ ' + o.swept.kind + ' swept at ' + F(o.swept.p) + ' (' + o.swept.age + ' bars ago, ' + esc(o.swept.tf) + ')</small></div>';
   else if (o.bsl || o.ssl) c1 += '<div class="warn"><small>no sweep yet</small></div>';
   let c2 = o.irl ? '<div><b>IRL</b> ' + F(o.irl.lo) + ' – ' + F(o.irl.hi) + '<br><small class="dim">' + esc(o.irl.what) + (o.irl.at ? ' · price is at it' : '') + '</small></div>' : '<div><b>IRL</b> ' + dash + '</div>';
-  c2 += o.erl ? '<div><b>ERL</b> high ' + F(o.erl.hi) + ' · low ' + F(o.erl.lo) + '<br><small class="dim">' + esc(o.erl.tf) + ' range · ' + (long ? 'long runs to the high' : 'short runs to the low') + '</small></div>' : '<div><b>ERL</b> ' + dash + '</div>';
+  c2 += o.erl ? '<div><b>ERL</b> high ' + F(o.erl.hi) + ' · low ' + F(o.erl.lo) + '<br><small class="dim">' + esc(o.erl.tf) + ' range · ' + (long ? 'long runs to the high' : 'short runs to the low') + (o.erl.approx ? ' · approx' : '') + '</small></div>' : '<div><b>ERL</b> ' + dash + '</div>';
   let c3 = dash;
   if (o.pl){ const pl = o.pl, st = o.swept ? (o.swept.shift ? '<small class="up">sweep + ' + esc(o.swept.shiftKind || 'shift') + ' done: enter in the area</small>' : '<small class="warn">swept, wait for the structure shift</small>') : '<small class="warn">after the ' + (long ? 'SSL' : 'BSL') + ' sweep' + (long ? (o.ssl ? ' at ' + F(o.ssl.p) : '') : (o.bsl ? ' at ' + F(o.bsl.p) : '')) + '</small>';
     c3 = '<div>' + st + '</div><div>Entry <b>' + F(pl.ref) + '</b></div><div>SL <b class="dn">' + F(pl.sl) + '</b></div><div>TP1 <b class="up">' + (isNum(pl.tp1) ? F(pl.tp1) : '—') + '</b>' + (isNum(pl.tp2) ? ' · TP2 <b class="up">' + F(pl.tp2) + '</b>' : '') + '</div>' + (pl.rr != null ? '<div><small class="dim">R:R ' + pl.rr.toFixed(1) + ' · ' + esc(pl.src) + (pl.n1 ? ' · TP1 = ' + esc(pl.n1) : '') + '</small></div>' : ''); }
@@ -10299,13 +10301,21 @@ function cselHtml(){
   return '<table class="pst" style="width:100%;max-width:1500px"><thead><tr><th style="text-align:left">#  Coin</th><th title="Power Scanner, Prediction Radar, SMC/ICT, crowd/funding, flush, OTE and data quality combined, then moved up or down by the 12-point pre-trade checklist">Combined score</th><th title="Points of the pre-trade checklist that pass (out of 11 checks, the 12th is your journal step) and how many score points the checklist added or removed. Click a row for every point.">Checklist</th><th title="Market phase of the coin on the 4h: accumulation, distribution, manipulation (sweep and reclaim) or consolidation (chop)">Phase</th><th title="Strong long or strong short from the full verdict. Lean means the verdict is not strong yet">Verdict</th><th title="Discount (cheap half) or premium (expensive half) and whether price is in the golden OTE pullback zone">Disc / Prem zone</th><th style="text-align:left" title="Buy-side liquidity (BSL) is the pool of stops and breakout orders above price (equal highs, prior highs). Sell-side liquidity (SSL) is the pool below price. The nearest one on each side is shown with its price, distance and what it is made of. A long normally takes the SSL first; a short takes the BSL first.">BSL / SSL</th><th style="text-align:left" title="IRL = internal range liquidity: the fresh FVG / order block inside the range where the entry is expected. ERL = external range liquidity: the range high and low, where price is heading after the entry.">IRL / ERL</th><th style="text-align:left" title="Entry, stop loss and take profits for the setup after the sweep. The stop sits beyond the swept liquidity, targets are the next untouched pools.">Entry · SL · TP after sweep</th><th title="Exchanges where this coin trades: HL = Hyperliquid, BN perp / BN spot = Binance futures / spot, plus Bybit, OKX, MEXC and others">Exchanges</th></tr></thead><tbody>' +
     R.map((r, i) => { const open = CSEL.open.has(r.name), ck = r.ck; return '<tr class="cselR" data-cs="' + esc(r.name) + '" style="cursor:pointer"><td style="text-align:left"><b>' + (i + 1) + '.</b> <b>' + esc(r.name) + '</b> <small class="dim">' + (open ? '▾' : '▸') + '</small></td><td class="' + sc(r.score) + '"><b>' + r.score + '</b></td><td title="Click to see all 12 checkpoints">' + (ck ? '<b class="' + (ck.gate ? (ck.pass >= 9 ? 'up' : '') : 'warn') + '">' + ck.pass + '/' + ck.total + '</b> <small class="' + (ck.impact >= 0 ? 'up' : 'dn') + '">' + (ck.impact >= 0 ? '+' : '−') + Math.abs(ck.impact) + '</small>' + (!ck.gate ? '<br><small class="warn">gate not clear</small>' : '') + (ck.unknown ? '<br><small class="dim">' + ck.unknown + ' loading</small>' : '') : '<span class="dim">—</span>') + '</td><td class="' + (r.phase ? r.phase[1] : 'dim') + '">' + (r.phase ? r.phase[0] : '—') + '</td><td class="' + (r.side > 0 ? 'up' : 'dn') + '"><b>' + (r.strong ? 'STRONG ' : 'LEAN ') + (r.side > 0 ? 'LONG' : 'SHORT') + '</b>' + (r.zone.against ? '<br><small class="warn">⏳ wait for ' + (r.side > 0 ? 'a dip to discount' : 'a bounce to premium') + '</small>' : '') + (r.press ? '<br><small class="' + (r.pressOk ? (r.side > 0 ? 'up' : 'dn') : 'warn') + '" title="Institutional buying or selling pressure and how close it is to firing (GO = all conditions met, READY = one missing, BUILDING = forming)">' + esc(r.press) + '</small>' : '') + '</td><td class="' + r.zone.c + '">' + esc(r.zone.t) + (r.zone.fit ? ' ✓' : '') + '</td>' + cselLvCells(r) + '<td style="text-align:left">' + (r.ex && r.ex.length ? r.ex.map(x => '<span class="tagp ' + (/^HL$|BN perp/.test(x) ? 'good' : '') + '">' + esc(x) + '</span>').join(' ') : '<span class="dim">—</span>') + '</td></tr>' + (open ? cselDetail(r) : ''); }).join('') + '</tbody></table>';
 }
+/* read the SMC/ICT scanner for these 10 coins right now (the background feed is slow), then redraw */
+async function cselIct(){
+  if (CSEL.ib) return; const names = CSEL.rows.map(r => r.name).filter(n => { const h = ICTS.data.get(n); return !h || Date.now() - h.at > (h.ok === false ? 300000 : 240000); }); if (!names.length) return;
+  CSEL.ib = true; let n = 0;
+  const w = async () => { while (names.length){ const nm = names.shift(); try { ICTS.data.set(nm, await ictScanOne(nm)); } catch(e){ ICTS.data.set(nm, {ok: false, name: nm, why: errTxt(e), at: Date.now()}); } if (++n % 2 === 0 && state.view === 'csel'){ try { cselCompute(); cselRender(); } catch(e){} } } };
+  try { await Promise.all([w(), w(), w()]); } finally { CSEL.ib = false; }
+  if (state.view === 'csel'){ try { cselCompute(); cselRender(); } catch(e){} }
+}
 function cselRender(redo){
   const el = $('viewCsel'); if (!el) return;
   if (!el._b){ el._b = 1; el.innerHTML = '<div class="nsec"><h3>Coin\'s selection: the 10 best coins</h3><p class="hint">Each coin is checked through all the scanners (Power Scanner, Prediction Radar, SMC/ICT Scanner, funding and crowd, crowd flushed, discount / OTE zone, institutional data and data quality) and then through your <b>12-point pre-trade checklist</b>: Part 1 is the mood and pressure gate (backdrop, zone, pressure, sweep, R:R, journal) and Part 2 is the institutional TA gate (timeframe alignment, sweep + reclaim, zone, fresh FVG / order block, order flow, R:R and invalidation). <b>Click any coin</b> to see every point with a tick or cross, what the scanner sees and how many score points it adds or removes. If the first gate (backdrop, zone, pressure) is not clear the score is capped at 69: no pressure, no sweep, no zone, no trade. Only the 10 best are kept. Rows marked LEAN have a lean, not a strong verdict yet. Educational, not financial advice.</p><p class="hint" id="cselNote"></p><div class="row"><button class="btn sm" type="button" id="cselAll">Show / hide the checklist for all 10</button></div><div id="cselWrap" style="overflow:auto"></div></div>';
     el.addEventListener('click', e => { if (e.target.closest('#cselAll')){ const R = CSEL.rows, all = R.every(r => CSEL.open.has(r.name)); R.forEach(r => all ? CSEL.open.delete(r.name) : CSEL.open.add(r.name)); cselRender(); return; } const t = e.target.closest('tr.cselR'); if (!t) return; const n = t.dataset.cs; if (CSEL.open.has(n)) CSEL.open.delete(n); else CSEL.open.add(n); cselRender(); }); }
   if (!CSEL.at || Date.now() - CSEL.at > 30000 || redo){ try { cselCompute(); } catch(e){ console.error(e); } }
-  const w = $('cselWrap'), h = cselHtml(); if (w && w._h !== h){ w.innerHTML = h; w._h = h; } const n = $('cselNote'); if (n) n.textContent = CSEL.at ? 'Updated ' + ago(CSEL.at) + (TMW.feeding ? ' · adding SMC/ICT reads…' : '') : '';
-  setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300);
+  const w = $('cselWrap'), h = cselHtml(); if (w && w._h !== h){ w.innerHTML = h; w._h = h; } const n = $('cselNote'); if (n) n.textContent = CSEL.at ? 'Updated ' + ago(CSEL.at) + (CSEL.ib || TMW.feeding ? ' · adding SMC/ICT reads (IRL, ERL and entries sharpen as they arrive)…' : '') : '';
+  setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300); try { cselIct(); } catch(e){}
 }
 setInterval(() => { try { if (state.view === 'csel') cselRender(); } catch(e){} }, 20000);
 /* ===== DATA RELEASE PREDICTOR (V8.9): nowcast of CPI / core CPI / jobs / unemployment, surprise vs consensus, market reaction map, own track record ===== */
