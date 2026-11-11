@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.45</title>
+<title>ELPP CRYPTO SCANNER PRO V9.46</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -587,7 +587,7 @@ td.h{background:color-mix(in srgb,var(--c) calc(var(--a) * 55%),transparent)}
   #search{flex:1 1 100%}
   #sectorSel,#newsSel{flex:1 1 calc(50% - 6px);width:auto!important;min-width:0}
   .toolbar .btn{flex:1 1 auto}
-  .toolbar:not(.mbmore) :is(#btnGuide,.fld,.tg,#btnPause,.sp){display:none!important}
+  .toolbar:not(.mbmore) :is(#btnGuide,.fld,.tg,#btnPause,#btnFav,.sp){display:none!important}
   #mbMore{flex:1 1 auto}
   #btnRefresh{flex:1 1 100%}
   .btn,select,input[type=text],input[type=password],input[type=number],textarea{min-height:40px}
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.45</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.46</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -856,6 +856,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
       <div class="chip-pop"><b id="srcTxt">–</b></div></details>
     <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
+    <button class="btn sm" id="btnFav" type="button" style="display:none">☆ Favorites (0)</button>
     <button class="btn sm" id="btnPause" type="button" title="Freeze every scanner screen. Nothing refreshes until you click again. Clicks, sorting and filters still work; watchlist and server alerts keep running.">⏸ PAUSE</button>
     <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
@@ -5212,7 +5213,7 @@ function allColumns(){
   const pick = (list, dflt) => list.includes(s) ? s : dflt;
   const cols = [];
   const num = (id, label, fn, fmt, cls) => cols.push({id, label, val:fn, cell:c => { const v = fn(c); return [fmt(v), cls ? cls(v) : (isNum(v) ? '' : 'dim')]; }});
-  cols.push({id:'sym', label:'Symbol', val:c => c.name, cell:c => [`<a href="#" data-chart="${esc(c.name)}" title="Open chart">${esc(c.name)}</a><a class="cp" href="https://app.hyperliquid.xyz/trade/${encodeURIComponent(c.name)}" target="_blank" rel="noopener noreferrer" title="Open on Hyperliquid" style="text-decoration:none">↗</a><button class="cp wl${wlGet(c.name) ? ' on' : ''}" type="button" data-wl="${esc(c.name)}" title="${wlGet(c.name) ? 'Watching: edit alerts' : 'Add to watchlist and set alerts'}">${wlGet(c.name) ? '★' : '☆'}</button><button class="cp" type="button" data-copy="${esc(c.name)}" title="Copy /signal ${esc(c.name)}">/signal</button>`, 'sym']});
+  cols.push({id:'sym', label:'Symbol', val:c => c.name, cell:c => [`<a href="#" data-chart="${esc(c.name)}" title="Open chart">${esc(c.name)}</a><a class="cp" href="https://app.hyperliquid.xyz/trade/${encodeURIComponent(c.name)}" target="_blank" rel="noopener noreferrer" title="Open on Hyperliquid" style="text-decoration:none">↗</a><button class="cp wl fav${FAV.has(FAV.tk(), c.name) ? ' on' : ''}" type="button" data-favc="${esc(c.name)}" title="${FAV.has(FAV.tk(), c.name) ? 'Favorite: click to remove' : 'Add to Favorites (this scanner)'}">${FAV.has(FAV.tk(), c.name) ? '★' : '☆'}</button><button class="cp" type="button" data-copy="${esc(c.name)}" title="Copy /signal ${esc(c.name)}">/signal</button>`, 'sym']});
   num('px','Price', c => c.m.px, fmtPx);
   cols.push({id:'score', label:'Score', val:c => c.ev.sortScore, cell:c => {
     const e = c.ev, g = e.A ? 'A' : e.ok ? 'P' : '';
@@ -5291,6 +5292,50 @@ function pauseWrap(){ try { renderPower = pzw(renderPower); } catch(e){} try { r
 function pauseToggle(){ state.paused = !state.paused; pauseUI(); if (!state.paused){ lastAct = Date.now(); try { requestRender(); } catch(e){} toast('Scanner released: refreshing now'); } else toast('Scanner paused: the screen is frozen until you release it'); }
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnPause')) pauseToggle(); });
 window.addEventListener('load', () => { pauseWrap(); setTimeout(pauseWrap, 3000); pauseUI(); });
+/* V9.46: Favorites. Every scanner has its own favorite list. The star puts a coin on it (it also stays in the scanner), and the Favorites button in the top bar shows only your favorites in that scanner. Saved in this browser. */
+const FAV = {k:'elpp_fav_v1', d:null,
+  load(){ if (!this.d){ try { this.d = JSON.parse(localStorage.getItem(this.k) || '{}') || {}; } catch(e){ this.d = {}; } } return this.d; },
+  save(){ try { localStorage.setItem(this.k, JSON.stringify(this.d)); } catch(e){} },
+  tk(){ return 'table:' + (state.mode || 'perp'); },
+  key(){ return state.view === 'table' ? this.tk() : state.view; },
+  rec(k){ const d = this.load(); return d[k] || (d[k] = {c:[], on:false}); },
+  has(k, n){ return this.rec(k).c.includes(n); },
+  on(k){ return !!this.rec(k).on; },
+  toggle(k, n){ const r = this.rec(k), i = r.c.indexOf(n); if (i >= 0) r.c.splice(i, 1); else r.c.push(n); this.save(); },
+  setOn(k, b){ this.rec(k).on = !!b; this.save(); }
+};
+const FAV_C = {table:'viewTable', screener:'viewScreener', ictscan:'viewIct', tomorrow:'viewTmw', csel:'viewCsel', consol:'viewCons', predict:'viewPredict', movers:'viewMovers', inst:'viewInst', instspot:'viewInstSpot', power:'viewPower'};
+let favObs = null, favRoot = null, favBusy = false, favKey = '';
+function favRowName(tr){ let n = tr.dataset.chart || tr.dataset.ictrow || tr.dataset.cs || ''; if (!n){ const a = tr.querySelector('td a[data-chart]'); if (a) n = a.dataset.chart || ''; } return n; }
+function favDecorate(){
+  const id = FAV_C[state.view], root = id && document.getElementById(id); if (!root || root.hidden) return;
+  const k = FAV.key(), only = FAV.on(k); let hid = false, seen = false;
+  root.querySelectorAll('tbody tr').forEach(tr => {
+    if (tr.parentElement && tr.parentElement.closest('td')) return;
+    const nm = favRowName(tr);
+    if (!nm){ if (seen) tr.style.display = hid ? 'none' : ''; return; }
+    seen = true; const on = FAV.has(k, nm); hid = only && !on; tr.style.display = hid ? 'none' : '';
+    let b = tr.querySelector('.fav[data-favc]');
+    if (!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'cp wl fav'; b.dataset.favc = nm; const a = tr.querySelector('td a[data-chart]'), td = a ? a.closest('td') : tr.querySelector('td'); if (!td) return; if (a && a.parentNode === td) td.insertBefore(b, a); else td.insertBefore(b, td.firstChild); }
+    b.classList.toggle('on', on); const t = on ? '★' : '☆'; if (b.textContent !== t) b.textContent = t; b.title = on ? 'Favorite: click to remove' : 'Add to Favorites (this scanner)';
+  });
+}
+function favBtn(){
+  const b = document.getElementById('btnFav'); if (!b) return; const ok = !!FAV_C[state.view]; b.style.display = ok ? '' : 'none'; if (!ok) return;
+  const k = FAV.key(), n = FAV.rec(k).c.length, on = FAV.on(k); b.textContent = (on ? '★ Favorites: ON' : '☆ Favorites') + ' (' + n + ')'; b.classList.toggle('primary', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.title = on ? 'Showing only your favorites in this scanner. Click to show every coin again.' : 'Click to show only the coins you starred in this scanner. Tap the star next to a coin to add it.';
+}
+function favAttach(){
+  if (favObs){ favObs.disconnect(); favObs = null; } const id = FAV_C[state.view], root = id && document.getElementById(id); favRoot = root || null; favKey = FAV.key(); favBtn(); if (!root) return;
+  favObs = new MutationObserver(() => { if (favBusy) return; favBusy = true; try { favObs.disconnect(); favDecorate(); } catch(e){} finally { favBusy = false; if (favObs && favRoot) favObs.observe(favRoot, {childList:true, subtree:true}); } });
+  favDecorate(); favObs.observe(root, {childList:true, subtree:true});
+}
+document.addEventListener('click', e => {
+  const t = e.target && e.target.closest ? e.target.closest('.fav[data-favc]') : null;
+  if (t){ e.preventDefault(); e.stopPropagation(); FAV.toggle(FAV.key(), t.dataset.favc); favDecorate(); favBtn(); return; }
+  if (e.target && e.target.closest && e.target.closest('#btnFav')){ const k = FAV.key(), on = !FAV.on(k); FAV.setOn(k, on); favDecorate(); favBtn(); if (on && !FAV.rec(k).c.length) toast('No favorites in this scanner yet. Tap the ☆ next to a coin to add it.'); }
+}, true);
+setInterval(() => { try { const id = FAV_C[state.view], root = id && document.getElementById(id) || null; if (root !== favRoot || FAV.key() !== favKey) favAttach(); } catch(e){} }, 400);
 function render(){
   if (PZ()){ lastRender = Date.now(); return; }
   lastRender = Date.now();
@@ -11035,7 +11080,7 @@ function consHtml(){
   const head = '<tr><th style="text-align:left">Coin</th>' + th('phase', 'Phase', 'Consolidating, accumulating or distributing, from the 4h coin-regime read') + CONS_COLS.map(id => { const c = R.cols.get(id); return c ? th(id, id === 'pPress' ? 'Pressure' : id === 'pressTh' ? 'Buy/sell %' : c.label, c.tip || c.label) : ''; }).join('') + CONS_X.map(x => '<th title="' + esc(x[1]) + '">' + esc(x[0]) + '</th>').join('') + '</tr>';
   const body = R.rows.slice(0, 200).map(c => {
     const ph = CONS_PH[c.m.regime], rp = c.m.rangePos && isNum(c.m.rangePos['4h']) ? c.m.rangePos['4h'] : null;
-    let tds = '<td style="text-align:left"><a href="#" class="cnl" data-chart="' + esc(c.name) + '" title="Open the chart in a new tab"><b>' + esc(c.name) + '</b></a> <button class="cp wl' + (wlGet(c.name) ? ' on' : '') + '" type="button" data-wl="' + esc(c.name) + '" title="' + (wlGet(c.name) ? 'Watching: edit alerts' : 'Add to watchlist and set alerts') + '">' + (wlGet(c.name) ? '★' : '☆') + '</button></td>' +
+    let tds = '<td style="text-align:left"><a href="#" class="cnl" data-chart="' + esc(c.name) + '" title="Open the chart in a new tab"><b>' + esc(c.name) + '</b></a></td>' +
       '<td class="' + ph[1] + '"><b>' + ph[0] + '</b>' + (rp != null ? '<br><small class="dim">4h range: ' + (rp <= 40 ? 'discount' : rp >= 60 ? 'premium' : 'middle') + ' (' + Math.round(rp) + '%)</small>' : '') + '</td>';
     for (const id of CONS_COLS){ const col = R.cols.get(id); if (!col) continue; let r; try { r = col.cell(c); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
     for (const x of CONS_X){ let r; try { r = x[2](c, R.cols); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
@@ -11048,7 +11093,7 @@ function consRender(force){
   const el = $('viewCons'); if (!el) return;
   if (force !== true && el._b && (Date.now() - (CONS.scrAt || 0) < 2000 || Date.now() - (CONS.drawAt || 0) < 4000)) return;
   if (!el._b){ el._b = 1; el.addEventListener('scroll', () => { CONS.scrAt = Date.now(); }, true); el.innerHTML = '<div class="nsec"><h3>Consolidating coins: accumulating / distributing</h3><p class="hint">Every coin the scanner reads as <b>consolidating</b> (stuck in a range), <b>accumulating</b> (quiet buying inside the range) or <b>distributing</b> (quiet selling into strength), with institutional pressure, the overall verdict, the exchanges that list it, and the liquidity above and below (BSL / SSL) and the entry zone and range edges (IRL / ERL) with prices. Pressure that agrees with the phase is the better set-up; a breakout from the range often follows a sweep of one side. Educational, not financial advice.</p><div id="consWrap"></div></div>';
-    el.addEventListener('click', e => { const wb = e.target.closest('[data-wl]'); if (wb){ e.preventDefault(); wlRowClick(wb.dataset.wl); consRender(true); { const d = $('wlDlg'); if (d) d.addEventListener('close', () => consRender(true), {once:true}); } return; } const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(true); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(true); } });
+    el.addEventListener('click', e => { const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(true); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(true); } });
     el.addEventListener('toggle', e => { if (e.target && e.target.id === 'lqtBox') LQT.open = e.target.open; }, true);
     el.addEventListener('click', e => { if (e.target.closest('[data-lqtclear]') && confirm('Delete the saved Sweep first? check log in this browser?')){ lqtSave([]); consRender(true); } });
     el.addEventListener('change', e => { if (e.target.id === 'consSide'){ CONS.side = e.target.value; consRender(true); } });
@@ -11733,6 +11778,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.46: Favorites: a star and a Favorites toggle in every scanner ===== */
 /* ===== V9.45: Volume pressure column in every scanner ===== */
 /* ===== V9.44: chart Data window: BSL / SSL by Thick, Medium, Thin ===== */
 /* ===== V9.43: star (watchlist) button on every coin in Consolidating coins ===== */
@@ -14028,6 +14074,7 @@ const AC_RISK = [
   'This scanner prepares information. It is not financial advice and not a promise of profit.'
 ];
 const AC_VOCAB = [
+  ['Favorites (star)', 'The star next to a coin adds it to the Favorites list of the scanner you are in. The coin stays in the scanner as before. The Favorites button in the top bar then shows only your starred coins in that scanner, and a second click shows every coin again. Each scanner keeps its own list. It is saved in this browser. The Watchlist and its alerts are separate: add a coin there from the coin window.', 'Basics'],
   ['Volume pressure', 'A column in every scanner. It says which side the volume is pushing (buying or selling), how strong (Strong, Lean, Weak, Balanced) and whether that push is building, fading, steady or just coming in. It uses the 15m, 1h and 4h buy/sell pressure and the 1h relative volume. A reading of the tape, not a forecast.', 'Volume'],
   ['Live positions (journal)', 'The journal cards for trades that are running now. Entry, stop, target, distance to each, reward : risk, profit and loss in $ and %, leverage, margin, position size, account size, time and liquidity pools update by themselves every 20 seconds while the app is open.', 'Execution'],
   ['Return on margin (ROE)', 'Profit or loss as a percentage of the margin you put into the trade. At 10x leverage a 1% price move is about 10% on margin.', 'Execution'],
