@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.41</title>
+<title>ELPP CRYPTO SCANNER PRO V9.42</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.41</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.42</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11710,6 +11710,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.42: order-book walls Thick / Medium / Thin for bid and ask ===== */
 /* ===== V9.41: chart Data window always shows the Thick / Medium / Thin boxes ===== */
 /* ===== V9.40: Hyperliquid account includes free spot USDC (Available to Trade) ===== */
 /* ===== V9.39: relay also reads Kraken Futures, BitMEX, Deribit, Phemex, Lighter ===== */
@@ -17237,7 +17238,7 @@ async function wallsLoad(c){
     let bids = [], asks = []; const sym = bnSymOf(f);
     if (sym){ const j = await jget('https://fapi.binance.com/fapi/v1/depth?symbol=' + sym + '&limit=1000'); bids = j.bids.map(x => [+x[0], +x[1]]); asks = j.asks.map(x => [+x[0], +x[1]]); }
     else { const hs = venSyms('hl', f.sym)[0]; if (!hs) throw 0; const j = await jget('https://api.hyperliquid.xyz/info', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'l2Book', coin:hs[1]})}); bids = j.levels[0].map(x => [+x.px, +x.sz]); asks = j.levels[1].map(x => [+x.px, +x.sz]); }
-    const px = c.bars[c.n - 1].c, bin = px * 0.0015, agg = arr => { const m = new Map(); arr.forEach(([p, q]) => { const k = Math.round(p / bin); m.set(k, (m.get(k) || 0) + p * q); }); return [...m].map(([k, v]) => ({p:k * bin, v})).filter(x => Math.abs(x.p - px) / px < 0.08).sort((a, b) => b.v - a.v).slice(0, 3); };
+    const px = c.bars[c.n - 1].c, bin = px * 0.0015, agg = arr => { const m = new Map(); arr.forEach(([p, q]) => { const k = Math.round(p / bin); m.set(k, (m.get(k) || 0) + p * q); }); const all = [...m].map(([k, v]) => ({p:k * bin, v})).filter(x => Math.abs(x.p - px) / px < 0.08), mean = all.length ? all.reduce((t, x) => t + x.v, 0) / all.length : 0; return all.map(x => Object.assign(x, {r:mean ? x.v / mean : 0})).filter(x => x.r >= 1.5).map(x => Object.assign(x, {tier:x.r >= 5 ? 'thick' : x.r >= 2.5 ? 'medium' : 'thin'})).sort((a, b) => b.v - a.v).slice(0, 15); };
     c.walls = {bid:agg(bids), ask:agg(asks), at:Date.now(), src:sym ? 'Binance' : 'Hyperliquid'};
   } catch(e){ c.walls = {bid:[], ask:[], at:Date.now(), err:1}; }
   c._wl = 0; c.dirty = true;
@@ -17262,7 +17263,7 @@ Chart.prototype.extFront = function(g, plotW, ff){
     if (i0 < n){ fac = B[i0].c / m.get(B[i0].t); g.strokeStyle = '#e879f9'; g.lineWidth = 1.5; g.beginPath(); let st = false; for (let i = Math.max(0, vis0); i <= Math.min(n - 1, vis1); i++){ const v = m.get(B[i].t); if (v == null){ st = false; continue; } const x = this.xOf(i), y = this.yOf(v * fac); if (!st){ g.moveTo(x, y); st = true; } else g.lineTo(x, y); } g.stroke(); g.fillStyle = '#e879f9'; g.fillText(p.cmp.sym + ' (rebased)', 8, mh - 8); }
   }
   if (xOn(p, 'liqm')){ const M = liqMap(this); if (M){ const ml = 110; for (let i = 0; i < M.nb; i++){ const y0 = this.yOf(M.lo + (i + 1) * M.bs), y1 = this.yOf(M.lo + i * M.bs); if (y1 < 0 || y0 > mh) continue; const h = Math.max(1.5, y1 - y0 - 0.5); if (M.S[i] > 0){ g.fillStyle = 'rgba(240,97,109,' + (0.12 + 0.5 * M.S[i] / M.mx) + ')'; g.fillRect(plotW - ml * M.S[i] / M.mx, y0, ml * M.S[i] / M.mx, h); } if (M.L[i] > 0){ g.fillStyle = 'rgba(47,191,113,' + (0.12 + 0.5 * M.L[i] / M.mx) + ')'; g.fillRect(plotW - ml * M.L[i] / M.mx, y0, ml * M.L[i] / M.mx, h); } } g.textAlign = 'right'; for (const t of M.top){ const y = this.yOf(t.p); if (y < 8 || y > mh - 8) continue; g.fillStyle = t.s === 'S' ? '#f0616d' : '#2fbf71'; g.fillText('~' + (t.s === 'S' ? 'short' : 'long') + ' liq $' + fmtV(t.v), plotW - 4, y - 2); } g.fillStyle = '#8393a7'; g.fillText('estimated liquidation map', plotW - 4, 10); g.textAlign = 'left'; } }
-  if (xOn(p, 'walls')){ if (!this.walls || Date.now() - this.walls.at > 20000) wallsLoad(this); const W = this.walls; if (W){ if (W.err) { g.fillStyle = '#8393a7'; g.fillText('order-book walls: no book for this venue', 8, 22); } for (const [arr, col, lab] of [[W.bid, '#2fbf71', 'BID'], [W.ask, '#f0616d', 'ASK']]){ for (const w of arr){ const y = Math.round(this.yOf(w.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = col; g.lineWidth = 1.5; g.setLineDash([6, 3]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.fillText(lab + ' wall $' + fmtV(w.v) + ' (' + W.src + ')', 8, y - 3); } } } }
+  if (xOn(p, 'walls')){ if (!this.walls || Date.now() - this.walls.at > 20000) wallsLoad(this); const W = this.walls; if (W){ if (W.err) { g.fillStyle = '#8393a7'; g.fillText('order-book walls: no book for this venue', 8, 22); } for (const [arr, col, lab] of [[W.bid, '#2fbf71', 'BID'], [W.ask, '#f0616d', 'ASK']]){ for (const w of arr){ const wl = p.wl || {}, sd = lab === 'BID' ? 'bid' : 'ask', on = wl[sd + '_' + w.tier]; if (on === false || (on === undefined && w.tier === 'thin')) continue; const y = Math.round(this.yOf(w.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = col; g.lineWidth = 1.5; g.setLineDash([6, 3]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = col; g.fillText(lab + ' wall (' + w.tier + ') $' + fmtV(w.v) + ' (' + W.src + ')', 8, y - 3); } } } }
   if (xOn(p, 'pools')){ const pl = hookCache(this, 'pools'); for (const q of pl){ if (!plShow(p, q)) continue; const y = Math.round(this.yOf(q.p)) + 0.5; if (y < 0 || y > mh) continue; g.strokeStyle = 'rgba(227,179,65,' + (q.inst ? 0.9 : 0.55) + ')'; g.lineWidth = q.inst ? 1.4 : 1; g.setLineDash([2, 4]); g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#e3b341'; g.textAlign = 'right'; g.fillText((q.name || ('pool ' + q.label)) + (q.wall ? ' $' + fmtV(q.wall) : ''), plotW - 4, y - 2); g.textAlign = 'left'; } }
   if (xOn(p, 'hist')){ const hs = hookCache(this, 'history'); for (const s of hs){ const x = this.xOf(this.iOfT(s.t)); if (x < -20 || x > plotW + 20) continue; const y = this.yOf(s.entry), up = s.dir === 'long', col = s.kind === 'journal' ? '#58a6ff' : (up ? '#2fbf71' : '#f0616d'); g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y - 1); g.lineTo(x - 5, y + 9); g.lineTo(x + 5, y + 9); } else { g.moveTo(x, y + 1); g.lineTo(x - 5, y - 9); g.lineTo(x + 5, y - 9); } g.fill(); if (s.tEnd && s.exit != null){ const x2 = this.xOf(this.iOfT(s.tEnd)), y2 = this.yOf(s.exit), win = s.r != null ? s.r >= 0 : (up ? s.exit >= s.entry : s.exit <= s.entry); g.strokeStyle = win ? '#2fbf71' : '#f0616d'; g.lineWidth = 1; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]); g.fillStyle = win ? '#2fbf71' : '#f0616d'; g.fillRect(x2 - 2, y2 - 2, 4, 4); g.fillText((s.kind === 'journal' ? 'J ' : '') + (s.r != null ? (s.r >= 0 ? '+' : '') + s.r.toFixed(1) + 'R' : (win ? 'win' : 'loss')), x2 + 5, y2 + 3); } else { g.fillStyle = col; g.fillText((s.kind === 'journal' ? 'J ' : 'S ') + (s.st || 'open'), x + 7, y + 3); } } }
   this.evtPos = [];
@@ -17288,15 +17289,18 @@ function dataMenu(c, btn){
       + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY TYPE</div><div style="display:flex;flex-wrap:wrap;gap:2px 10px">' + Object.keys(cats).sort((a, b) => a - b).map(t => '<label style="font-size:11px"><input type="checkbox" data-pt="' + t + '"' + (o.t[t] === false ? '' : ' checked') + '> ' + esc(LQ[t] || ('Type ' + t)) + ' <span style="color:var(--muted)">' + cats[t] + '</span></label>').join('') + '</div>'
       + '<div style="font-size:10px;color:var(--muted);margin-top:6px">EACH POOL (highest price first)</div><div style="max-height:220px;overflow:auto">' + pls.map(q => '<label style="display:flex;gap:6px;align-items:baseline;font-size:11px;padding:1px 0"><input type="checkbox" data-pk="' + esc(plKey(q)) + '"' + (plShow(p, q) ? ' checked' : '') + '> <span style="font-family:var(--mono)">' + fp(q.p) + '</span> <b>' + esc(q.name || ('pool ' + q.label)) + '</b> <span style="color:var(--muted)">' + (Number.isFinite(q.d) ? (q.d > 0 ? '+' : '') + q.d.toFixed(2) + '%' : '') + (q.usd ? ' · $' + fmtV(q.usd) : '') + (q.inst ? ' · institutional' : '') + (q.tier ? ' · ' + q.tier : '') + '</span></label>').join('') + '</div></div>';
   };
+  const wlBlock = () => { const wl = p.wl = p.wl || {}, dis = !xOn(p, 'walls') ? ' style="opacity:.5"' : '', W = c.walls || {}, cn = (sd, t) => ((W[sd] || []).filter(w => w.tier === t)).length, row = (sd, nm) => '<div style="margin:2px 0"><b style="font-size:11px;display:inline-block;width:34px">' + nm + '</b>' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px;margin-right:10px"><input type="checkbox" data-wt="' + sd + '_' + t + '"' + ((wl[sd + '_' + t] === undefined ? t !== 'thin' : wl[sd + '_' + t]) ? ' checked' : '') + '> ' + t[0].toUpperCase() + t.slice(1) + ' <span style="color:var(--muted)">' + (c.walls ? cn(sd, t) : '') + '</span></label>').join('') + '</div>';
+    return '<div' + dis + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Order-book walls: choose strength</b><div style="font-size:10px;color:var(--muted)">Thick = a wall at least 5 times the average level, medium = 2.5 to 5 times, thin = 1.5 to 2.5 times. Bid and ask are separate.</div>' + row('bid', 'Bid') + row('ask', 'Ask') + '</div>'; };
   openPop(btn, html, pp => {
-    const plBox = pp.querySelector('.ta-pl'); if (plBox) plBox.innerHTML = plBlock();
+    const plBox = pp.querySelector('.ta-pl'); if (plBox) plBox.innerHTML = plBlock() + wlBlock();
+    pp.addEventListener('change', e => { const w = e.target.dataset.wt; if (!w) return; p.wl = p.wl || {}; p.wl[w] = e.target.checked; save(); c.dirty = true; });
     pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {}; o.tiers = {};
       for (const q of pls){ const a = b.dataset.pq, keep = a === 'all' ? true : a === 'none' ? false : a === 'above' ? q.side === 1 : a === 'below' ? q.side === 2 : !!q.inst; if (!keep) o.h[plKey(q)] = true; }
-      save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); });
-    pp.addEventListener('change', e => { if (e.target.dataset.ptier != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.tiers = o.tiers || {}; o.tiers[e.target.dataset.ptier] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
-      if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
-      if (e.target.dataset.pk != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.h = o.h || {}; if (e.target.checked) delete o.h[e.target.dataset.pk]; else o.h[e.target.dataset.pk] = true; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; } });
-    pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; if (k === 'pools' && plBox) plBox.innerHTML = plBlock(); });
+      save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); });
+    pp.addEventListener('change', e => { if (e.target.dataset.ptier != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.tiers = o.tiers || {}; o.tiers[e.target.dataset.ptier] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; }
+      if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; }
+      if (e.target.dataset.pk != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.h = o.h || {}; if (e.target.checked) delete o.h[e.target.dataset.pk]; else o.h[e.target.dataset.pk] = true; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock() + wlBlock(); return; } });
+    pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; if ((k === 'pools' || k === 'walls') && plBox) plBox.innerHTML = plBlock() + wlBlock(); });
     pp.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; if (b.dataset.i === 'rs' && !p.cmp){ toastX('Turn on Compare first, then add Relative strength.'); return; } addInd(c, b.dataset.i); refresh(c); b.style.opacity = '.5'; toastX('Added ' + IND[b.dataset.i].n); });
   });
 }
