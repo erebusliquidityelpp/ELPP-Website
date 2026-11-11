@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.40</title>
+<title>ELPP CRYPTO SCANNER PRO V9.41</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.40</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.41</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11710,6 +11710,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.41: chart Data window always shows the Thick / Medium / Thin boxes ===== */
 /* ===== V9.40: Hyperliquid account includes free spot USDC (Available to Trade) ===== */
 /* ===== V9.39: relay also reads Kraken Futures, BitMEX, Deribit, Phemex, Lighter ===== */
 /* ===== V9.38: total balance across exchanges (Hyperliquid, dYdX wallet; relay exchanges). journal reads Aster, MEXC, BingX, KuCoin Futures and Coinbase through the relay (read-only keys stay in the relay) ===== */
@@ -17277,7 +17278,8 @@ function dataMenu(c, btn){
   const html = '<div class="ta-pp" style="width:360px"><h4>Data layers · ' + esc(p.sym) + '</h4><div class="xl">' + XDEF.map(x => '<label style="display:block;margin:4px 0" title="' + esc(x[2]) + '"><input type="checkbox" data-k="' + x[0] + '"' + (xOn(p, x[0]) ? ' checked' : '') + '> <b>' + x[1] + (HK[x[0]] ? ' <span style="font-weight:400;color:var(--muted)">(' + cnt(HK[x[0]]) + ' for ' + esc(p.sym) + ')</span>' : '') + '</b><br><span style="font-size:10px;color:var(--muted);margin-left:19px">' + esc(x[2]) + '</span></label>').join('') + '</div><div class="ta-pl"></div><div style="margin-top:6px;font-weight:600">Add as a pane under the chart</div><div class="row">' + XIND.map(x => '<button class="ta-b" data-i="' + x[0] + '">+ ' + x[1] + '</button>').join('') + '</div><div style="font-size:10px;color:var(--muted)">Open interest, funding and long/short come from Binance futures (funding falls back to Hyperliquid). Not every coin has them.</div></div>';
   const plBlock = () => {
     const pls = (() => { try { return (HOOK().pools(p.sym) || []).slice().sort((a, b) => b.p - a.p); } catch(e){ return []; } })(), LQ = (() => { try { return HOOK().liqt() || {}; } catch(e){ return {}; } })(), o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.h = o.h || {};
-    if (!pls.length) return '<p class="hint" style="margin:6px 0">No scanner pools for ' + esc(p.sym) + ' yet.</p>';
+    if (!pls.length){ const dis0 = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
+      return '<div' + dis0 + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(0 found for ' + esc(p.sym) + ')</span><div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">0</span></label>').join('') + '</div><p class="hint" style="margin:6px 0">The scanner has no pools for ' + esc(p.sym) + ' yet. It finds pools only for coins it has loaded and scanned, so open this coin in a scanner first. Your tick boxes are remembered and apply as soon as pools appear.</p></div>'; }
     const fp = v => v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v.toPrecision(4), cats = {}, tc = {}; for (const q of pls){ for (const t of q.types) cats[t] = (cats[t] || 0) + 1; if (q.tier) tc[q.tier] = (tc[q.tier] || 0) + 1; }
     const nOn = pls.filter(q => plShow(p, q)).length, dis = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
     return '<div' + dis + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(' + nOn + ' of ' + pls.length + ' shown)</span>'
