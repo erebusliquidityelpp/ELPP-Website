@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.24</title>
+<title>ELPP CRYPTO SCANNER PRO V9.25</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -832,7 +832,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.24</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.25</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10279,7 +10279,7 @@ function cselCompute(){
 CSEL.open = new Set();
 function cselLvCells(r){
   const o = r.lv || {}, F = v => esc(fmtPx(v)), P = d => (d >= 0 ? '+' : '') + d.toFixed(1) + '%', dash = '<span class="dim">—</span>', long = r.side > 0;
-  const pool = (lab, q, tgt) => q ? '<div><b class="' + (lab === 'BSL' ? 'dn' : 'up') + '">' + lab + '</b> ' + F(q.p) + ' <small class="dim">' + P(q.d) + ' · ' + esc(q.nm) + (q.big ? ' · big' : '') + '</small>' + (tgt ? ' <small class="warn" title="The side the scanner expects price to take first">' + tgt + '</small>' : '') + '</div>' : '<div><b>' + lab + '</b> ' + dash + '</div>';
+  const pool = (lab, q, tgt) => q ? '<div><b class="' + (lab === 'BSL' ? 'dn' : 'up') + '">' + lab + '</b> ' + F(q.p) + '<br><small class="dim">' + P(q.d) + ' · ' + esc(q.nm) + (q.big ? ' · big' : '') + '</small>' + (tgt ? ' <small class="warn" title="The side the scanner expects price to take first">' + tgt + '</small>' : '') + '</div>' : '<div><b>' + lab + '</b> ' + dash + '</div>';
   let c1 = pool('BSL', o.bsl, !long ? '← sweep first' : '→ target') + pool('SSL', o.ssl, long ? '← sweep first' : '→ target');
   if (o.swept) c1 += '<div class="up"><small>✓ ' + o.swept.kind + ' swept at ' + F(o.swept.p) + ' (' + o.swept.age + ' bars ago, ' + esc(o.swept.tf) + ')</small></div>';
   else if (o.bsl || o.ssl) c1 += '<div class="warn"><small>no sweep yet</small></div>';
@@ -10288,7 +10288,7 @@ function cselLvCells(r){
   let c3 = dash;
   if (o.pl){ const pl = o.pl, st = o.swept ? (o.swept.shift ? '<small class="up">sweep + ' + esc(o.swept.shiftKind || 'shift') + ' done: enter in the area</small>' : '<small class="warn">swept, wait for the structure shift</small>') : '<small class="warn">after the ' + (long ? 'SSL' : 'BSL') + ' sweep' + (long ? (o.ssl ? ' at ' + F(o.ssl.p) : '') : (o.bsl ? ' at ' + F(o.bsl.p) : '')) + '</small>';
     c3 = '<div>' + st + '</div><div>Entry <b>' + F(pl.ref) + '</b></div><div>SL <b class="dn">' + F(pl.sl) + '</b></div><div>TP1 <b class="up">' + (isNum(pl.tp1) ? F(pl.tp1) : '—') + '</b>' + (isNum(pl.tp2) ? ' · TP2 <b class="up">' + F(pl.tp2) + '</b>' : '') + '</div>' + (pl.rr != null ? '<div><small class="dim">R:R ' + pl.rr.toFixed(1) + ' · ' + esc(pl.src) + (pl.n1 ? ' · TP1 = ' + esc(pl.n1) : '') + '</small></div>' : ''); }
-  return '<td style="text-align:left;white-space:nowrap">' + c1 + '</td><td style="text-align:left;white-space:nowrap">' + c2 + '</td><td style="text-align:left;white-space:nowrap">' + c3 + '</td>';
+  return '<td style="text-align:left;white-space:normal;min-width:150px">' + c1 + '</td><td style="text-align:left;white-space:normal;min-width:170px">' + c2 + '</td><td style="text-align:left;white-space:nowrap">' + c3 + '</td>';
 }
 function cselDetail(r){
   const ck = r.ck; if (!ck) return '<tr class="cselD"><td colspan="11" class="hint">Checklist not available for this coin yet.</td></tr>';
