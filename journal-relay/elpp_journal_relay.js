@@ -18,6 +18,12 @@
     GATE_KEY     GATE_SECRET                            (USDT futures)
     BITGET_KEY   BITGET_SECRET   BITGET_PASSPHRASE      (USDT futures)
     KRAKEN_KEY   KRAKEN_SECRET                          (spot)
+    ASTER_KEY    ASTER_SECRET                           (futures, Binance-style keys)
+    MEXC_KEY     MEXC_SECRET                            (USDT futures)
+    BINGX_KEY    BINGX_SECRET                           (perpetual swaps)
+    KUCOIN_KEY   KUCOIN_SECRET   KUCOIN_PASSPHRASE      (futures)
+    COINBASE_KEY COINBASE_SECRET                        (spot; Advanced Trade key name + PEM private key, write the PEM on one line with \n)
+  The Aster, MEXC, BingX, KuCoin and Coinbase adapters were written from the exchanges' public documentation and have not been run against live accounts. Check /journal/trades?token=... and the Journal's status table after you connect.
 
   CREATE EVERY API KEY AS READ-ONLY. Never tick Trade or Withdraw. Anything that can only read history cannot move your money.
   Hyperliquid and dYdX need no keys here: the Journal page reads them directly from your wallet address.
@@ -28,7 +34,7 @@ try { for (const l of fs.readFileSync(path.join(__dirname, '.env'), 'utf8').spli
 const env = k => process.env[k] || '';
 const PORT = +env('PORT') || 8787, TOKEN = env('JOURNAL_TOKEN');
 const ORIGINS = (env('ALLOW_ORIGIN') || 'https://erebusliquidityelpp.github.io,http://localhost,http://127.0.0.1,null').split(',').map(s => s.trim()).filter(Boolean);
-const BASE = {binance:env('BINANCE_BASE') || 'https://fapi.binance.com', bybit:env('BYBIT_BASE') || 'https://api.bybit.com', okx:env('OKX_BASE') || 'https://www.okx.com', gate:env('GATE_BASE') || 'https://api.gateio.ws', bitget:env('BITGET_BASE') || 'https://api.bitget.com', kraken:env('KRAKEN_BASE') || 'https://api.kraken.com'};
+const BASE = {binance:env('BINANCE_BASE') || 'https://fapi.binance.com', bybit:env('BYBIT_BASE') || 'https://api.bybit.com', okx:env('OKX_BASE') || 'https://www.okx.com', gate:env('GATE_BASE') || 'https://api.gateio.ws', bitget:env('BITGET_BASE') || 'https://api.bitget.com', kraken:env('KRAKEN_BASE') || 'https://api.kraken.com', aster:env('ASTER_BASE') || 'https://fapi.asterdex.com', mexc:env('MEXC_BASE') || 'https://contract.mexc.com', bingx:env('BINGX_BASE') || 'https://open-api.bingx.com', kucoin:env('KUCOIN_BASE') || 'https://api-futures.kucoin.com', coinbase:env('COINBASE_BASE') || 'https://api.coinbase.com'};
 const DAY = 864e5, sleep = ms => new Promise(r => setTimeout(r, ms));
 const hmac = (alg, key, data, enc) => crypto.createHmac(alg, key).update(data).digest(enc);
 const sha = (alg, data, enc) => crypto.createHash(alg).update(data).digest(enc);
@@ -64,16 +70,18 @@ function group(src, coin, fills, mkt){
 const groupAll = (src, fills, mkt) => { const by = new Map(); for (const f of fills){ if (!by.has(f.k)) by.set(f.k, {coin:f.coin, a:[]}); by.get(f.k).a.push(f); } let o = []; for (const {coin, a} of by.values()) o = o.concat(group(src, coin, a, mkt)); return o; };
 
 /* ---------- Binance USD-M futures ---------- */
-async function binSigned(p, q){ const qs = new URLSearchParams(Object.assign({timestamp:Date.now(), recvWindow:20000}, q)).toString(), sig = hmac('sha256', env('BINANCE_SECRET'), qs, 'hex'); return jf(BASE.binance + p + '?' + qs + '&signature=' + sig, {headers:{'X-MBX-APIKEY':env('BINANCE_KEY')}}); }
-async function binance(days){
+const BINX = {binance:{base:'binance', k:'BINANCE'}, aster:{base:'aster', k:'ASTER'}};
+async function binSigned(p, q, X){ X = X || BINX.binance; const qs = new URLSearchParams(Object.assign({timestamp:Date.now(), recvWindow:20000}, q)).toString(), sig = hmac('sha256', env(X.k + '_SECRET'), qs, 'hex'); return jf(BASE[X.base] + p + '?' + qs + '&signature=' + sig, {headers:{'X-MBX-APIKEY':env(X.k + '_KEY')}}); }
+async function binLike(X, days){
   const now = Date.now(), syms = new Set();
-  for (let t = now - days * DAY; t < now; t += 7 * DAY){ let from = t; for (let k = 0; k < 5; k++){ const inc = await binSigned('/fapi/v1/income', {incomeType:'REALIZED_PNL', startTime:from, endTime:Math.min(now, t + 7 * DAY - 1), limit:1000}); for (const r of inc) if (r.symbol) syms.add(r.symbol); if (inc.length < 1000) break; from = inc[inc.length - 1].time + 1; } }
+  for (let t = now - days * DAY; t < now; t += 7 * DAY){ let from = t; for (let k = 0; k < 5; k++){ const inc = await binSigned('/fapi/v1/income', {incomeType:'REALIZED_PNL', startTime:from, endTime:Math.min(now, t + 7 * DAY - 1), limit:1000}, X); for (const r of inc) if (r.symbol) syms.add(r.symbol); if (inc.length < 1000) break; from = inc[inc.length - 1].time + 1; } }
   const fills = [], seen = new Set();
-  for (const s of syms){ for (let t = now - days * DAY; t < now; t += 7 * DAY){ let from = t; for (let k = 0; k < 8; k++){ const L = await binSigned('/fapi/v1/userTrades', {symbol:s, startTime:from, endTime:Math.min(now, t + 7 * DAY - 1), limit:1000});
+  for (const s of syms){ for (let t = now - days * DAY; t < now; t += 7 * DAY){ let from = t; for (let k = 0; k < 8; k++){ const L = await binSigned('/fapi/v1/userTrades', {symbol:s, startTime:from, endTime:Math.min(now, t + 7 * DAY - 1), limit:1000}, X);
         for (const r of L){ const uk = s + ':' + r.id; if (r.id !== undefined){ if (seen.has(uk)) continue; seen.add(uk); } const ca = String(r.commissionAsset || '').toUpperCase(), fee = ['USDT', 'USDC', 'BUSD', 'FDUSD'].includes(ca) ? +r.commission : 0; fills.push({k:s + (r.positionSide && r.positionSide !== 'BOTH' ? ':' + r.positionSide : ''), coin:coinOf(s), t:+r.time, side:r.side === 'BUY' ? 'B' : 'A', px:+r.price, sz:+r.qty, fee, pnl:+r.realizedPnl || 0}); }
         if (L.length < 1000) break; from = L[L.length - 1].time + 1; } await sleep(120); } }
-  return groupAll('binance', fills);
+  return groupAll(X === BINX.aster ? 'aster' : 'binance', fills);
 }
+const binance = d => binLike(BINX.binance, d), aster = d => binLike(BINX.aster, d);
 /* ---------- Bybit linear: closed positions straight from the exchange ---------- */
 async function bybit(days){
   const out = [], now = Date.now();
@@ -133,10 +141,70 @@ async function kraken(days){
   GROUP_OPEN = []; const g = groupAll('kraken', all, 'spot'); KRAKEN_OPEN = GROUP_OPEN.slice(); return g;
 }
 
+/* ---------- MEXC USDT futures (untested) ---------- */
+async function mexcGet(p, q){ const ts = String(Date.now()), qs = new URLSearchParams(q || {}).toString(); const j = await jf(BASE.mexc + p + (qs ? '?' + qs : ''), {headers:{ApiKey:env('MEXC_KEY'), 'Request-Time':ts, Signature:hmac('sha256', env('MEXC_SECRET'), env('MEXC_KEY') + ts + qs, 'hex'), 'Content-Type':'application/json'}}); if (j.success === false || (j.code !== undefined && j.code !== 0)) throw new Error('MEXC: ' + (j.message || j.code)); return j.data; }
+async function mexcSizes(){ const m = new Map(); try { const j = await jf(BASE.mexc + '/api/v1/contract/detail'); for (const c of j.data || []) m.set(c.symbol, +c.contractSize || 1); } catch(e){} return m; }
+async function mexc(days){
+  const sz = await mexcSizes(), out = [], cut = Date.now() - days * DAY;
+  for (let pg = 1; pg <= 20; pg++){ const L = await mexcGet('/api/v1/private/position/list/history_positions', {page_num:pg, page_size:100}); if (!Array.isArray(L) || !L.length) break; let old = 0;
+    for (const r of L){ const c = +r.updateTime || +r.createTime; if (c < cut){ old++; continue; } const m = sz.get(r.symbol) || 1, vol = (+r.closeVol || +r.holdVol) * m, en = +r.openAvgPrice, ex = +r.closeAvgPrice; if (!(vol > 0 && en > 0 && ex > 0)) continue;
+      out.push({id:'mexc:' + (r.positionId || r.symbol + c), src:'mexc', coin:coinOf(r.symbol), side:+r.positionType === 2 ? 'short' : 'long', entry:en, exit:ex, size:vol, lev:num(r.leverage), open:+r.createTime || null, close:c, fees:Math.abs(+r.totalFee || 0), pnl:+r.realised, liq:+r.state === 4 && /liq/i.test(String(r.closeType || '')), mkt:'perp'}); }
+    if (L.length < 100 || old === L.length) break; await sleep(250); }
+  return out;
+}
+/* ---------- BingX perpetual swaps (untested) ---------- */
+async function bingxGet(p, q){ const qs = new URLSearchParams(Object.assign({timestamp:Date.now(), recvWindow:20000}, q)).toString(), j = await jf(BASE.bingx + p + '?' + qs + '&signature=' + hmac('sha256', env('BINGX_SECRET'), qs, 'hex'), {headers:{'X-BX-APIKEY':env('BINGX_KEY')}}); if (j.code !== 0 && j.code !== undefined) throw new Error('BingX: ' + (j.msg || j.code)); return j.data; }
+async function bingx(days){
+  const now = Date.now(), syms = new Set(), fills = [], seen = new Set();
+  for (let t = now - days * DAY; t < now; t += 7 * DAY){ const inc = await bingxGet('/openApi/swap/v2/user/income', {incomeType:'REALIZED_PNL', startTime:t, endTime:Math.min(now, t + 7 * DAY - 1), limit:1000}); for (const r of Array.isArray(inc) ? inc : []) if (r.symbol) syms.add(r.symbol); await sleep(150); }
+  for (const s of syms){ for (let t = now - days * DAY; t < now; t += 7 * DAY){ const d = await bingxGet('/openApi/swap/v2/trade/allFillOrders', {symbol:s, tradingUnit:'COIN', startTs:t, endTs:Math.min(now, t + 7 * DAY - 1)}), L = (d && d.fill_orders) || [];
+      for (const r of L){ const tm = typeof r.filledTime === 'number' ? r.filledTime : Date.parse(r.filledTime) || +r.time, uk = s + ':' + (r.filledTm || r.orderId) + ':' + tm + ':' + r.qty; if (seen.has(uk)) continue; seen.add(uk);
+        fills.push({k:s + ':' + (r.positionSide || ''), coin:coinOf(s), t:tm, side:/BUY/i.test(r.side) ? 'B' : 'A', px:+r.price, sz:Math.abs(+r.qty), fee:Math.abs(+r.commission || 0)}); } await sleep(150); } }
+  return groupAll('bingx', fills);
+}
+/* ---------- KuCoin Futures (untested) ---------- */
+async function kuGet(p){ const ts = String(Date.now()); const j = await jf(BASE.kucoin + p, {headers:{'KC-API-KEY':env('KUCOIN_KEY'), 'KC-API-SIGN':hmac('sha256', env('KUCOIN_SECRET'), ts + 'GET' + p, 'base64'), 'KC-API-TIMESTAMP':ts, 'KC-API-PASSPHRASE':hmac('sha256', env('KUCOIN_SECRET'), env('KUCOIN_PASSPHRASE'), 'base64'), 'KC-API-KEY-VERSION':'2'}}); if (j.code !== '200000') throw new Error('KuCoin: ' + (j.msg || j.code)); return j.data; }
+async function kuMult(){ const m = new Map(); try { const j = await jf(BASE.kucoin + '/api/v1/contracts/active'); for (const c of j.data || []) m.set(c.symbol, Math.abs(+c.multiplier) || 1); } catch(e){} return m; }
+const kuCoin = s => coinOf(String(s).replace(/USDTM$|USDM$/, '').replace(/^XBT$/, 'BTC'));
+async function kucoin(days){
+  const mu = await kuMult(), fills = [], cut = Date.now() - days * DAY;
+  for (let pg = 1; pg <= 30; pg++){ const d = await kuGet('/api/v1/fills?pageSize=100&currentPage=' + pg + '&startAt=' + cut), L = (d && d.items) || []; if (!L.length) break;
+    for (const r of L){ if (!/USDT/.test(r.symbol)) continue; const t = Math.round(+r.tradeTime / 1e6) || +r.createdAt; fills.push({k:r.symbol, coin:kuCoin(r.symbol), t, side:/buy/i.test(r.side) ? 'B' : 'A', px:+r.price, sz:Math.abs(+r.size) * (mu.get(r.symbol) || 1), fee:Math.abs(+r.fee || 0)}); }
+    if (pg >= (d.totalPage || 1)) break; await sleep(200); }
+  return groupAll('kucoin', fills);
+}
+/* ---------- Coinbase Advanced Trade spot (untested) ---------- */
+const b64u = b => Buffer.from(b).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+function cbJwt(method, host, p){ const now = Math.floor(Date.now() / 1000), hd = {alg:'ES256', kid:env('COINBASE_KEY'), nonce:crypto.randomBytes(8).toString('hex'), typ:'JWT'}, pl = {sub:env('COINBASE_KEY'), iss:'cdp', nbf:now, exp:now + 110, uri:method + ' ' + host + p}, data = b64u(JSON.stringify(hd)) + '.' + b64u(JSON.stringify(pl));
+  return data + '.' + b64u(crypto.sign('sha256', Buffer.from(data), {key:env('COINBASE_SECRET').replace(/\\n/g, '\n'), dsaEncoding:'ieee-p1363'})); }
+let COINBASE_OPEN = [];
+async function coinbase(days){
+  const host = new URL(BASE.coinbase).host, p = '/api/v3/brokerage/orders/historical/fills', all = [], cut = Date.now() - days * DAY; let cursor = '';
+  for (let k = 0; k < 40; k++){ const q = '?limit=250&start_sequence_timestamp=' + encodeURIComponent(new Date(cut).toISOString()) + (cursor ? '&cursor=' + encodeURIComponent(cursor) : ''), j = await jf(BASE.coinbase + p + q, {headers:{Authorization:'Bearer ' + cbJwt('GET', host, p)}}); if (j.error || j.message && !j.fills) throw new Error('Coinbase: ' + (j.message || j.error));
+    for (const r of j.fills || []){ const m = /^([A-Z0-9]+)-(USD|USDC)$/.exec(r.product_id || ''); if (!m) continue; const px = +r.price, size = r.size_in_quote === true || r.size_in_quote === 'true' ? +r.size / px : +r.size; all.push({k:m[1], coin:m[1], t:Date.parse(r.trade_time), side:r.side === 'BUY' ? 'B' : 'A', px, sz:size, fee:Math.abs(+r.commission || 0)}); }
+    cursor = j.cursor; if (!cursor || !(j.fills || []).length) break; await sleep(150); }
+  GROUP_OPEN = []; const g = groupAll('coinbase', all, 'spot'); COINBASE_OPEN = GROUP_OPEN.slice(); return g;
+}
+
+/* ---------- account balances (total equity in USD terms; untested on live accounts) ---------- */
+async function bybGet(path, q){ const ts = String(Date.now()), rw = '20000'; return jf(BASE.bybit + path + '?' + q, {headers:{'X-BAPI-API-KEY':env('BYBIT_KEY'), 'X-BAPI-TIMESTAMP':ts, 'X-BAPI-RECV-WINDOW':rw, 'X-BAPI-SIGN':hmac('sha256', env('BYBIT_SECRET'), ts + env('BYBIT_KEY') + rw + q, 'hex')}}); }
+const BAL = {
+  async binance(X){ X = X || BINX.binance; const a = await binSigned('/fapi/v2/account', {}, X); return {total:num(a.totalMarginBalance), free:num(a.availableBalance)}; },
+  async aster(){ return BAL.binance(BINX.aster); },
+  async bybit(){ const j = await bybGet('/v5/account/wallet-balance', 'accountType=UNIFIED'); if (j.retCode !== 0) throw new Error('Bybit: ' + j.retMsg); const a = ((j.result || {}).list || [])[0] || {}; return {total:num(a.totalEquity), free:num(a.totalAvailableBalance)}; },
+  async okx(){ const j = await okxGet('/api/v5/account/balance'); if (j.code !== '0') throw new Error('OKX: ' + j.msg); const a = (j.data || [])[0] || {}; return {total:num(a.totalEq), free:num(a.adjEq)}; },
+  async gate(){ const a = await gateGet('/futures/usdt/accounts', ''); if (a.label) throw new Error('Gate: ' + a.message); return {total:(+a.total || 0) + (+a.unrealised_pnl || 0), free:num(a.available)}; },
+  async bitget(){ const p = '/api/v2/mix/account/accounts', q = 'productType=USDT-FUTURES', ts = String(Date.now()), j = await jf(BASE.bitget + p + '?' + q, {headers:{'ACCESS-KEY':env('BITGET_KEY'), 'ACCESS-SIGN':hmac('sha256', env('BITGET_SECRET'), ts + 'GET' + p + '?' + q, 'base64'), 'ACCESS-TIMESTAMP':ts, 'ACCESS-PASSPHRASE':env('BITGET_PASSPHRASE'), 'Content-Type':'application/json'}}); if (j.code !== '00000') throw new Error('Bitget: ' + j.msg); const a = (j.data || [])[0] || {}; return {total:num(a.accountEquity || a.usdtEquity), free:num(a.available)}; },
+  async mexc(){ const L = await mexcGet('/api/v1/private/account/assets', {}), a = (Array.isArray(L) ? L : []).find(x => x.currency === 'USDT') || {}; return {total:num(a.equity), free:num(a.availableBalance)}; },
+  async bingx(){ const d = await bingxGet('/openApi/swap/v2/user/balance', {}), a = (d && d.balance) || {}; return {total:num(a.equity || a.balance), free:num(a.availableMargin)}; },
+  async kucoin(){ const a = await kuGet('/api/v1/account-overview?currency=USDT'); return {total:num(a.accountEquity), free:num(a.availableBalance)}; }
+};
+
 /* ---------- running (open) positions ---------- */
 const oid = (src, coin, side) => src + ':' + coin + ':' + side + ':open';
 const OPEN = {
-  async binance(){ const L = await binSigned('/fapi/v2/positionRisk', {}); return L.filter(r => +r.positionAmt).map(r => { const a = +r.positionAmt, side = r.positionSide === 'SHORT' || (r.positionSide !== 'LONG' && a < 0) ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('binance', coin, side), src:'binance', coin, side, entry:+r.entryPrice, size:Math.abs(a), pnl:+r.unRealizedProfit, lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:null, mkt:'perp'}; }); },
+  async binance(X){ X = X || BINX.binance; const src = X === BINX.aster ? 'aster' : 'binance', L = await binSigned('/fapi/v2/positionRisk', {}, X); return L.filter(r => +r.positionAmt).map(r => { const a = +r.positionAmt, side = r.positionSide === 'SHORT' || (r.positionSide !== 'LONG' && a < 0) ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid(src, coin, side), src, coin, side, entry:+r.entryPrice, size:Math.abs(a), pnl:+r.unRealizedProfit, lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:null, mkt:'perp'}; }); },
+  async aster(){ return OPEN.binance(BINX.aster); },
   async bybit(){ const q = 'category=linear&settleCoin=USDT&limit=200', ts = String(Date.now()), rw = '20000', j = await jf(BASE.bybit + '/v5/position/list?' + q, {headers:{'X-BAPI-API-KEY':env('BYBIT_KEY'), 'X-BAPI-TIMESTAMP':ts, 'X-BAPI-RECV-WINDOW':rw, 'X-BAPI-SIGN':hmac('sha256', env('BYBIT_SECRET'), ts + env('BYBIT_KEY') + rw + q, 'hex')}}); if (j.retCode !== 0) throw new Error('Bybit: ' + j.retMsg);
     return ((j.result || {}).list || []).filter(r => +r.size).map(r => { const side = r.side === 'Sell' ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('bybit', coin, side), src:'bybit', coin, side, entry:+r.avgPrice, size:+r.size, pnl:+r.unrealisedPnl, lev:num(r.leverage), liqPx:num(r.liqPrice) || null, open:+r.createdTime || null, mkt:'perp'}; }); },
   async okx(){ const ins = new Map(); try { const i = await jf(BASE.okx + '/api/v5/public/instruments?instType=SWAP'); for (const r of i.data || []) ins.set(r.instId, r); } catch(e){}
@@ -147,20 +215,25 @@ const OPEN = {
     return L.filter(r => +r.size).map(r => { const a = +r.size, side = a > 0 ? 'long' : 'short', coin = coinOf(r.contract); return {id:oid('gate', coin, side), src:'gate', coin, side, entry:+r.entry_price, size:Math.abs(a) * (mult.get(r.contract) || 1), pnl:+r.unrealised_pnl, lev:num(r.leverage), liqPx:num(r.liq_price) || null, open:r.open_time ? +r.open_time * 1000 : null, mkt:'perp'}; }); },
   async bitget(){ const q = 'productType=USDT-FUTURES&marginCoin=USDT', p = '/api/v2/mix/position/all-position', ts = String(Date.now()), j = await jf(BASE.bitget + p + '?' + q, {headers:{'ACCESS-KEY':env('BITGET_KEY'), 'ACCESS-SIGN':hmac('sha256', env('BITGET_SECRET'), ts + 'GET' + p + '?' + q, 'base64'), 'ACCESS-TIMESTAMP':ts, 'ACCESS-PASSPHRASE':env('BITGET_PASSPHRASE'), 'Content-Type':'application/json'}}); if (j.code !== '00000') throw new Error('Bitget: ' + j.msg);
     return (j.data || []).filter(r => +r.total).map(r => { const side = r.holdSide === 'short' ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('bitget', coin, side), src:'bitget', coin, side, entry:+r.openPriceAvg, size:+r.total, pnl:+r.unrealizedPL, lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:+r.cTime || null, mkt:'perp'}; }); },
-  async kraken(){ return KRAKEN_OPEN; }
+  async kraken(){ return KRAKEN_OPEN; },
+  async mexc(){ const sz = await mexcSizes(), L = await mexcGet('/api/v1/private/position/open_positions', {}); return (Array.isArray(L) ? L : []).filter(r => +r.holdVol).map(r => { const side = +r.positionType === 2 ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('mexc', coin, side), src:'mexc', coin, side, entry:+r.holdAvgPrice, size:+r.holdVol * (sz.get(r.symbol) || 1), pnl:num(r.realised), lev:num(r.leverage), liqPx:num(r.liquidatePrice) || null, open:+r.createTime || null, mkt:'perp'}; }); },
+  async bingx(){ const L = await bingxGet('/openApi/swap/v2/user/positions', {}); return (Array.isArray(L) ? L : []).filter(r => +r.positionAmt).map(r => { const side = String(r.positionSide).toUpperCase() === 'SHORT' ? 'short' : 'long', coin = coinOf(r.symbol); return {id:oid('bingx', coin, side), src:'bingx', coin, side, entry:+r.avgPrice, size:Math.abs(+r.positionAmt), pnl:num(r.unrealizedProfit), lev:num(r.leverage), liqPx:num(r.liquidationPrice) || null, open:+r.createTime || null, mkt:'perp'}; }); },
+  async kucoin(){ const mu = await kuMult(), L = await kuGet('/api/v1/positions'); return (Array.isArray(L) ? L : []).filter(r => r.isOpen !== false && +r.currentQty).map(r => { const q = +r.currentQty, side = q < 0 ? 'short' : 'long', coin = kuCoin(r.symbol); return {id:oid('kucoin', coin, side), src:'kucoin', coin, side, entry:+r.avgEntryPrice, size:Math.abs(q) * (mu.get(r.symbol) || 1), pnl:num(r.unrealisedPnl), lev:num(r.realLeverage), liqPx:num(r.liquidationPrice) || null, open:+r.openingTimestamp || null, mkt:'perp'}; }); },
+  async coinbase(){ return COINBASE_OPEN; }
 };
 let KRAKEN_OPEN = [];
-const ADAPTERS = {binance:{f:binance, need:['BINANCE_KEY', 'BINANCE_SECRET']}, bybit:{f:bybit, need:['BYBIT_KEY', 'BYBIT_SECRET']}, okx:{f:okx, need:['OKX_KEY', 'OKX_SECRET', 'OKX_PASSPHRASE']}, gate:{f:gate, need:['GATE_KEY', 'GATE_SECRET']}, bitget:{f:bitget, need:['BITGET_KEY', 'BITGET_SECRET', 'BITGET_PASSPHRASE']}, kraken:{f:kraken, need:['KRAKEN_KEY', 'KRAKEN_SECRET']}};
+const ADAPTERS = {binance:{f:binance, need:['BINANCE_KEY', 'BINANCE_SECRET']}, bybit:{f:bybit, need:['BYBIT_KEY', 'BYBIT_SECRET']}, okx:{f:okx, need:['OKX_KEY', 'OKX_SECRET', 'OKX_PASSPHRASE']}, gate:{f:gate, need:['GATE_KEY', 'GATE_SECRET']}, bitget:{f:bitget, need:['BITGET_KEY', 'BITGET_SECRET', 'BITGET_PASSPHRASE']}, kraken:{f:kraken, need:['KRAKEN_KEY', 'KRAKEN_SECRET']}, aster:{f:aster, need:['ASTER_KEY', 'ASTER_SECRET']}, mexc:{f:mexc, need:['MEXC_KEY', 'MEXC_SECRET']}, bingx:{f:bingx, need:['BINGX_KEY', 'BINGX_SECRET']}, kucoin:{f:kucoin, need:['KUCOIN_KEY', 'KUCOIN_SECRET', 'KUCOIN_PASSPHRASE']}, coinbase:{f:coinbase, need:['COINBASE_KEY', 'COINBASE_SECRET']}};
 const configured = () => Object.keys(ADAPTERS).filter(k => ADAPTERS[k].need.every(n => env(n)));
 const cache = new Map();
 async function collect(days){
   const ck = String(days), c = cache.get(ck); if (c && Date.now() - c.at < 45000) return c.v;
-  const ex = configured(), status = {}, trades = [], openTrades = [];
+  const ex = configured(), status = {}, trades = [], openTrades = [], balances = {};
   await Promise.all(ex.map(async k => { try { const L = (await ADAPTERS[k].f(days)).filter(t => t && isFinite(t.entry) && isFinite(t.exit) && isFinite(t.pnl) && t.size > 0); status[k] = {ok:true, n:L.length, openOk:false, open:0}; for (const t of L) trades.push(t); } catch(e){ status[k] = {ok:false, err:String(e.message || e).slice(0, 220)}; return; }
-    try { const O = (await OPEN[k]()).filter(t => t && isFinite(t.entry) && t.entry > 0 && t.size > 0); status[k].openOk = true; status[k].open = O.length; for (const t of O) openTrades.push(t); } catch(e){ status[k].openErr = String(e.message || e).slice(0, 160); } }));
+    try { const O = (await OPEN[k]()).filter(t => t && isFinite(t.entry) && t.entry > 0 && t.size > 0); status[k].openOk = true; status[k].open = O.length; for (const t of O) openTrades.push(t); } catch(e){ status[k].openErr = String(e.message || e).slice(0, 160); }
+    if (BAL[k]){ try { const b = await BAL[k](); if (b && isFinite(b.total)) balances[k] = {total:b.total, free:isFinite(b.free) ? b.free : null}; } catch(e){ status[k].balErr = String(e.message || e).slice(0, 160); } } }));
   const ids = new Set(), uniq = trades.filter(t => !ids.has(t.id) && ids.add(t.id)); trades.length = 0; for (const t of uniq) trades.push(t);
   for (const k of Object.keys(status)) if (status[k].ok) status[k].n = trades.filter(t => t.src === k).length;
-  trades.sort((a, b) => (b.close || 0) - (a.close || 0)); const v = {ok:true, at:Date.now(), days, status, trades, openTrades}; cache.set(ck, {at:Date.now(), v}); return v;
+  trades.sort((a, b) => (b.close || 0) - (a.close || 0)); const v = {ok:true, at:Date.now(), days, status, trades, openTrades, balances}; cache.set(ck, {at:Date.now(), v}); return v;
 }
 function main(){
   if (!TOKEN || TOKEN.length < 12){ console.error('Set JOURNAL_TOKEN to a long random password (at least 12 characters), then start again.'); process.exit(1); }
