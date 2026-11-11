@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.29</title>
+<title>ELPP CRYPTO SCANNER PRO V9.30</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -833,7 +833,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.29</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.30</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -4960,6 +4960,8 @@ function extCols(num, cols){
       const tg = q => `${q.rank === 2 ? 'Major' : 'Minor'} · ${['', 'Micro', 'Mid', 'Mega'][q.size]} · ${q.scale === 2 ? 'Large' : 'Small'} · ${q.weight === 2 ? 'Heavy' : 'Light'}`;
       const part = (q, ar) => q ? `<span title="${esc(q.name + ' · ' + tg(q) + ' · ' + fmtUsd(q.usd))}">${ar} ${Math.abs(q.d).toFixed(2)}% ${esc(q.name.split(' + ')[0])}</span>` : '';
       return [`<a href="#" data-liq="${esc(c.name)}" title="Open the full liquidity map">${part(up, '▲')}${up && dn ? ' · ' : ''}${part(dn, '▼')}</a>`, '', 'white-space:normal;min-width:240px;text-align:left']; });
+    col('bslSsl', 'BSL / SSL (price)', c => { const o = lvFor(c); const d = [o.bsl, o.ssl].filter(Boolean).map(q => Math.abs(q.d)); return d.length ? Math.min(...d) : null; }, c => [lvPoolsHtml(lvFor(c)), '', 'text-align:left;white-space:nowrap']);
+    col('irlErl', 'IRL / ERL (price)', c => { const o = lvFor(c); return o.erl ? (o.erl.hi / o.erl.lo - 1) * 100 : null; }, c => [lvRangeHtml(lvFor(c)), '', 'text-align:left;white-space:nowrap']);
     col('whales', 'Whale wallets', c => c.m.whNet, c => { const m = c.m; if (!isNum(m.whN)) return ['—', 'dim']; if (!m.whN) return ['none', 'dim'];
       const sx = whSideTxt(m.whSide); return [`<a href="#" data-wh="${esc(c.name)}" title="Open wallets by size">${sx[0]} ${esc(fmtUsd(m.whNet, true))} · ${m.whN} wallets · P&amp;L ${esc(fmtUsd(m.whPnl, true))}</a>`, sx[1]]; });
     col('bo', 'Sweep → breakout ' + it, c => (c.m.bo || {})[it], c => { const v = (c.m.bo || {})[it]; if (!isNum(v) || !v) return ['—', 'dim']; const age = (c.m.boAge || {})[it], d = (c.m.boDist || {})[it];
@@ -9835,9 +9837,9 @@ function ictRows(){
 function ictTable(){
   const rows = ictRows(); if (!rows.length) return '<div class="ict-empty">' + (ICTS.busy ? 'Scanning candles on 15m, 1h, 4h, 12h and Daily for each coin… results appear here as they finish.' : (ICTS.msg || 'No coins match. Change the filters, or press Rescan.')) + '</div>';
   const bad = [...ICTS.data.values()].filter(r => r && r.ok === false).length;
-  return '<div class="ict-wrap ict-main"><table class="ict-t ict-fit"><thead><tr><th>Coin</th><th>Verdict</th><th>Structure (D · 12h · 4h · 1h · 15m)</th><th>Where to enter, stop and target</th><th>Pullback and what is missing</th><th></th></tr></thead><tbody>' + rows.map(r => {
+  return '<div class="ict-wrap ict-main"><table class="ict-t ict-fit"><thead><tr><th>Coin</th><th>Verdict</th><th>Structure (D · 12h · 4h · 1h · 15m)</th><th>Where to enter, stop and target</th><th>BSL / SSL · IRL / ERL</th><th>Pullback and what is missing</th><th></th></tr></thead><tbody>' + rows.map(r => {
     const e = r.entry, k = r.key && r.key[0], miss = r.conds.filter(c => !c.ok).slice(0, 2).map(c => c.name.replace(/ \(.*$/, '')).join('; ');
-    return '<tr class="' + (ICTS.sel === r.name ? 'sel' : '') + '" data-ictrow="' + esc(r.name) + '"><td class="sym"><a href="#" data-chart="' + esc(r.name) + '" title="Open the super chart in a new tab">' + esc(r.name) + '</a><br><small class="ict-dim">' + ictFmt(r.px) + '</small></td><td>' + ictChip(r) + '<br><small class="ict-dim">Score <b>' + r.score + '</b> · ' + r.met + '/13 conditions</small></td><td class="ict-strip">' + ictStrip(r) + (ictTfRead(r).indexOf('pick') < 0 ? '<div class="ict-sm ict-tfr">' + ictTfRead(r) + '</div>' : '') + '</td><td class="ict-sm">' + (k ? '<b>' + ictFmt(k.lo) + ' – ' + ictFmt(k.hi) + '</b> <small class="ict-dim">' + esc(k.comps.slice(0, 3).map(c => ICT.TFN[c.tf] + ' ' + c.type).join(' + ')) + '</small>' + (e ? '<br>Stop <b>' + ictFmt(e.sl) + '</b> · Target 1 <b>' + ictFmt(e.tp1) + '</b>' + (e.est ? '<small class="ict-dim"> est.</small>' : '') + ' · R:R <b>' + e.rr.toFixed(1) + '</b>' : '') : '<span class="ict-dim">no area yet</span>') + '</td><td class="ict-sm">' + ictPbShort(r) + '<br><small class="ict-dim">Missing: ' + esc(miss || 'nothing') + '</small>' + (r.flush && r.flush.state ? '<br><small class="' + (r.flush.done ? (r.flushFx && r.flushFx.pts < 0 ? 'dn' : 'up') : 'ict-dim') + '">' + esc(r.flush.short) + (r.flushFx && r.flushFx.pts ? ' (' + (r.flushFx.pts > 0 ? '+' : '') + r.flushFx.pts + ')' : '') + '</small>' : '') + (r.crowd && r.crowd.state ? '<br><small class="' + (r.crowdFx && r.crowdFx.pts < 0 ? 'dn' : 'up') + '">Funding: ' + esc(r.crowd.short) + (r.crowdFx && r.crowdFx.pts ? ' (' + (r.crowdFx.pts > 0 ? '+' : '') + r.crowdFx.pts + ')' : '') + '</small>' : '') + '</td><td><button type="button" class="ict-btn" data-ictopen="' + esc(r.name) + '">Details</button></td></tr>';
+    return '<tr class="' + (ICTS.sel === r.name ? 'sel' : '') + '" data-ictrow="' + esc(r.name) + '"><td class="sym"><a href="#" data-chart="' + esc(r.name) + '" title="Open the super chart in a new tab">' + esc(r.name) + '</a><br><small class="ict-dim">' + ictFmt(r.px) + '</small></td><td>' + ictChip(r) + '<br><small class="ict-dim">Score <b>' + r.score + '</b> · ' + r.met + '/13 conditions</small></td><td class="ict-strip">' + ictStrip(r) + (ictTfRead(r).indexOf('pick') < 0 ? '<div class="ict-sm ict-tfr">' + ictTfRead(r) + '</div>' : '') + '</td><td class="ict-sm">' + (k ? '<b>' + ictFmt(k.lo) + ' – ' + ictFmt(k.hi) + '</b> <small class="ict-dim">' + esc(k.comps.slice(0, 3).map(c => ICT.TFN[c.tf] + ' ' + c.type).join(' + ')) + '</small>' + (e ? '<br>Stop <b>' + ictFmt(e.sl) + '</b> · Target 1 <b>' + ictFmt(e.tp1) + '</b>' + (e.est ? '<small class="ict-dim"> est.</small>' : '') + ' · R:R <b>' + e.rr.toFixed(1) + '</b>' : '') : '<span class="ict-dim">no area yet</span>') + '</td><td class="ict-sm" style="white-space:nowrap">' + (() => { try { const c = state.coins.get(r.name) || {name: r.name, m: {}}, o = lvFor(c, r); return lvPoolsHtml(o) + '<div style="margin-top:3px"></div>' + lvRangeHtml(o); } catch(e){ return '<span class="ict-dim">—</span>'; } })() + '</td><td class="ict-sm">' + ictPbShort(r) + '<br><small class="ict-dim">Missing: ' + esc(miss || 'nothing') + '</small>' + (r.flush && r.flush.state ? '<br><small class="' + (r.flush.done ? (r.flushFx && r.flushFx.pts < 0 ? 'dn' : 'up') : 'ict-dim') + '">' + esc(r.flush.short) + (r.flushFx && r.flushFx.pts ? ' (' + (r.flushFx.pts > 0 ? '+' : '') + r.flushFx.pts + ')' : '') + '</small>' : '') + (r.crowd && r.crowd.state ? '<br><small class="' + (r.crowdFx && r.crowdFx.pts < 0 ? 'dn' : 'up') + '">Funding: ' + esc(r.crowd.short) + (r.crowdFx && r.crowdFx.pts ? ' (' + (r.crowdFx.pts > 0 ? '+' : '') + r.crowdFx.pts + ')' : '') + '</small>' : '') + '</td><td><button type="button" class="ict-btn" data-ictopen="' + esc(r.name) + '">Details</button></td></tr>';
   }).join('') + '</tbody></table></div>' + (bad ? '<p class="ict-dim ict-note">' + bad + ' coin(s) could not be loaded (no candles from Binance, Bybit or Hyperliquid) and are left out.</p>' : '');
 }
 /* ---------- detail panel ---------- */
@@ -10256,6 +10258,22 @@ function cselCheck(r, z, pp, f, strong){
   const gate = rows[0].ok !== false && rows[1].ok === true && rows[2].ok === true;   /* mood, zone, pressure must hold before the setup counts */
   return {rows, impact, g1, g2, pass: rows.filter(x => x.ok === true).length, total: 12, gate, unknown: rows.filter(x => x.ok === null && !x.manual).length};
 }
+/* ---- V9.30: BSL/SSL and IRL/ERL price columns for every scanner ---- */
+function lvFor(c, ictRead){
+  const m = c.m || {}, ir = ictRead || ICTS.data.get(c.name), ict = ir && ir.ok !== false && ir.label ? ir : null;
+  let side = isNum(m.verdict) ? (m.verdict >= 4 ? 1 : m.verdict >= 2 ? -1 : 0) : 0; if (!side && ict && ict.dir) side = ict.dir;
+  return cselLevels({c, side, ict, plan: null, name: c.name});
+}
+function lvPoolsHtml(o){
+  if (!o || !isNum(o.px)) return '<span class="dim">—</span>'; if (!o.bsl && !o.ssl) return '<span class="dim">—</span>';
+  const F = v => esc(fmtPx(v)), P = d => (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1) + '%', one = (lab, q, cl) => q ? '<div title="' + esc(q.nm + (q.big ? ' · big pool' : '')) + '"><b class="' + cl + '">' + lab + '</b> ' + F(q.p) + ' <small class="dim">' + P(q.d) + '</small></div>' : '<div><b>' + lab + '</b> <span class="dim">—</span></div>';
+  return one('BSL', o.bsl, 'dn') + one('SSL', o.ssl, 'up') + (o.swept ? '<div class="up"><small title="Liquidity already taken, ' + o.swept.age + ' bars ago">✓ ' + o.swept.kind + ' swept ' + F(o.swept.p) + '</small></div>' : '');
+}
+function lvRangeHtml(o){
+  if (!o || !isNum(o.px)) return '<span class="dim">—</span>'; if (!o.irl && !o.erl) return '<span class="dim">—</span>';
+  const F = v => esc(fmtPx(v)), ap = x => x && x.approx ? ' <small class="dim" title="Approximate: from the liquidity map. The exact SMC/ICT level replaces it when that scan has run for this coin">≈</small>' : '';
+  return (o.irl ? '<div title="' + esc(o.irl.what || '') + '"><b>IRL</b> ' + F(o.irl.lo) + ' – ' + F(o.irl.hi) + ap(o.irl) + '</div>' : '<div><b>IRL</b> <span class="dim">—</span></div>') + (o.erl ? '<div title="' + esc((o.erl.tf || '') + ' range') + '"><b>ERL</b> ' + F(o.erl.hi) + ' / ' + F(o.erl.lo) + ap(o.erl) + '</div>' : '<div><b>ERL</b> <span class="dim">—</span></div>');
+}
 /* BSL / SSL, IRL / ERL and the entry, stop and targets for the sweep, all with prices */
 function cselLevels(r){
   const m = r.c.m || {}, px = m.px, side = r.side, ict = r.ict && r.ict.ok !== false ? r.ict : null, mine = ict && ict.dir === side, o = {long: side > 0};
@@ -10268,7 +10286,7 @@ function cselLevels(r){
   const k = mine ? ict.key : null; if (k) o.irl = {lo: k.lo, hi: k.hi, what: k.comps.slice(0, 3).map(c => ICT.TFN[c.tf] + ' ' + c.type + (c.status === 'fresh' ? ' (fresh)' : '')).join(' + '), at: !!(ict.inZone || ict.near)};
   if (ict && ict.perTf){ for (const tf of ['4h', '1h']){ const A = ict.perTf[tf]; if (A && A.ok && A.rng && isNum(A.rng.hi) && isNum(A.rng.lo)){ o.erl = {hi: A.rng.hi, lo: A.rng.lo, eq: A.rng.eq, tf: ICT.TFN[tf] || tf}; break; } } }
   if (!o.erl && above.length && below.length){ const hi = Math.max(...pools.map(q => q.p)), lo = Math.min(...pools.map(q => q.p)); if (hi > lo) o.erl = {hi, lo, tf: 'liquidity map', approx: true}; }
-  if (!o.irl && o.erl){ const h = o.erl.hi, l = o.erl.lo, g = h - l; o.irl = side > 0 ? {lo: h - 0.79 * g, hi: h - 0.62 * g} : {lo: l + 0.62 * g, hi: l + 0.79 * g}; o.irl.what = 'OTE zone (62–79%) of the range · approx, SMC/ICT read still loading'; o.irl.at = side > 0 ? px <= o.irl.hi && px >= o.irl.lo : px >= o.irl.lo && px <= o.irl.hi; o.irl.approx = true; }
+  if (!o.irl && o.erl && side){ const h = o.erl.hi, l = o.erl.lo, g = h - l; o.irl = side > 0 ? {lo: h - 0.79 * g, hi: h - 0.62 * g} : {lo: l + 0.62 * g, hi: l + 0.79 * g}; o.irl.what = 'OTE zone (62–79%) of the range · approx, SMC/ICT read still loading'; o.irl.at = side > 0 ? px <= o.irl.hi && px >= o.irl.lo : px >= o.irl.lo && px <= o.irl.hi; o.irl.approx = true; }
   const pl = mine && ict.entry ? ict.entry : r.plan; if (pl && isNum(pl.sl)){ o.pl = {ref: isNum(pl.ref) ? pl.ref : px, sl: pl.sl, tp1: pl.tp1, tp2: pl.tp2, rr: isNum(pl.rr) ? pl.rr : null, n1: pl.tp1n || '', n2: pl.tp2n || '', src: mine && ict.entry ? 'SMC/ICT' : 'Power Scanner'}; }
   o.px = px; return o;
 }
@@ -14011,11 +14029,11 @@ const PS_ELITE_GROUPS = [
   ['🏦 Exchanges', ['pVen','pHL','pGap','pList']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','bslSsl','irlErl','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
-  trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','px','chg_1h','pV1h','pV4h','pV24','fund8']},
-  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPB','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','px','chg_1h']},
+  trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','bslSsl','irlErl','px','chg_1h','pV1h','pV4h','pV24','fund8']},
+  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPB','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','bslSsl','irlErl','px','chg_1h']},
   crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','crowdState','flushState','oteZone','pCrowd','pFlush','pOte','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
   mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
@@ -14037,7 +14055,8 @@ function pbInfo(m){
   }
   return null;
 }
-function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp3){ state.ps.pp3 = 1; const a = state.ps.cols; if (!a.includes('pPB')){ const i = a.indexOf('pPress'); a.splice(i >= 0 ? i + 1 : 0, 0, 'pPB'); } }
+function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.lv1){ state.ps.lv1 = 1; const a = state.ps.cols; for (const id of ['irlErl', 'bslSsl']) if (!a.includes(id)){ const i = a.indexOf('px'); a.splice(i >= 0 ? i + 1 : a.length, 0, id); } }
+  if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp3){ state.ps.pp3 = 1; const a = state.ps.cols; if (!a.includes('pPB')){ const i = a.indexOf('pPress'); a.splice(i >= 0 ? i + 1 : 0, 0, 'pPB'); } }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp2){ state.ps.pp2 = 1; const a = state.ps.cols, i = a.indexOf('pPress'), j = i >= 0 ? i : a.indexOf('pInst'); for (const id of ['pBig', 'pPD']) if (!a.includes(id)) a.splice(j >= 0 ? j + 1 : 0, 0, id); }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp1){ state.ps.pp1 = 1; if (!state.ps.cols.includes('pPress')){ const i = state.ps.cols.indexOf('pInst'); state.ps.cols.splice(i >= 0 ? i + 1 : 0, 0, 'pPress'); } }
   if (state.ps && Array.isArray(state.ps.cols) && state.ps.cols.includes('vol') && !state.ps.cols.includes('pV1h')){ state.ps.cols = state.ps.cols.flatMap(x => x === 'vol' ? ['pV1h', 'pV4h', 'pV24'] : [x]); }
@@ -15630,7 +15649,7 @@ const PERP_GROUPS = [
     ['Price and change', ['px','read'].concat(TFS.map(t => 'chg_' + t), ['chgUsd','relStr','rangePos','distHi','distLo','vwapDay','sweep','tfAgree'])],
     ['Volume and activity', ['vol','volD','volDUsd','rvol','rvolBest','trades','tradesX','vlt','vltX','atr']],
     ['Regime and trend', ['regime','trend']],
-    ['Verdict and smart money', ['cpConf','verdict','dataRead','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','instFlow','pattern','liqMap','ob','fvg','ote','instVol','volState','retail']],
+    ['Verdict and smart money', ['cpConf','verdict','dataRead','swpRe','walScore','pressTh','verdictWhy','whales','bo','ic','instFlow','pattern','liqMap','bslSsl','irlErl','ob','fvg','ote','instVol','volState','retail']],
     ['Take-off and build-up', ['takeoff','buildup','takeWhy']],
     ['Execution quality', ['depthX','slipPct','tpAtr','slAtr','rr1']],
     ['Sessions and macro', ['session','asiaSweep','kzSweep','eventRisk','eventMin','rotation','domChg']],
