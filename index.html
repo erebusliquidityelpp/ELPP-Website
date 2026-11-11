@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.35</title>
+<title>ELPP CRYPTO SCANNER PRO V9.36</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -156,7 +156,7 @@ header.top .chips .chip-pop b{color:var(--fg);font-weight:500;font-family:var(--
 .maplg i{font-style:normal;color:#fff;padding:2px 8px;border-radius:3px;font-family:var(--mono);text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .dkgrid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;margin-top:10px}
 @media (max-width:900px){.dkgrid{grid-template-columns:1fr}}
-.wxb{font:700 9px var(--mono);color:#16a085;border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-left:3px;vertical-align:super;line-height:1.3}
+.hlb,.wxb{font:700 9px var(--mono);color:#16a085;border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-left:3px;vertical-align:super;line-height:1.3}
 .dkbadge{margin-left:auto;font:600 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 10px}
 .dktab{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
 .dktab th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--line)}
@@ -404,6 +404,7 @@ body{font-size:13.5px;line-height:1.5;padding-left:0;padding-right:0;-webkit-fon
 .btn:hover{border-color:var(--accent);background:var(--surface2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+body.is-paused::after{content:'⏸ PAUSED: scanner screens are frozen';position:fixed;left:50%;bottom:10px;transform:translateX(-50%);background:var(--accent);color:var(--accent-fg);padding:5px 14px;border-radius:999px;font:600 12px var(--sans);z-index:9999;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.4)}
 .btn.sm{padding:3px 9px;font-size:12px}
 select,input[type=text],input[type=number],input[type=password],textarea{height:30px;border-radius:6px;border:1px solid var(--line2);background:var(--surface);padding:3px 8px;font-size:12.5px}
 textarea{height:auto}
@@ -833,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.35</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.36</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -854,6 +855,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
       <div class="chip-pop"><b id="srcTxt">–</b></div></details>
     <span class="chip" id="chipVen" title="Pick the exchange data source: Auto, All merged, or one exchange">Venue <select id="venueSelTop" aria-label="Exchange data source (header)"><option value="auto">Auto: Hyperliquid, then others</option><option value="merged">All venues merged</option><option value="hyperliquid">Hyperliquid only (DEX)</option><option value="binance">Binance only</option><option value="bybit">Bybit only</option><option value="okx">OKX only</option><option value="bitget">Bitget only</option><option value="gate">Gate only</option><option value="dydx">dYdX only (DEX)</option><option value="aster">Aster only (DEX)</option><option value="paradex">Paradex only (DEX)</option><option value="drift">Drift only (DEX, prices and volume)</option><option value="lighter">Lighter only (DEX, prices and volume)</option></select> <b id="venTxt">–</b></span>
     <span class="chip" id="chipBudget">API <b id="budTxt">–</b></span>
+    <button class="btn sm" id="btnPause" type="button" title="Freeze every scanner screen. Nothing refreshes until you click again. Clicks, sorting and filters still work; watchlist and server alerts keep running.">⏸ PAUSE</button>
     <button class="btn sm" id="btnUpdate" type="button" title="Refresh all data and get the newest version">⟳ Refresh</button>
     <button class="btn sm" id="btnTheme" type="button">Theme</button>
     <span class="chip" id="welcomeChip" hidden style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
@@ -1043,7 +1045,6 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
       <label class="tg"><input type="checkbox" id="onlyWeex"> Only coins on WEEX</label>
       <label class="tg" title="If fewer coins pass, fill the list with the closest matches">Show at least <input type="number" id="minShow" min="0" max="30" style="width:52px"> coins</label>
       <span class="sp"></span>
-      <button class="btn" id="btnPause" type="button">Pause</button>
       <button class="btn primary" id="btnRefresh" type="button">Refresh now</button>
     </div>
     <div class="toolbar" id="setupBar">
@@ -5277,7 +5278,19 @@ function requestRender(){
   const wait = Math.max(0, gap - (Date.now() - lastRender));
   renderT = setTimeout(() => { renderT = null; render(); }, wait);
 }
+/* V9.36: PAUSE. Freezes what every scanner screen shows. Data keeps loading in the background; the screen catches up when you release it. */
+let lastAct = 0;
+const NOPAUSE = new Set(['trading', 'journal', 'sdesk', 'signals', 'api', 'watch']);
+function PZ(){ return !!state.paused && !NOPAUSE.has(state.view) && Date.now() - lastAct > 900; }
+for (const ev of ['pointerdown', 'keydown', 'change', 'input']) document.addEventListener(ev, () => { lastAct = Date.now(); }, true);
+function pauseUI(){ const b = document.getElementById('btnPause'); if (!b) return; b.textContent = state.paused ? '▶ PAUSED: click to release' : '⏸ PAUSE'; b.classList.toggle('primary', !!state.paused); b.setAttribute('aria-pressed', state.paused ? 'true' : 'false'); document.body.classList.toggle('is-paused', !!state.paused); }
+function pzw(f){ if (typeof f !== 'function' || f.__pz) return f; const w = function(){ if (PZ() && arguments[0] !== true) return; return f.apply(this, arguments); }; w.__pz = 1; return w; }
+function pauseWrap(){ try { renderPower = pzw(renderPower); } catch(e){} try { renderIct = pzw(renderIct); } catch(e){} try { tmwRender = pzw(tmwRender); } catch(e){} try { cselRender = pzw(cselRender); } catch(e){} try { consRender = pzw(consRender); } catch(e){} try { renderPredict = pzw(renderPredict); } catch(e){} try { prDraw = pzw(prDraw); } catch(e){} try { renderMovers = pzw(renderMovers); } catch(e){} try { renderScreener = pzw(renderScreener); } catch(e){} try { renderInst = pzw(renderInst); } catch(e){} try { renderInstSpot = pzw(renderInstSpot); } catch(e){} try { renderMap = pzw(renderMap); } catch(e){} try { renderFlowsView = pzw(renderFlowsView); } catch(e){} try { renderWhales = pzw(renderWhales); } catch(e){} try { renderOptions = pzw(renderOptions); } catch(e){} try { renderOrderflowView = pzw(renderOrderflowView); } catch(e){} try { renderOverview = pzw(renderOverview); } catch(e){} try { renderListings = pzw(renderListings); } catch(e){} try { wxRender = pzw(wxRender); } catch(e){} try { renderMemes = pzw(renderMemes); } catch(e){} try { renderDropsView = pzw(renderDropsView); } catch(e){} try { ncRender = pzw(ncRender); } catch(e){} try { renderToday = pzw(renderToday); } catch(e){} try { renderElite = pzw(renderElite); } catch(e){} try { renderLookup = pzw(renderLookup); } catch(e){} try { renderCharts = pzw(renderCharts); } catch(e){} }
+function pauseToggle(){ state.paused = !state.paused; pauseUI(); if (!state.paused){ lastAct = Date.now(); try { requestRender(); } catch(e){} toast('Scanner released: refreshing now'); } else toast('Scanner paused: the screen is frozen until you release it'); }
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnPause')) pauseToggle(); });
+window.addEventListener('load', () => { pauseWrap(); setTimeout(pauseWrap, 3000); pauseUI(); });
 function render(){
+  if (PZ()){ lastRender = Date.now(); return; }
   lastRender = Date.now();
   const now = Date.now();
   const market = state.mode !== 'perp';
@@ -5659,19 +5672,19 @@ async function wxLoad(force){
 }
 const wxKey = name => { const p = vPlain(name); if (WX.set.has(p)) return p; if (WX.set.has('1000' + p)) return '1000' + p; if (/^1000/.test(p) && WX.set.has(p.slice(4))) return p.slice(4); return null; };
 const wxHas = name => !!WX.set.size && !!wxKey(name);
-/* coin links (a[data-chart]) in any scanner get a small W badge when the coin trades on WEEX; one cheap pass, marks what it has seen */
+/* V9.36: coin links (a[data-chart]) in any scanner get a small green HL badge when the coin trades on Hyperliquid (perp or HIP-3). WEEX now shows in the Exchanges and Listed on columns instead. */
 let wxT = 0;
 function wxDecorate(all){
-  if (!WX.set.size) return;
-  if (all) document.querySelectorAll('a[data-chart][data-wx]').forEach(a => { a.removeAttribute('data-wx'); const n = a.nextElementSibling; if (n && n.classList.contains('wxb')) n.remove(); });
-  document.querySelectorAll('a[data-chart]:not([data-wx])').forEach(a => { a.setAttribute('data-wx', '1'); const n = a.dataset.chart; if (a.textContent.trim() !== n || !wxHas(n)) return; a.insertAdjacentHTML('afterend', '<span class="wxb" title="Listed on WEEX futures">W</span>'); });
+  let idx; try { idx = liIndex(); } catch(e){ return; } if (!idx || !idx.size) return;
+  if (all) document.querySelectorAll('a[data-chart][data-wx]').forEach(a => { a.removeAttribute('data-wx'); const n = a.nextElementSibling; if (n && (n.classList.contains('hlb') || n.classList.contains('wxb'))) n.remove(); });
+  document.querySelectorAll('a[data-chart]:not([data-wx])').forEach(a => { a.setAttribute('data-wx', '1'); const n = a.dataset.chart; if (a.textContent.trim() !== n) return; const t = liTags(n); const nx = a.nextElementSibling; if (nx && nx.classList.contains('wxb')) nx.remove(); if (!t.includes('HL') && !t.includes('HL3')) return; a.insertAdjacentHTML('afterend', '<span class="hlb" title="Listed on Hyperliquid' + (t.includes('HL3') ? ' (HIP-3 market)' : '') + '">HL</span>'); });
 }
 function wxSchedule(){ if (wxT) return; wxT = setTimeout(() => { wxT = 0; try { wxDecorate(false); } catch(e){} }, 400); }
 try { new MutationObserver(wxSchedule).observe(document.body, {childList:true, subtree:true}); } catch(e){}
 function wxRender(force){
   const el = $('viewWeex'); if (!el) return;
   if (!el._b){ el._b = 1; el.addEventListener('input', e => { if (e.target.id === 'wxQ'){ WX.q = e.target.value; wxList(); } }); el.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.hasAttribute('data-wx-reload')){ wxLoad(true); } const a = e.target.closest('[data-chart]'); if (a){ e.preventDefault(); openChart(a.dataset.chart); } }); }
-  if (!el._built || force){ el._built = 1; el.innerHTML = '<div class="nsec"><h3>WEEX coins: what is listed on WEEX futures</h3><p class="hint">Coins that trade on WEEX carry a small <span class="wxb">W</span> badge next to their name in every scanner, and the Filters panel has "Only coins on WEEX". This page lists every WEEX perpetual and says whether the scanners cover it. The scanners read prices and candles from Hyperliquid, Binance and other open feeds, so a WEEX coin that those do not list shows here but cannot be scanned.</p><div class="row"><input type="text" id="wxQ" placeholder="Search a coin" autocomplete="off" autocapitalize="characters" style="min-width:180px;font-family:var(--mono);text-transform:uppercase" value="' + esc(WX.q) + '"> <button type="button" class="btn sm" data-wx-reload>Reload WEEX list</button> <span id="wxSt" class="hint"></span></div><div id="wxList"></div></div>'; }
+  if (!el._built || force){ el._built = 1; el.innerHTML = '<div class="nsec"><h3>WEEX coins: what is listed on WEEX futures</h3><p class="hint">Coins that trade on WEEX list WEEX in the <b>Exchanges</b> and <b>Listed on</b> columns of the scanners, and the Filters panel has "Only coins on WEEX". Coins on Hyperliquid carry a small green <span class="hlb">HL</span> badge next to their name. This page lists every WEEX perpetual and says whether the scanners cover it. The scanners read prices and candles from Hyperliquid, Binance and other open feeds, so a WEEX coin that those do not list shows here but cannot be scanned.</p><div class="row"><input type="text" id="wxQ" placeholder="Search a coin" autocomplete="off" autocapitalize="characters" style="min-width:180px;font-family:var(--mono);text-transform:uppercase" value="' + esc(WX.q) + '"> <button type="button" class="btn sm" data-wx-reload>Reload WEEX list</button> <span id="wxSt" class="hint"></span></div><div id="wxList"></div></div>'; }
   wxList();
 }
 function wxList(){
@@ -10921,6 +10934,9 @@ function lqTds(c){
     return '<td style="text-align:left;white-space:nowrap">' + lvPoolsHtml(o) + '</td><td style="text-align:left;white-space:nowrap">' + lvRangeHtml(o) + '</td><td class="' + (d[1] || '') + '" style="' + (d[2] || '') + '">' + d[0] + '</td><td class="' + (w[1] || '') + '" style="' + (w[2] || '') + '">' + w[0] + '</td>';
   } catch(e){ return '<td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td>'; }
 }
+/* V9.36: one pool, three strengths. Thick = major + heavy + big (6 or 7 points), Medium = 4 or 5, Thin = 3 */
+function poolPts(q){ return (q.rank === 2 ? 2 : 1) + (q.weight === 2 ? 2 : 1) + (q.size >= 1 && q.size <= 3 ? q.size : 1); }
+function poolTier(q){ const p = poolPts(q); return p >= 6 ? 'thick' : p >= 4 ? 'medium' : 'thin'; }
 function consDens(c){
   const pl = (c.m.pools || []).filter(q => isNum(q.p) && isNum(q.d)), px = c.m.px; if (!pl.length) return null;
   const pts = q => ((q.rank === 2 ? 2 : 1) + (q.weight === 2 ? 2 : 1) + (q.size || 1)), df = d => { d = Math.abs(d); return d <= 1 ? 1 : d <= 3 ? 0.8 : d <= 6 ? 0.5 : d <= 10 ? 0.25 : 0; };
@@ -12734,7 +12750,7 @@ function renderBt(){
 /* ===== V4.34: beginner guide on every page: what each number means and where good / neutral / bad starts ===== */
 const VG_VERDICT = ['Verdict (Strong long / Lean long / Avoid / Lean short / Strong short)', 'The scanner adds points for and against a trade (trend, flow, positioning, levels, data quality). The total is the score.', 'Perp scalp: score +35 or more = Strong long, +15 to +34 = Lean long, -15 to -34 = Lean short, -35 or less = Strong short, in between = Wait. Spot, swing and positional use +28 / +10. Avoid means a hard block (very low volume, big event). Only trade Strong when the plan and the chart agree.'];
 const VIEW_GUIDE = {
-  weexcoins: [['What this page is', 'The list of every perpetual coin on the WEEX exchange, with price, 24h change and volume, and whether the scanners cover it.', 'A coin on WEEX shows a small W badge next to its name in every scanner. Use Filters, Only coins on WEEX, to keep only those.'], ['Limits', 'The scanners read candles from Hyperliquid, Binance and other open feeds. A WEEX coin those feeds do not list is shown here but cannot be scanned.', 'WEEX trading itself is on the TRADING page (beta).']],
+  weexcoins: [['What this page is', 'The list of every perpetual coin on the WEEX exchange, with price, 24h change and volume, and whether the scanners cover it.', 'A coin on WEEX shows WEEX in the Exchanges and Listed on columns. A small green HL badge next to a coin name means it is on Hyperliquid. Use Filters, Only coins on WEEX, to keep only WEEX coins.'], ['Limits', 'The scanners read candles from Hyperliquid, Binance and other open feeds. A WEEX coin those feeds do not list is shown here but cannot be scanned.', 'WEEX trading itself is on the TRADING page (beta).']],
   nowcast: [['What this page is', 'A calculator that turns public leading numbers into your own estimate of CPI, core CPI, payrolls or the unemployment rate before the release, then compares it with the market consensus.', 'Nobody can know the number early. The value is in judging the surprise and checking whether your estimates beat the consensus.'], ['How to use it', 'The page fills the boxes by itself from live US government data (FRED) and shows the predicted next CPI, core CPI, payrolls and unemployment rate at the top. The market consensus fills in by itself from the Cryptocraft / Forex Factory calendar in the week of each release (you can type over it) so you see the surprise and the usual reaction of the dollar, yields, gold, stocks and crypto.', 'The "How these predictions affect the crypto market" box turns the four predictions into one read for crypto (bullish, bearish or neutral), with what crypto usually does on a hot, in-line or cool number.', 'Boxes marked live came from the data feed. Type in a box to override it. The used-car index, ISM and the Cleveland Fed nowcast have no free feed, so they stay manual.'], ['My track record', 'Save each estimate, then type the actual number after the release. The page compares your average miss with the consensus miss.', 'Trade on your own estimate only if you were closer than the consensus in more than half of 10 or more releases.']],
   trading: [['Mode and exchange', 'Paper = fake money inside this page. Test network = the exchange\'s own test money. LIVE = real money. Fourteen exchanges: Hyperliquid, Binance, Bybit, OKX, Bitget, Gate, MEXC, BingX, KuCoin Futures, Kraken Futures, HTX, Deribit, Phemex, WEEX.', 'Start in Paper, move to Test network, and go LIVE only after the same trades work there. Every exchange except Hyperliquid, Binance, Bybit and OKX is BETA: not yet checked with a live account (Kraken, HTX, Deribit and Phemex are low confidence). Beta exchanges are limited to 50 USDT per order until you tick that you verified them. MEXC and HTX have no test network.'], ['Order types', 'Market, Limit, Post-only (maker), Stop-market entry, Stop-limit entry, plus Chase (a limit that follows the price), Iceberg (small visible parts), TWAP (market slices over time) and Scale (a ladder of limits). Every order or part carries a stop loss and a take profit.', 'If an exchange cannot protect an order type with a stop, the page blocks that type instead of leaving you unprotected.'], ['Settings', 'Minimum balance to keep, cross or isolated margin, one-way or hedge mode, amount by risk %, fixed margin, fixed position size or fixed coins, leverage cap, R:R target and minimum, daily loss limit, max trades per day, cooldown, price-move guard.', 'Isolated margin, risk 1% or less, minimum R:R 1.5 to 2, leverage at most 10x.'], ['Several take profits and trailing stop', 'Add TP2 and TP3 and split the size between them (for example 50/30/20). A trailing stop follows the price by a percent once the trade is 1R in profit.', 'Trailing is native on Binance and Bybit (Bybit: market entry). On every other exchange the page watches the price and closes the position at market when price falls back, so keep it open; your fixed stop stays as backup. Several take profits work with Market, Limit, Post-only and Stop orders.'], ['Order ticket', 'Coin, side, order type, stop loss and take profit. Leave Take profit empty to have it set from your R:R target. "Fill from scanner plan" copies the scanner\'s side, stop and Target 1.', 'Stop at least 1% away, reward 2R or more after fees. The page warns when fees would eat the profit or liquidation is close to the stop.'], ['OCO exit and time in force', 'OCO exit sets a take profit and a stop together on an open position (a real OCO on OKX, Bybit, HTX and Hyperliquid; two linked exits elsewhere). Limit orders can be IOC (fill now or cancel) or FOK (all now or nothing).', 'Check the exchange app that both exits exist.'], ['Open orders and positions', 'Real accounts show balance, positions with a liquidation price, and waiting orders you can cancel. Positions can be closed fully or 50%. After a market order the page checks that the position size matches what you asked for.', 'Check the exchange app after your first order on any exchange.'], ['Safety', 'Keys are encrypted in this browser, trade-only keys are recommended, every live order needs a typed confirmation, and there is a kill switch. Trade history downloads as CSV.', 'Never use keys that can withdraw. Never use this on a shared device.']],
   consol: [['Phase', 'Consolidating = price is stuck in a range (chopping). Accumulating = quiet buying is absorbing supply inside the range. Distributing = quiet selling into strength. This is the scanner\'s 4h coin-regime read.', 'Accumulating or Distributing with pressure that is BUILDING / READY is the most useful: a breakout is being prepared.'], ['Pressure (inst.)', 'Which side big money is on and how close it is to firing: BUYING or SELLING, then GO (all conditions met), READY (one missing) or BUILDING.', 'Pressure that agrees with the phase (accumulating + BUYING, distributing + SELLING) is stronger.'], ['Verdict', 'The scanner\'s overall call for the coin, from Strong long to Strong short, plus its status and grade.', 'Wait or Avoid means the scanners do not agree yet.'], ['BSL / SSL and IRL / ERL', 'The liquidity above and below price, the entry zone inside the range and the range edges, all with prices.', 'Price often sweeps one side before leaving the range.'],
@@ -13637,7 +13653,8 @@ function t10Venues(c){
   const list = rows.map(([v, r]) => nm(v) + (ty(v) ? ' (' + ty(v) + ')' : '') + ' ' + fmtPx(px(r)) + (isNum(r.vol) ? ' · 24h ' + fmtUsd(r.vol) : '') + (isNum(r.oi) ? ' · OI ' + fmtUsd(r.oi * (px(r) || 1)) : ''));
   const ps = rows.map(([v, r]) => px(r)).filter(x => x > 0), gap = ps.length > 1 ? (Math.max(...ps) / Math.min(...ps) - 1) * 100 : null;
   let spot = ''; try { const L = instListed(c); spot = L.full.join(', '); } catch(e){}
-  return {names:rows.map(x => nm(x[0])), list, gap, spot, hl:!!vs.hyperliquid, top:rows.length ? nm(rows[0][0]) : ''};
+  const names = rows.map(x => nm(x[0])); try { if (wxHas(c.name)){ names.push('WEEX'); list.push('WEEX (perp) listed, no price feed'); } } catch(e){}
+  return {names, list, gap, spot, hl:!!vs.hyperliquid, top:rows.length ? nm(rows[0][0]) : ''};
 }
 function t10Build(){
   const mk = vcMk(), LAB = ['AVOID', 'WAIT', 'LEAN SHORT', 'STRONG SHORT', 'LEAN LONG', 'STRONG LONG'], out = [], dbg = {nv:0, nd:0, err:[]};
@@ -13685,7 +13702,7 @@ window.__elppTop10Csv = () => { try { return t10Csv().text; } catch(e){ return '
 window.__elppTop10 = () => { try { return t10Build(); } catch(e){ return {error:String(e && e.message || e)}; } };
 /* ---------- V5: step-by-step "how to use this page" for every page ---------- */
 const VIEW_HOW = {
-  weexcoins:['Open the page; the WEEX list loads by itself.','Search a coin to see if it trades on WEEX.','In any scanner, look for the small W badge next to the coin name, or tick Only coins on WEEX in Filters.'],
+  weexcoins:['Open the page; the WEEX list loads by itself.','Search a coin to see if it trades on WEEX.','In any scanner, look for WEEX in the Exchanges column, or tick Only coins on WEEX in Filters. The small green HL badge next to a coin name means it is on Hyperliquid.'],
   nowcast:['Open the page and pick a release (CPI, core CPI, payrolls or unemployment).','Boxes fill by themselves from live FRED data; the predicted values show at the top. Type in a box only to override it.','Type the consensus forecast from the economic calendar to see the surprise and the usual market reaction.','Press Save, and after the release type the actual number to build your track record.'],
   trading:['Leave Mode on Paper (practice) to learn. Pick the exchange you plan to use.','Open Settings once: set the minimum balance to keep, cross or isolated, one-way or hedge, how the amount is worked out, max leverage, R:R target and your safety limits.','Type a coin (for example BTC) or pick one from Coin\'s selection, then press Fill from scanner plan. Choose the order type: Market now, or Limit, Post-only or Stop entry to wait for a price, or Chase, Iceberg, TWAP or Scale for algorithm orders that this page runs (keep it open). Add TP2, TP3 and a trailing stop if you want them.','Check the preview: position size, leverage, margin, fees and reward after fees. Fix any warning.','Press Review and place order, read the confirmation, and confirm. In paper mode the position (or waiting order) appears below and closes by itself at the stop or target.','For a real exchange: choose Test network, create trade-only test keys, paste them under Connect, press Use for this session (or Save encrypted), then Test connection.','Place the same trade on the test network and make sure the entry, stop and take profit all appear on the exchange. Bitget, Gate and MEXC are beta, so check them extra carefully.','Only then choose LIVE, type LIVE to unlock it, and start with the smallest size. Every live order asks you to type the coin to confirm.','Use Close all or Close 50% in the positions list, Cancel on waiting orders, or the Kill switch to block all new orders. Download the trade history as CSV any time.'],
   consol:['Open the page. It lists every coin the scanner reads as consolidating, accumulating or distributing.','Use the phase buttons to look at one group, and the side filter for long or short leans.','Read Pressure and Verdict together: pressure that agrees with the phase is the better set-up.','Use BSL / SSL and IRL / ERL to see where price is likely to sweep and where the entry zone and range edges are.','Read Manipulation, Actual reclaim and Markup / Markdown to see if the hunt already happened.','Read Liquidity density and Sweep first? to see which side is likely to be swept first.','Click a coin name to open its full chart in a new tab.'],
@@ -13796,6 +13813,9 @@ const AC_RISK = [
   'This scanner prepares information. It is not financial advice and not a promise of profit.'
 ];
 const AC_VOCAB = [
+  ['PAUSE button', 'The button in the top bar. It freezes every scanner screen and stops the live feeds that can be stopped, so you can read a table without it moving. Click again to release; the screen then refreshes at once. Sorting and filters still work while paused.', 'Basics'],
+  ['HL badge', 'A small green HL next to a coin name means the coin trades on Hyperliquid (a perpetual, or a HIP-3 market). Other exchanges, including WEEX, are listed in the Exchanges and Listed on columns.', 'Hyperliquid'],
+  ['Pool strength (Thick / Medium / Thin)', 'In the chart Data window, under Scanner liquidity pools, you can show only thick pools (big, major, heavy), medium pools or thin pools, to keep the chart clean. Thick = 6 or 7 points from rank, weight and size, Medium = 4 or 5, Thin = 3.', 'Liquidity'],
   ['Liquidity density', 'How much stop liquidity sits close to price: Thick (a lot, so price is pulled toward it), Medium or Thin (little fuel). Shown with the heavier side, above (BSL) or below (SSL). The scanner estimates it from the size, type and distance of the pools on the liquidity map.', 'Liquidity'],
   ['Sweep first?', 'The scanner\'s reading of where the stop hunt goes first. Accumulating with a heavy pool below: sweep down first, then markup. Distributing with a heavy pool above: sweep up first, then markdown. Pressure building toward the heavy pool makes it more likely. A reading, not a proven rule.', 'Liquidity'],
   ['Heavy pool', 'A liquidity pool that is large for its distance: Major rank, big size or heavy weight. It is the likely target of a stop hunt.', 'Liquidity'],
@@ -14669,7 +14689,7 @@ window.__elppTaHook = {
   plan: n => { try { const c = snapshot.get(n) || snapshot.get('xyz:' + n); if (!c) return null; const q = planFor(c); return q && isNum(q.entry) ? {dir:q.dir, entry:q.entry, sl:q.sl, tp1:q.tp1, tp2:q.tp2} : null; } catch(e){ return null; } },
   watch: (n, o) => { try { if (!(snapshot.get(n) || state.coins.get(n))){ toast(n + ' is not in the scanner list, so it was starred here only'); return false; } let w = wlGet(n), fresh = false; if (!w){ w = wlAdd(n); fresh = true; } if (o && w){ if (o.side) w.side = o.side; if (o.note) w.note = (w.note ? w.note + ' | ' : '') + o.note; saveState(); } toast(fresh ? '★ ' + n + ' added to your Watchlist' + (o && o.side ? ' (' + o.side + ')' : '') : n + ' is already in your watchlist' + (o && o.note ? ' (plan note added)' : '')); if (state.view === 'watch') { try { renderWatch(); } catch(e){} } return true; } catch(e){ return false; } },
   acct: () => { try { const a = state.acct || {}; return {bal:parseNum(a.bal) || 1000, risk:parseNum(a.risk) || 1}; } catch(e){ return {bal:1000, risk:1}; } },
-  pools: n => { try { const c = snapshot.get(n) || state.coins.get(n) || snapshot.get('xyz:' + n); const pl = (c && c.m && c.m.pools) || []; return pl.filter(q => isNum(q.p)).slice(0, 40).map(q => ({p:q.p, label:[...(q.types || [])].slice(0, 2).join('/'), name:q.name || '', types:[...(q.types || [])], d:isNum(q.d) ? q.d : null, usd:q.usd || 0, rank:q.rank || 0, wall:q.wall || 0, inst:!!q.inst, side:q.side || 0})); } catch(e){ return []; } },
+  pools: n => { try { const c = snapshot.get(n) || state.coins.get(n) || snapshot.get('xyz:' + n); const pl = (c && c.m && c.m.pools) || []; return pl.filter(q => isNum(q.p)).slice(0, 40).map(q => ({p:q.p, label:[...(q.types || [])].slice(0, 2).join('/'), name:q.name || '', types:[...(q.types || [])], d:isNum(q.d) ? q.d : null, usd:q.usd || 0, rank:q.rank || 0, wall:q.wall || 0, inst:!!q.inst, side:q.side || 0, weight:q.weight || 0, size:q.size || 0, tier:(q.weight || q.size || q.rank) ? poolTier(q) : ''})); } catch(e){ return []; } },
   liqt: () => LIQT,
   history: n => { try { const out = [], N = String(n).toUpperCase(); (SIG.list || []).forEach(s => { if (String(s.name).toUpperCase() !== N || !isNum(s.entry) || !s.t) return; out.push({kind:'signal', dir:s.dir === 'short' || s.dir === -1 ? 'short' : 'long', t:s.t, entry:s.entry, tEnd:s.tEnd || null, exit:isNum(s.pxEnd) ? s.pxEnd : null, r:isNum(s.r) ? s.r : null, st:s.status || ''}); }); try { jrLoad(); (JR.trades || []).forEach(t => { const co = String(t.coin || '').toUpperCase().replace(/(USDT|USD|-PERP)$/, ''); if (co !== N || !isNum(t.entry) || !t.open) return; const lg = !/short|sell/i.test(String(t.side)); const R = isNum(t.exit) && isNum(t.sl) && t.sl !== t.entry ? ((lg ? t.exit - t.entry : t.entry - t.exit) / Math.abs(t.entry - t.sl)) : null; out.push({kind:'journal', dir:lg ? 'long' : 'short', t:t.open, entry:t.entry, tEnd:t.close || null, exit:isNum(t.exit) ? t.exit : null, r:R, st:t.status || ''}); }); } catch(e){} return out.slice(-80); } catch(e){ return []; } },
   events: n => { try { const out = [], N = String(n).toUpperCase(); (X.news || []).forEach(a => { if (a && a.t && (a.coins || []).map(x => String(x).toUpperCase()).includes(N)) out.push({kind:'news', t:a.t, title:a.title, url:a.url}); }); const e = X.dropIdx && X.dropIdx.get(N); if (e){ [['air', 'airdrop'], ['unl', 'unlock'], ['hyp', 'listing']].forEach(([k, lab]) => (e[k] || []).forEach(d => { if (d && d.t) out.push({kind:k, t:d.t, title:lab + ': ' + (d.name || N) + (d.usd ? ' · $' + Math.round(d.usd).toLocaleString() : '') + (d.pct ? ' · ' + (+d.pct).toFixed(1) + '% supply' : ''), url:d.url}); })); } return out.sort((a, b) => a.t - b.t).slice(-60); } catch(e){ return []; } },
@@ -14765,7 +14785,7 @@ const LI_T = {
   OKP:['OKX perp', 'OKX perpetual', 'CEX'], OKS:['OKX spot', 'OKX spot', 'CEX'], BGP:['Bitget perp', 'Bitget perpetual', 'CEX'], BGS:['Bitget spot', 'Bitget spot', 'CEX'],
   GTP:['Gate perp', 'Gate perpetual', 'CEX'], GTS:['Gate spot', 'Gate spot', 'CEX'], MXP:['MEXC perp', 'MEXC perpetual', 'CEX'], MXS:['MEXC spot', 'MEXC spot', 'CEX'],
   CB:['Coinbase', 'Coinbase spot', 'CEX'], KR:['Kraken', 'Kraken spot', 'CEX'], KC:['KuCoin', 'KuCoin spot', 'CEX'], UP:['Upbit', 'Upbit spot (Korea)', 'CEX'],
-  DY:['dYdX perp', 'dYdX perpetual', 'DEX'], MET:['Meteora', 'Meteora DEX pool on Solana', 'DEX']
+  DY:['dYdX perp', 'dYdX perpetual', 'DEX'], WX:['WEEX perp', 'WEEX futures (perpetual)', 'CEX'], MET:['Meteora', 'Meteora DEX pool on Solana', 'DEX']
 };
 const LI_ORDER = Object.keys(LI_T);
 const LI_SRC = [
@@ -14829,8 +14849,8 @@ function liIndex(){
   LI.idx = m; LI.idxAt = Date.now(); return m;
 }
 function liTags(name){
-  const k = isHip3(name) ? name : liSym(normSym(name)), s = liIndex().get(k); if (!s) return [];
-  return LI_ORDER.filter(t => s.has(t));
+  const k = isHip3(name) ? name : liSym(normSym(name)), s = liIndex().get(k); if (!s){ try { return wxHas(name) ? ['WX'] : []; } catch(e){ return []; } }
+  const r = LI_ORDER.filter(t => s.has(t)); try { if (wxHas(name)) r.push('WX'); } catch(e){} return r;
 }
 /* a native Hyperliquid perp that no other exchange lists yet: a pre-launch (hyperp) style market. Only said when enough exchange lists have loaded. */
 function liPre(name){
@@ -15934,7 +15954,6 @@ function bindToolbar(){
   $('onlyWeex').addEventListener('change', e => { state.onlyWeex = e.target.checked; saveState(); requestRender(); });
   $('minShow').addEventListener('change', e => { const v = Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0)); state.minShow = v; e.target.value = v; saveState(); requestRender(); });
   $('search').addEventListener('input', e => { state.search = e.target.value; saveState(); requestRender(); });
-  $('btnPause').addEventListener('click', () => { state.paused = !state.paused; $('btnPause').textContent = state.paused ? 'Resume' : 'Pause'; requestRender(); });
   $('btnRefresh').addEventListener('click', () => { for (const c of state.coins.values()) c.fetchedAt = 0; ctxTick(); toast('Refreshing all coins'); });
   $('btnPanel').addEventListener('click', () => { state.panelOpen = !state.panelOpen; $('wrap').classList.toggle('nofilters', !state.panelOpen); saveState(); });
   $('btnTheme').addEventListener('click', () => {
@@ -16996,7 +17015,7 @@ function cmpMenu(c, btn){
 const XDFT = {pools:1, hist:1, evt:1};
 const xOn = (p, k) => p.x && k in p.x ? !!p.x[k] : !!XDFT[k];
 const plKey = q => (q.name || q.label) + '|' + (+q.p).toPrecision(5);
-function plShow(p, q){ const o = p.pl || {}, ty = q.types || []; if (o.t && ty.length && ty.every(t => o.t[t] === false)) return false; if (o.h && o.h[plKey(q)]) return false; return true; }
+function plShow(p, q){ const o = p.pl || {}, ty = q.types || []; if (o.tiers && q.tier && o.tiers[q.tier] === false) return false; if (o.t && ty.length && ty.every(t => o.t[t] === false)) return false; if (o.h && o.h[plKey(q)]) return false; return true; }
 function bnSymOf(f){ if (f.src && f.src.src === 'bn') return f.src.s; const v = venSyms('bn', f.sym)[0]; return v ? v[1] : null; }
 const AUXP = {'5m':1, '15m':1, '30m':1, '1h':1, '2h':1, '4h':1, '1d':1};
 const auxPeriod = tf => AUXP[tf] ? tf : (TFSEC[tf] < 300 ? '5m' : '1d');
@@ -17069,19 +17088,21 @@ function dataMenu(c, btn){
   const plBlock = () => {
     const pls = (() => { try { return (HOOK().pools(p.sym) || []).slice().sort((a, b) => b.p - a.p); } catch(e){ return []; } })(), LQ = (() => { try { return HOOK().liqt() || {}; } catch(e){ return {}; } })(), o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.h = o.h || {};
     if (!pls.length) return '<p class="hint" style="margin:6px 0">No scanner pools for ' + esc(p.sym) + ' yet.</p>';
-    const fp = v => v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v.toPrecision(4), cats = {}; for (const q of pls) for (const t of q.types) cats[t] = (cats[t] || 0) + 1;
+    const fp = v => v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v.toPrecision(4), cats = {}, tc = {}; for (const q of pls){ for (const t of q.types) cats[t] = (cats[t] || 0) + 1; if (q.tier) tc[q.tier] = (tc[q.tier] || 0) + 1; }
     const nOn = pls.filter(q => plShow(p, q)).length, dis = !xOn(p, 'pools') ? ' style="opacity:.5"' : '';
     return '<div' + dis + ' style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Choose which liquidity pools to show</b> <span style="color:var(--muted)">(' + nOn + ' of ' + pls.length + ' shown)</span>'
       + '<div class="row" style="gap:4px;margin:4px 0;flex-wrap:wrap"><button class="ta-b" data-pq="all">All</button><button class="ta-b" data-pq="none">None</button><button class="ta-b" data-pq="above">Above price</button><button class="ta-b" data-pq="below">Below price</button><button class="ta-b" data-pq="inst">Institutional only</button></div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY STRENGTH (thick = big, major, heavy pools; thin = small, minor ones)</div><div style="display:flex;flex-wrap:wrap;gap:2px 12px">' + ['thick', 'medium', 'thin'].map(t => '<label style="font-size:11px"><input type="checkbox" data-ptier="' + t + '"' + (o.tiers && o.tiers[t] === false ? '' : ' checked') + '> <b>' + t[0].toUpperCase() + t.slice(1) + '</b> <span style="color:var(--muted)">' + (tc[t] || 0) + '</span></label>').join('') + '</div>'
       + '<div style="font-size:10px;color:var(--muted);margin-top:4px">BY TYPE</div><div style="display:flex;flex-wrap:wrap;gap:2px 10px">' + Object.keys(cats).sort((a, b) => a - b).map(t => '<label style="font-size:11px"><input type="checkbox" data-pt="' + t + '"' + (o.t[t] === false ? '' : ' checked') + '> ' + esc(LQ[t] || ('Type ' + t)) + ' <span style="color:var(--muted)">' + cats[t] + '</span></label>').join('') + '</div>'
-      + '<div style="font-size:10px;color:var(--muted);margin-top:6px">EACH POOL (highest price first)</div><div style="max-height:220px;overflow:auto">' + pls.map(q => '<label style="display:flex;gap:6px;align-items:baseline;font-size:11px;padding:1px 0"><input type="checkbox" data-pk="' + esc(plKey(q)) + '"' + (plShow(p, q) ? ' checked' : '') + '> <span style="font-family:var(--mono)">' + fp(q.p) + '</span> <b>' + esc(q.name || ('pool ' + q.label)) + '</b> <span style="color:var(--muted)">' + (Number.isFinite(q.d) ? (q.d > 0 ? '+' : '') + q.d.toFixed(2) + '%' : '') + (q.usd ? ' · $' + fmtV(q.usd) : '') + (q.inst ? ' · institutional' : '') + '</span></label>').join('') + '</div></div>';
+      + '<div style="font-size:10px;color:var(--muted);margin-top:6px">EACH POOL (highest price first)</div><div style="max-height:220px;overflow:auto">' + pls.map(q => '<label style="display:flex;gap:6px;align-items:baseline;font-size:11px;padding:1px 0"><input type="checkbox" data-pk="' + esc(plKey(q)) + '"' + (plShow(p, q) ? ' checked' : '') + '> <span style="font-family:var(--mono)">' + fp(q.p) + '</span> <b>' + esc(q.name || ('pool ' + q.label)) + '</b> <span style="color:var(--muted)">' + (Number.isFinite(q.d) ? (q.d > 0 ? '+' : '') + q.d.toFixed(2) + '%' : '') + (q.usd ? ' · $' + fmtV(q.usd) : '') + (q.inst ? ' · institutional' : '') + (q.tier ? ' · ' + q.tier : '') + '</span></label>').join('') + '</div></div>';
   };
   openPop(btn, html, pp => {
     const plBox = pp.querySelector('.ta-pl'); if (plBox) plBox.innerHTML = plBlock();
-    pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {};
+    pp.addEventListener('click', e => { const b = e.target.closest('[data-pq]'); if (!b) return; const o = p.pl = p.pl || {t:{}, h:{}}, pls = (() => { try { return HOOK().pools(p.sym) || []; } catch(e){ return []; } })(); o.t = {}; o.h = {}; o.tiers = {};
       for (const q of pls){ const a = b.dataset.pq, keep = a === 'all' ? true : a === 'none' ? false : a === 'above' ? q.side === 1 : a === 'below' ? q.side === 2 : !!q.inst; if (!keep) o.h[plKey(q)] = true; }
       save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); });
-    pp.addEventListener('change', e => { if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
+    pp.addEventListener('change', e => { if (e.target.dataset.ptier != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.tiers = o.tiers || {}; o.tiers[e.target.dataset.ptier] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
+      if (e.target.dataset.pt != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.t = o.t || {}; o.t[e.target.dataset.pt] = e.target.checked; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; }
       if (e.target.dataset.pk != null){ const o = p.pl = p.pl || {t:{}, h:{}}; o.h = o.h || {}; if (e.target.checked) delete o.h[e.target.dataset.pk]; else o.h[e.target.dataset.pk] = true; save(); c.dirty = true; if (plBox) plBox.innerHTML = plBlock(); return; } });
     pp.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; p.x[k] = e.target.checked; if (k === 'walls') c.walls = null; save(); c.dirty = true; if (k === 'pools' && plBox) plBox.innerHTML = plBlock(); });
     pp.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; if (b.dataset.i === 'rs' && !p.cmp){ toastX('Turn on Compare first, then add Relative strength.'); return; } addInd(c, b.dataset.i); refresh(c); b.style.opacity = '.5'; toastX('Added ' + IND[b.dataset.i].n); });
