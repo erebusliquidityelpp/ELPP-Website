@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.42</title>
+<title>ELPP CRYPTO SCANNER PRO V9.43</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -835,7 +835,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.42</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.43</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -11012,7 +11012,7 @@ function consHtml(){
   const head = '<tr><th style="text-align:left">Coin</th>' + th('phase', 'Phase', 'Consolidating, accumulating or distributing, from the 4h coin-regime read') + CONS_COLS.map(id => { const c = R.cols.get(id); return c ? th(id, id === 'pPress' ? 'Pressure' : id === 'pressTh' ? 'Buy/sell %' : c.label, c.tip || c.label) : ''; }).join('') + CONS_X.map(x => '<th title="' + esc(x[1]) + '">' + esc(x[0]) + '</th>').join('') + '</tr>';
   const body = R.rows.slice(0, 200).map(c => {
     const ph = CONS_PH[c.m.regime], rp = c.m.rangePos && isNum(c.m.rangePos['4h']) ? c.m.rangePos['4h'] : null;
-    let tds = '<td style="text-align:left"><a href="#" class="cnl" data-chart="' + esc(c.name) + '" title="Open the chart in a new tab"><b>' + esc(c.name) + '</b></a> ' + (typeof liMini === 'function' ? '' : '') + '</td>' +
+    let tds = '<td style="text-align:left"><a href="#" class="cnl" data-chart="' + esc(c.name) + '" title="Open the chart in a new tab"><b>' + esc(c.name) + '</b></a> <button class="cp wl' + (wlGet(c.name) ? ' on' : '') + '" type="button" data-wl="' + esc(c.name) + '" title="' + (wlGet(c.name) ? 'Watching: edit alerts' : 'Add to watchlist and set alerts') + '">' + (wlGet(c.name) ? '★' : '☆') + '</button></td>' +
       '<td class="' + ph[1] + '"><b>' + ph[0] + '</b>' + (rp != null ? '<br><small class="dim">4h range: ' + (rp <= 40 ? 'discount' : rp >= 60 ? 'premium' : 'middle') + ' (' + Math.round(rp) + '%)</small>' : '') + '</td>';
     for (const id of CONS_COLS){ const col = R.cols.get(id); if (!col) continue; let r; try { r = col.cell(c); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
     for (const x of CONS_X){ let r; try { r = x[2](c, R.cols); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
@@ -11025,7 +11025,7 @@ function consRender(force){
   const el = $('viewCons'); if (!el) return;
   if (force !== true && el._b && (Date.now() - (CONS.scrAt || 0) < 2000 || Date.now() - (CONS.drawAt || 0) < 4000)) return;
   if (!el._b){ el._b = 1; el.addEventListener('scroll', () => { CONS.scrAt = Date.now(); }, true); el.innerHTML = '<div class="nsec"><h3>Consolidating coins: accumulating / distributing</h3><p class="hint">Every coin the scanner reads as <b>consolidating</b> (stuck in a range), <b>accumulating</b> (quiet buying inside the range) or <b>distributing</b> (quiet selling into strength), with institutional pressure, the overall verdict, the exchanges that list it, and the liquidity above and below (BSL / SSL) and the entry zone and range edges (IRL / ERL) with prices. Pressure that agrees with the phase is the better set-up; a breakout from the range often follows a sweep of one side. Educational, not financial advice.</p><div id="consWrap"></div></div>';
-    el.addEventListener('click', e => { const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(true); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(true); } });
+    el.addEventListener('click', e => { const wb = e.target.closest('[data-wl]'); if (wb){ e.preventDefault(); wlRowClick(wb.dataset.wl); consRender(true); { const d = $('wlDlg'); if (d) d.addEventListener('close', () => consRender(true), {once:true}); } return; } const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(true); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(true); } });
     el.addEventListener('toggle', e => { if (e.target && e.target.id === 'lqtBox') LQT.open = e.target.open; }, true);
     el.addEventListener('click', e => { if (e.target.closest('[data-lqtclear]') && confirm('Delete the saved Sweep first? check log in this browser?')){ lqtSave([]); consRender(true); } });
     el.addEventListener('change', e => { if (e.target.id === 'consSide'){ CONS.side = e.target.value; consRender(true); } });
@@ -11710,6 +11710,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.43: star (watchlist) button on every coin in Consolidating coins ===== */
 /* ===== V9.42: order-book walls Thick / Medium / Thin for bid and ask ===== */
 /* ===== V9.41: chart Data window always shows the Thick / Medium / Thin boxes ===== */
 /* ===== V9.40: Hyperliquid account includes free spot USDC (Available to Trade) ===== */
