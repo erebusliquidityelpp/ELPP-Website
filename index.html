@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.32</title>
+<title>ELPP CRYPTO SCANNER PRO V9.33</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -833,7 +833,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.32</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.33</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
   </div>
   <div class="chips">
@@ -10906,6 +10906,34 @@ const CONS_X = [
     return out.length ? [out.join(''), '', 'text-align:left;white-space:normal;min-width:190px'] : ['not reclaimed', 'dim'];
   }]
 ];
+function consDens(c){
+  const pl = (c.m.pools || []).filter(q => isNum(q.p) && isNum(q.d)), px = c.m.px; if (!pl.length) return null;
+  const pts = q => ((q.rank === 2 ? 2 : 1) + (q.weight === 2 ? 2 : 1) + (q.size || 1)), df = d => { d = Math.abs(d); return d <= 1 ? 1 : d <= 3 ? 0.8 : d <= 6 ? 0.5 : d <= 10 ? 0.25 : 0; };
+  const side = sd => { let t = 0, best = null; for (const q of pl){ if (q.side !== sd) continue; const v = pts(q) * df(q.d); t += v; if (!best || v > best.v) best = {v, q}; } return {t, best}; };
+  const up = side(1), dn = side(2), tot = up.t + dn.t;
+  const lvl = tot >= 8 ? 'Thick' : tot >= 4 ? 'Medium' : 'Thin';
+  const hv = up.t >= dn.t * 1.4 && up.t > 0 ? 1 : dn.t >= up.t * 1.4 && dn.t > 0 ? 2 : 0;
+  return {lvl, tot, up, dn, hv};
+}
+CONS_X.push(['Liquidity density', 'Thick / Medium / Thin: how much stop liquidity sits close to price, from pool size, rank and distance (pools beyond 10% are ignored). Also shows which side is heavier. An estimate from the liquidity map.', c => {
+  const d = consDens(c); if (!d) return ['—', 'dim'];
+  const cl = d.lvl === 'Thick' ? 'warn' : d.lvl === 'Thin' ? 'dim' : '';
+  return ['<div class="' + cl + '"><b>' + d.lvl + '</b> <small class="dim">(' + d.tot.toFixed(1) + ')</small></div><div><small>' + (d.hv === 1 ? 'Heavier above (BSL)' : d.hv === 2 ? 'Heavier below (SSL)' : 'Balanced both sides') + '</small></div>', '', 'text-align:left;white-space:nowrap'];
+}]);
+CONS_X.push(['Sweep first?', 'Where the stop hunt is likely to go first, from the phase, the heavier pool side and the 1h buy/sell pressure. A reading of the setup, not a proven rule.', c => {
+  const d = consDens(c); if (!d || d.lvl === 'Thin' && !d.hv) return ['Less fuel: clean move less likely', 'dim', 'white-space:normal;min-width:170px'];
+  const ph = c.m.regime, pr = (c.m.pressure || {})['1h'], th = (typeof PR_T !== 'undefined' && PR_T.note) || 10;
+  const buy = isNum(pr) && pr >= th, sell = isNum(pr) && pr <= -th, bs = d.hv === 1 ? 'up' : d.hv === 2 ? 'down' : '';
+  let t, cl = '';
+  if (!bs){ t = 'Both sides similar: either side can be hunted'; cl = 'dim'; }
+  else if (ph === 1 && bs === 'down'){ t = '▼ Sweep down first, then markup'; cl = 'up'; }
+  else if (ph === 2 && bs === 'up'){ t = '▲ Sweep up first, then markdown'; cl = 'dn'; }
+  else if (ph === 1 && bs === 'up'){ t = '▲ Heavy pool above: markup may run straight to it'; cl = 'up'; }
+  else if (ph === 2 && bs === 'down'){ t = '▼ Heavy pool below: markdown may run straight to it'; cl = 'dn'; }
+  else { t = (bs === 'up' ? '▲ Likely hunts the highs first' : '▼ Likely hunts the lows first'); }
+  const pn = bs && ((bs === 'up' && buy) || (bs === 'down' && sell)) ? '<div class="up"><small>✔ pressure is building toward it</small></div>' : bs && ((bs === 'up' && sell) || (bs === 'down' && buy)) ? '<div class="dim"><small>pressure points the other way</small></div>' : '';
+  return ['<div class="' + cl + '">' + t + '</div>' + pn, '', 'white-space:normal;min-width:190px;text-align:left'];
+}]);
 function consRows(){
   const D = psData(false), cols = psCols(), el = c => D.E.get(c.name) || {};
   let rows = D.live.filter(c => isNum(c.m.regime) && CONS_PH[c.m.regime]); const counts = {all: rows.length, 0: 0, 1: 0, 2: 0}; rows.forEach(c => { counts[c.m.regime]++; });
@@ -10931,18 +10959,20 @@ function consHtml(){
     for (const x of CONS_X){ let r; try { r = x[2](c, R.cols); } catch(e){ r = ['—', 'dim']; } r = r || ['—', 'dim']; tds += '<td class="' + (r[1] || '') + '"' + (r[2] ? ' style="' + esc(r[2]) + '"' : '') + '>' + r[0] + '</td>'; }
     return '<tr>' + tds + '</tr>';
   }).join('');
-  return bar + (R.rows.length ? '<div style="overflow:auto"><table class="pst" style="width:100%"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' + (R.rows.length > 200 ? '<p class="hint">Showing the first 200 of ' + R.rows.length + '. Use the filters to narrow it.</p>' : '') : '<p class="hint">' + (R.D.live.length ? 'No coin matches these filters right now.' : 'Reading every scanner… the list appears as soon as the first coins have data.') + '</p>') +
+  return bar + (R.rows.length ? '<div id="consScroll" style="overflow:auto"><table class="pst" style="width:100%"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' + (R.rows.length > 200 ? '<p class="hint">Showing the first 200 of ' + R.rows.length + '. Use the filters to narrow it.</p>' : '') : '<p class="hint">' + (R.D.live.length ? 'No coin matches these filters right now.' : 'Reading every scanner… the list appears as soon as the first coins have data.') + '</p>') +
     '<p class="hint">' + R.D.live.length + ' coins scanned (the top 250 by 24h volume across all venues). ' + R.counts.all + ' are consolidating, accumulating or distributing right now.</p>';
 }
-function consRender(){
+function consRender(force){
   const el = $('viewCons'); if (!el) return;
-  if (!el._b){ el._b = 1; el.innerHTML = '<div class="nsec"><h3>Consolidating coins: accumulating / distributing</h3><p class="hint">Every coin the scanner reads as <b>consolidating</b> (stuck in a range), <b>accumulating</b> (quiet buying inside the range) or <b>distributing</b> (quiet selling into strength), with institutional pressure, the overall verdict, the exchanges that list it, and the liquidity above and below (BSL / SSL) and the entry zone and range edges (IRL / ERL) with prices. Pressure that agrees with the phase is the better set-up; a breakout from the range often follows a sweep of one side. Educational, not financial advice.</p><div id="consWrap"></div></div>';
-    el.addEventListener('click', e => { const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(); } });
-    el.addEventListener('change', e => { if (e.target.id === 'consSide'){ CONS.side = e.target.value; consRender(); } });
-    el.addEventListener('input', e => { if (e.target.id === 'consQ'){ CONS.q = e.target.value; const pos = e.target.selectionStart; consRender(); const q = $('consQ'); if (q){ q.focus(); try { q.setSelectionRange(pos, pos); } catch(x){} } } });
+  if (force !== true && el._b && (Date.now() - (CONS.scrAt || 0) < 2000 || Date.now() - (CONS.drawAt || 0) < 4000)) return;
+  if (!el._b){ el._b = 1; el.addEventListener('scroll', () => { CONS.scrAt = Date.now(); }, true); el.innerHTML = '<div class="nsec"><h3>Consolidating coins: accumulating / distributing</h3><p class="hint">Every coin the scanner reads as <b>consolidating</b> (stuck in a range), <b>accumulating</b> (quiet buying inside the range) or <b>distributing</b> (quiet selling into strength), with institutional pressure, the overall verdict, the exchanges that list it, and the liquidity above and below (BSL / SSL) and the entry zone and range edges (IRL / ERL) with prices. Pressure that agrees with the phase is the better set-up; a breakout from the range often follows a sweep of one side. Educational, not financial advice.</p><div id="consWrap"></div></div>';
+    el.addEventListener('click', e => { const b = e.target.closest('[data-cph]'); if (b){ CONS.ph = b.dataset.cph; consRender(true); return; } const t = e.target.closest('[data-consort]'); if (t){ const id = t.dataset.consort; CONS.sort = CONS.sort.id === id ? {id, dir: -CONS.sort.dir} : {id, dir: id === 'phase' ? 1 : -1}; consRender(true); } });
+    el.addEventListener('change', e => { if (e.target.id === 'consSide'){ CONS.side = e.target.value; consRender(true); } });
+    el.addEventListener('input', e => { if (e.target.id === 'consQ'){ CONS.q = e.target.value; const pos = e.target.selectionStart; consRender(true); const q = $('consQ'); if (q){ q.focus(); try { q.setSelectionRange(pos, pos); } catch(x){} } } });
   }
   let h = ''; try { h = consHtml(); } catch(e){ console.error(e); h = '<p class="hint warn">Could not build the list: ' + esc(errTxt(e)) + '</p>'; }
-  const w = $('consWrap'); if (w && w._h !== h){ w.innerHTML = h; w._h = h; }
+  const w = $('consWrap'); if (w && w._h !== h){ const sc = $('consScroll'), sl = sc ? sc.scrollLeft : 0, st = sc ? sc.scrollTop : 0, py = window.scrollY; w.innerHTML = h; w._h = h; const n2 = $('consScroll'); if (n2){ n2.scrollLeft = sl; n2.scrollTop = st; } if (window.scrollY !== py) window.scrollTo(window.scrollX, py); }
+  CONS.drawAt = Date.now();
   setTimeout(() => { try { ictFeed(); } catch(e){} }, 400);
 }
 setInterval(() => { try { if (state.view === 'consol') consRender(); } catch(e){} }, 15000);
