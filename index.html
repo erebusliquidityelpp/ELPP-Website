@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.56</title>
+<title>ELPP CRYPTO SCANNER PRO V9.57</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -249,6 +249,7 @@ label.tg{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size
 .side{position:sticky;top:12px;max-height:calc(100dvh - 24px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px}
 .side h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 6px 4px;font-weight:600}
 .side .nv{display:block;text-align:left;width:100%;background:none;border:0;color:var(--fg);padding:7px 9px;border-radius:6px;cursor:pointer;font:inherit;font-size:13px}
+.ci-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}.ci-g>div{min-width:0}@media(max-width:1100px){.ci-g{grid-template-columns:1fr}}.ci-t td,.ci-t th{padding:3px 7px}.ci-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:8px 0 4px}.ci-bar>div{height:100%}
 .side .nv .nvs{display:block;font-size:10.5px;opacity:.65;font-weight:400}
 .side .nv:hover{background:var(--surface2)}
 .side .nv.on{background:var(--accent);color:var(--accent-fg);font-weight:500}
@@ -845,7 +846,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.56</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.57</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -3786,6 +3787,7 @@ function rankUniverse(){
   const all = [...state.coins.values()].filter(c => c.ctx && isNum(c.ctx.dayVol)).sort((a,b) => b.ctx.dayVol - a.ctx.dayVol);
   state.rank = all;
   const u = new Set(all.slice(0, state.topN).map(c => c.name)); u.add('BTC');
+  (state.ciPin || []).forEach(n => { if (state.coins.has(n)) u.add(n); });
   state.universe = u;
 }
 function parseCandles(arr){
@@ -15080,42 +15082,46 @@ function ciCollect(c){
   return out;
 }
 function ciVotes(c, D){
-  const m = c.m || {}, V = [], put = (src, dir, txt, w) => V.push({src, dir, txt, w:w || 1});
-  try { if (isNum(m.verdict)) put('Scanner verdict (every perp and spot table)', m.verdict >= 4 ? 1 : (m.verdict === 2 || m.verdict === 3) ? -1 : 0, VERDICT_LAB[m.verdict] + (isNum(m.verdictScore) ? ' (' + (m.verdictScore > 0 ? '+' : '') + m.verdictScore + ')' : ''), (m.verdict === 5 || m.verdict === 3) ? 1.5 : 1); } catch(e){}
-  try { const E = D && D.E.get(c.name); if (E) put('Power Scanner (Conviction Engine)', E.dir === 'long' ? 1 : E.dir === 'short' ? -1 : 0, (PS_TAG[E.tag] ? PS_TAG[E.tag][0] : 'no set-up') + (isNum(E.rank) ? ' · rank ' + Math.round(E.rank) : '') + (E.grade ? ' · grade ' + E.grade : ''), 1.5); } catch(e){}
-  try { const ir = ICTS.data.get(c.name); if (ir && ir.ok !== false && ir.label) put('SMC/ICT (Smart Money Structure Terminal)', ir.dir > 0 ? 1 : ir.dir < 0 ? -1 : 0, ir.label + (isNum(ir.score) ? ' · score ' + ir.score : ''), 1.5); } catch(e){}
-  for (const hz of ['4h', '12h']){ try { const p = prCalc(c, hz); put('Prediction Radar (Forward Probability Desk), ' + hz, p.dir, p.pUp + '% chance up · net ' + Math.round(p.net)); } catch(e){} }
-  try { const rd = instRow(c, 'perp'), S = rd.setup || {}; put('Institutional Flow Radar (derivatives)', rd.fin && rd.fin.final ? (rd.fin.final === 'long' ? 1 : -1) : (S.dir || 0), (rd.fin && rd.fin.text ? rd.fin.text : '') + (rd.sc && isNum(rd.sc.score) ? ' · score ' + rd.sc.score : '')); } catch(e){}
-  try { const x = tmwCoin(c, D, 0); if (x) put('Next-Session Briefing (Tomorrow)', x.side > 0 ? 1 : x.side < 0 ? -1 : 0, (x.tier || '') + (isNum(x.score) ? ' · score ' + x.score : '')); } catch(e){}
+  const m = c.m || {}, V = [], put = (src, dir, txt, sv, w) => V.push({src, dir, txt, sv: isNum(sv) ? Math.max(-100, Math.min(100, sv)) : null, w: w || 1});
+  try { if (isNum(m.verdict)){ const code = m.verdict, base = {5:85, 4:50, 3:-85, 2:-50}[code] || 0; put('Scanner verdict (every perp and spot table)', code >= 4 ? 1 : (code === 2 || code === 3) ? -1 : 0, VERDICT_LAB[code] + (isNum(m.verdictScore) ? ' (' + (m.verdictScore > 0 ? '+' : '') + m.verdictScore + ')' : ''), base, 1.2); } } catch(e){}
+  try { const E = D && D.E.get(c.name); if (E){ const r = isNum(E.rank) ? E.rank : (isNum(E.rank0) ? E.rank0 : null), d = E.dir === 'long' ? 1 : E.dir === 'short' ? -1 : 0; put('Power Scanner (Conviction Engine)', d, (PS_TAG[E.tag] ? PS_TAG[E.tag][0] : 'no set-up') + (r != null ? ' · rank ' + Math.round(r) : '') + (E.grade ? ' · grade ' + E.grade : ''), d && r != null ? d * Math.max(0, Math.min(100, r)) : 0, 1.5); } } catch(e){}
+  try { const ir = ICTS.data.get(c.name); if (ir && ir.ok !== false && ir.label){ const d = ir.dir > 0 ? 1 : ir.dir < 0 ? -1 : 0; put('SMC/ICT (Smart Money Structure Terminal)', d, ir.label + (isNum(ir.score) ? ' · score ' + ir.score : ''), d && isNum(ir.score) ? d * ir.score : 0, 1.5); } } catch(e){}
+  for (const hz of ['4h', '12h']){ try { const p = prCalc(c, hz); put('Prediction Radar (Forward Probability Desk), ' + hz, p.dir, p.pUp + '% chance up · net ' + Math.round(p.net), (p.pUp - 50) * 2, 1); } catch(e){} }
+  try { const rd = instRow(c, 'perp'), S = rd.setup || {}, d = rd.fin && rd.fin.final ? (rd.fin.final === 'long' ? 1 : -1) : (S.dir || 0); put('Institutional Flow Radar (derivatives)', d, (rd.fin && rd.fin.text ? rd.fin.text : '') + (rd.sc && isNum(rd.sc.score) ? ' · score ' + rd.sc.score : ''), d && rd.sc && isNum(rd.sc.score) ? d * rd.sc.score : 0, 1.2); } catch(e){}
+  try { const x = tmwCoin(c, D, 0); if (x){ const d = x.side > 0 ? 1 : x.side < 0 ? -1 : 0; put('Next-Session Briefing (Tomorrow)', d, (x.tier || '') + (isNum(x.score) ? ' · score ' + x.score : ''), d && isNum(x.score) ? d * x.score : 0, 1); } } catch(e){}
   return V;
 }
 function ciVerdictHtml(c, D){
-  const V = ciVotes(c, D), m = c.m || {}; let net = 0, w = 0; V.forEach(v => { net += v.dir * v.w; w += v.w; });
-  const act = V.filter(v => v.dir !== 0), dir = net > 0.5 ? 1 : net < -0.5 ? -1 : 0, agree = act.filter(v => v.dir === dir).length;
+  const V = ciVotes(c, D), m = c.m || {}; let num = 0, den = 0; V.forEach(v => { if (v.sv != null){ num += v.sv * v.w; den += v.w; } });
+  const S = den ? num / den : 0, L = Math.round(50 + S / 2), Sh = 100 - L, act = V.filter(v => v.dir !== 0), dir = S >= 8 ? 1 : S <= -8 ? -1 : 0, agree = act.filter(v => v.dir === dir).length;
   const lab = dir > 0 ? 'LONG' : dir < 0 ? 'SHORT' : 'NO CLEAR SIDE', k = dir > 0 ? 'up' : dir < 0 ? 'dn' : 'warn';
-  const str = !dir ? 'The scanners do not agree. Stay out or wait.' : agree === act.length && act.length >= 4 ? 'Strong agreement: every active scanner is on the same side.' : agree / Math.max(1, act.length) >= 0.7 ? 'Good agreement.' : 'Mixed: the side is only slightly ahead. Wait for confirmation.';
+  const str = !den ? 'No scanner has produced a reading yet. The data is still loading.' : !dir ? 'The scanners do not agree. Stay out or wait.' : Math.abs(S) >= 45 ? 'Strong lean.' : Math.abs(S) >= 25 ? 'Clear lean, wait for the entry trigger.' : 'Slight lean only. Wait for confirmation.';
   const px = isNum(m.px) ? fmtPx(m.px) : '—', pl = (() => { try { return planFor(c); } catch(e){ return null; } })();
   const caut = []; try {
-    if (act.length && agree < act.length && dir) caut.push('Not every scanner agrees (' + agree + ' of ' + act.length + ').');
+    if (act.length && dir && agree < act.length) caut.push('Not every scanner agrees (' + agree + ' of ' + act.length + ').');
     if (isNum(m.liqUsd) && m.liqUsd < 3e5) caut.push('Thin liquidity: stops and slippage can be bigger than planned.');
     if (isNum(m.eventMin) && m.eventMin >= 0 && m.eventMin < 90) caut.push('A major macro event is about ' + Math.round(m.eventMin) + ' minutes away.');
     if ((m.newsTags || []).includes('Risk')) caut.push('A risk headline is linked to this coin (hack, delisting or similar).');
     const ir = ICTS.data.get(c.name); if (ir && ir.stage === 'LATE') caut.push('The SMC/ICT scanner says the move is already late.');
     if (isNum(m.fdvRatio) && m.fdvRatio >= 2.5) caut.push('Large unlock overhang: more supply is still to come.');
-    if (!ir || ir.ok === false) caut.push('The SMC/ICT scan for this coin has not finished, so its vote is missing.');
+    if (!ir || ir.ok === false) caut.push('The SMC/ICT scan has not finished, so its vote is missing.');
   } catch(e){}
-  const rows = V.map(v => `<tr><td style="text-align:left"><b>${esc(v.src)}</b></td><td class="${v.dir > 0 ? 'up' : v.dir < 0 ? 'dn' : 'dim'}"><b>${v.dir > 0 ? 'LONG' : v.dir < 0 ? 'SHORT' : 'NEUTRAL'}</b></td><td style="text-align:left">${esc(v.txt)}</td></tr>`).join('');
-  return `<div class="ci-v"><div class="row" style="gap:14px;align-items:baseline;flex-wrap:wrap"><b style="font-size:1.3em">${esc(c.name)}</b><span>${px}</span><span class="${k}" style="font-size:1.2em"><b>${lab}</b></span><span class="hint">${act.length ? agree + ' of ' + act.length + ' scanners agree' : 'no scanner has a side yet'}</span></div><p class="hint" style="margin:4px 0">${esc(str)}</p>
-    <div style="overflow:auto"><table class="gtab sm ci-t"><thead><tr><th style="text-align:left">Scanner</th><th>Side</th><th style="text-align:left">Reading</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="dim">No scanner data yet.</td></tr>'}</tbody></table></div>
+  const sc = v => v.sv == null ? ['—', '—'] : [Math.round(50 + v.sv / 2), 100 - Math.round(50 + v.sv / 2)];
+  const rows = V.map(v => { const q = sc(v); return `<tr><td style="text-align:left"><b>${esc(v.src)}</b><br><span class="dim" style="font-size:11px">${esc(v.txt)}</span></td><td class="${v.dir > 0 ? 'up' : v.dir < 0 ? 'dn' : 'dim'}"><b>${v.dir > 0 ? 'LONG' : v.dir < 0 ? 'SHORT' : 'NEUTRAL'}</b></td><td class="up">${q[0]}</td><td class="dn">${q[1]}</td></tr>`; }).join('');
+  return `<div class="ci-v"><div class="row" style="gap:14px;align-items:baseline;flex-wrap:wrap"><b style="font-size:1.3em">${esc(c.name)}</b><span>${px}</span><span class="${k}" style="font-size:1.2em"><b>${lab}</b></span><span class="hint">${act.length ? agree + ' of ' + act.length + ' scanners agree' : ''}</span></div>
+    <div class="ci-score"><div class="ci-bar"><div style="width:${L}%;background:#2fbf71"></div><div style="width:${Sh}%;background:#f0616d"></div></div><div class="row" style="justify-content:space-between;font-size:15px"><span class="up"><b>LONG ${L} / 100</b></span><span class="dn"><b>SHORT ${Sh} / 100</b></span></div></div>
+    <p class="hint" style="margin:4px 0">${esc(str)} The score is the weighted average of each scanner's signed strength (50 = no edge).</p>
+    <div style="overflow:auto"><table class="gtab sm ci-t"><thead><tr><th style="text-align:left">Scanner</th><th>Side</th><th>Long /100</th><th>Short /100</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="dim">No scanner data yet.</td></tr>'}</tbody></table></div>
     ${pl && isNum(pl.entry) ? `<p style="margin:8px 0 2px"><b>Plan from the scanners:</b> ${esc(String(pl.dir || '').toUpperCase())} · entry ${esc(fmtPx(pl.entry))} · stop ${esc(fmtPx(pl.sl))} · TP1 ${esc(fmtPx(pl.tp1))} · TP2 ${esc(fmtPx(pl.tp2))}</p>` : ''}
     ${caut.length ? `<p style="margin:8px 0 2px" class="warn"><b>Caution</b></p><ul class="ovstory">${caut.map(x => '<li>' + esc(x) + '</li>').join('')}</ul>` : ''}<p class="hint">Educational reading of the scanners, not financial advice. Check the stop against real liquidity before entering.</p></div>`;
 }
 function ciTable(rows, q){
-  if (!rows.length) return '<p class="hint">No data in this part yet.</p>';
-  let last = null; const body = rows.filter(r => !q || (r.label + ' ' + r.sub + ' ' + ciTxt(r.html) + ' ' + r.tip).toLowerCase().includes(q)).map(r => {
-    const sub = r.sub !== last ? (last = r.sub, `<tr class="ci-sub"><td colspan="3" style="text-align:left;background:var(--surface2,#1b2433);font-size:11px;letter-spacing:.04em">${esc(r.sub)}</td></tr>`) : '';
-    return sub + `<tr><td style="text-align:left;white-space:normal;min-width:150px"><b>${esc(r.label)}</b></td><td class="${esc(r.cls)}" style="text-align:left;white-space:normal;min-width:140px">${r.html}</td><td class="dim" style="text-align:left;white-space:normal;font-size:11px">${esc(r.tip)}</td></tr>`; }).join('');
-  return `<div style="overflow:auto"><table class="gtab sm ci-t"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">Value</th><th style="text-align:left">What it means</th></tr></thead><tbody>${body}</tbody></table></div>`;
+  if (!rows.length) return '<p class="hint">No data in this part.</p>';
+  const blank = r => { const t = ciTxt(r.html); return !t || /^[—–-]+$/.test(t) || /^(n\/a|none yet)$/i.test(t); };
+  const keep = rows.filter(r => !q || (r.label + ' ' + r.sub + ' ' + ciTxt(r.html) + ' ' + r.tip).toLowerCase().includes(q)), full = keep.filter(r => !blank(r)), empty = keep.filter(blank);
+  let last = null; const body = full.map(r => { const sub = r.sub !== last ? (last = r.sub, `<tr class="ci-sub"><td colspan="2" style="text-align:left;background:var(--surface2,#1b2433);font-size:11px;letter-spacing:.04em">${esc(r.sub)}</td></tr>`) : '';
+    return sub + `<tr><td style="text-align:left;white-space:normal;min-width:120px" title="${esc(r.tip)}"><b>${esc(r.label)}</b></td><td class="${esc(r.cls)}" style="text-align:left;white-space:normal">${r.html}</td></tr>`; }).join('');
+  return `<div style="overflow:auto"><table class="gtab sm ci-t"><thead><tr><th style="text-align:left">Data</th><th style="text-align:left">Value</th></tr></thead><tbody>${body || '<tr><td colspan="2" class="dim">Nothing loaded yet.</td></tr>'}</tbody></table></div>${empty.length ? `<p class="hint" style="font-size:11px;margin:4px 0"><b>No data yet (${empty.length}):</b> ${esc(empty.map(r => r.label).join(', '))}</p>` : ''}<p class="hint" style="font-size:11px;margin:2px 0">Hover a data name to see what it means.</p>`;
 }
 function ciPoolsHtml(c){
   let pl = []; try { pl = window.__elppTaHook.pools(c.name) || []; } catch(e){}
@@ -15151,19 +15157,26 @@ function ciReports(c, D){
     box('Institutional Flow Radar report: derivatives', () => instDetail(c, 'perp')), box('Institutional Flow Radar report: cash markets', () => instDetail(c, 'spot')),
     box('Next-Session Briefing report (Tomorrow)', () => tmwDetail(tmwCoin(c, D, 0)))].join('');
 }
+function ciPin(c){
+  const a = state.ciPin = (state.ciPin || []).filter(n => n !== c.name); a.push(c.name); while (a.length > 4) a.shift();
+  try { rankUniverse(); } catch(e){} try { x9Want([c.name]); } catch(e){}
+  if (!c.loaded && c.ctx && !c._ciF && Date.now() - (c._ciT || 0) > 30000){ c._ciF = 1; c._ciT = Date.now(); fetchCandles(c).catch(() => {}).then(() => { c._ciF = 0; if (state.view === 'coininst') setTimeout(ciDraw, 300); }); }
+}
 function ciDraw(){
-  const el = $('viewCoinInst'), out = el && el.querySelector('#ciOut'); if (!out) return; const c = CI.name ? ciFind(CI.name) : null;
+  const el = $('viewCoinInst'), out = el && el.querySelector('#ciOut'); if (!out) return; const c = CI.name ? ciFind(CI.name) : null; clearTimeout(CI.t);
   if (!CI.name){ out.innerHTML = '<p class="hint">Type a coin above, for example SOL, and press Analyse.</p>'; return; }
   if (!c){ out.innerHTML = '<div class="nsec"><h3>Coin not found</h3><p class="hint">' + esc(CI.name) + ' is not in the scanner list yet. Check the spelling, or wait until the coin list has loaded.</p></div>'; return; }
-  CI.at = Date.now(); const y = window.scrollY, openD = [...out.querySelectorAll('details[open]')].map(d => (d.querySelector('summary') || {}).textContent); let D = null; try { D = psData(false); if (!D.E.has(c.name)) D.E.set(c.name, psElite(c, vcMk())); } catch(e){}
-  const rows = ciCollect(c); CI.rows = rows; const q = (CI.q || '').trim().toLowerCase(); let h = '';
-  h += `<div class="nsec"><h3>${esc(CI_SECS[0][1])}</h3>${ciVerdictHtml(c, D)}</div>`;
-  for (const [id, nm] of CI_SECS.slice(1)){
-    if (id === 'chart'){ h += `<div class="nsec"><h3>${esc(nm)}</h3>${ciIctHtml(c)}${ciPoolsHtml(c)}${ciWallsHtml(c)}</div>`; continue; }
-    if (id === 'reports'){ h += `<div class="nsec"><h3>${esc(nm)}</h3><p class="hint">The complete report of each scanner for this coin.</p>${ciReports(c, D)}</div>`; continue; }
-    const part = rows.filter(r => r.sec === id); h += `<div class="nsec"><h3>${esc(nm)} <small class="hint">(${part.length} data points)</small></h3>${ciTable(part, q)}</div>`; }
+  CI.at = Date.now(); try { ciPin(c); } catch(e){}
+  const y = window.scrollY, openD = [...out.querySelectorAll('details[open]')].map(d => (d.querySelector('summary') || {}).textContent); let D = null;
+  try { D = psData(false); if (!D.E.has(c.name)) D.E.set(c.name, psElite(c, vcMk())); } catch(e){}
+  const rows = ciCollect(c); CI.rows = rows; const q = (CI.q || '').trim().toLowerCase(), part = id => rows.filter(r => r.sec === id), sec = (id, nm) => `<div class="nsec"><h3>${esc(nm)} <small class="hint">(${part(id).length})</small></h3>${ciTable(part(id), q)}</div>`;
+  const nm = Object.fromEntries(CI_SECS), ir = ICTS.data.get(c.name), st = [c.loaded || !c.ctx ? 'candles ✓' : 'candles loading…', ir && ir.ok !== false ? 'SMC/ICT ✓' : (CI.ictBusy ? 'SMC/ICT loading…' : 'SMC/ICT pending'), CI.walls && CI.wallsFor === c.name ? 'order book ✓' : 'order book loading…'];
+  let h = `<div class="nsec"><h3>${esc(nm.verdict)}</h3><p class="hint" style="margin:0 0 4px">Data status: ${esc(st.join(' · '))}${c.ctx ? '' : ' · this coin is not a Hyperliquid perp, so perp-only data stays blank'}</p>${ciVerdictHtml(c, D)}</div>`;
+  h += `<div class="ci-g"><div>${['tech_ret', 'tech_inst', 'fund', 'psy_ret', 'psy_inst'].map(id => sec(id, nm[id])).join('')}</div><div>${['liq'].map(id => sec(id, nm[id])).join('')}<div class="nsec"><h3>${esc(nm.chart)}</h3>${ciIctHtml(c)}${ciPoolsHtml(c)}${ciWallsHtml(c)}</div>${['press', 'onchain', 'exch', 'plan'].map(id => sec(id, nm[id])).join('')}</div></div>`;
+  h += `<div class="nsec"><h3>${esc(nm.reports)}</h3><p class="hint">The complete report of each scanner for this coin.</p>${ciReports(c, D)}</div>` + sec('other', nm.other);
   out.innerHTML = h; out.querySelectorAll('details').forEach(d => { if (openD.includes((d.querySelector('summary') || {}).textContent)) d.open = true; }); try { window.scrollTo(0, y); } catch(e){}
   try { if (!ICTS.data.get(c.name) && !CI.ictBusy) ciIct(c.name); } catch(e){} try { ciWallsLoad(c); } catch(e){}
+  if (state.view === 'coininst' && (CI.tries = (CI.tries || 0) + 1) < 14) CI.t = setTimeout(() => { const a = document.activeElement; if (state.view === 'coininst' && !(a && (a.id === 'ciQ' || a.id === 'ciF'))) ciDraw(); }, 7000);
 }
 async function ciIct(name){
   CI.ictBusy = true; ciDraw(); try { ICTS.data.set(name, await ictScanOne(name)); } catch(e){ ICTS.data.set(name, {ok:false, name, why:errTxt(e), at:Date.now()}); } CI.ictBusy = false; if (state.view === 'coininst') ciDraw();
@@ -15179,7 +15192,7 @@ function ciRender(){
     el.innerHTML = `<div class="nsec"><h3>🏛️ Coin Institutional Analysis <small class="hint">(every scanner, one coin)</small></h3><p class="hint">Type a coin. The page reads every scanner for it and puts the result in tables: the combined verdict, retail and institutional technicals, fundamentals, psychology, liquidity, on-chain, pressure, exchanges and the data behind the chart. Nothing is left out: every column of every scanner for the coin is listed.</p>
       <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><input id="ciQ" type="text" placeholder="Coin, e.g. SOL" list="ciList" style="min-width:180px" autocomplete="off"><datalist id="ciList"></datalist><button class="btn primary" type="button" id="ciGo">Analyse</button><button class="btn sm" type="button" id="ciRef">Refresh</button><button class="btn sm" type="button" id="ciCsv">Download CSV</button><input id="ciF" type="text" placeholder="Filter the tables…" style="min-width:160px;margin-left:auto"></div></div><div id="ciOut"></div>`;
     $('ciQ').value = CI.name;
-    const go = () => { CI.name = $('ciQ').value.trim().toUpperCase(); state.ciName = CI.name; try { saveState(); } catch(e){} CI.wallsFor = ''; CI.q = ''; $('ciF').value = ''; const c = ciFind(CI.name); if (c) ICTS.data.delete(c.name); ciDraw(); };
+    const go = () => { CI.name = $('ciQ').value.trim().toUpperCase(); state.ciName = CI.name; try { saveState(); } catch(e){} CI.wallsFor = ''; CI.q = ''; CI.tries = 0; $('ciF').value = ''; const c = ciFind(CI.name); if (c) ICTS.data.delete(c.name); ciDraw(); };
     el.addEventListener('click', e => { if (e.target.closest('#ciGo')) go(); else if (e.target.closest('#ciRef')){ CI.wallsFor = ''; const c = ciFind(CI.name); if (c) ICTS.data.delete(c.name); ciDraw(); } else if (e.target.closest('#ciCsv')) ciCsv(); });
     el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ciQ') go(); });
     el.addEventListener('input', e => { if (e.target.id === 'ciF'){ CI.q = e.target.value; ciDraw(); } });
@@ -15189,7 +15202,7 @@ function ciRender(){
 }
 try {
   VIEW_HINT.coininst = 'Type one coin and get everything the scanners know about it in one place: a combined verdict, then refined tables for retail and institutional technical analysis, fundamentals, retail and institutional psychology, liquidity, on-chain data, pressure, exchanges, the data behind the chart and the full report of each scanner.';
-  VIEW_HOW.coininst = ['Type the coin (for example SOL) and press Analyse. The coin list loads by itself.', 'Read the Final verdict first: it counts how many scanners are long, short or neutral and shows the plan and the Caution list.', 'Go down the tables. Every column of every scanner for this coin is there, each with what it means. Use Filter the tables to find one word.', 'Open Chart features for the SMC/ICT structure by timeframe, the liquidity pools (BSL/SSL, thick, medium, thin) and the order-book walls.', 'Open Full scanner reports for the complete report of each scanner. Press Download CSV to keep all the numbers.', 'The SMC/ICT part loads from candles and takes a few seconds. Some data (on-chain, options, paid feeds) stays blank until its source or key is available.'];
+  VIEW_HOW.coininst = ['Type the coin (for example SOL) and press Analyse. The coin list loads by itself.', 'Read the Final verdict first: it gives a LONG score and a SHORT score out of 100 (they add up to 100), shows each scanner\'s side and score, then the plan and the Caution list.', 'The tables sit in two columns. Every column of every scanner for this coin is listed; hover a data name to see what it means. Data that has not loaded or needs a key is listed in one line under the table. Use Filter the tables to find one word.', 'Open Chart features for the SMC/ICT structure by timeframe, the liquidity pools (BSL/SSL, thick, medium, thin) and the order-book walls.', 'Open Full scanner reports for the complete report of each scanner. Press Download CSV to keep all the numbers.', 'The SMC/ICT part loads from candles and takes a few seconds. Some data (on-chain, options, paid feeds) stays blank until its source or key is available.'];
   VIEW_GUIDE.coininst = [['Final verdict', 'Counts the sides of the scanner verdict, Power Scanner, SMC/ICT, Prediction Radar, Institutional Flow Radar and the Next-Session Briefing.', 'The more scanners agree, the better. Mixed means wait.'], ['Retail and institutional tables', 'Every column of the perp, spot and Power scanners, sorted into technical, fundamental, psychology, liquidity, on-chain, pressure and exchange tables.', 'Read the meaning column. A blank value means that data is not available for this coin right now.']];
 } catch(e){}
 window.__elppTaHook = {
