@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.48</title>
+<title>ELPP CRYPTO SCANNER PRO V9.49</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -61,6 +61,11 @@ button,select,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* header */
+.topfold{margin-left:10px;width:22px;height:22px;padding:0;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--muted);font-size:10px;line-height:1;cursor:pointer;vertical-align:middle}
+.topfold:hover{color:var(--gold);border-color:var(--gold)}
+header.top.fold{padding-block:6px 6px}
+header.top.fold .sub{display:none}
+header.top.fold .chips>:not(#btnPause):not(#btnFav):not(#btnUpdate){display:none!important}
 .top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:16px 12px}
 .brand{display:flex;flex-direction:column;gap:2px;min-width:0}
 .brand h1{font-size:19px;font-weight:600;letter-spacing:.01em}
@@ -839,8 +844,9 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.48</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.49</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
+    <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
   <div class="chips">
     <span class="chip"><i class="dot wait" id="dot"></i><span id="liveTxt">Connecting…</span></span>
@@ -5342,6 +5348,11 @@ document.addEventListener('click', e => {
   if (e.target && e.target.closest && e.target.closest('#btnFav')){ const k = FAV.key(), on = !FAV.on(k); FAV.setOn(k, on); favDecorate(); favBtn(); if (on && !FAV.rec(k).c.length) toast('No favorites in this scanner yet. Tap the ☆ next to a coin to add it.'); }
 }, true);
 setInterval(() => { try { const id = FAV_C[state.view], root = id && document.getElementById(id) || null; if (root !== favRoot || FAV.key() !== favKey) favAttach(); } catch(e){} }, 400);
+/* V9.49: the little arrow in the top panel shrinks it to the brand line plus PAUSE, Favorites and Refresh. Remembered in this browser. */
+(function(){ function fold(on){ const h = document.querySelector('header.top'), b = document.getElementById('btnTopFold'); if (!h || !b) return; h.classList.toggle('fold', on); b.textContent = on ? '▼' : '▲'; b.title = on ? 'Show the full panel' : 'Shrink this panel'; b.setAttribute('aria-expanded', on ? 'false' : 'true'); b.setAttribute('aria-label', on ? 'Show the full top panel' : 'Shrink the top panel'); }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#btnTopFold'); if (!b) return; const on = !document.querySelector('header.top').classList.contains('fold'); fold(on); try { localStorage.setItem('elpp_topfold', on ? '1' : '0'); } catch(_){} });
+  window.addEventListener('load', () => { let v = '0'; try { v = localStorage.getItem('elpp_topfold') || '0'; } catch(_){} fold(v === '1'); });
+})();
 function render(){
   if (PZ()){ lastRender = Date.now(); return; }
   lastRender = Date.now();
@@ -11785,6 +11796,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.49: arrow that shrinks the top panel ===== */
 /* ===== V9.48: Volume pressure filter, menu, filter panel, vocabulary and academy updated ===== */
 /* ===== V9.47: P&L growth graphs on Verified results, plain Favorites star ===== */
 /* ===== V9.46: Favorites: a star and a Favorites toggle in every scanner ===== */
