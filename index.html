@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.49</title>
+<title>ELPP CRYPTO SCANNER PRO V9.50</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -844,7 +844,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.49</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.50</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -4971,6 +4971,7 @@ function extCols(num, cols){
     col('pbStat', 'Pullback status', c => { const p = pbInfo(c.m); return p ? p.r : -1; }, c => { const p = pbInfo(c.m); if (!p) return ['<span title="No clear recent leg to measure">— no clear move</span>', 'dim']; return ['<span title="' + esc(p.why) + '">' + (p.up ? '▲ ' : '▼ ') + esc(p.t) + '</span>', p.k]; });
     col('walScore', 'Tracked wallets (100)', c => c.m.walScore, c => walCell(c.m));
     col('pressTh', 'Buy/sell pressure %', c => (c.m.pressure || {})['1h'], c => pressCell(c.m));
+    col('volPress', 'Volume pressure', c => { const v = volPress(c); return v ? v.s : null; }, c => volPressCell(c));
     col('verdictWhy', 'Verdict: why', c => c.m.verdictWhy || '', c => [esc(c.m.verdictWhy || '—'), 'dim', 'white-space:normal;min-width:340px;max-width:560px;text-align:left']);
     col('instFlow', 'Institutional flow', c => c.m.instFlow, c => { const v = c.m.instFlow; return [isNum(v) ? `<span title="Big-bar flow ${isNum(c.m.instFlowPct) ? c.m.instFlowPct.toFixed(0) : '?'}% · small-bar flow ${isNum(c.m.retailFlowPct) ? c.m.retailFlowPct.toFixed(0) : '?'}% (estimated from candles)">${esc(METRICS.instFlow.cat[v])}</span>` : '—', !isNum(v) ? 'dim' : v === 1 ? 'up' : v === 2 ? 'dn' : 'dim']; });
     col('pattern', 'Pattern ' + it, c => (c.m.pattern || {})[it], c => catCell('pattern', (c.m.pattern || {})[it], [1, 3, 5, 7], [2, 4, 6, 8]));
@@ -4984,7 +4985,6 @@ function extCols(num, cols){
     col('irlErl', 'IRL / ERL (price)', c => { const o = lvFor(c); return o.erl ? (o.erl.hi / o.erl.lo - 1) * 100 : null; }, c => [lvRangeHtml(lvFor(c)), '', 'text-align:left;white-space:nowrap']);
     col('liqDens', 'Liquidity density (thick / thin)', c => { const d = consDens(c); return d ? d.tot : null; }, c => densCell(c));
     col('sweepFirst', 'Sweep first? (where the hunt goes)', c => { const d = consDens(c); return d ? (d.hv === 1 ? 1 : d.hv === 2 ? -1 : 0) * d.tot : null; }, c => sweepFirstCell(c));
-    col('volPress', 'Volume pressure', c => { const v = volPress(c); return v ? v.s : null; }, c => volPressCell(c));
     col('whales', 'Whale wallets', c => c.m.whNet, c => { const m = c.m; if (!isNum(m.whN)) return ['—', 'dim']; if (!m.whN) return ['none', 'dim'];
       const sx = whSideTxt(m.whSide); return [`<a href="#" data-wh="${esc(c.name)}" title="Open wallets by size">${sx[0]} ${esc(fmtUsd(m.whNet, true))} · ${m.whN} wallets · P&amp;L ${esc(fmtUsd(m.whPnl, true))}</a>`, sx[1]]; });
     col('bo', 'Sweep → breakout ' + it, c => (c.m.bo || {})[it], c => { const v = (c.m.bo || {})[it]; if (!isNum(v) || !v) return ['—', 'dim']; const age = (c.m.boAge || {})[it], d = (c.m.boDist || {})[it];
@@ -7771,13 +7771,13 @@ function renderScreener(){
   const f = (SCR_SORT[c.sort] || SCR_SORT.vol)[1];
   if (c.sort === 'funding' || c.sort === 'c1d' || c.sort === 'c1h' || c.sort === 'c5' || c.sort === 'oi1h') rows = rows.slice().sort((a, b) => (b.v1d || 0) - (a.v1d || 0)).slice(0, c.ex === 'bn' ? 20 : 80);
   rows = rows.slice().sort((a, b) => { const x = f(a), y = f(b); return (isNum(y) ? y : -1) - (isNum(x) ? x : -1); }).slice(0, c.n);
-  const cols = [['Coin', null], ['Data verdict', null], ['Scanner verdict', null], ['Price', null], ['5m', 'c5'], ['1h', 'c1h'], ['24h', 'c1d'], ['Vol 24h', 'vol'], ['Vol 1h', 'v1h'], ['15m range', null], ['Trades 15m', 't15'], ['Open interest', 'oi'], ['OI 1h', 'oi1h'], ['Funding/yr', 'funding'], ['Pressure 15m', null], ['Pressure 1h', null], ['Sweep + 2nd test', null], ['Tracked wallets', null], ['24h trend', null], ['Confirm (13 checks)', null], ['BSL / SSL', null], ['IRL / ERL', null], ['Liquidity density', null], ['Sweep first?', null], ['Volume pressure', null]];
+  const cols = [['Coin', null], ['Data verdict', null], ['Scanner verdict', null], ['Price', null], ['5m', 'c5'], ['1h', 'c1h'], ['24h', 'c1d'], ['Vol 24h', 'vol'], ['Vol 1h', 'v1h'], ['15m range', null], ['Trades 15m', 't15'], ['Open interest', 'oi'], ['OI 1h', 'oi1h'], ['Funding/yr', 'funding'], ['Pressure 15m', null], ['Pressure 1h', null], ['Volume pressure', null], ['Sweep + 2nd test', null], ['Tracked wallets', null], ['24h trend', null], ['Confirm (13 checks)', null], ['BSL / SSL', null], ['IRL / ERL', null], ['Liquidity density', null], ['Sweep first?', null]];
   $('scrHead').innerHTML = cols.map(([l, k]) => `<th${k ? ` data-scs="${k}" class="${c.sort === k ? 'on' : ''}" style="cursor:pointer"` : ''}${SCR_TIP[l] ? ` title="${esc(SCR_TIP[l])}"` : ''}>${esc(l)}</th>`).join('');
   const cl = v => isNum(v) ? (v > 0 ? 'up' : v < 0 ? 'dn' : '') : 'dim';
   const bold = (v, t) => isNum(v) && Math.abs(v) >= t ? 'font-weight:700' : '';
   const scv = r => { const cc = state.coins.get(r.coin), v = cc && cc.m ? cc.m.verdict : null; return isNum(v) ? `<span title="${esc(cc.m.verdictWhy || '')}">${esc(VERDICT_LAB[v])}</span>` : '<span class="dim">—</span>'; };
   const scvK = r => { const cc = state.coins.get(r.coin), v = cc && cc.m ? cc.m.verdict : null; return isNum(v) ? (v >= 4 ? 'up' : (v === 2 || v === 3) ? 'dn' : v === 0 ? 'warn' : 'dim') : 'dim'; };
-  $('scrBody').innerHTML = rows.map(r => `<tr${state.coins.has(r.coin) ? ` data-chart="${esc(r.coin)}" style="cursor:pointer"` : ''}><td><b>${esc(r.coin)}</b> ${liMini(r.coin)}</td><td class="${dvCell(r.dv)[1]}" style="font-weight:600">${dvCell(r.dv)[0]}</td><td class="${scvK(r)}">${scv(r)}</td><td>${esc(fmtPx(r.px))}</td><td class="${cl(r.c5)}" style="${bold(r.c5, DV_TH.c5 + 0.2)}">${esc(fmtPct(r.c5))}</td><td class="${cl(r.c1h)}" style="${bold(r.c1h, DV_TH.c1hX)}">${esc(fmtPct(r.c1h))}</td><td class="${cl(r.c1d)}" style="${bold(r.c1d, DV_TH.c1d)}">${esc(fmtPct(r.c1d))}</td><td>${esc(fmtUsd(r.v1d))}</td><td>${esc(fmtUsd(r.v1h))}</td><td>${esc(isNum(r.r15) ? r.r15.toFixed(2) + '%' : '—')}</td><td>${esc(fmtInt(r.t15))}</td><td>${esc(fmtUsd(r.oi))}</td><td class="${cl(r.oi1h)}" style="${bold(r.oi1h, DV_TH.oi1h)}">${esc(fmtPct(r.oi1h, 1))}</td><td class="${isNum(r.apr) && Math.abs(r.apr) >= 60 ? 'warn' : ''}">${esc(isNum(r.apr) ? Math.round(r.apr) + '%' : '—')}</td>${(() => { const pc = v => `<td class="${pressLab(v)[1]}" title="${esc(pressLab(v)[0] + '. Thresholds: ±' + PR_T.note + '% buying/selling, ±' + PR_T.strong + '% strong')}" style="${Math.abs(v) >= PR_T.strong ? 'font-weight:700' : ''}">${isNum(v) ? (v > 0 ? '+' : '') + Math.round(v) + '%' : '—'}</td>`, sw = r._m ? swpCell(r._m) : ['—', 'dim'], wl = r._m ? walCell(r._m) : ['—', 'dim']; return pc(r.p15) + pc(r.p1h) + `<td class="${sw[1]}" style="white-space:normal;min-width:180px;text-align:left">${sw[0]}</td><td class="${wl[1]}" style="white-space:nowrap">${wl[0]}</td>`; })()}<td>${scrSpark(r.spark)}</td><td>${cpChip(r.coin)}</td>${lqTds(r._m ? {name: r.coin, m: r._m} : null)}${vpTd(r._m ? {name: r.coin, m: r._m} : null)}</tr>`).join('') || `<tr><td colspan="25" class="dim" style="text-align:center;padding:14px">Nothing to show yet.</td></tr>`;
+  $('scrBody').innerHTML = rows.map(r => `<tr${state.coins.has(r.coin) ? ` data-chart="${esc(r.coin)}" style="cursor:pointer"` : ''}><td><b>${esc(r.coin)}</b> ${liMini(r.coin)}</td><td class="${dvCell(r.dv)[1]}" style="font-weight:600">${dvCell(r.dv)[0]}</td><td class="${scvK(r)}">${scv(r)}</td><td>${esc(fmtPx(r.px))}</td><td class="${cl(r.c5)}" style="${bold(r.c5, DV_TH.c5 + 0.2)}">${esc(fmtPct(r.c5))}</td><td class="${cl(r.c1h)}" style="${bold(r.c1h, DV_TH.c1hX)}">${esc(fmtPct(r.c1h))}</td><td class="${cl(r.c1d)}" style="${bold(r.c1d, DV_TH.c1d)}">${esc(fmtPct(r.c1d))}</td><td>${esc(fmtUsd(r.v1d))}</td><td>${esc(fmtUsd(r.v1h))}</td><td>${esc(isNum(r.r15) ? r.r15.toFixed(2) + '%' : '—')}</td><td>${esc(fmtInt(r.t15))}</td><td>${esc(fmtUsd(r.oi))}</td><td class="${cl(r.oi1h)}" style="${bold(r.oi1h, DV_TH.oi1h)}">${esc(fmtPct(r.oi1h, 1))}</td><td class="${isNum(r.apr) && Math.abs(r.apr) >= 60 ? 'warn' : ''}">${esc(isNum(r.apr) ? Math.round(r.apr) + '%' : '—')}</td>${(() => { const pc = v => `<td class="${pressLab(v)[1]}" title="${esc(pressLab(v)[0] + '. Thresholds: ±' + PR_T.note + '% buying/selling, ±' + PR_T.strong + '% strong')}" style="${Math.abs(v) >= PR_T.strong ? 'font-weight:700' : ''}">${isNum(v) ? (v > 0 ? '+' : '') + Math.round(v) + '%' : '—'}</td>`, sw = r._m ? swpCell(r._m) : ['—', 'dim'], wl = r._m ? walCell(r._m) : ['—', 'dim']; return pc(r.p15) + pc(r.p1h) + vpTd(r._m ? {name: r.coin, m: r._m} : null) + `<td class="${sw[1]}" style="white-space:normal;min-width:180px;text-align:left">${sw[0]}</td><td class="${wl[1]}" style="white-space:nowrap">${wl[0]}</td>`; })()}<td>${scrSpark(r.spark)}</td><td>${cpChip(r.coin)}</td>${lqTds(r._m ? {name: r.coin, m: r._m} : null)}</tr>`).join('') || `<tr><td colspan="25" class="dim" style="text-align:center;padding:14px">Nothing to show yet.</td></tr>`;
 }
 
 
@@ -10954,7 +10954,7 @@ function trdPage(){ trdRender(false); trdAlgoDraw(); const pb = $('trdPaperBox')
 /* ===== V9.31: Consolidating coins scanner: every coin in consolidation, accumulation or distribution, with pressure, verdict, exchanges and liquidity prices ===== */
 const CONS = {ph: 'all', side: 'all', q: '', sort: {id: 'pRank', dir: -1}};
 const CONS_PH = {0: ['Consolidating', 'warn'], 1: ['Accumulating', 'up'], 2: ['Distributing', 'dn']};
-const CONS_COLS = ['pRank', 'pSide', 'pPress', 'pressTh', 'verdict', 'pTag', 'pGrade', 'pVen', 'bslSsl', 'irlErl', 'px', 'chg_1h', 'pV24'];
+const CONS_COLS = ['pRank', 'pSide', 'pPress', 'pressTh', 'volPress', 'verdict', 'pTag', 'pGrade', 'pVen', 'bslSsl', 'irlErl', 'px', 'chg_1h', 'pV24'];
 const CONS_X = [
   ['Manipulation', 'Signs the big players hunted stops: a swept level that price reclaimed (2nd test), a sweep followed by a breakout, or a crowded side that was flushed.', (c, cols) => {
     const parts = [['swpRe', 'Sweep'], ['bo', 'Breakout'], ['pFlush', 'Flush']].map(([id, lab]) => { const k = cols.get(id); if (!k) return ''; let r; try { r = k.cell(c); } catch(e){ return ''; } return r && r[0] && r[0] !== '—' && !/^(no |…|\.\.\.|none)/i.test(String(r[0]).replace(/<[^>]*>/g, '').trim()) ? '<div><small class="dim">' + lab + '</small> ' + r[0] + '</div>' : ''; }).filter(Boolean);
@@ -11055,7 +11055,6 @@ function sweepFirstCell(c){
 function sweepSide(c){ const d = consDens(c); return d ? d.hv : 0; }
 CONS_X.push(['Liquidity density', LD_TIP, c => densCell(c)]);
 CONS_X.push(['Sweep first?', SF_TIP, c => sweepFirstCell(c)]);
-CONS_X.push(['Volume pressure', VP_TIP, c => volPressCell(c)]);
 /* V9.35: live check of the "Sweep first?" reading. It logs the reading, then watches whether price takes the heavier pool or the opposite pool first. Saved in this browser only. */
 const LQT = {open: false, key: 'elpp_lqt', cap: 500, ttl: 24 * 36e5};
 function lqtLoad(){ try { const a = JSON.parse(localStorage.getItem(LQT.key) || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
@@ -11796,6 +11795,7 @@ async function jrSync(manual){
   JR.busy = false; if (manual) toast(added ? added + ' new trades added to your journal.' : 'Journal is up to date.'); jrRedraw();
 }
 function jrRedraw(){ try { if (state.view === 'journal') renderJournal(); } catch(e){} }
+/* ===== V9.50: Volume pressure sits next to the buy/sell pressure column in every scanner ===== */
 /* ===== V9.49: arrow that shrinks the top panel ===== */
 /* ===== V9.48: Volume pressure filter, menu, filter panel, vocabulary and academy updated ===== */
 /* ===== V9.47: P&L growth graphs on Verified results, plain Favorites star ===== */
@@ -14556,16 +14556,16 @@ AC_SETUPS.push(...[["ICT entry: sweep, shift, order block or FVG", "Institutions
 /* ---------- V5: POWER SCANNER - every scanner's data merged into one table, pick your columns, shrink groups, open any row for full detail ---------- */
 const PS = {cache:null, cacheAt:0, open:new Set(), lastRender:0, built:false, shown:[]};
 const PS_ELITE_GROUPS = [
-  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','pPB','pPD','pBig','pFinal','pBlock']],
+  ['⚡ Elite call', ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','volPress','pPB','pPD','pBig','pFinal','pBlock']],
   ['🎯 Trade plan', ['pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev']],
   ['🏦 Exchanges', ['pVen','pHL','pGap','pList']],
   ['📈 Market', ['px','chg_5m','chg_15m','chg_1h','chg_4h','chg_8h','chg_12h','chg_1d','pV1h','pV4h','pV24','pV1hD','pV4hD','oiUsd','fund8','dqScore']]
 ];
-const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','bslSsl','irlErl','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
+const PS_DEFAULT = ['pRank','pSide','pTag','pGrade','pIct','pCrowd','pFlush','pOte','pInst','pPress','volPress','pPB','pPD','pBig','pEntry','pSL','pTP1','pRR','pLev','pVen','px','bslSsl','irlErl','chg_1h','chg_4h','pV1h','pV4h','pV24','fund8'];
 const PS_PRESETS = {
   elite:{n:'Elite (default)', c:PS_DEFAULT},
   trader:{n:'Trader: side + plan', c:['pSide','pTag','pGrade','pEntry','pSL','pSLp','pTP1','pTP2','pRR','pLev','bslSsl','irlErl','px','chg_1h','pV1h','pV4h','pV24','fund8']},
-  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','pPB','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','bslSsl','irlErl','px','chg_1h']},
+  smart:{n:'Smart money', c:['pRank','pSide','pInst','pPress','volPress','pPB','pPD','pBig','pFinal','pGrade','cpConf','verdict','swpRe','pressTh','whales','ic','instFlow','bo','takeoff','buildup','bslSsl','irlErl','px','chg_1h']},
   crowd:{n:'Crowding + funding', c:['pRank','pSide','px','chg_1h','fund8','fundGap','fundZ','lsRatio','lsState','crowdState','flushState','oteZone','pCrowd','pFlush','pOte','liqFlush','liqL5','liqS5','oiUsd','oiPx_1h','cvdDiv_1h']},
   mini:{n:'Minimal', c:['pRank','pSide','pTag','px','chg_1h','pV24']},
   all:{n:'Everything', c:null}
@@ -14588,6 +14588,7 @@ function pbInfo(m){
   return null;
 }
 function psSt(){ if (state.ps && Array.isArray(state.ps.cols) && !state.ps.lv1){ state.ps.lv1 = 1; const a = state.ps.cols; for (const id of ['irlErl', 'bslSsl']) if (!a.includes(id)){ const i = a.indexOf('px'); a.splice(i >= 0 ? i + 1 : a.length, 0, id); } }
+  if (state.ps && Array.isArray(state.ps.cols) && !state.ps.vp1){ state.ps.vp1 = 1; const a = state.ps.cols; if (!a.includes('volPress')){ const i = a.indexOf('pPress'); if (i >= 0) a.splice(i + 1, 0, 'volPress'); } }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp3){ state.ps.pp3 = 1; const a = state.ps.cols; if (!a.includes('pPB')){ const i = a.indexOf('pPress'); a.splice(i >= 0 ? i + 1 : 0, 0, 'pPB'); } }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp2){ state.ps.pp2 = 1; const a = state.ps.cols, i = a.indexOf('pPress'), j = i >= 0 ? i : a.indexOf('pInst'); for (const id of ['pBig', 'pPD']) if (!a.includes(id)) a.splice(j >= 0 ? j + 1 : 0, 0, id); }
   if (state.ps && Array.isArray(state.ps.cols) && !state.ps.pp1){ state.ps.pp1 = 1; if (!state.ps.cols.includes('pPress')){ const i = state.ps.cols.indexOf('pInst'); state.ps.cols.splice(i >= 0 ? i + 1 : 0, 0, 'pPress'); } }
