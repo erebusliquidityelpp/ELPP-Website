@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.73</title>
+<title>ELPP CRYPTO SCANNER PRO V9.74</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -846,7 +846,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.73</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.74</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -7141,7 +7141,11 @@ function mkCalc(all){
   else if (chopHi){ stt = 'Consolidation'; tone = 'warn'; line = 'Prices are moving sideways in a tight range.'; act = 'Do not chase breakouts; trade range edges only after a sweep and reclaim.'; }
   else { stt = 'Mixed'; tone = 'warn'; line = 'No clear direction across the market.'; act = 'Trade only the cleanest set-ups.'; }
   /* tradeability score 0-100: how clean is the market to trade right now */
+  /* V9.74: volatility of the whole market: value, thresholds, spread across coins and score impact */
+  const vlM = (() => { const k = [0, 0, 0, 0]; let n = 0; for (const c of all){ const v = c.m && c.m.volState; if (isNum(v) && v >= 0 && v <= 3){ k[v]++; n++; } } return n ? k.map(x => x / n * 100) : null; })(), atrM = med(c => c.m.atr && c.m.atr['1h']), rkM = med(c => c.m.atrRank);
+  let vlPts = 0, vlNote = 'not enough range data yet'; if (vx !== null){ if (vx >= 2.2){ vlPts = -8; vlNote = 'extreme: moves are too fast and large to control, skip or size down'; } else if (vx >= 1.5){ if (trend >= 25){ vlPts = 3; vlNote = 'high and directional: moves are fast and many coins are following through'; } else { vlPts = -3; vlNote = 'high but directionless: fast moves that reverse, stops get hit'; } } else if (vx >= 0.9){ vlPts = 0; vlNote = 'normal: no effect on the score'; } else { vlPts = -4; vlNote = 'low: price is coiling, little to earn until it breaks out'; } }
   let sc = 50; const why = [];
+  if (vlPts){ sc += vlPts; why.push(vx >= 2.2 ? 'extreme volatility' : vx >= 1.5 ? (vlPts > 0 ? 'fast directional moves' : 'fast directionless moves') : 'low volatility'); }
   if (bull >= 2 || bear >= 2){ sc += 15; why.push('clear direction'); } else { sc -= 5; why.push('no clear direction'); }
   if (trend >= 35){ sc += 15; why.push(trend.toFixed(0) + '% coins trending'); } else if (trend < 15){ sc -= 10; why.push('few coins trending'); }
   if (vol !== null){ if (vol >= 1.2){ sc += 12; why.push('strong volume'); } else if (vol >= 0.8){ sc += 5; why.push('normal volume'); } else if (vol >= 0.45){ sc -= 12; why.push('thin volume'); } else { sc -= 35; why.push('dead volume'); } }
@@ -7170,7 +7174,7 @@ function mkCalc(all){
   const combo = comboRead(liqDir, volDir, voltDir);
   const churnPct = pct(top, c => isNum(c.m.instVolState) ? c.m.instVolState === 5 : null);
   const bot = botBadge(manip, churnPct, crowdHi);
-  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, liqDir, volDir, voltDir, liqChgPct, voltChgPct, combo, bot, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%']], n:all.length};
+  return {state:stt, tone, line, act, grade, gcls, score:sc, why, size, sizeLabel, sizeText, weekend, wk, liq, volTrend, liqVolTip, volt, press, crowd, oiTrend, trendStr, corr, liqMag, gamma, stable, event, bookDepth, dexShare, cmeGap, insurFund, borrowRate, liqDir, volDir, voltDir, liqChgPct, voltChgPct, combo, bot, chips:[['Volume', vol !== null ? vol.toFixed(2) + 'x normal' : '—'], ['Coins up (4h)', b4.toFixed(0) + '%'], ['BTC', bt === 1 ? 'uptrend' : bt === -1 ? 'downtrend' : bt === 0 ? 'consolidating' : '—'], ['Crowding', 'long ' + crowdL.toFixed(0) + '% · short ' + crowdS.toFixed(0) + '%'], ['Chop / manipulation', chop.toFixed(0) + '% / ' + manip.toFixed(0) + '%'], ['Trending coins', trend.toFixed(0) + '%'], ['Volatility', vx !== null ? vx.toFixed(2) + 'x normal · ' + volt.label.replace(' volatility', '').toLowerCase() : '—']].concat(vlM ? [['Coins coiling / expanding / extreme', vlM[0].toFixed(0) + '% / ' + vlM[2].toFixed(0) + '% / ' + vlM[3].toFixed(0) + '%']] : [], isNum(atrM) ? [['Typical 1h ATR', atrM.toFixed(2) + '%']] : [], isNum(rkM) ? [['Volatility percentile (2 days)', rkM.toFixed(0)]] : []), vlt:{vx, pts:vlPts, note:vlNote, atrM, rkM, vlM, dir:voltDir, chg:voltChgPct}, n:all.length};
 }
 function mkDirTxt(r){ return r.state === 'Bad' ? 'Bearish (strong)' : r.state === 'Weak' ? 'Bearish' : r.state === 'Good' ? 'Bullish' : r.state === 'Strong' ? 'Bullish (strong)' : r.state; }
 function mkSideTxt(r){ return (r.state === 'Bad' || r.state === 'Weak') ? ' · FOR SHORTS' : (r.state === 'Good' || r.state === 'Strong') ? ' · FOR LONGS' : ''; }
@@ -7179,7 +7183,7 @@ function renderMktBar(all){
   if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
   const pill = b => `<span class="mkb-pill mkb-p-${b.tone}" title="${esc(b.why)}">${esc(b.label)}</span>`;
   const pills = [r.liq, r.volTrend, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
-  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state" title="Direction: which side is winning. This word says nothing about how clean the market is to trade.">${esc(mkDirTxt(r))}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability ${r.score}/100 = how clean the market is to trade (clear direction, trending coins, volume), NOT which way it goes. Direction is the word on the left. ${esc(r.why.join(', '))}">${esc(r.grade)}${esc(mkSideTxt(r))} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Tradeability ${r.score}/100 (how clean it is to trade, not which way) because: ${esc(r.why.join(', '))}.</span></div>${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
+  el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state" title="Direction: which side is winning. This word says nothing about how clean the market is to trade.">${esc(mkDirTxt(r))}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability ${r.score}/100 = how clean the market is to trade (clear direction, trending coins, volume), NOT which way it goes. Direction is the word on the left. ${esc(r.why.join(', '))}">${esc(r.grade)}${esc(mkSideTxt(r))} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Tradeability ${r.score}/100 (how clean it is to trade, not which way) because: ${esc(r.why.join(', '))}.</span></div>${(() => { const V = r.vlt; if (!V || V.vx === null) return ''; const nm = r.volt.label.replace(' volatility', '').toUpperCase(); return `<div class="mkb3" style="border-left-color:var(--bd)"><b>Volatility of the whole market: ${esc(nm)} · ${V.vx.toFixed(2)}x normal.</b> Thresholds: under 0.9x low (coiling) · 0.9 to 1.5x normal · 1.5 to 2.2x high · 2.2x or more extreme. ${isNum(V.atrM) ? 'Typical coin moves ' + V.atrM.toFixed(2) + '% per hour (ATR). ' : ''}${isNum(V.rkM) ? 'Hotter than ' + V.rkM.toFixed(0) + '% of the last 2 days. ' : ''}${V.vlM ? V.vlM[0].toFixed(0) + '% of coins are coiling, ' + V.vlM[2].toFixed(0) + '% expanding and ' + V.vlM[3].toFixed(0) + '% extreme. ' : ''}${V.dir ? 'Volatility is ' + (V.dir === 'rise' || V.dir === 'rising' ? 'rising' : V.dir === 'fall' || V.dir === 'falling' ? 'falling' : 'flat') + ' over the last 20 minutes. ' : ''}<b>Impact on tradeability: ${V.pts > 0 ? '+' : V.pts < 0 ? '−' : ''}${Math.abs(V.pts)}</b> (${esc(V.note)}).</div>`; })()}${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
 }
 const OPT_GLOSS = [
   ['Option','A contract that gives the right, not the duty, to buy or sell at a fixed price before a date.'],
