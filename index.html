@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.69</title>
+<title>ELPP CRYPTO SCANNER PRO V9.70</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -846,7 +846,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.69</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.70</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -13394,6 +13394,63 @@ function prOvHtml(){
     ${btc ? `<p class="hint" style="margin-top:8px"><b>Bitcoin, next 12 hours:</b> <b class="${btc.dir > 0 ? 'up' : btc.dir < 0 ? 'dn' : ''}">${btc.pUp}% chance up</b>, confidence ${btc.conf}%. ${esc(btc.story)} ${btc.trap ? '<b>' + esc(btc.trap) + '</b>' : ''}</p>` : ''}</div>`;
   } catch(e){ h = ''; } return h;
 }
+
+/* ===== V9.70: Daily Market Briefing (yesterday in review + today's outlook) ===== */
+const BSM = {v:null, at:0, busy:false, err:''};
+const BS_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'ADA', 'AVAX', 'LINK', 'TRX'];
+async function bsLoad(){
+  if (BSM.busy) return; BSM.busy = true;
+  try {
+    const out = {};
+    await Promise.all(BS_COINS.map(async n => { try { const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/klines?symbol=' + encodeURIComponent(vSymFor('binance', n)) + '&interval=1d&limit=10'); out[n] = j.map(k => ({t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[7]})); } catch(e){} }));
+    let fund = null, oiD = null;
+    try { const j = await vget('binance', 'https://fapi.binance.com/fapi/v1/premiumIndex?symbol=' + encodeURIComponent(vSymFor('binance', 'BTC'))); fund = +j.lastFundingRate * 100; } catch(e){}
+    try { const j = await vget('binance', 'https://fapi.binance.com/futures/data/openInterestHist?symbol=' + encodeURIComponent(vSymFor('binance', 'BTC')) + '&period=1d&limit=4'); if (j.length >= 3){ const a = +j[j.length - 2].sumOpenInterestValue, b = +j[j.length - 3].sumOpenInterestValue; if (a && b) oiD = (a - b) / b * 100; } } catch(e){}
+    BSM.v = bsBuild(out, fund, oiD, Date.now()); BSM.at = Date.now(); BSM.err = BSM.v ? '' : 'Could not read the daily candles right now.';
+  } catch(e){ BSM.err = 'Could not read the daily candles right now.'; }
+  BSM.busy = false; try { const el = $('viewToday'); if (el && state.view === 'today'){ el._h = ''; renderToday(); } } catch(e){}
+}
+function bsBuild(D, fund, oiD, now){
+  const btc = D.BTC; if (!btc || btc.length < 4) return null;
+  const pc = (a, b) => b ? (a - b) / b * 100 : 0, sg = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+  const split = arr => { const n = arr.findIndex(x => x.t <= now && now < x.t + 864e5); if (n < 2) return null; return {y:arr[n - 1], p:arr[n - 2], t:arr[n], hist:arr.slice(Math.max(0, n - 8), n - 1)}; };
+  const B = split(btc); if (!B) return null;
+  const y = B.y, rg = y.h - y.l, chg = pc(y.c, y.o), rngP = pc(y.h, y.l), pos = rg > 0 ? (y.c - y.l) / rg : 0.5, body = rg > 0 ? Math.abs(y.c - y.o) / rg : 0;
+  const va = B.hist.length ? B.hist.reduce((s, x) => s + x.v, 0) / B.hist.length : 0, vr = va ? y.v / va : null;
+  const upW = rg > 0 ? (y.h - Math.max(y.o, y.c)) / rg : 0, dnW = rg > 0 ? (Math.min(y.o, y.c) - y.l) / rg : 0;
+  let character; if (body >= 0.6 && chg > 0 && pos >= 0.7) character = 'a clean trend day up'; else if (body >= 0.6 && chg < 0 && pos <= 0.3) character = 'a clean trend day down'; else if (upW >= 0.4 && chg <= 0.5) character = 'a day where buyers pushed up but were rejected (long upper wick)'; else if (dnW >= 0.4 && chg >= -0.5) character = 'a day where sellers pushed down but were rejected (long lower wick)'; else if (body < 0.25) character = 'an indecisive, choppy day'; else character = chg >= 0 ? 'a mild up day' : 'a mild down day';
+  const alt = []; for (const n of BS_COINS){ const s = D[n] && split(D[n]); if (s) alt.push({n, c:pc(s.y.c, s.y.o), tc:pc(s.t.c, s.t.o)}); }
+  const up = alt.filter(x => x.c > 0).length, dn = alt.filter(x => x.c < 0).length, rest = alt.filter(x => x.n !== 'BTC').sort((a, b) => b.c - a.c), eth = alt.find(x => x.n === 'ETH');
+  const breadth = alt.length >= 6 ? (up >= alt.length * 0.75 ? 'broad buying' : dn >= alt.length * 0.75 ? 'broad selling' : 'a mixed, selective market') : '';
+  const yday = [];
+  yday.push('Bitcoin closed ' + (chg >= 0 ? 'up ' : 'down ') + Math.abs(chg).toFixed(1) + '% at ' + fmtPx(y.c) + ', after trading between ' + fmtPx(y.l) + ' and ' + fmtPx(y.h) + ' (a ' + rngP.toFixed(1) + '% range).');
+  yday.push('It finished ' + (pos >= 0.7 ? 'near the top of the range, so buyers held control into the close' : pos <= 0.3 ? 'near the bottom of the range, so sellers held control into the close' : 'in the middle of the range, so neither side won clearly') + ', which makes it ' + character + '.');
+  if (vr != null) yday.push('Volume was ' + vr.toFixed(1) + 'x the recent 7-day average, ' + (vr >= 1.3 ? 'real participation, so the move is more trustworthy' : vr <= 0.75 ? 'quiet, so the move is less trustworthy' : 'about normal') + '.');
+  if (alt.length >= 6) yday.push((eth ? 'Ether ' + sg(eth.c) + '. ' : '') + 'Of ' + alt.length + ' large coins, ' + up + ' rose and ' + dn + ' fell, which is ' + breadth + (rest.length ? '; strongest was ' + rest[0].n + ' ' + sg(rest[0].c) + ' and weakest was ' + rest[rest.length - 1].n + ' ' + sg(rest[rest.length - 1].c) : '') + '.');
+  const pos2 = []; if (oiD != null) pos2.push('Bitcoin open interest ' + (oiD >= 0 ? 'rose ' : 'fell ') + Math.abs(oiD).toFixed(1) + '% over the day' + (oiD >= 2 && chg >= 0 ? ' (new money joined the move)' : oiD >= 2 && chg < 0 ? ' (new shorts or trapped longs)' : oiD <= -2 ? ' (positions were closed, a cooling move)' : '')); if (fund != null) pos2.push('funding is ' + (fund >= 0 ? '+' : '') + fund.toFixed(4) + '% per 8h' + (fund > 0.03 ? ', longs are crowded and paying' : fund < -0.01 ? ', shorts are crowded and paying' : ', fairly balanced'));
+  if (pos2.length) yday.push(pos2.join(' and ') + '.');
+  yday.push('Net: ' + (chg > 1 && pos >= 0.6 ? 'buyers had the upper hand yesterday' : chg < -1 && pos <= 0.4 ? 'sellers had the upper hand yesterday' : 'no side clearly dominated yesterday') + '.');
+  // today
+  const t = B.t, tchg = pc(t.c, t.o), r = MK.last, S = (() => { try { return rgStatus(); } catch(e){ return null; } })(), nx = (() => { try { return macNext(); } catch(e){ return null; } })(), hr = new Date(now).getUTCHours();
+  let sc = 0; sc += chg > 1 ? 1 : chg < -1 ? -1 : 0; sc += pos >= 0.7 ? 1 : pos <= 0.3 ? -1 : 0; sc += vr != null && vr >= 1.3 ? (chg >= 0 ? 1 : -1) : 0; sc += up >= alt.length * 0.75 && alt.length >= 6 ? 1 : dn >= alt.length * 0.75 && alt.length >= 6 ? -1 : 0; sc += tchg > 0.7 ? 1 : tchg < -0.7 ? -1 : 0; if (r) sc += (r.state === 'Strong' ? 2 : r.state === 'Good' ? 1 : r.state === 'Bad' ? -2 : r.state === 'Weak' ? -1 : 0); if (fund != null && Math.abs(fund) > 0.03) sc += fund > 0 ? -0.5 : 0.5;
+  const lean = sc >= 3 ? 'bullish' : sc >= 1.5 ? 'mildly bullish' : sc <= -3 ? 'bearish' : sc <= -1.5 ? 'mildly bearish' : 'neutral, no clear edge', lk = sc >= 1.5 ? 'up' : sc <= -1.5 ? 'dn' : 'warn';
+  const tod = [];
+  tod.push('So far today (since 05:00 PKT) Bitcoin is ' + (tchg >= 0 ? 'up ' : 'down ') + Math.abs(tchg).toFixed(1) + '% at ' + fmtPx(t.c) + ', ' + (hr < 7 ? 'in the Asia session (thin liquidity, often a range)' : hr < 12 ? 'in the London session (the first real move of the day usually comes here)' : hr < 21 ? 'in the New York session (the most liquid hours, biggest moves)' : 'in the late, quieter hours') + '.');
+  tod.push('The lines to watch are yesterday\'s high ' + fmtPx(y.h) + ' and low ' + fmtPx(y.l) + ': holding above the low keeps buyers in play, and a clean break and close below it would hand control to sellers; a push through the high on strong volume would confirm continuation.');
+  tod.push('Putting yesterday, today so far' + (alt.length >= 6 ? ', market breadth' : '') + (r ? ' and the scanner\'s own market state (' + mkDirTxt(r) + ')' : '') + ' together, the lean for today is <b>' + lean + '</b>. This is a lean based on what already happened, not a forecast.');
+  if (r) tod.push('The scanner grades trading conditions as ' + r.grade + ' with suggested size: ' + r.sizeLabel + '.');
+  if (nx && nx.ev) tod.push('Event risk: ' + nx.ev.name + ' at ' + dcPkt(nx.ev.t).replace(/ PKT.*/, '') + ' PKT' + (nx.min < 120 && nx.min > -15 ? ' is very close, so expect sudden spikes and wait for it to pass' : '') + '.');
+  tod.push('Caution: ' + (fund != null && fund > 0.03 ? 'longs are crowded, so a drop can be sharp. ' : fund != null && fund < -0.01 ? 'shorts are crowded, so a squeeze up can be sharp. ' : '') + 'plan for both sides, and take entries only from your own confirmed set-ups, never from this paragraph alone.');
+  return {yday, tod, lean, lk, at:now, ymd:dcPkt(y.t).replace(/ PKT,/, ',').replace(/^\d\d:\d\d, /, '')};
+}
+function bsHtml(){
+  const v = BSM.v; if (!BSM.at && !BSM.busy && !BSM.err) bsLoad(); else if (Date.now() - BSM.at > 6e5 && !BSM.busy) bsLoad();
+  if (!v) return `<div class="nsec"><h3>Daily Market Briefing</h3><p class="hint">${BSM.err ? esc(BSM.err) + ' It will retry on its own.' : 'Reading yesterday\'s and today\'s candles…'}</p></div>`;
+  return `<div class="nsec"><h3>Daily Market Briefing <small class="hint">updated ${esc(ago(v.at))}</small></h3>
+    <div class="vbox" style="margin:0 0 10px"><b>Yesterday in review <small class="hint">(${esc(v.ymd)}, UTC day: 05:00 PKT to 05:00 PKT)</small></b><p style="margin:6px 0 0">${v.yday.map(esc).join(' ')}</p></div>
+    <div class="vbox" style="margin:0"><b>Today's outlook <small class="hint ${v.lk}">lean: ${esc(v.lean)}</small></b><p style="margin:6px 0 0">${v.tod.map(x => x.replace(/&/g, '&amp;').replace(/<(?!\/?b>)/g, '&lt;')).join(' ')}</p></div>
+    <p class="hint">Built from the live daily candles, volume, open interest, funding and the scanner's market state. An advisory read of what the market did and which side has the edge, never a BUY or SELL call or a guaranteed forecast.</p></div>`;
+}
 function todayHtml(){
   const sg = v => (v > 0 ? '+' : '') + v, now = Date.now(), r = MK.last, S = rgStatus(), nx = macNext();
   const all = [...state.coins.values()].filter(c => c.m && isNum(c.m.verdict) && (c.m.verdict === 5 || c.m.verdict === 3)).sort((a, b) => Math.abs(b.m.verdictScore) - Math.abs(a.m.verdictScore)).slice(0, 5);
@@ -13402,6 +13459,7 @@ function todayHtml(){
   let hs = []; try { hs = healthRows(); } catch(e){} const bad = hs.filter(x => !x.ok && !x.opt).length;
   const tile = (lab, val, sub, cls) => `<div style="flex:1;min-width:170px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)"><small class="hint">${esc(lab)}</small><div style="font-size:18px;font-weight:700" class="${cls || ''}">${val}</div><small class="hint">${sub && sub.raw ? sub.raw : esc(sub || '')}</small></div>`;
   let h = scanWidgetHtml();
+  h += bsHtml();
   h += `<div class="nsec"><h3>Today</h3><div class="row" style="gap:10px;flex-wrap:wrap">${tile('Market verdict', r ? esc(mkDirTxt(r)) : 'Collecting…', r ? r.grade + mkSideTxt(r) + ' · size: ' + r.sizeLabel : 'needs about 5 coins', r && /BEST|GOOD/.test(r.grade) ? 'up' : r && r.grade === 'NOT TRADEABLE' ? 'dn' : '')}${tile('Next macro event', nx ? esc(nx.ev.name) : 'none loaded', nx ? {raw:cdHtml(nx.ev.t, true)} : '', nx && nx.min >= -15 && nx.min <= 60 ? 'warn' : '')}${tile('Signals today', closedToday.length + ' closed', sg(+sumR.toFixed(1)) + 'R · ' + open.length + ' open', sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '')}${tile('Risk guard', S.on ? (S.locked ? 'LOCKED' : 'Active') : 'Off', S.on ? (S.locked ? S.why : 'today ' + sg(+S.sum.toFixed(1)) + 'R') : 'optional, on the Signals page', S.locked ? 'dn' : S.on ? 'up' : '')}${tile('Data health', bad ? bad + ' failing' : 'All working', hs.length + ' feeds checked', bad ? 'warn' : 'up')}</div></div>`;
   h += `<div class="nsec"><h3>Top set-ups right now</h3>${all.length ? `<table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Coin</th><th>Verdict</th><th>Score</th><th style="text-align:left">Psychology</th><th>Entry</th><th>Stop</th><th>TP1</th><th>TP2</th><th></th></tr></thead><tbody>${all.map(c => { const p = (() => { try { return planFor(c); } catch(e){ return null; } })(), m = c.m; return `<tr><td style="text-align:left"><a href="#" class="cnl" data-chart="${esc(c.name)}" title="Open the chart in a new tab">${esc(c.name)}</a></td><td class="${m.verdict === 5 ? 'up' : 'dn'}">${esc(VERDICT_LAB[m.verdict])}</td><td>${sg(Math.round(m.verdictScore))}</td><td style="text-align:left" class="dim">${esc(m.psy ? m.psy.tag : '—')}</td><td>${p ? esc(fmtPx(p.entry)) : '—'}</td><td>${p ? esc(fmtPx(p.sl)) : '—'}</td><td>${p ? esc(fmtPx(p.tp1)) : '—'}</td><td>${p ? esc(fmtPx(p.tp2)) : '—'}</td><td><button class="btn sm" type="button" data-chart="${esc(c.name)}">Chart</button></td></tr>`; }).join('')}</tbody></table><p class="hint">Check each one on your own chart before taking it. Open "How it decides" to see why a coin scored what it did.</p>` : '<p class="hint">No Strong long or short verdicts at the moment. Waiting is also a position.</p>'}</div>`;
   h += prTodayHtml();
