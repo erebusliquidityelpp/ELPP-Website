@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.82</title>
+<title>ELPP CRYPTO SCANNER PRO V9.83</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -25,8 +25,9 @@
 <link rel="apple-touch-icon" href="eagle-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
 /* Layout concept: filter rail on the left, dense sortable table on the right; rail collapses on phones. */
 :root{
@@ -846,7 +847,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.82</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.83</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -949,7 +950,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
     <button class="nv" type="button" data-nav="cols">Columns</button>
     <button class="nv" type="button" data-nav="guide">Threshold guide</button>
     <button class="nv" type="button" id="btnManual" style="font-weight:700">📖 User manual (PDF, opens in new tab)</button>
-    <button class="nv" type="button" id="btnInstall" hidden>⬇ Install as app</button>
+    <button class="nv" type="button" id="btnInstallNav" hidden>⬇ Install as app</button>
     </details>
   </nav>
   <aside class="panel" id="panel" aria-label="Filters">
@@ -5390,7 +5391,7 @@ const TBL = {th:'', tb:'', ok:0};
 function requestRender(){
   if (renderT) return;
   /* the table page refreshes about once a second; every other page, and a hidden tab, refresh much less often */
-  const gap = document.hidden ? 15000 : state.view === 'table' ? 900 : 2500;
+  const gap = document.hidden ? 15000 : state.view === 'table' ? 1200 : 3500;
   const wait = Math.max(0, gap - (Date.now() - lastRender));
   renderT = setTimeout(() => { renderT = null; render(); }, wait);
 }
@@ -8505,6 +8506,7 @@ function cpLoad(name, force){
 }
 
 /* ---------- the judge: turns the numbers into a plain verdict for LONG or SHORT ---------- */
+const cpLocC = new Map();
 function cpEval(R, dir){
   const long = dir === 'long', out = {}, E = R.err || {};
   const mk = (id, st, v, say, lines) => { out[id] = {id, st, v, say, lines:lines || []}; };
@@ -8623,7 +8625,7 @@ function cpEval(R, dir){
   /* 12 session */
   { const d = R.sess; if (!d) na('sess', 'no data'); else {
       const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'your time'; } catch(e){ return 'your time'; } })();
-      const loc = (hh) => { const dt = new Date(); dt.setUTCHours(Math.floor(hh), Math.round((hh % 1) * 60), 0, 0); return dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); };
+      const loc = (hh) => { const ck = hh + '|' + new Date().getUTCDate(); if (cpLocC.has(ck)) return cpLocC.get(ck); const dt = new Date(); dt.setUTCHours(Math.floor(hh), Math.round((hh % 1) * 60), 0, 0); const o = dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); cpLocC.set(ck, o); return o; };
       const st = d.kz ? 'ok' : (d.we || d.ses.length === 0) ? 'bad' : 'warn';
       const lines = ['Now: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ' in ' + tz + ' (' + String(Math.floor(d.h)).padStart(2, '0') + ':' + String(Math.floor((d.h % 1) * 60)).padStart(2, '0') + ' UTC)', 'Open sessions: ' + (d.ses.length ? d.ses.join(', ') : 'none (thin hours)'),
         'Kill zones in your time: Asia open ' + loc(0) + ' to ' + loc(3) + ', London open ' + loc(7) + ' to ' + loc(10) + ', New York open ' + loc(12) + ' to ' + loc(15) + ', London close ' + loc(15) + ' to ' + loc(17), d.next ? 'Next kill zone: ' + d.next.nm + ' in about ' + (d.next.dh < 1 ? Math.round(d.next.dh * 60) + ' minutes' : d.next.dh.toFixed(1) + ' hours') : ''];
@@ -8638,6 +8640,9 @@ function cpEval(R, dir){
   return out;
 }
 function cpOverall(R, dir){
+  { const kk = R.__ov && R.__ov[dir], nk = Object.keys(R).length; if (kk && kk.n === nk && Date.now() - kk.t < 60000) return kk.v; const v = cpOverall0(R, dir); try { if (!R.__ov) Object.defineProperty(R, '__ov', {value:{}, enumerable:false, writable:true}); R.__ov[dir] = {t:Date.now(), n:Object.keys(R).length, v}; } catch(e){} return v; }
+}
+function cpOverall0(R, dir){
   const items = cpEval(R, dir), W = {ok:1, warn:0.4, bad:0};
   let s = 0, w = 0, ok = 0, warn = 0, bad = 0, n = 0;
   for (const id of CP_ORDER){ const it = items[id]; if (!it || it.st === 'na') continue; const wt = CP_CORE.has(id) ? 2 : 1; s += W[it.st] * wt; w += wt; n++; if (it.st === 'ok') ok++; else if (it.st === 'warn') warn++; else bad++; }
@@ -8713,7 +8718,8 @@ function cpDraw(){
 /* the Confirm column / buttons are added to every scanner table or card that shows a coin name */
 function cpDecorate(){
   const sel = ['#viewMovers a[data-chart]', '#viewWatch a[data-chart]', '#viewSdesk a[data-chart]', '#viewSdesk button[data-chart]', '#viewMemes a[data-chart]', '#viewOrderflow a[data-chart]', '#viewOptions a[data-chart]', '#viewSignals a[data-chart]', '#viewWhales a[data-chart]', '#viewFlows a[data-chart]', '#viewNews a[data-chart]', '#viewMap a[data-chart]', '#viewLookup [data-lkchart]'];
-  document.querySelectorAll(sel.join(',')).forEach(a => {
+  const actSel = sel.filter(x => { try { const e0 = document.querySelector(x.split(' ')[0]); return !e0 || !e0.hidden; } catch(e){ return true; } });
+  if (actSel.length) document.querySelectorAll(actSel.join(',')).forEach(a => {
     const nm = a.dataset.chart || a.dataset.lkchart; if (!nm) return; const nx = a.nextElementSibling;
     if (nx && nx.classList && nx.classList.contains('cpb')){ if (nx.dataset.cp !== nm) nx.dataset.cp = nm; return; }
     a.insertAdjacentHTML('afterend', cpChip(nm, true).replace('<button ', '<button data-cpd="1" '));
@@ -8733,7 +8739,7 @@ function cpAuto(names){
 function cpInit(){
   if (cpInit.done) return; cpInit.done = true; cpDlgEnsure();
   document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-cp]'); if (!b) return; e.preventDefault(); e.stopPropagation(); cpOpen(b.dataset.cp); }, true);
-  try { new MutationObserver(muts => { for (const m of muts) for (const n of m.addedNodes){ if (!(n.nodeType === 1 && n.classList && n.classList.contains('cpb'))){ try { cpDecorate(); } catch(e){} return; } } }).observe(document.body, {childList:true, subtree:true}); } catch(e){}
+  try { new MutationObserver(muts => { for (const m of muts) for (const n of m.addedNodes){ if (!(n.nodeType === 1 && n.classList && (n.classList.contains('cpb') || n.classList.contains('lim')))){ cpDecSoon(); return; } } }).observe(document.body, {childList:true, subtree:true}); } catch(e){}
   cpDecSoon();
 }
 
@@ -14769,7 +14775,7 @@ function renderPredict(force){
       <div class="row" id="prBar" style="gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0"></div>
       <div id="prMarket"></div><div id="prGuide"></div><div id="prTrackBox"></div>
       <p class="hint" id="prNote"></p><div class="psw" id="prWrap"></div></div>`;
-    el.addEventListener('click', prClick); el.addEventListener('change', prChange); el.addEventListener('input', e => { if (e.target.id === 'prQ'){ st.q = e.target.value; saveState(); prDraw(); } });
+    el.addEventListener('click', prClick); el.addEventListener('change', prChange); el.addEventListener('input', e => { if (e.target.id === 'prFindQ'){ st.q = e.target.value; saveState(); prDraw(); } });
   }
   if (!force && Date.now() - PR.lastRender < 7000) return; PR.lastRender = Date.now();
   prBarDraw(st); prDraw(true); prTick();
@@ -14782,7 +14788,7 @@ function prBarDraw(st){
     <label class="hint">Min confidence ${sel('prConf', [[0, 'any'], [45, '45+'], [60, '60+'], [75, '75+']], st.conf)}</label>
     <label class="hint"><input type="checkbox" id="prHL"${st.hl ? ' checked' : ''}> Hyperliquid only</label>
     <label class="hint">Rows ${sel('prN', [[20, '20'], [40, '40'], [80, '80'], [150, '150']], st.n)}</label>
-    <label class="hint">Find <input id="prQ" type="text" value="${esc(st.q)}" placeholder="coin" style="width:80px"></label>
+    <label class="hint">Find <input id="prFindQ" type="text" value="${esc(st.q)}" placeholder="coin" style="width:80px"></label>
     <button class="btn sm" type="button" data-pra="refresh">↻ Refresh</button><button class="btn sm" type="button" data-pra="csv2">⬇ CSV</button>`;
   if (act){ const a = $(act); if (a && a.focus) try { a.focus(); } catch(e){} }
 }
@@ -15652,10 +15658,10 @@ function accRender(){
   const el = $('viewAccum'); if (!el) return;
   if (!el._b){ el._b = 1;
     el.innerHTML = `<div class="nsec"><h3>🕵️ Silent Accumulation Radar <small class="hint">(altcoins big players seem to be quietly building)</small></h3><p class="hint">Reads about 8 months of daily candles for the larger altcoins and looks for the footprints of quiet buying: price that goes nowhere while buyers take more of the volume, selling that dries up, higher lows and a shake-out that gets bought back. Each coin gets a score out of 100, a verdict, the reasons and a hold time: weeks, about a month or two, or months. Bitcoin, Ether and stablecoins are left out.</p>
-      <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><label class="hint">Minimum score <select id="acMin"><option value="70">70 strong</option><option value="55" selected>55 probable</option><option value="40">40 early signs</option><option value="0">0 show all</option></select></label><label class="hint">Hold <select id="acHold"><option value="all">any</option><option value="weeks">weeks</option><option value="month">about 1 to 2 months</option><option value="months">months</option></select></label><input id="acQ" type="text" placeholder="Find a coin…" style="min-width:150px"><button class="btn primary" type="button" id="acGo">Refresh</button><button class="btn sm" type="button" id="acCsv">Download CSV</button></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><label class="hint">Minimum score <select id="acMin"><option value="70">70 strong</option><option value="55" selected>55 probable</option><option value="40">40 early signs</option><option value="0">0 show all</option></select></label><label class="hint">Hold <select id="acHold"><option value="all">any</option><option value="weeks">weeks</option><option value="month">about 1 to 2 months</option><option value="months">months</option></select></label><input id="acFindQ" type="text" placeholder="Find a coin…" style="min-width:150px"><button class="btn primary" type="button" id="acGo">Refresh</button><button class="btn sm" type="button" id="acCsv">Download CSV</button></div>
       <div id="acOut"></div><p class="hint"><b>Caution:</b> this is an inference from public volume and candle data, not proof that institutions are buying, and it is not backtested. Altcoins follow Bitcoin, so check BTC first. Use small size, scale in, and keep the stop.</p></div>`;
     el.addEventListener('change', e => { if (e.target.id === 'acMin'){ ACC.f.min = +e.target.value; accDraw(); } else if (e.target.id === 'acHold'){ ACC.f.hold = e.target.value; accDraw(); } });
-    el.addEventListener('input', e => { if (e.target.id === 'acQ'){ ACC.f.q = e.target.value; accDraw(); } });
+    el.addEventListener('input', e => { if (e.target.id === 'acFindQ'){ ACC.f.q = e.target.value; accDraw(); } });
     el.addEventListener('click', e => { if (e.target.closest('#acGo')){ accLoad(true); accDraw(); } else if (e.target.closest('#acCsv')) accCsv(); else if (!e.target.closest('a')){ const tr = e.target.closest('tr.acrow'); if (tr){ const sy = tr.dataset.sy; ACC.f.open = ACC.f.open === sy ? '' : sy; accDraw(); } } });
   }
   accDraw(); if (!ACC.busy && (!ACC.at || Date.now() - ACC.at > 7200000)) accLoad(false);
@@ -17228,7 +17234,7 @@ async function updCheck(manual){
   try {
     const cur = (document.querySelector('.v4b') || {}).textContent || '', url = location.href.split('#')[0].replace(/[?&]r=\d+/, '');
     let latest = '';
-    if (/^https?:/.test(location.protocol)){ const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'chk=' + Date.now(), {cache:'no-store'}); if (r.ok) latest = updVer(await r.text()); }
+    if (/^https?:/.test(location.protocol)){ const ctl = new AbortController(), r = await fetch(url + (url.includes('?') ? '&' : '?') + 'chk=' + Date.now(), {cache:'no-store', signal:ctl.signal}); if (r.ok){ if (r.body && r.body.getReader){ /* the version sits at the very top of the page: stop downloading as soon as it is found (about 100 KB instead of 3 MB) */ const rd = r.body.getReader(), dec = new TextDecoder(); let t = ''; try { for (;;){ const x = await rd.read(); if (x.done) break; t += dec.decode(x.value, {stream:true}); latest = updVer(t); if (latest || t.length > 600000) break; } } finally { try { rd.cancel(); } catch(e){} try { ctl.abort(); } catch(e){} } } else latest = updVer(await r.text()); } }
     UPD.newer = !!latest && latest !== cur;
     if (btn){ btn.classList.toggle('newv', UPD.newer); btn.title = UPD.newer ? 'New version ' + latest + ' is ready. Press to update.' : 'Refresh all data (you have the latest version)'; if (!manual) btn.textContent = UPD.newer ? '⟳ Update ' + latest : '⟳ Refresh'; }
     if (!manual) return;
@@ -17262,10 +17268,10 @@ function renderOverview(){
 
 /* ===== V4.9: install as an app (Chrome / Edge on Windows, Android) ===== */
 (function(){
-  let dp = null; const bt = () => document.getElementById('btnInstall');
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; const b = bt(); if (b) b.hidden = false; });
-  window.addEventListener('appinstalled', () => { dp = null; const b = bt(); if (b) b.hidden = true; });
-  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnManual')){ const w = window.open('manual.html', '_blank', 'noopener'); if (!w) location.href = 'manual.html'; return; } const b = e.target.closest && e.target.closest('#btnInstall'); if (!b || !dp) return; dp.prompt(); dp.userChoice.finally(() => { dp = null; b.hidden = true; }); });
+  let dp = null; const bt = () => document.getElementById('btnInstall'); const bn = () => document.getElementById('btnInstallNav');
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; const b = bt(); if (b) b.hidden = false; const n = bn(); if (n) n.hidden = false; });
+  window.addEventListener('appinstalled', () => { dp = null; const b = bt(); if (b) b.hidden = true; const n = bn(); if (n) n.hidden = true; });
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnManual')){ const w = window.open('manual.html', '_blank', 'noopener'); if (!w) location.href = 'manual.html'; return; } const b = e.target.closest && e.target.closest('#btnInstall,#btnInstallNav'); if (!b || !dp) return; dp.prompt(); dp.userChoice.finally(() => { dp = null; b.hidden = true; }); });
   if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 })();
 /* ===== V4.12: listings index (which exchange lists which coin), Hyperliquid HIP-3 / spot / HIP-4, and Meteora DEX pools ===== */
@@ -17359,7 +17365,8 @@ function liMini(name){
 }
 function liColumn(){ return {id:'listed', label:'Listed on', val:c => liTags(c.name).length, cell:c => [liChips(c.name, 6), '', 'white-space:normal;min-width:190px;max-width:300px;text-align:left']}; }
 function liDecorate(){
-  document.querySelectorAll('#viewMovers .cpb[data-cpd], #viewWatch .cpb[data-cpd], #viewSignals .cpb[data-cpd], #viewWhales .cpb[data-cpd], #viewMemes .cpb[data-cpd]').forEach(b => {
+  const liSel = ['#viewMovers', '#viewWatch', '#viewSignals', '#viewWhales', '#viewMemes'].filter(x => { const e0 = document.querySelector(x); return !e0 || !e0.hidden; }).map(x => x + ' .cpb[data-cpd]').join(', ');
+  if (liSel) document.querySelectorAll(liSel).forEach(b => {
     const nm = b.dataset.cp, html = liMini(nm), key = liTags(nm).join(','), nx = b.nextElementSibling;
     if (nx && nx.classList.contains('lim')){ if (nx.dataset.n !== key){ const t = document.createElement('template'); t.innerHTML = html; nx.replaceWith(t.content.firstChild); } return; }
     b.insertAdjacentHTML('afterend', html);
@@ -20626,7 +20633,7 @@ const TA = window.TA = {
     b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var show = i.type === 'password'; i.type = show ? 'text' : 'password'; b.textContent = show ? 'Hide' : 'Show'; i.focus(); });
   }
   var q = 0; function scan(){ q = 0; document.querySelectorAll('input[type="password"]').forEach(wrap); }
-  function sched(){ if (!q) q = requestAnimationFrame(scan); }
+  function sched(){ if (!q) q = setTimeout(scan, 600); }
   scan(); new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
