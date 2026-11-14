@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.84</title>
+<title>ELPP CRYPTO SCANNER PRO V9.85</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -848,7 +848,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.84</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.85</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -3064,7 +3064,7 @@ function renderWhales(){
       <p class="hint">Shows which coins the biggest public Hyperliquid wallets are holding, whether they are long or short, and their open profit or loss. Whale + orca + shark are counted as institutions. Wallets come from Hyperliquid's public leaderboard. If your network blocks it, paste its address, or paste wallet addresses below (one per line, then an optional name).</p>
       <div class="row"><input type="text" id="whLb" placeholder="Leaderboard address (optional, default is Hyperliquid's own)" style="flex:1;min-width:240px"><button class="btn sm" id="whReload" type="button">Reload wallets</button></div>
       <div class="row"><textarea id="whList" rows="3" placeholder="Extra wallets to follow, e.g. 0xabc…123 My favourite trader" style="flex:1;min-width:240px"></textarea></div>
-      <div class="row"><label class="hint">Min institutional size <select id="whMin"><option value="0">Any</option><option value="250000">$250k</option><option value="1000000">$1M</option><option value="5000000">$5M</option><option value="20000000">$20M</option></select></label>
+      <div class="row"><label class="hint">Min institutional size <select id="whMin"><option value="0">Any</option><option value="250000">$250k</option><option value="1000000">$1M</option><option value="5000000">$5M</option><option value="10000000">$10M</option><option value="15000000">$15M</option><option value="20000000">$20M</option><option value="20000001">&gt; $20M</option></select></label>
         <label class="hint">Min wallets <select id="whMinN"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option></select></label>
         <label class="hint">Side <select id="whSideF"><option value="all">All</option><option value="1">Long</option><option value="2">Short</option></select></label>
         <label class="hint">Sort <select id="whSort"><option value="usd">Biggest</option><option value="long">Most net long</option><option value="short">Most net short</option><option value="pnl">Most profit</option><option value="flow">Biggest flow</option></select></label></div>
@@ -15912,7 +15912,7 @@ async function ofLoad(name){
 /* V9.82: large-trades bubble map (like the CoinGlass Large Trades indicator): each big print is a circle, size = dollars, green = bought at the ask, red = sold at the bid */
 function ofBubbles(D){
   const T = D && D.tape; if (!T || !T.trades || T.trades.length < 30) return '';
-  const tr = T.trades, t0 = tr[0].T, t1 = tr[tr.length - 1].T, span = Math.max(1000, t1 - t0), lg = tr.filter(x => x.usd >= T.thr), max = lg.reduce((m, x) => Math.max(m, x.usd), 0);
+  const tr = T.trades, t0 = tr[0].T, t1 = tr[tr.length - 1].T, span = Math.max(1000, t1 - t0), lg = tr.filter(x => x.usd >= Math.max(T.thr, OFL.bmin || 0)), max = lg.reduce((m, x) => Math.max(m, x.usd), 0);
   const W = 860, H = 300, pl = 8, pr = 66, pt = 10, pb = 22, pw = W - pl - pr, ph = H - pt - pb, bms = Math.max(1000, span / 40), bk = new Map();
   for (const x of tr){ const k = Math.floor((x.T - t0) / bms); let c = bk.get(k); if (!c) bk.set(k, c = {k, o:x.p, h:x.p, l:x.p, c:x.p}); c.h = Math.max(c.h, x.p); c.l = Math.min(c.l, x.p); c.c = x.p; }
   const cs = [...bk.values()].sort((a, b) => a.k - b.k); let lo = Math.min(...cs.map(c => c.l)), hi = Math.max(...cs.map(c => c.h)); const pad = ((hi - lo) || hi * 0.001) * 0.12; lo -= pad; hi += pad;
@@ -15922,7 +15922,7 @@ function ofBubbles(D){
   const shown = lg.slice().sort((a, b) => b.usd - a.usd).slice(0, 300).sort((a, b) => b.usd - a.usd);
   for (const x of shown){ const r = 4 + 22 * Math.sqrt(x.usd / (max || 1)), col = x.buy ? '#22d36b' : '#ff4d4d'; g += '<circle cx="' + X(x.T).toFixed(1) + '" cy="' + Y(x.p).toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + col + '" fill-opacity="0.18" stroke="' + col + '" stroke-width="1.4"><title>' + esc((x.buy ? 'Bought ' : 'Sold ') + fmtUsd(x.usd) + ' at ' + fmtPx(x.p) + ' · ' + new Date(x.T).toLocaleTimeString()) + '</title></circle>'; }
   const tm = [t0, t0 + span / 2, t1].map((t, i) => '<text x="' + (i === 0 ? pl : i === 1 ? pl + pw / 2 : pl + pw) + '" y="' + (H - 6) + '" font-size="10" fill="#9aa4b2" text-anchor="' + (i === 0 ? 'start' : i === 1 ? 'middle' : 'end') + '">' + esc(new Date(t).toLocaleTimeString()) + '</text>').join('');
-  return '<div class="nsec"><h3>Large trades <small class="hint">bubble map, ' + T.mins.toFixed(1) + ' min</small></h3><p class="hint" style="margin:0 0 4px">MAX <b>' + esc(fmtUsd(max)) + '</b> · Count <b>' + T.n + '</b> trades · Large trades <b>' + lg.length + '</b> (each ' + esc(fmtUsd(T.thr)) + ' or more, 5 times the median trade) · large buys <b class="up">' + esc(fmtUsd(T.lb)) + '</b> vs large sells <b class="dn">' + esc(fmtUsd(T.ls)) + '</b></p><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;background:#0f141b;border-radius:6px" role="img" aria-label="Large trades bubble map">' + g + tm + '</svg><p class="hint">Each circle is one big print: the bigger the circle, the more dollars. Green = bought at the ask (aggressive buyer), red = sold at the bid (aggressive seller). Candles are built from the same trades. Binance only gives the latest trades, so this covers the last few minutes, not hours. Hover a circle for its size, price and time.</p></div>';
+  return '<div class="nsec"><h3>Large trades <small class="hint">bubble map, ' + T.mins.toFixed(1) + ' min</small></h3><p class="hint" style="margin:0 0 4px">MAX <b>' + esc(fmtUsd(max)) + '</b> · Count <b>' + T.n + '</b> trades · <label>Smallest bubble <select id="ofBmin">' + [[0, 'Auto'], [10000, '$10K'], [25000, '$25K'], [50000, '$50K'], [100000, '$100K'], [250000, '$250K'], [500000, '$500K'], [1000000, '$1M'], [2500000, '$2.5M'], [5000000, '$5M'], [10000000, '$10M'], [15000000, '$15M'], [20000000, '$20M'], [20000001, '&gt; $20M']].map(o => '<option value="' + o[0] + '"' + ((OFL.bmin || 0) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label> · Large trades <b>' + lg.length + '</b> (each ' + esc(fmtUsd(T.thr)) + ' or more, 5 times the median trade) · large buys <b class="up">' + esc(fmtUsd(T.lb)) + '</b> vs large sells <b class="dn">' + esc(fmtUsd(T.ls)) + '</b></p><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;background:#0f141b;border-radius:6px" role="img" aria-label="Large trades bubble map">' + g + tm + '</svg><p class="hint">Each circle is one big print: the bigger the circle, the more dollars. Green = bought at the ask (aggressive buyer), red = sold at the bid (aggressive seller). Candles are built from the same trades. Binance only gives the latest trades, so this covers the last few minutes, not hours. Hover a circle for its size, price and time.</p></div>';
 }
 function ofBuild(D, ci){
   const P = v => esc(fmtPx(v)), U = v => esc(fmtUsd(v)), sg = (v, d) => (v > 0 ? '+' : '') + v.toFixed(d == null ? 2 : d), tb = (h, rows, cls) => `<div style="overflow:auto"><table class="gtab sm ci-t ${cls || ''}"><thead><tr>${h}</tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -15954,7 +15954,7 @@ function ofRender(){
     const go = () => { OFL.name = $('ofQ').value.trim().toUpperCase().replace(/USDT$/, ''); state.ciName = OFL.name; try { saveState(); } catch(e){} OFL.d = null; OFL.prevW = null; OFL.busy = 0; ofDraw(); if (OFL.name) ofLoad(OFL.name); };
     el.addEventListener('click', e => { if (e.target.closest('#ofGo')) go(); });
     el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ofQ') go(); });
-    el.addEventListener('change', e => { if (e.target.id === 'ofTf'){ OFL.tf = +e.target.value; if (OFL.d && OFL.d.tape) OFL.d.foot = ofFoot(OFL.d.tape.trades, OFL.tf, OFL.d.px); ofDraw(); } });
+    el.addEventListener('change', e => { if (e.target.id === 'ofBmin'){ OFL.bmin = +e.target.value || 0; ofDraw(); } if (e.target.id === 'ofTf'){ OFL.tf = +e.target.value; if (OFL.d && OFL.d.tape) OFL.d.foot = ofFoot(OFL.d.tape.trades, OFL.tf, OFL.d.px); ofDraw(); } });
     ofDraw(); if (OFL.name) ofLoad(OFL.name);
   } else if (OFL.name && (!OFL.d || Date.now() - OFL.at > 30000) && !OFL.busy) ofLoad(OFL.name);
 }
@@ -20028,7 +20028,8 @@ Chart.prototype.extFront = function(g, plotW, ff){
 };
 /* ===== V9.84: super chart: large-trade bubbles + next-candle breakout probability ===== */
 XDEF.push(['bub', 'Large trades (bubbles)', 'Each big print as a circle at its price and time: green = aggressive buy, red = aggressive sell, size = dollars. Pick the smallest trade to show so small trades do not clutter the chart. Binance coins load recent history; other coins fill live from the moment you switch it on.'], ['brk', 'Breakout probability (next candle)', 'How likely the next candle is to close outside this candle’s range, learned from this coin’s own candles and tilted by the scanner’s long/short read. Shown only above your threshold; green = up, red = down.']);
-const BUB = new Map(), BUB_FLOOR = 10000, BUB_MAX = 5000, BUB_MIN = [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000];
+const BUB = new Map(), BUB_FLOOR = 10000, BUB_MAX = 5000, BUB_MIN = [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000, 15000000, 20000000, 20000001];
+const szL = v => v > 2e7 ? '> $20M' : usdF(v);
 const usdF = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + 'M' : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'K' : '$' + Math.round(v);
 function bubKey(f){ const b = bnSymOf(f); if (b) return ['bn', b]; const hs = venSyms('hl', f.sym)[0]; return hs ? ['hl', hs[1]] : null; }
 function bubAdd(st, arr){ for (const t of arr){ if (!(t.usd >= BUB_FLOOR) || st.ids.has(t.a)) continue; st.ids.add(t.a); st.tr.push(t); } st.tr.sort((x, y) => x.t - y.t); if (st.tr.length > BUB_MAX){ for (const t of st.tr.splice(0, st.tr.length - BUB_MAX)) st.ids.delete(t.a); } }
@@ -20058,7 +20059,7 @@ Chart.prototype.bubDraw = function(g, plotW, ff){
   for (const q of list.slice().reverse()){ const x = this.xOf(q.i), y = this.yOf(q.pv / q.usd), r = 4 + 17 * Math.sqrt(q.usd / mx); if (x < -r || x > plotW + r || y < -r || y > mh + r) continue; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fillStyle = q.buy ? 'rgba(47,191,113,0.34)' : 'rgba(240,97,109,0.34)'; g.fill(); g.lineWidth = 1.2; g.strokeStyle = q.buy ? '#2fbf71' : '#f0616d'; g.stroke(); }
   g.textAlign = 'center'; g.fillStyle = '#e6edf3'; list.slice(0, 8).forEach(q => { const x = this.xOf(q.i), y = this.yOf(q.pv / q.usd); if (x > 10 && x < plotW - 10 && y > 8 && y < mh - 4) g.fillText(usdF(q.usd), x, y + 3); });
   g.textAlign = 'left'; g.fillStyle = '#8393a7'; const first = st.tr.length ? st.tr[0].t : null, fm = first ? new Date(first).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-  g.fillText('Large trades ' + (auto ? 'auto' : '≥ ' + usdF(thr)) + (auto ? ' (≥ ' + usdF(thr) + ')' : '') + ' · ' + list.length + ' shown · ' + (k[0] === 'bn' ? 'Binance' : 'Hyperliquid live') + (first ? ', trades since ' + fm : ', waiting for trades') + (st.err ? ' · ' + st.err : ''), 8, 36);
+  g.fillText('Large trades ' + (auto ? 'auto' : (thr > 2e7 ? '> $20M' : '≥ ' + usdF(thr))) + (auto ? ' (≥ ' + usdF(thr) + ')' : '') + ' · ' + list.length + ' shown · ' + (k[0] === 'bn' ? 'Binance' : 'Hyperliquid live') + (first ? ', trades since ' + fm : ', waiting for trades') + (st.err ? ' · ' + st.err : ''), 8, 36);
   g.restore();
 };
 /* next-candle breakout probability: logistic model on this chart's own candles, direction tilted by the scanner */
@@ -20090,7 +20091,7 @@ Chart.prototype.extFront = function(g, plotW, ff){
   if (this.cell && Date.now() - (this._qs || 0) > 1000){ this._qs = Date.now(); try { for (const b of this.cell.querySelectorAll('[data-a="qbub"],[data-a="qbrk"]')) b.classList.toggle('on', xOn(p, b.dataset.a === 'qbub' ? 'bub' : 'brk')); } catch(e){} }
 };
 function xcfg(p){ const b = p.bub || {min:0, side:'both'}, r = p.brk || {thr:50}, sel = (att, v, opts) => '<select ' + att + '>' + opts.map(([k, t]) => '<option value="' + k + '"' + (String(v) === String(k) ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>';
-  return '<div style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Large-trade bubbles</b><div class="rw"><span>Smallest trade</span>' + sel('data-bub="min"', BUB_MIN.includes(b.min) ? b.min : '', BUB_MIN.map(v => [v, v ? usdF(v) : 'Auto (top 40)']).concat(BUB_MIN.includes(b.min) ? [] : [['', 'Custom ' + usdF(b.min)]])) + ' <input type="number" min="1000" step="1000" placeholder="custom $" data-bub="custom" style="width:90px"></div><div class="rw"><span>Show</span>' + sel('data-bub="side"', b.side, [['both', 'Buys and sells'], ['buy', 'Buys only'], ['sell', 'Sells only']]) + '</div><b>Breakout probability</b><div class="rw"><span>Show only above</span>' + sel('data-brk="thr"', r.thr, [50, 55, 60, 65, 70, 75, 80].map(v => [v, v + '%'])) + '</div></div>'; }
+  return '<div style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><b>Large-trade bubbles</b><div class="rw"><span>Smallest trade</span>' + sel('data-bub="min"', BUB_MIN.includes(b.min) ? b.min : '', BUB_MIN.map(v => [v, v ? szL(v) : 'Auto (top 40)']).concat(BUB_MIN.includes(b.min) ? [] : [['', 'Custom ' + szL(b.min)]])) + ' <input type="number" min="1000" step="1000" placeholder="custom $" data-bub="custom" style="width:90px"></div><div class="rw"><span>Show</span>' + sel('data-bub="side"', b.side, [['both', 'Buys and sells'], ['buy', 'Buys only'], ['sell', 'Sells only']]) + '</div><b>Breakout probability</b><div class="rw"><span>Show only above</span>' + sel('data-brk="thr"', r.thr, [50, 55, 60, 65, 70, 75, 80].map(v => [v, v + '%'])) + '</div></div>'; }
 /* ---- header chips (this timeframe) and per-timeframe tooltips ---- */
 function instLine(ie, n){ if (!ie || !ie.c.length) return 'no institutional entry candle in view'; const o = ie.c.filter(x => x.st !== 'failed').slice(-1)[0] || ie.c[ie.c.length - 1]; return (o.kind === 'absorb' ? 'absorption ' : 'institutional ') + (o.dir > 0 ? 'BUY' : 'SELL') + ' ' + o.mult.toFixed(1) + '× volume, ' + (n - 1 - o.i) + ' bars ago · ' + (o.st === 'failed' ? 'FAILED (price closed through it)' : o.st === 'real' ? 'held ✓' : 'too fresh to judge') + (o.tests.length ? ' · 2nd test ✓' : ' · no 2nd test yet') + (o.rec.length ? ' · reclaimed' : '') + (o.hunts.length ? ' · hunt wick seen' : ''); }
 const _au2 = anaUpd;
