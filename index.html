@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.90</title>
+<title>ELPP CRYPTO SCANNER PRO V9.91</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.90</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.91</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -2368,7 +2368,7 @@ async function spend(w){
 function budgetUsed(){ const cut = Date.now() - 60000; while (budget.log.length && budget.log[0][0] < cut) budget.log.shift(); return budget.log.reduce((a,b) => a + b[1], 0); }
 async function hl(body, w){
   await spend(w);
-  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 20000);
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 12000);
   try {
     const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
     if (r.status === 429){ budget.tokens = -500; throw new Error('Rate limited by Hyperliquid (429). Slowing down.'); }
@@ -2538,7 +2538,7 @@ async function ctxTickV(){
   if (mode === 'auto'){
     if (!V.fb){
       if (R.hyperliquid) V.hlFail = 0;
-      else { V.hlFail++; if (V.hlFail >= 2){ V.fb = true; V.fbAt = now; await run(VFALL); } }
+      else { V.hlFail++; if (V.hlFail >= (state.lastCtx ? 2 : 1)){ V.fb = true; V.fbAt = now; await run(VFALL); } }
     } else {
       /* in fallback: probe Hyperliquid every 10 minutes and return to it once it answers */
       if (now - V.fbAt >= 600000){ const hr = await vTickers('hyperliquid'); if (hr){ R = {hyperliquid:hr}; got = 1; V.fb = false; V.hlFail = 0; } else V.fbAt = now - 300000; }
@@ -17402,9 +17402,12 @@ async function updCheck(manual){
     if (UPD.newer){ toast('Updating to ' + latest + '…'); try { const rs = await navigator.serviceWorker.getRegistrations(); for (const x of rs) await x.unregister(); } catch(e){} try { for (const k of await caches.keys()) await caches.delete(k); } catch(e){} setTimeout(() => { location.replace(url.split('?')[0] + '?r=' + Date.now()); }, 400); return; }
     toast('You have the latest version (' + cur + '). Refreshing all data…');
     PT.at = 0; OV.cacheAt = 0; MX.cacheAt = 0; MX.at = 0;
-    for (const f of [() => ctxTick(), () => loadMarkets(), () => loadMacro(), () => ovLoadExtra(true), () => mxLoad(true), () => jrSync(false), () => eiLoadAll(true), () => requestRender()]){ try { const p = f(); if (p && p.catch) p.catch(() => {}); } catch(e){} }
+    if (btn) btn.textContent = '⟳ Updating data…'; const ps = [];
+    for (const f of [() => ctxTick(), () => loadMarkets(), () => loadMacro(), () => ovLoadExtra(true), () => mxLoad(true), () => jrSync(false), () => eiLoadAll(true), () => requestRender()]){ try { const p = f(); if (p && p.catch) ps.push(p.catch(() => {})); } catch(e){} }
+    await Promise.race([Promise.all(ps), sleep(20000)]);
+    if (btn){ const ok = !!state.lastCtx && !state.err; btn.textContent = ok ? '✓ Updated' : '⚠ No data yet'; toast(ok ? 'Data updated.' : 'Could not reach the exchanges yet: ' + (state.err || 'still connecting') + '. Check your internet or VPN.'); setTimeout(() => { if (btn && !UPD.checking) btn.textContent = UPD.newer ? '⟳ Update' : '⟳ Refresh'; }, 3000); }
   } catch(e){ if (manual){ toast('Could not check for updates (' + errTxt(e) + '). Reloading…'); setTimeout(() => location.reload(), 700); } }
-  finally { UPD.checking = false; if (btn){ btn.disabled = false; if (manual) btn.textContent = UPD.newer ? '⟳ Update' : '⟳ Refresh'; } }
+  finally { UPD.checking = false; if (btn){ btn.disabled = false; if (manual && !/Updat|No data/.test(btn.textContent)) btn.textContent = UPD.newer ? '⟳ Update' : '⟳ Refresh'; } }
 }
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#btnUpdate')) updCheck(true); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updCheck(false); });
