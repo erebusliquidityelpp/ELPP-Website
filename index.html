@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.87</title>
+<title>ELPP CRYPTO SCANNER PRO V9.88</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -848,7 +848,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.87</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.88</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -19872,7 +19872,7 @@ Chart.prototype.hit = function(x, y){
 /* ---------- market phases + institutional entry tracking (everything is computed from the candles of the chart's own timeframe) ---------- */
 SMC.push(
   ['phz', 'Phases', 'Market phases', 'Boxes the ranges and names them: accumulation (buyers loading after a drop), distribution (sellers unloading after a rise) or choppy (no edge). Computed on this timeframe'],
-  ['phb', 'Real / fake breakout', 'Market phases', 'First close beyond the 20-candle range. REAL = it held for 3 candles on above-normal volume. FAKE = it closed back inside within 3 candles (a trap)'],
+  ['phb', 'Real / fake breakout', 'Market phases', 'First close beyond the 20-candle range. REAL = it held for 3 candles on above-normal volume (green for a buy breakout, red for a sell breakout). FAKE = it closed back inside within 3 candles (a trap, orange, written BUY FAKE BREAKOUT or SELL FAKE BREAKOUT)'],
   ['phm', 'Manipulation', 'Market phases', 'Stop hunt: a big wick through the recent high or low on rising volume that closes back inside, the way smart money grabs liquidity'],
   ['ieC', 'Real inst. volume', 'Institutional entry', 'Candles with 2x+ normal volume, a big range and a strong close in one direction: institutions entered. Marked with the volume multiple and a tick if it held, a cross if it failed'],
   ['ieZ', 'Entry zones', 'Institutional entry', 'The lower (buy) or upper (sell) half of the institutional candle body, drawn forward until price closes through it. Where institutions defend their position'],
@@ -19942,7 +19942,7 @@ Chart.prototype.extFront = function(g, plotW, ff){
     for (const e of C.ph.ev.slice(-60)){
       if (!inV(e.i)) continue; const x = this.xOf(e.i);
       if (e.type === 'man' && on('phm')){ const y = e.dir > 0 ? this.yOf(B[e.i].l) + 4 : this.yOf(B[e.i].h) - 4; mk2(x, y, e.dir > 0, '#e879f9'); lab(e.txt, x, e.dir > 0 ? y + 17 : y - 10, '#e879f9'); }
-      if (e.type === 'bo' && on('phb') && e.st !== 'weak'){ const real = e.st === 'real', fake = e.st === 'fake', col = real ? '#2fbf71' : fake ? '#f0616d' : '#e3b341', y = e.dir > 0 ? this.yOf(B[e.i].h) - 6 : this.yOf(B[e.i].l) + 6; if (e.lvl){ const yl = Math.round(this.yOf(e.lvl)) + 0.5; g.strokeStyle = rgba(col, 0.5); g.setLineDash([3, 3]); g.beginPath(); g.moveTo(this.xOf(Math.max(vis0, e.i - 20)), yl); g.lineTo(x + this.bw * 4, yl); g.stroke(); g.setLineDash([]); } mk2(x, y, e.dir < 0, col); lab((real ? 'REAL BO' : fake ? 'FAKE BO (trap)' : 'BO?') + (e.dir > 0 ? ' ▲' : ' ▼'), x, e.dir > 0 ? y - 10 : y + 18, col); }
+      if (e.type === 'bo' && on('phb') && e.st !== 'weak'){ const real = e.st === 'real', fake = e.st === 'fake', col = fake ? '#f0a030' : real ? (e.dir > 0 ? '#2fbf71' : '#f0616d') : '#8393a7', y = e.dir > 0 ? this.yOf(B[e.i].h) - 6 : this.yOf(B[e.i].l) + 6; if (e.lvl){ const yl = Math.round(this.yOf(e.lvl)) + 0.5; g.strokeStyle = rgba(col, 0.5); g.setLineDash([3, 3]); g.beginPath(); g.moveTo(this.xOf(Math.max(vis0, e.i - 20)), yl); g.lineTo(x + this.bw * 4, yl); g.stroke(); g.setLineDash([]); } mk2(x, y, e.dir < 0, col); lab((real ? (e.dir > 0 ? 'REAL BUY BREAKOUT ▲' : 'REAL SELL BREAKOUT ▼') : fake ? (e.dir > 0 ? 'BUY FAKE BREAKOUT ▲' : 'SELL FAKE BREAKOUT ▼') : (e.dir > 0 ? 'BUY BO? ▲' : 'SELL BO? ▼')), x, e.dir > 0 ? y - 10 : y + 18, col); }
     }
   }
   if (C.ie) for (const o of C.ie.c){
@@ -19961,7 +19961,7 @@ SMC.push(
   ['paTL', 'Trendlines', 'Price action', 'A rising trendline through the swing lows and a falling one through the swing highs, extended to the right. A line with 3 or more touches is strong; a close through it is shown as broken'],
   ['paCs', 'Candle patterns', 'Price action', 'Candlestick patterns on the last 60 candles: pin bar, hammer, shooting star, doji, marubozu, engulfing, harami, piercing line, dark cloud, morning and evening star, three soldiers and crows, tweezers. Green below the candle = bullish, red above = bearish, grey = indecision'],
   ['paCp', 'Chart patterns', 'Price action', 'Double top and bottom, head and shoulders (and inverse), triangles, wedges, rectangle and flags. Drawn with their lines, the neckline or trigger level, the state (forming, at the neckline, confirmed) and the measured target'],
-  ['paBr', 'Breakouts / fakeouts', 'Price action', 'A close through a support or resistance level: BO ✓ = it held (real), BO ? = too early, FAKE = it closed back inside within 4 candles (a trap). RETEST marks the pullback to a broken level that held'],
+  ['paBr', 'Breakouts / fakeouts', 'Price action', 'A close through a support or resistance level: REAL BUY BREAKOUT (green) or REAL SELL BREAKOUT (red) = it held, BO ? = too early (grey), BUY or SELL FAKE BREAKOUT (orange) = it closed back inside within 4 candles (a trap). RETEST marks the pullback to a broken level that held'],
   ['paRg', 'Range', 'Price action', 'The last trading range with its high, low and midpoint. Edges of a range are where trades work; the middle is noise'],
   ['paPl', 'Price action plan', 'Price action', 'The price-action trade plan: entry, stop and two targets with the R:R and grade, from the nearest level, the last swing and the next levels'],
   ['paFb', 'Fib retracement', 'Price action', 'Fibonacci retracement of the last swing (38.2, 50, 61.8, 78.6), the golden pocket (61.8 to 65%) shaded, and the 127.2 and 161.8% extension targets'],
@@ -19982,7 +19982,7 @@ Chart.prototype.extFront = function(g, plotW, ff){
   if (on('paCp')){ for (const cp of R.CP){ const c = cp.dir > 0 ? '#2fbf71' : cp.dir < 0 ? '#f0616d' : '#e3b341'; if (cp.pts && cp.pts.length){ g.strokeStyle = rgba(c, 0.85); g.lineWidth = 1.4; g.beginPath(); cp.pts.forEach((q, k) => { const x = X(q.i), y = Y(q.p); if (k) g.lineTo(x, y); else g.moveTo(x, y); }); g.stroke(); cp.pts.forEach(q => { g.fillStyle = c; g.beginPath(); g.arc(X(q.i), Y(q.p), 2.4, 0, 6.2832); g.fill(); }); }
       (cp.lines || []).forEach(l => line(X(l.i1), Y(l.p1), X(l.i2), Y(l.p2), rgba(c, 0.8), 1.3, [5, 3])); if (cp.neck && cp.pts && cp.pts.length){ const xn = X(cp.line ? cp.line[0].i : cp.ni), yn = Y(cp.neck); line(xn, yn, plotW, yn, rgba(c, 0.7), 1, [6, 3]); lab('neckline ' + fp(cp.neck), plotW - 4, yn - 3, c, 'right'); }
       if (cp.tgt){ const yt = Y(cp.tgt); line(Math.max(0, X(cp.i)), yt, plotW, yt, rgba(c, 0.55), 1, [2, 4]); lab('target ' + fp(cp.tgt), plotW - 4, yt - 3, c, 'right'); } const a = cp.pts && cp.pts.length ? cp.pts[Math.floor(cp.pts.length / 2)] : (cp.lines && cp.lines[0] ? {i:cp.lines[0].i1, p:cp.lines[0].p1} : null); if (a) lab(cp.name + ' · ' + cp.st, Math.max(60, Math.min(plotW - 60, X(a.i))), Y(a.p) + (cp.dir > 0 ? 16 : -9), c); } }
-  if (on('paBr')){ for (const b of R.BO){ if (!inV(b.i)) continue; const x = X(b.i), c = b.st === 'fake' ? '#f0b429' : col(b.dir), y = b.dir > 0 ? Y(B[b.i + off].l) + 14 : Y(B[b.i + off].h) - 8, yl = Y(b.lvl); line(Math.max(0, x - 18), yl, x + 30, yl, rgba(c, 0.6), 1, [2, 3]); lab(b.st === 'fake' ? 'FAKE ' + (b.dir > 0 ? '(bull trap)' : '(bear trap)') : b.st === 'real' ? 'BO ✓' : 'BO ?', x, y, c); }
+  if (on('paBr')){ for (const b of R.BO){ if (!inV(b.i)) continue; const x = X(b.i), c = b.st === 'fake' ? '#f0a030' : b.st === 'real' ? col(b.dir) : '#8393a7', y = b.dir > 0 ? Y(B[b.i + off].l) + 14 : Y(B[b.i + off].h) - 8, yl = Y(b.lvl); line(Math.max(0, x - 18), yl, x + 30, yl, rgba(c, 0.6), 1, [2, 3]); lab(b.st === 'fake' ? (b.dir > 0 ? 'BUY FAKE BREAKOUT (bull trap)' : 'SELL FAKE BREAKOUT (bear trap)') : b.st === 'real' ? (b.dir > 0 ? 'REAL BUY BREAKOUT ✓' : 'REAL SELL BREAKOUT ✓') : (b.dir > 0 ? 'BUY BO ?' : 'SELL BO ?'), x, y, c); }
     const t = R.retest || {}; if (t.dir && t.s >= 0.7 && R.BO.length){ const b = R.BO.find(q => q.st === 'real'); if (b){ const y = Y(b.lvl); lab('RETEST ' + (t.s >= 1 ? '(now)' : '(held)'), plotW - 4, y + (b.dir > 0 ? 12 : -14), '#22d3ee', 'right'); } } }
   if (on('paCs')){ let k = 0; for (const s of R.CS.slice(-60)){ if (!inV(s.i) || s.name === 'Spinning top' || (!s.dir && s.i < R.n - 6)) continue; const bar = B[s.i + off]; if (!bar) continue; const x = X(s.i), c = col(s.dir), up = s.dir >= 0 ? (s.dir > 0 ? false : true) : true; const t = (PA_SHORT[s.name] || s.name) + (s.dir > 0 ? ' ▲' : s.dir < 0 ? ' ▼' : ''); lab(t, x, s.dir > 0 ? Y(bar.l) + 24 : Y(bar.h) - 14, c); } }
   if (on('paIb')){ const s0 = Math.max(1, vis0 - off); for (let i = s0; i < R.n; i++){ const k = R.B[i], q = R.B[i - 1]; if (!q || i + off > vis1) continue; if (k.h < q.h && k.l > q.l){ const x = X(i); g.strokeStyle = rgba('#a78bfa', 0.9); g.lineWidth = 1.2; g.strokeRect(x - this.bw * 0.5 - 1, Y(k.h) - 2, this.bw + 2, Y(k.l) - Y(k.h) + 4); } } if (R.nr7){ lab('NR7', X(R.n - 1), Y(R.B[R.n - 1].h) - 16, '#a78bfa'); } }
