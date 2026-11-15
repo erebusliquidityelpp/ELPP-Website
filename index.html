@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.89</title>
+<title>ELPP CRYPTO SCANNER PRO V9.90</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.89</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.90</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -7193,9 +7193,13 @@ function mkCalc(all){
 }
 function mkDirTxt(r){ return r.state === 'Bad' ? 'Bearish (strong)' : r.state === 'Weak' ? 'Bearish' : r.state === 'Good' ? 'Bullish' : r.state === 'Strong' ? 'Bullish (strong)' : r.state; }
 function mkSideTxt(r){ return (r.state === 'Bad' || r.state === 'Weak') ? ' · FOR SHORTS' : (r.state === 'Good' || r.state === 'Strong') ? ' · FOR LONGS' : ''; }
+function mkWhy(all){ let tot = 0, lastCtx = 0; try { tot = state.coins ? state.coins.size : 0; lastCtx = state.lastCtx || 0; } catch(e){}
+  if (!lastCtx) return esc(state.err ? 'No exchange answered yet: ' + state.err : 'Connecting to the exchanges…') + ' Check your internet, VPN or ad blocker.';
+  return 'Prices loaded for ' + tot + ' coins; candle history ready for ' + all.length + ' (needs 5).' + (state.err ? ' Last problem: ' + esc(state.err) + '.' : ' It fills in a few seconds at a time.'); }
+function mkRetry(){ try { const sw = navigator.serviceWorker; if (sw && sw.getRegistrations) sw.getRegistrations().then(rs => Promise.all(rs.map(x => x.unregister()))).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {}); } catch(e){} setTimeout(() => location.reload(), 400); }
 function renderMktBar(all){
   const el = $('mktBar'); if (!el) return; const r = mkCalc(all); MK.last = r; try { verdictWatch(r); } catch(e){}
-  if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
+  if (!r){ const wk = mkWeekend(); el.innerHTML = `<div class="mkbar mkb-warn"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state">Collecting data…</b></div><div class="mkb3">${mkWhy(all)} <button class="btn sm" type="button" onclick="mkRetry()">Reload data</button></div>${wk ? '<div class="mkb3">Today is a weekend: stock and forex markets are closed, so liquidity is usually thin and moves can be sharp or fake. Reduce size or skip trades.</div>' : ''}</div>`; return; }
   const pill = b => `<span class="mkb-pill mkb-p-${b.tone}" title="${esc(b.why)}">${esc(b.label)}</span>`;
   const pills = [r.liq, r.volTrend, r.volt, r.press, r.crowd, r.oiTrend].map(pill).join('');
   el.innerHTML = `<div class="mkbar mkb-${r.tone}"><div class="mkb1"><span class="mkb-tag">Market verdict</span><b class="mkb-state" title="Direction: which side is winning. This word says nothing about how clean the market is to trade.">${esc(mkDirTxt(r))}</b><span class="mkb-grade mkb-g-${r.gcls}" title="Tradeability ${r.score}/100 = how clean the market is to trade (clear direction, trending coins, volume), NOT which way it goes. Direction is the word on the left. ${esc(r.why.join(', '))}">${esc(r.grade)}${esc(mkSideTxt(r))} · ${r.score}</span><span class="mkb-size mkb-s-${r.size}">${esc(r.sizeLabel)}</span>${pills}</div><div class="mkb2">${esc(r.line)} <b>${esc(r.act)}</b> <span class="mkb-why">Tradeability ${r.score}/100 (how clean it is to trade, not which way) because: ${esc(r.why.join(', '))}.</span></div>${(() => { const V = r.vlt; if (!V || V.vx === null) return ''; const nm = r.volt.label.replace(' volatility', '').toUpperCase(); return `<div class="mkb3" style="border-left-color:var(--bd)"><b>Volatility of the whole market: ${esc(nm)} · ${V.vx.toFixed(2)}x normal.</b> Thresholds: under 0.9x low (coiling) · 0.9 to 1.5x normal · 1.5 to 2.2x high · 2.2x or more extreme. ${isNum(V.atrM) ? 'Typical coin moves ' + V.atrM.toFixed(2) + '% per hour (ATR). ' : ''}${isNum(V.rkM) ? 'Hotter than ' + V.rkM.toFixed(0) + '% of the last 2 days. ' : ''}${V.vlM ? V.vlM[0].toFixed(0) + '% of coins are coiling, ' + V.vlM[2].toFixed(0) + '% expanding and ' + V.vlM[3].toFixed(0) + '% extreme. ' : ''}${V.dir ? 'Volatility is ' + (V.dir === 'rise' || V.dir === 'rising' ? 'rising' : V.dir === 'fall' || V.dir === 'falling' ? 'falling' : 'flat') + ' over the last 20 minutes. ' : ''}<b>Impact on tradeability: ${V.pts > 0 ? '+' : V.pts < 0 ? '−' : ''}${Math.abs(V.pts)}</b> (${esc(V.note)}).</div>`; })()}${r.weekend ? `<div class="mkb3"><b>Weekend.</b> ${esc(r.weekend)}</div>` : ''}<div class="mkb4">${r.chips.map(([k, v]) => `<span><em>${esc(k)}</em> ${esc(v)}</span>`).join('')}<span class="mkb-n">${r.n} coins</span></div></div>`;
@@ -16610,7 +16614,8 @@ function whmFromFills(){
   } catch(e){}
 }
 function eltStatus(){ const el = $('eltSt'); if (el) el.textContent = 'Sample ' + WHB.sample.length + ' wallets · trade history loaded ' + WHB.fok + (WHB.ftried ? ' of ' + WHB.ftried : '') + ' · ' + WHM.ev.length + ' moves kept'; }
-function eltKick(){ try { if (!W.at || WHB.fbusy || state.paused) return; if (!WHB.sample.length && whbPool().length) whbDraw(); if (WHB.sample.length) whbLoad(null); } catch(e){} }
+const ELT_T0 = Date.now();
+function eltKick(){ try { if (!W.at || WHB.fbusy || state.paused) return; if (!(MK.last || Date.now() - ELT_T0 > 120000)) return; if (!WHB.sample.length && whbPool().length) whbDraw(); if (WHB.sample.length) whbLoad(null); } catch(e){} }
 function eltShow(){ const a = $('viewWhb'), b = $('viewWhm'); if (a) a.hidden = ELT.tab !== 'board'; if (b) b.hidden = ELT.tab !== 'moves'; const t = $('eltTabs'); if (t) for (const x of t.querySelectorAll('[data-et]')){ const on = x.dataset.et === ELT.tab; x.style.background = on ? 'var(--accent)' : ''; x.style.color = on ? '#000' : ''; x.style.fontWeight = on ? '700' : ''; } }
 function eltOpen(){ const t = $('eltTabs'); if (t && !t._e){ t._e = 1; t.innerHTML = '<p><button class="btn" type="button" data-et="board">Board: long and short by coin</button> <button class="btn" type="button" data-et="moves">Moves: live opens, adds, cuts, closes</button> <span class="hint" id="eltSt"></span></p>'; t.addEventListener('click', e => { const b = e.target.closest('[data-et]'); if (!b) return; ELT.tab = b.dataset.et; eltShow(); eltOpen(); }); }
   eltShow(); if (ELT.tab === 'board') whbOpen(); else whmOpen(); eltKick(); eltStatus(); }
