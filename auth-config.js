@@ -1,5 +1,5 @@
-/* Paste your Railway backend address between the quotes, for example: https://elpp-backend-production.up.railway.app
-   While it is empty, login is switched off and the scanner opens for everyone as before. */
-window.ELPP_API = 'https://elpp-website-production.up.railway.app';
-/* The same server also acts as the data proxy for sources the browser or GitHub blocks (FRED, calendar and more). */
-window.ELPP_PX = window.ELPP_API;
+/* GitHub-only mode: the scanner runs entirely from GitHub Pages. No server is needed.
+   Macro data (FRED, the economic calendar) is refreshed by the GitHub Actions in .github/workflows and read from the data/ folder.
+   Leave both lines empty. (Only fill them if you ever host the optional backend folder somewhere.) */
+window.ELPP_API = '';
+window.ELPP_PX = '';

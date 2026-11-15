@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.95</title>
+<title>ELPP CRYPTO SCANNER PRO V9.96</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#0a0a0a">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.95</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.96</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -2431,7 +2431,7 @@ async function vget(v, url){
     if (/rate limit|HTTP/.test(e.message)) throw e;
     { const rb = rlyBase(); if (rb && m && /^(fapi|api|www|indexer|data|mainnet|contract)\./.test(m[1])){ try { const j = await one(rb + '/api/rx?u=' + encodeURIComponent(url)); st.via = 'server'; return j; } catch(e0){} } }
     if (rel && m){ try { const j = await one(rel + '/x/' + m[1] + m[2]); st.via = 'relay'; return j; } catch(e2){} }
-    if (state.pxMain !== true) throw new Error(VN[v].n + ' blocked or offline from your browser (a relay can fix it)');
+    if (state.pxMain !== true && state.lastCtx) throw new Error(VN[v].n + ' blocked or offline from your browser (a relay can fix it)'); /* nothing has connected yet: use the free public proxies as a last resort */
     try { const j = await pubProxy(url); st.via = 'proxy'; return j; } catch(e3){ throw new Error(VN[v].n + ' blocks direct browser calls or is unreachable (' + errTxt(e) + '); the public proxy also failed'); }
   }
 }
@@ -7197,7 +7197,7 @@ function mkCalc(all){
 function mkDirTxt(r){ return r.state === 'Bad' ? 'Bearish (strong)' : r.state === 'Weak' ? 'Bearish' : r.state === 'Good' ? 'Bullish' : r.state === 'Strong' ? 'Bullish (strong)' : r.state; }
 function mkSideTxt(r){ return (r.state === 'Bad' || r.state === 'Weak') ? ' · FOR SHORTS' : (r.state === 'Good' || r.state === 'Strong') ? ' · FOR LONGS' : ''; }
 const RP = {at:0, txt:'', busy:0};
-async function rlyProbe(){ if (RP.busy || Date.now() - RP.at < 45000) return; RP.busy = 1; RP.at = Date.now(); const rb = rlyBase(); if (!rb){ RP.txt = 'No Railway server address is set.'; RP.busy = 0; return; }
+async function rlyProbe(){ if (RP.busy || Date.now() - RP.at < 45000) return; RP.busy = 1; RP.at = Date.now(); const rb = rlyBase(); if (!rb){ RP.txt = ''; RP.busy = 0; return; }
   try { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000); let h = null, r = null; try { h = await fetch(rb + '/api/health', {signal:ctl.signal}); } catch(e){ h = null; }
     if (!h){ RP.txt = 'Your Railway server did not answer at all (it may be asleep, redeploying, or blocked on this network).'; }
     else { try { r = await fetch(rb + '/api/hl', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'allMids'}), signal:ctl.signal}); } catch(e){ r = null; }
