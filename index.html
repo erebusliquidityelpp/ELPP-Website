@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.96</title>
+<title>ELPP CRYPTO SCANNER PRO V9.97</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#0a0a0a">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.96</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.97</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -5459,7 +5459,22 @@ setInterval(() => { try { const id = FAV_C[state.view], root = id && document.ge
   document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#btnTopFold'); if (!b) return; const on = !document.querySelector('header.top').classList.contains('fold'); fold(on); try { localStorage.setItem('elpp_topfold', on ? '1' : '0'); } catch(_){} });
   window.addEventListener('load', () => { let v = '0'; try { v = localStorage.getItem('elpp_topfold') || '0'; } catch(_){} fold(v === '1'); });
 })();
+let RERR = null;
+function chipsDraw(){
+  const dot = $('dot'); if (!dot) return; const now = Date.now(); let nl = 0, nt = 0; try { for (const c of state.coins.values()){ if (c.ctx){ nt++; if (c.loaded) nl++; } } } catch(e){}
+  const age = state.lastCtx ? Math.round((now - state.lastCtx) / 1000) : null;
+  if (state.paused){ dot.className = 'dot wait'; $('liveTxt').textContent = 'Paused'; }
+  else if (!state.lastCtx){ dot.className = 'dot ' + (state.err ? 'bad' : 'wait'); $('liveTxt').textContent = state.err ? 'No connection' : 'Connecting…'; }
+  else { dot.className = 'dot ' + (age > 40 ? 'bad' : 'ok'); $('liveTxt').textContent = 'Live · prices ' + age + 's ago · candles ' + nl + '/' + nt; }
+  try { $('budTxt').textContent = budgetUsed() + '/1200'; $('venTxt').textContent = venueLabel(); } catch(e){}
+  const ch = $('liveTxt') && $('liveTxt').parentNode; if (ch) ch.title = RERR ? 'Screen error: ' + (RERR.message || RERR) : '';
+}
+/* one failing part of the screen must never stop the data loop: errors are caught, shown in the Market Verdict box, and the connection chips still update */
 function render(){
+  try { renderBody(); RERR = null; } catch(e){ RERR = e; try { console.error(e); } catch(x){} }
+  try { chipsDraw(); } catch(e){}
+}
+function renderBody(){
   if (PZ()){ lastRender = Date.now(); return; }
   lastRender = Date.now();
   const now = Date.now();
@@ -7205,7 +7220,7 @@ async function rlyProbe(){ if (RP.busy || Date.now() - RP.at < 45000) return; RP
     clearTimeout(to); } catch(e){ RP.txt = 'Server check failed.'; } RP.busy = 0; try { requestRender(); } catch(e){} }
 function mkWhy(all){ let tot = 0, lastCtx = 0; try { tot = state.coins ? state.coins.size : 0; lastCtx = state.lastCtx || 0; } catch(e){}
   if (!lastCtx){ try { rlyProbe(); } catch(e){} }
-  if (!lastCtx) return esc(state.err ? 'No exchange answered yet: ' + state.err : 'Connecting to the exchanges…') + (RP.txt ? ' <b>Server check: ' + esc(RP.txt) + '</b>' : '') + ' If another device loads fine, this browser or network is blocking the exchanges: open the site in a private/Incognito window with extensions off, turn off any VPN, ad blocker or DNS filter, or try mobile data.';
+  if (!lastCtx) return esc(state.err ? 'No exchange answered yet: ' + state.err : 'Connecting to the exchanges…') + (RP.txt ? ' <b>Server check: ' + esc(RP.txt) + '</b>' : '') + (RERR ? ' <b>Screen error: ' + esc(String(RERR.message || RERR)) + '</b>' : '') + ' If another device loads fine, this browser or network is blocking the exchanges: open the site in a private/Incognito window with extensions off, turn off any VPN, ad blocker or DNS filter, or try mobile data.';
   return 'Prices loaded for ' + tot + ' coins; candle history ready for ' + all.length + ' (needs 5).' + (state.err ? ' Last problem: ' + esc(state.err) + '.' : ' It fills in a few seconds at a time.'); }
 function mkRetry(){ try { const sw = navigator.serviceWorker; if (sw && sw.getRegistrations) sw.getRegistrations().then(rs => Promise.all(rs.map(x => x.unregister()))).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {}); } catch(e){} setTimeout(() => location.reload(), 400); }
 function renderMktBar(all){
@@ -18739,10 +18754,8 @@ if (!state.topNAllBump){ state.topNAllBump = true; state.topN = 9999; saveState(
 /* V4.68: one-time bump to merge every connected exchange (Hyperliquid, Binance, Bybit, OKX, Bitget, Gate, dYdX, Aster, Paradex, Drift, Lighter) on every refresh, CEX and DEX together, instead of Hyperliquid-only with fallback; dial back to Auto in the Venue chip or Filters if the extra requests are too much */
 if (!state.venueMergedBump){ state.venueMergedBump = true; state.venueMode = 'merged'; saveState(); }
 try { rankUniverse(); } catch(e){}
-bindToolbar(); bindPanel(); applyStateToUI(); tzInit(); sessDraw(); setInterval(sessDraw, 60000);
-addMenuTabLinks();
-render();
-ctxTick();
+for (const f of [bindToolbar, bindPanel, applyStateToUI, tzInit, sessDraw, () => setInterval(sessDraw, 60000), addMenuTabLinks, render]){ try { f(); } catch(e){ RERR = e; try { console.error(e); } catch(x){} } }
+try { ctxTick(); } catch(e){ RERR = e; }
 setInterval(ctxTick, 10000);
 setInterval(() => { if (!renderT && !document.hidden) requestRender(); }, 1000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) requestRender(); });
