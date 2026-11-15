@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.86</title>
+<title>ELPP CRYPTO SCANNER PRO V9.87</title>
 <script src="auth-config.js"></script>
 <script>
 /* login gate: no account, no scanner. Switched off while auth-config.js has no backend address. */
@@ -848,7 +848,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.86</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.87</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -20074,14 +20074,14 @@ Chart.prototype.brkDraw = function(g, plotW, ff){
   const p = this.pane, B = this.bars, n = this.n, mh = this.L.mainH; if (n < 3) return; const o = p.brk = p.brk || {thr:50}, thr = (o.thr || 50) / 100; const M = brkModel(this);
   g.save(); g.beginPath(); g.rect(0, 0, plotW, mh); g.clip(); g.font = '10px ' + ff; g.textAlign = 'left';
   if (!M.ok){ g.fillStyle = '#8393a7'; g.fillText('Breakout probability: needs about 140 candles of history', 8, 50); g.restore(); return; }
-  let sc = null; try { sc = HOOK().brk ? HOOK().brk(p.sym) : null; } catch(e){} const tilt = sc ? sc.tilt : 0, shr = Math.max(0.08, Math.min(0.92, M.dCur + 0.25 * tilt)), pU = M.pCur * shr, pD = M.pCur * (1 - shr), up = shr >= 0.5;
+  let sc = null; try { sc = HOOK().brk ? HOOK().brk(p.sym) : null; } catch(e){} const tilt = sc ? sc.tilt : 0, shr = Math.max(0.08, Math.min(0.92, M.dCur + 0.25 * tilt)), pU = M.pCur * shr, pD = M.pCur * (1 - shr), up = shr >= 0.5, dom = up ? shr : 1 - shr, sigOn = M.pCur > thr && dom > thr;
   const vis0 = Math.max(0, Math.floor(this.v0) - 1), vis1 = Math.min(n - 2, Math.ceil(this.v0 + plotW / this.bw) + 1); let sig = 0, hit = 0, sU = 0, hU = 0;
   for (const [i, h] of M.hist){ if (h.p <= thr) continue; sig++; const nx = B[i + 1], k = B[i], br = nx.c > k.h || nx.c < k.l; if (br) hit++; if (i < vis0 || i > vis1) continue; const x = this.xOf(i), upH = h.d >= 0.5, y = upH ? this.yOf(k.l) + 8 : this.yOf(k.h) - 8, col = upH ? '#2fbf71' : '#f0616d', ok = upH ? nx.c > k.h : nx.c < k.l;
     g.beginPath(); if (upH){ g.moveTo(x, y - 5); g.lineTo(x - 4, y + 3); g.lineTo(x + 4, y + 3); } else { g.moveTo(x, y + 5); g.lineTo(x - 4, y - 3); g.lineTo(x + 4, y - 3); } g.closePath(); if (ok){ g.fillStyle = col; g.fill(); } else { g.lineWidth = 1; g.strokeStyle = col; g.stroke(); } }
   const lk = B[n - 1], x = this.xOf(n - 1), col = up ? '#2fbf71' : '#f0616d';
-  if (M.pCur > thr){ const y = up ? this.yOf(lk.h) - 14 : this.yOf(lk.l) + 14; g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y - 7); g.lineTo(x - 7, y + 4); g.lineTo(x + 7, y + 4); } else { g.moveTo(x, y + 7); g.lineTo(x - 7, y - 4); g.lineTo(x + 7, y - 4); } g.closePath(); g.fill(); g.font = 'bold 11px ' + ff; g.textAlign = 'center'; g.fillText(Math.round(M.pCur * 100) + '%', Math.min(plotW - 18, x), up ? y - 11 : y + 20); g.font = '10px ' + ff; }
+  if (sigOn){ const y = up ? this.yOf(lk.h) - 14 : this.yOf(lk.l) + 14; g.fillStyle = col; g.beginPath(); if (up){ g.moveTo(x, y - 7); g.lineTo(x - 7, y + 4); g.lineTo(x + 7, y + 4); } else { g.moveTo(x, y + 7); g.lineTo(x - 7, y - 4); g.lineTo(x + 7, y - 4); } g.closePath(); g.fill(); g.font = 'bold 11px ' + ff; g.textAlign = 'center'; g.fillText(Math.round(dom * 100) + '%', Math.min(plotW - 18, x), up ? y - 11 : y + 20); g.font = '10px ' + ff; }
   const bw = 292, bx = Math.max(4, plotW - bw - 8), by = 46; g.fillStyle = 'rgba(15,20,27,0.82)'; g.fillRect(bx, by, bw, 62); g.strokeStyle = col; g.lineWidth = 1; g.strokeRect(bx + 0.5, by + 0.5, bw - 1, 61); g.textAlign = 'left'; g.fillStyle = '#e6edf3'; g.font = 'bold 11px ' + ff;
-  g.fillText('Next-candle breakout: ' + Math.round(M.pCur * 100) + '%' + (M.pCur > thr ? '' : ' (below ' + Math.round(thr * 100) + '%)'), bx + 8, by + 15); g.font = '10px ' + ff; g.fillStyle = '#2fbf71'; g.fillText('▲ up ' + Math.round(pU * 100) + '%', bx + 8, by + 30); g.fillStyle = '#f0616d'; g.fillText('▼ down ' + Math.round(pD * 100) + '%', bx + 78, by + 30); g.fillStyle = '#8393a7';
+  g.fillStyle = sigOn ? col : '#e6edf3'; g.fillText('Next candle: ' + (up ? '▲ UP' : '▼ DOWN') + ' breakout ' + Math.round(dom * 100) + '%' + (sigOn ? '' : ' (no signal: needs above ' + Math.round(thr * 100) + '%)'), bx + 8, by + 15); g.font = '10px ' + ff; g.fillStyle = '#8393a7'; g.fillText('Breakout chance ' + Math.round(M.pCur * 100) + '% · ', bx + 8, by + 30); const w0 = g.measureText('Breakout chance ' + Math.round(M.pCur * 100) + '% · ').width; g.fillStyle = '#2fbf71'; g.fillText('▲ up ' + Math.round(shr * 100) + '%', bx + 8 + w0, by + 30); g.fillStyle = '#f0616d'; g.fillText('▼ down ' + Math.round((1 - shr) * 100) + '%', bx + 8 + w0 + 62, by + 30); g.fillStyle = '#8393a7';
   g.fillText(sc ? 'Scanner tilt ' + (tilt >= 0 ? '+' : '') + tilt.toFixed(2) + ' (' + sc.parts.length + ' signals)' : 'No scanner read for this coin', bx + 8, by + 44); g.fillText(sig ? 'Past ' + sig + ' calls above ' + Math.round(thr * 100) + '%: ' + Math.round(hit / sig * 100) + '% broke out (any bar: ' + Math.round(M.base * 100) + '%)' : 'No past calls above ' + Math.round(thr * 100) + '%', bx + 8, by + 57);
   g.restore();
 };
