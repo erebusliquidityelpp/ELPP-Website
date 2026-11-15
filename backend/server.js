@@ -42,6 +42,7 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({ origin: (o, cb) => cb(null, !o || ORIGINS.includes(o) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o) && process.env.ALLOW_LOCALHOST === 'true'), methods: ['GET', 'POST', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'], exposedHeaders: ['X-ELPP-Proxy'], maxAge: 600 }));
 app.use((req, res, next) => req.path.startsWith('/api/runner') ? next() : express.json({ limit: '10kb' })(req, res, next));
+app.use(require('./relay').router); /* exchange data relay has its own, higher limit */
 app.use(rateLimit({ windowMs: 15 * 60e3, limit: 300, standardHeaders: true, legacyHeaders: false }));
 const authLimit = rateLimit({ windowMs: 15 * 60e3, limit: 15, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many attempts. Wait 15 minutes and try again.' } });
 

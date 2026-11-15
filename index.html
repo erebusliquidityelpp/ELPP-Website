@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.93</title>
+<title>ELPP CRYPTO SCANNER PRO V9.94</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#0a0a0a">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.93</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.94</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -2366,15 +2366,17 @@ async function spend(w){
   }
 }
 function budgetUsed(){ const cut = Date.now() - 60000; while (budget.log.length && budget.log[0][0] < cut) budget.log.shift(); return budget.log.reduce((a,b) => a + b[1], 0); }
+/* your own server (Railway) can read public exchange data for you when this browser or network cannot reach the exchange directly */
+const RLY = {until:0, ok:0, fail:0};
+const rlyBase = () => String(LS.get('elpp_px') || window.ELPP_PX || '').trim().replace(/\/+$/, '');
 async function hl(body, w){
   await spend(w);
-  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 12000);
-  try {
-    const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
-    if (r.status === 429){ budget.tokens = -500; throw new Error('Rate limited by Hyperliquid (429). Slowing down.'); }
-    if (!r.ok) throw new Error('Hyperliquid answered HTTP ' + r.status);
-    return await r.json();
-  } finally { clearTimeout(to); }
+  const go = async (url, ms) => { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms); try { const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal}); if (r.status === 429){ budget.tokens = -500; throw new Error('Rate limited by Hyperliquid (429). Slowing down.'); } if (!r.ok) throw Object.assign(new Error('Hyperliquid answered HTTP ' + r.status), {http:true}); return await r.json(); } finally { clearTimeout(to); } };
+  const rb = rlyBase();
+  if (rb && Date.now() < RLY.until){ try { const j = await go(rb + '/api/hl', 15000); RLY.ok = Date.now(); return j; } catch(e){ if (e.http || /Rate limited/.test(e.message)) throw e; RLY.until = 0; } }
+  try { return await go(API, rb ? 7000 : 12000); }
+  catch(e){ if (!rb || e.http || /Rate limited/.test(e.message)) throw e;
+    try { const j = await go(rb + '/api/hl', 15000); RLY.until = Date.now() + 300000; RLY.ok = Date.now(); return j; } catch(e2){ RLY.fail = Date.now(); throw e; } }
 }
 
 /* ---------- venue layer: Hyperliquid plus other CEX and DEX perpetual markets ----------
@@ -2427,6 +2429,7 @@ async function vget(v, url){
   catch(e){
     const rel = String(state.mxRelay || '').trim().replace(/\/+$/, ''), m = /^https:\/\/([^\/]+)(\/.*)$/.exec(url);
     if (/rate limit|HTTP/.test(e.message)) throw e;
+    { const rb = rlyBase(); if (rb && m && /^(fapi|api|www|indexer|data|mainnet|contract)\./.test(m[1])){ try { const j = await one(rb + '/api/rx?u=' + encodeURIComponent(url)); st.via = 'server'; return j; } catch(e0){} } }
     if (rel && m){ try { const j = await one(rel + '/x/' + m[1] + m[2]); st.via = 'relay'; return j; } catch(e2){} }
     if (state.pxMain !== true) throw new Error(VN[v].n + ' blocked or offline from your browser (a relay can fix it)');
     try { const j = await pubProxy(url); st.via = 'proxy'; return j; } catch(e3){ throw new Error(VN[v].n + ' blocks direct browser calls or is unreachable (' + errTxt(e) + '); the public proxy also failed'); }
