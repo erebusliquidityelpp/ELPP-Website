@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V9.91</title>
+<title>ELPP CRYPTO SCANNER PRO V9.92</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#061C0D">
@@ -834,7 +834,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.91</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V9.92</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -2531,7 +2531,7 @@ async function ctxTickV(){
   /* do not wait for the slowest exchange: once one has answered, give the others a few seconds, then go on. Late ones are used from their last good answer (up to 2 minutes old) and refresh the next round. */
   const run = async list => {
     const out = new Array(list.length).fill(undefined), ps = list.map((v, i) => vTickers(v).then(r => { out[i] = r; return r; }));
-    await new Promise(res => { let n = 0, tm = null; ps.forEach(p => p.then(r => { n++; if (n === ps.length) { if (tm) clearTimeout(tm); res(); } else if (r && !tm) tm = setTimeout(res, 3500); })); });
+    await new Promise(res => { let n = 0, tm = null; setTimeout(res, 20000); ps.forEach(p => p.then(r => { n++; if (n === ps.length) { if (tm) clearTimeout(tm); res(); } else if (r && !tm) tm = setTimeout(res, 3500); })); });
     list.forEach((v, i) => { let r = out[i]; if (r === undefined){ const st = VS[v]; r = st && st.rows && Date.now() - (st.at || 0) < 120000 ? st.rows : null; } if (r){ R[v] = r; got++; } });
   };
   await run(plan);
@@ -7194,7 +7194,7 @@ function mkCalc(all){
 function mkDirTxt(r){ return r.state === 'Bad' ? 'Bearish (strong)' : r.state === 'Weak' ? 'Bearish' : r.state === 'Good' ? 'Bullish' : r.state === 'Strong' ? 'Bullish (strong)' : r.state; }
 function mkSideTxt(r){ return (r.state === 'Bad' || r.state === 'Weak') ? ' · FOR SHORTS' : (r.state === 'Good' || r.state === 'Strong') ? ' · FOR LONGS' : ''; }
 function mkWhy(all){ let tot = 0, lastCtx = 0; try { tot = state.coins ? state.coins.size : 0; lastCtx = state.lastCtx || 0; } catch(e){}
-  if (!lastCtx) return esc(state.err ? 'No exchange answered yet: ' + state.err : 'Connecting to the exchanges…') + ' Check your internet, VPN or ad blocker.';
+  if (!lastCtx) return esc(state.err ? 'No exchange answered yet: ' + state.err : 'Connecting to the exchanges…') + ' If another device loads fine, this browser or network is blocking the exchanges: open the site in a private/Incognito window with extensions off, turn off any VPN, ad blocker or DNS filter, or try mobile data.';
   return 'Prices loaded for ' + tot + ' coins; candle history ready for ' + all.length + ' (needs 5).' + (state.err ? ' Last problem: ' + esc(state.err) + '.' : ' It fills in a few seconds at a time.'); }
 function mkRetry(){ try { const sw = navigator.serviceWorker; if (sw && sw.getRegistrations) sw.getRegistrations().then(rs => Promise.all(rs.map(x => x.unregister()))).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {}); } catch(e){} setTimeout(() => location.reload(), 400); }
 function renderMktBar(all){
