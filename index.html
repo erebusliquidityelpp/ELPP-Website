@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V10.2</title>
+<title>ELPP CRYPTO SCANNER PRO V10.3</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#0a0a0a">
@@ -836,7 +836,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V10.2</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V10.3</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -5371,7 +5371,7 @@ function allColumns(){
 
 /* ---------- render ---------- */
 let renderT = null, lastRender = 0, snapshot = new Map(), SCRL = 0;
-/* V10.2: never rebuild the screen while the page is being scrolled (this was the stutter): redraw 0.4 s after the scrolling stops */
+/* V10.3: never rebuild the screen while the page is being scrolled (this was the stutter): redraw 0.4 s after the scrolling stops */
 try { for (const ev of ['scroll', 'wheel', 'touchmove']) addEventListener(ev, () => { SCRL = Date.now(); }, {passive: true, capture: true}); } catch(e){}
 const TBL = {th:'', tb:'', ok:0};
 function requestRender(){
@@ -10676,7 +10676,7 @@ function cselRender(redo){
   setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300); try { cselIct(); } catch(e){} try { cselPa(); } catch(e){}
 }
 setInterval(() => { try { if (state.view === 'csel') cselRender(); } catch(e){} }, 20000);
-/* ===== V10.2: Liquidity Strategy Scanner (LSS) and DPB (direction probability breakout). Built on the ELPP institutional liquidity strategy: bias, selection, liquidity map, trigger, execution ===== */
+/* ===== V10.3: Liquidity Strategy Scanner (LSS) and DPB (direction probability breakout). Built on the ELPP institutional liquidity strategy: bias, selection, liquidity map, trigger, execution ===== */
 const lssAtr = (B, n) => { n = n || 14; let s = 0, k = 0; for (let i = Math.max(1, B.length - n); i < B.length; i++){ const q = B[i], p = B[i - 1]; s += Math.max(q.h - q.l, Math.abs(q.h - p.c), Math.abs(q.l - p.c)); k++; } return k ? s / k : 0; };
 const lssAtrAt = (B, i, n) => { n = n || 14; let s = 0, k = 0; for (let j = Math.max(1, i - n + 1); j <= i; j++){ const q = B[j], p = B[j - 1]; s += Math.max(q.h - q.l, Math.abs(q.h - p.c), Math.abs(q.l - p.c)); k++; } return k ? s / k : 0; };
 function lssEma(B, n){ const out = new Array(B.length), k = 2 / (n + 1); let e = B[0].c; for (let i = 0; i < B.length; i++){ e = i ? B[i].c * k + e * (1 - k) : B[0].c; out[i] = e; } return out; }
@@ -10800,7 +10800,7 @@ function lssEnrich(r){
   ck.push({nm: '24h volume threshold', ok: vol == null ? null : r.volOk, txt: vol == null ? 'No volume data' : fmtUsd(vol) + ' traded in 24h (needs ' + fmtUsd(LSS.thrVol) + ')'});
   ck.push({nm: 'Open interest (liquidity) threshold', ok: r.oiOk, txt: oi == null ? 'No open interest data' : fmtUsd(oi) + ' open interest (needs ' + fmtUsd(LSS.thrOi) + ')'});
   ck.push({nm: 'Other scanners agree', ok: avg == null || src.length < 2 ? null : avg >= 55, txt: src.length < 2 ? 'Fewer than 2 other scanners have read this coin yet' : 'Average of ' + src.length + ' scanners, aligned to this side: ' + Math.round(avg) + '/100'});
-  { /* V10.2: the rest of the liquidity-sweep strategy */
+  { /* V10.3: the rest of the liquidity-sweep strategy */
     const cd = m.cvdDiv || {}, cdv = cd['15m'] || cd['1h'] || 0, obi = isNum(m.obiPct) ? m.obiPct : null, got = [];
     if ((d > 0 && cdv === 1) || (d < 0 && cdv === 2)) got.push('CVD divergence'); if (obi != null && ((d > 0 && obi >= 10) || (d < 0 && obi <= -10))) got.push('order book imbalance ' + (obi > 0 ? '+' : '') + Math.round(obi) + '%'); if (T.wick != null && T.wick >= 0.5) got.push('sharp rejection wick'); if (T.absorb) got.push('absorption (big volume, small body)'); if (T.conf) got.push('structure shift');
     ck.push({nm: 'Confirmation: 2 of CVD / order book / absorption / wick / structure', ok: got.length >= 2, txt: got.length ? got.length + ' present: ' + got.join(', ') : 'None of the five confirmations present yet'}); r.conf2 = got;
@@ -10831,7 +10831,7 @@ function lssRowHtml(r, i){
   const plan = pl && st !== 'WATCH' ? 'Entry ' + P(pl.entry) + (pl.limit ? ' <small class="dim">limit</small>' : '') + '<br>SL ' + P(pl.stop) + '<br>TP1 ' + P(pl.tp1) + ' · TP2 ' + P(pl.tp2) : '<span class="dim">after the sweep</span>';
   const sc = k => { const s = r.src.find(x => x.key === k); if (!s) return '<span class="dim">—</span>'; const ok = s.d === T.dir ? 'up' : s.d === 0 ? 'dim' : 'dn'; return '<b class="' + ok + '">' + s.sc + '</b><small class="dim">' + (s.d > 0 ? ' ▲' : s.d < 0 ? ' ▼' : '') + '</small>'; };
   const tot = r.ck.length, ckc = r.allPass ? '<span class="ict-chip go">✓ ALL ' + tot + ' PASSED</span>' : '<b class="' + (r.pass >= tot - 2 ? 'up' : r.pass >= tot / 2 ? '' : 'dn') + '">' + r.pass + '/' + tot + ' ✓</b>';
-  const tfa = ['15m', '1h', '4h'].map(tf => { const R = r.per[tf]; if (!R) return {tf, a: null}; return {tf, a: R.bias > 0.4 ? 1 : R.bias < -0.4 ? -1 : 0}; }), nm = tfa.filter(x => x.a === T.dir && x.a !== 0).length, tfh = tfa.map(x => x.a === null ? '<span class="dim">' + x.tf + ' –</span>' : '<span class="dim">' + x.tf + '</span> <b style="font-size:15px;color:' + (x.a > 0 ? '#10b981' : x.a < 0 ? '#ef4444' : '#9ca3af') + '">' + (x.a > 0 ? '▲' : x.a < 0 ? '▼' : '◆') + '</b><small style="font-weight:700;color:' + (x.a === T.dir && x.a ? '#10b981' : x.a === 0 ? '#9ca3af' : '#ef4444') + '">' + (x.a === T.dir && x.a ? '✓' : x.a === 0 ? '' : '✗') + '</small>').join(' ') + '<br><small style="color:' + (nm === 3 ? '#10b981' : nm === 2 ? '#f59e0b' : '#ef4444') + '"><b>' + nm + ' of 3</b> timeframes match</small>';
+  const tfa = ['15m', '1h', '4h'].map(tf => { const R = r.per[tf]; if (!R) return {tf, a: null}; return {tf, a: R.bias > 0.4 ? 1 : R.bias < -0.4 ? -1 : 0}; }), nm = tfa.filter(x => x.a === T.dir && x.a !== 0).length, tfh = tfa.map(x => x.a === null ? '<span class="dim">' + x.tf + ' –</span>' : '<span class="dim">' + x.tf + '</span> <b style="font-size:15px;color:' + (x.a > 0 ? '#10b981' : x.a < 0 ? '#ef4444' : '#9ca3af') + '">' + (x.a > 0 ? '▲' : x.a < 0 ? '▼' : '◆') + '</b><small style="font-weight:700;color:' + (x.a === T.dir && x.a ? '#10b981' : x.a === 0 ? '#9ca3af' : '#ef4444') + '">' + (x.a === T.dir && x.a ? '✓' : x.a === 0 ? '' : '✗') + '</small>').join(' ') + '<br><small style="color:' + (nm === 3 ? '#10b981' : nm === 2 ? '#f59e0b' : '#ef4444') + '"><b>' + nm + ' of 3</b> agree with ' + (T.dir > 0 ? 'LONG' : 'SHORT') + (nm === 0 && tfa.every(x => x.a === -T.dir) ? ' (trend is the other way: reversal trade)' : '') + '</small>';
   const open = LSS.open.has(r.name), vc = r.volOk ? 'up' : 'dn', oc = r.oiOk === false ? 'dn' : r.oiOk ? 'up' : 'dim';
   let h = '<tr class="lssR" data-n="' + esc(r.name) + '" style="cursor:pointer"><td style="text-align:left"><b>' + (i + 1) + '.</b> <b>' + esc(r.name) + '</b><br><small class="dim">' + P(r.px) + '</small></td><td><span class="ict-chip ' + cls + ' ' + (T.dir > 0 ? 'l' : T.dir < 0 ? 's' : '') + '">' + st + (st !== 'NONE' ? ' ' + T.tf : '') + '</span></td><td>' + side + '</td><td style="white-space:nowrap">' + tfh + '</td><td title="' + esc('One score: 60% liquidity strategy (' + T.score + ') + 40% average of ' + (r.src.length ? r.src.map(s => s.label + ' ' + s.sc).join(', ') : 'the other scanners (none have read this coin yet)')) + '"><b style="font-size:17px">' + r.final + '</b><br><small class="dim">' + (r.src.length >= 2 ? 'LSS + ' + r.src.length + ' scanners' : 'LSS only') + '</small></td><td>' + ckc + '</td><td style="white-space:nowrap"><b class="' + vc + '">' + (r.vol != null ? esc(fmtUsd(r.vol)) : '—') + '</b><br><small class="' + oc + '">OI ' + (r.oi != null ? esc(fmtUsd(r.oi)) : '—') + '</small></td><td style="text-align:left;white-space:normal">' + sw + '</td><td style="text-align:left;white-space:nowrap">' + pools + '</td><td style="text-align:left;white-space:nowrap">' + plan + '</td><td>' + (pl && st !== 'WATCH' ? pl.rr1.toFixed(1) + ' / ' + pl.rr2.toFixed(1) : '—') + '</td><td style="white-space:nowrap">' + (lv && st !== 'WATCH' ? lv.lev + 'x<br><small class="dim">$' + Math.round(lv.margin) + ' margin</small>' : '—') + '</td><td>' + dpx + '</td></tr>';
   if (open){ const G = r.ck.map(x => '<tr><td style="text-align:left">' + (x.ok === true ? '<b style="color:#10b981">✓</b>' : x.ok === false ? '<b style="color:#ef4444">✗</b>' : '<span class="dim">·</span>') + ' ' + esc(x.nm) + '</td><td style="text-align:left;white-space:normal">' + esc(x.txt) + '</td></tr>').join('');
