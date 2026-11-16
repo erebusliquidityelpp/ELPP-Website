@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ELPP CRYPTO SCANNER PRO V10.1</title>
+<title>ELPP CRYPTO SCANNER PRO V10.2</title>
 <script src="auth-config.js"></script>
 <link rel="manifest" href="manifest.webmanifest?v=11">
 <meta name="theme-color" content="#0a0a0a">
@@ -836,7 +836,7 @@ td.sym .cp{margin-left:6px;min-height:0;height:auto;background:linear-gradient(1
 <body>
 <header class="top">
   <div class="brand">
-    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V10.1</span></h1>
+    <h1><span class="bt">ELPP Crypto Scanner Pro</span><span class="v4b">V10.2</span></h1>
     <span class="sub">Perp scalp · spot · swing · positional · hype · news</span>
     <button class="topfold" id="btnTopFold" type="button" title="Shrink this panel" aria-label="Shrink the top panel" aria-expanded="true">▲</button>
   </div>
@@ -5371,7 +5371,7 @@ function allColumns(){
 
 /* ---------- render ---------- */
 let renderT = null, lastRender = 0, snapshot = new Map(), SCRL = 0;
-/* V10.1: never rebuild the screen while the page is being scrolled (this was the stutter): redraw 0.4 s after the scrolling stops */
+/* V10.2: never rebuild the screen while the page is being scrolled (this was the stutter): redraw 0.4 s after the scrolling stops */
 try { for (const ev of ['scroll', 'wheel', 'touchmove']) addEventListener(ev, () => { SCRL = Date.now(); }, {passive: true, capture: true}); } catch(e){}
 const TBL = {th:'', tb:'', ok:0};
 function requestRender(){
@@ -10676,7 +10676,7 @@ function cselRender(redo){
   setTimeout(() => { try { tmwFeed(); } catch(e){} }, 300); try { cselIct(); } catch(e){} try { cselPa(); } catch(e){}
 }
 setInterval(() => { try { if (state.view === 'csel') cselRender(); } catch(e){} }, 20000);
-/* ===== V10.1: Liquidity Strategy Scanner (LSS) and DPB (direction probability breakout). Built on the ELPP institutional liquidity strategy: bias, selection, liquidity map, trigger, execution ===== */
+/* ===== V10.2: Liquidity Strategy Scanner (LSS) and DPB (direction probability breakout). Built on the ELPP institutional liquidity strategy: bias, selection, liquidity map, trigger, execution ===== */
 const lssAtr = (B, n) => { n = n || 14; let s = 0, k = 0; for (let i = Math.max(1, B.length - n); i < B.length; i++){ const q = B[i], p = B[i - 1]; s += Math.max(q.h - q.l, Math.abs(q.h - p.c), Math.abs(q.l - p.c)); k++; } return k ? s / k : 0; };
 const lssAtrAt = (B, i, n) => { n = n || 14; let s = 0, k = 0; for (let j = Math.max(1, i - n + 1); j <= i; j++){ const q = B[j], p = B[j - 1]; s += Math.max(q.h - q.l, Math.abs(q.h - p.c), Math.abs(q.l - p.c)); k++; } return k ? s / k : 0; };
 function lssEma(B, n){ const out = new Array(B.length), k = 2 / (n + 1); let e = B[0].c; for (let i = 0; i < B.length; i++){ e = i ? B[i].c * k + e * (1 - k) : B[0].c; out[i] = e; } return out; }
@@ -10722,18 +10722,30 @@ function dpbCalc(B){
 /* ---- the scanner ---- */
 const LSS = {rows: new Map(), busy: false, xBusy: false, pa: new Map(), prog: {done: 0, total: 0}, n: 50, thrVol: 1e7, thrOi: 2e6, thrSv: 1.3, f: {side: 'all', q: ''}, open: new Set(), at: 0, btc: null, msg: '', built: false};
 async function lssBtc(){ try { const [a, b] = await Promise.all([ictKl('BTC', '4h'), ictKl('BTC', '1h')]); LSS.btc = {h4: lssBias(a), h1: lssBias(b), px: b[b.length - 1].c}; } catch(e){ LSS.btc = null; } }
-function lssRead(B, tf){
+function lssExtraPools(B, end, px, m){
+  const add = (arr, p, kind, n) => arr.push({p, n: n || 1, kind}), up = [], dn = [], T = B[end].t, day = 864e5, d0 = Math.floor(T / day) * day;
+  let ph = 0, pl = 1e18, wh = 0, wl = 1e18, th = 0, tl = 1e18; for (const b of B){ if (b.t >= d0 - day && b.t < d0){ ph = Math.max(ph, b.h); pl = Math.min(pl, b.l); } if (b.t >= d0){ th = Math.max(th, b.h); tl = Math.min(tl, b.l); } if (b.t >= T - 7 * day){ wh = Math.max(wh, b.h); wl = Math.min(wl, b.l); } }
+  const put = (p, kind, n) => { if (!(p > 0) || p >= 1e17) return; if (p > px) add(up, p, kind, n); else if (p < px) add(dn, p, kind, n); };
+  put(ph, 'PDH'); put(pl, 'PDL'); put(wh, 'WKH'); put(wl, 'WKL'); put(th, 'DH'); put(tl, 'DL');
+  const mag = Math.pow(10, Math.floor(Math.log10(px))), st = mag / 2; put(Math.ceil(px / st) * st, 'RND'); put(Math.floor(px / st) * st, 'RND');
+  try { const L = m && m.lhm; if (L){ for (const x of L.above.slice(0, 2)) if (x.p > px && x.d <= 6) add(up, x.p, 'LIQ', 2); for (const x of L.below.slice(0, 2)) if (x.p < px && x.d >= -6) add(dn, x.p, 'LIQ', 2); } } catch(e){}
+  return {up, dn};
+}
+function lssRead(B, tf, m){
   const n = B.length; if (n < 80) return null; const end = n - 1, px = B[end].c, atr = lssAtr(B, 14); if (!(atr > 0)) return null;
   const pv = lssPiv(B, end, 3, 160), P = lssPool(B, end, atr, pv), sw = lssSweep(B, end, pv, 10);
   let av = 0; for (let j = end - 20; j < end; j++) av += B[j].v; av /= 20; let lo = 1e18, hi = 0; for (let j = end - 59; j <= end; j++){ lo = Math.min(lo, B[j].l); hi = Math.max(hi, B[j].h); } const pct = (px - lo) / ((hi - lo) || 1);
+  try { const X = lssExtraPools(B, end, px, m), eq = 0.18 * atr, merge = (arr, ex, up) => { for (const q of ex){ const near = arr.find(a => Math.abs(a.p - q.p) <= eq); if (near){ near.n += 1; near.kind = near.kind || q.kind; } else arr.push(q); } arr.sort((a, b) => up ? a.p - b.p : b.p - a.p); }; merge(P.bsl, X.up, true); merge(P.ssl, X.dn, false); } catch(e){}
   const R = {tf, px, atr, P, sw, pct, dir: 0, conf: false, stage: 'NONE'};
+  R.regime = (() => { const a50 = lssAtrAt(B, end - 14, 50); return a50 > 0 ? atr / a50 : null; })();
   const bs = P.bsl[0], ss = P.ssl[0]; R.bsl = bs || null; R.ssl = ss || null; R.dB = bs ? (bs.p - px) / atr : null; R.dS = ss ? (px - ss.p) / atr : null;
   if (sw){ R.dir = sw.dir; R.age = end - sw.k; for (let j = sw.k + 1; j <= end; j++){ if (sw.dir > 0 && B[j].c > B[sw.k].h) R.conf = true; if (sw.dir < 0 && B[j].c < B[sw.k].l) R.conf = true; }
     let ext = sw.ext, ex = sw.dir > 0 ? 0 : 1e18; for (let j = sw.k; j <= end; j++){ if (sw.dir > 0){ ext = Math.min(ext, B[j].l); ex = Math.max(ex, B[j].h); } else { ext = Math.max(ext, B[j].h); ex = Math.min(ex, B[j].l); } }
     const d = sw.dir, stop = d > 0 ? ext - 0.15 * atr : ext + 0.15 * atr, leg = Math.abs(ex - ext), ote = leg >= 0.5 * atr ? (d > 0 ? ex - 0.705 * leg : ex + 0.705 * leg) : px, entry = d > 0 ? Math.min(px, ote) : Math.max(px, ote), risk = Math.abs(entry - stop);
+    { const sb = B[sw.k], rg = (sb.h - sb.l) || 1; R.wick = sw.dir > 0 ? (Math.min(sb.o, sb.c) - sb.l) / rg : (sb.h - Math.max(sb.o, sb.c)) / rg; R.absorb = av > 0 && sb.v >= 1.5 * av && Math.abs(sb.c - sb.o) / rg < 0.4; }
     R.vol = av > 0 ? B[sw.k].v / av : null; R.late = Math.abs(px - ext) / atr > 3.2;
     if (risk > 0){ const pools = d > 0 ? P.bsl : P.ssl, t1 = pools.find(q => Math.abs(q.p - entry) >= 0.8 * risk), t2 = t1 ? pools.find(q => (d > 0 ? q.p > t1.p : q.p < t1.p)) : null; const tp1 = t1 ? t1.p : entry + d * 2 * risk, tp2 = t2 ? t2.p : entry + d * Math.max(3 * risk, Math.abs(tp1 - entry) * 1.5);
-      R.plan = {dir: d, entry, stop, tp1, tp2, rr1: Math.abs(tp1 - entry) / risk, rr2: Math.abs(tp2 - entry) / risk, limit: Math.abs(px - entry) > 0.15 * atr, t1pool: !!t1, t1n: t1 ? t1.n : 0, t2pool: !!t2, ext, stopPct: risk / entry}; } }
+      R.plan = {dir: d, entry, stop, tp1, tp2, rr1: Math.abs(tp1 - entry) / risk, rr2: Math.abs(tp2 - entry) / risk, limit: Math.abs(px - entry) > 0.15 * atr, t1pool: !!t1, t1n: t1 ? t1.n : 0, t2pool: !!t2, ext, ex, stopPct: risk / entry, t1kind: t1 ? t1.kind || '' : '', t2kind: t2 ? t2.kind || '' : ''}; } }
   R.stage = R.dir ? (R.conf ? (R.late ? 'LATE' : 'READY') : 'SWEPT') : ((R.dB != null && R.dB < 1.2) || (R.dS != null && R.dS < 1.2) ? 'WATCH' : 'NONE');
   if (R.stage === 'WATCH'){ const nearB = R.dB != null && (R.dS == null || R.dB <= R.dS); R.watch = nearB ? {dir: -1, lvl: R.bsl.p, d: R.dB, n: R.bsl.n, txt: 'Price is close to buy-side liquidity (highs) at ' + fmtPx(R.bsl.p) + ': watch for a sweep and a close back below, then a SHORT'} : {dir: 1, lvl: R.ssl.p, d: R.dS, n: R.ssl.n, txt: 'Price is close to sell-side liquidity (lows) at ' + fmtPx(R.ssl.p) + ': watch for a sweep and a close back above, then a LONG'}; R.dir = R.watch.dir; }
   return R;
@@ -10754,7 +10766,7 @@ function lssScore(R, ctx){
 async function lssCoin(name){
   const bars = {}, errs = []; await Promise.all(['15m', '1h', '4h'].map(tf => ictKl(name, tf).then(v => { bars[tf] = v; }, e => { errs.push(errTxt(e)); })));
   const c = state.coins.get(name) || snapshot.get(name), m = c && c.m, coin4h = bars['4h'] ? lssBias(bars['4h']) : 0, ctx = {m, coin4h, btc: LSS.btc}, per = {};
-  for (const tf of ['15m', '1h', '4h']){ if (!bars[tf]) continue; try { const R = lssRead(bars[tf], tf); if (R){ const S = lssScore(R, ctx); R.bias = lssBias(bars[tf]); R.score = S.score; R.rows = S.rows; R.cr = S.cr; per[tf] = R; } } catch(e){ console.error('LSS', name, tf, e); } }
+  for (const tf of ['15m', '1h', '4h']){ if (!bars[tf]) continue; try { const R = lssRead(bars[tf], tf, m); if (R){ const S = lssScore(R, ctx); R.bias = lssBias(bars[tf]); R.score = S.score; R.rows = S.rows; R.cr = S.cr; per[tf] = R; } } catch(e){ console.error('LSS', name, tf, e); } }
   const list = Object.values(per); if (!list.length) throw new Error(errs[0] || 'not enough candles');
   const rank = R => ({READY: 4, SWEPT: 3, LATE: 2, WATCH: 1, NONE: 0}[R.stage]) * 1000 + R.score; list.sort((a, b) => rank(b) - rank(a)); const top = list[0], agree = list.filter(R => R.dir === top.dir && R.dir && (R.stage === 'READY' || R.stage === 'SWEPT')).length;
   let score = top.score; if (top.stage === 'READY' && agree > 1) score = Math.min(100, score + 4 * (agree - 1));
@@ -10788,8 +10800,25 @@ function lssEnrich(r){
   ck.push({nm: '24h volume threshold', ok: vol == null ? null : r.volOk, txt: vol == null ? 'No volume data' : fmtUsd(vol) + ' traded in 24h (needs ' + fmtUsd(LSS.thrVol) + ')'});
   ck.push({nm: 'Open interest (liquidity) threshold', ok: r.oiOk, txt: oi == null ? 'No open interest data' : fmtUsd(oi) + ' open interest (needs ' + fmtUsd(LSS.thrOi) + ')'});
   ck.push({nm: 'Other scanners agree', ok: avg == null || src.length < 2 ? null : avg >= 55, txt: src.length < 2 ? 'Fewer than 2 other scanners have read this coin yet' : 'Average of ' + src.length + ' scanners, aligned to this side: ' + Math.round(avg) + '/100'});
+  { /* V10.2: the rest of the liquidity-sweep strategy */
+    const cd = m.cvdDiv || {}, cdv = cd['15m'] || cd['1h'] || 0, obi = isNum(m.obiPct) ? m.obiPct : null, got = [];
+    if ((d > 0 && cdv === 1) || (d < 0 && cdv === 2)) got.push('CVD divergence'); if (obi != null && ((d > 0 && obi >= 10) || (d < 0 && obi <= -10))) got.push('order book imbalance ' + (obi > 0 ? '+' : '') + Math.round(obi) + '%'); if (T.wick != null && T.wick >= 0.5) got.push('sharp rejection wick'); if (T.absorb) got.push('absorption (big volume, small body)'); if (T.conf) got.push('structure shift');
+    ck.push({nm: 'Confirmation: 2 of CVD / order book / absorption / wick / structure', ok: got.length >= 2, txt: got.length ? got.length + ' present: ' + got.join(', ') : 'None of the five confirmations present yet'}); r.conf2 = got;
+    const kz = lssSession(); ck.push({nm: 'Session timing (London / New York)', ok: kz.ok, txt: kz.txt});
+    const ev = m.eventRisk, un = isNum(m.unlockDays) && m.unlockDays <= 3 && ((isNum(m.unlockPct) && m.unlockPct >= 1.5) || (isNum(m.unlockUsd) && m.unlockUsd >= 5e6));
+    ck.push({nm: 'No catalyst collision (macro print, unlock)', ok: ev == null && !un ? null : !(ev >= 1) && !un, txt: ev >= 1 ? 'High-impact event ' + (m.eventName || '') + ' in about ' + Math.round(m.eventMin) + ' min: wait or downsize' : un ? 'Token unlock within ' + m.unlockDays + ' days' : ev == null ? 'No calendar data' : 'No high-impact macro print within the hour and no near unlock'});
+    const vr = T.regime, vrg = m.volRegime; ck.push({nm: 'Volatility regime (compression, not already expanded)', ok: vr == null ? null : vr <= 1.5 && vrg !== 2, txt: vr == null ? 'No data' : 'Volatility is ' + vr.toFixed(2) + 'x its 50-candle average' + (vrg === 1 ? ' (compression: building toward a sweep)' : vrg === 2 ? ' (expansion: you are late)' : vr > 1.5 ? ' (already expanding: late)' : ' (normal)')});
+    const bt = LSS.btc, bta = isNum(m.beta) ? m.beta : null; let bok = null, btx = 'No BTC data'; if (bt){ const b1 = bt.h1; if (bta != null && Math.abs(bta) < 0.5){ bok = true; btx = 'Moves independently of Bitcoin (beta ' + bta.toFixed(2) + '): the coin\'s own map is enough'; } else { bok = b1 * d >= 0; btx = 'Bitcoin 1h is ' + (b1 > 0.4 ? 'up' : b1 < -0.4 ? 'down' : 'flat') + (bta != null ? ' and this coin follows it (beta ' + bta.toFixed(2) + ')' : '') + (bok ? ': not against you' : ': against your side, check the Bitcoin map first'); } }
+    ck.push({nm: 'BTC correlation / beta', ok: bok, txt: btx}); }
   { const tfs = ['15m', '1h', '4h'].map(tf => r.per[tf] ? (r.per[tf].bias > 0.4 ? 1 : r.per[tf].bias < -0.4 ? -1 : 0) : null), n = tfs.filter(x => x === d && x !== 0).length; ck.push({nm: 'Timeframes agree (15m / 1h / 4h)', ok: n >= 2, txt: n + ' of 3 timeframes trend ' + (d > 0 ? 'up' : 'down') + ' (15m ' + (tfs[0] > 0 ? '▲' : tfs[0] < 0 ? '▼' : '◆') + ', 1h ' + (tfs[1] > 0 ? '▲' : tfs[1] < 0 ? '▼' : '◆') + ', 4h ' + (tfs[2] > 0 ? '▲' : tfs[2] < 0 ? '▼' : '◆') + '); needs 2'}); }
   r.ck = ck; r.pass = ck.filter(x => x.ok === true).length; r.allPass = ck.every(x => x.ok === true); return r;
+}
+function lssSession(){
+  try { const L = citySess('Europe/London', 480, 990), N = citySess('America/New_York', 570, 960), lo = L.open ? 510 - L.toClose : null, no = N.open ? 390 - N.toClose : null;
+    if (lo != null && lo <= 180) return {ok: true, txt: 'London open for ' + Math.round(lo) + ' min: inside the London kill zone'};
+    if (no != null && no <= 180) return {ok: true, txt: 'New York open for ' + Math.round(no) + ' min: inside the New York kill zone'};
+    if (L.open || N.open) return {ok: null, txt: 'A major session is open but past its first 3 hours: sweeps are less reliable'};
+    return {ok: false, txt: 'London and New York are closed: low-liquidity hours give more false sweeps'}; } catch(e){ return {ok: null, txt: 'Session time unavailable'}; }
 }
 async function lssExtra(list){
   const q = list.slice(); const w = async () => { while (q.length){ const nm = q.shift(); try { const h = ICTS.data.get(nm); if (!h || h.ok === false || Date.now() - h.at > 240000) ICTS.data.set(nm, await ictScanOne(nm)); } catch(e){} try { LSS.pa.set(nm, await paCoin(nm)); } catch(e){ LSS.pa.set(nm, {ok: false}); } } }; await Promise.all([w(), w(), w()]);
@@ -10798,7 +10827,7 @@ function lssRowHtml(r, i){
   const T = r.top, pl = T.plan, up = T.dir > 0, side = !T.dir ? '—' : up ? '<b style="color:#10b981">▲ LONG</b>' : '<b style="color:#ef4444">▼ SHORT</b>', P = v => esc(fmtPx(v)), st = T.stage, cls = st === 'READY' ? 'go' : st === 'SWEPT' ? 'ready' : st === 'LATE' ? 'late' : st === 'WATCH' ? 'watch' : 'wait';
   const lv = lssLev(pl, r.px, r.name), dp = r.dp, dpx = dp && dp.ok ? (dp.sig ? '<b class="' + (dp.d > 0 ? 'up' : 'dn') + '">' + (dp.d > 0 ? '▲' : '▼') + ' ' + Math.round(dp.p * 100) + '%</b>' : '<span class="dim">no edge</span>') : '<span class="dim">—</span>';
   const sw = T.sw && st !== 'WATCH' ? (T.dir > 0 ? 'Sell-side ' : 'Buy-side ') + 'swept ' + P(T.sw.level) + ' · ' + T.age + ' candle' + (T.age === 1 ? '' : 's') + ' ago' + (T.conf ? ' · closed back ✓' : ' · wait for close') : st === 'WATCH' ? 'Near ' + (T.watch.dir < 0 ? 'highs ' : 'lows ') + P(T.watch.lvl) + (T.watch.n > 1 ? ' (equal x' + T.watch.n + ')' : '') + ' · ' + T.watch.d.toFixed(1) + ' ATR away' : '—';
-  const pools = (T.bsl ? '▲ ' + P(T.bsl.p) + ' <small class="dim">+' + (((T.bsl.p - T.px) / T.px) * 100).toFixed(1) + '%' + (T.bsl.n > 1 ? ' x' + T.bsl.n : '') + '</small>' : '<span class="dim">▲ none</span>') + '<br>' + (T.ssl ? '▼ ' + P(T.ssl.p) + ' <small class="dim">-' + (((T.px - T.ssl.p) / T.px) * 100).toFixed(1) + '%' + (T.ssl.n > 1 ? ' x' + T.ssl.n : '') + '</small>' : '<span class="dim">▼ none</span>');
+  const pools = (T.bsl ? '▲ ' + P(T.bsl.p) + ' <small class="dim">+' + (((T.bsl.p - T.px) / T.px) * 100).toFixed(1) + '%' + (T.bsl.n > 1 ? ' x' + T.bsl.n : '') + (T.bsl.kind ? ' ' + T.bsl.kind : '') + '</small>' : '<span class="dim">▲ none</span>') + '<br>' + (T.ssl ? '▼ ' + P(T.ssl.p) + ' <small class="dim">-' + (((T.px - T.ssl.p) / T.px) * 100).toFixed(1) + '%' + (T.ssl.n > 1 ? ' x' + T.ssl.n : '') + (T.ssl.kind ? ' ' + T.ssl.kind : '') + '</small>' : '<span class="dim">▼ none</span>');
   const plan = pl && st !== 'WATCH' ? 'Entry ' + P(pl.entry) + (pl.limit ? ' <small class="dim">limit</small>' : '') + '<br>SL ' + P(pl.stop) + '<br>TP1 ' + P(pl.tp1) + ' · TP2 ' + P(pl.tp2) : '<span class="dim">after the sweep</span>';
   const sc = k => { const s = r.src.find(x => x.key === k); if (!s) return '<span class="dim">—</span>'; const ok = s.d === T.dir ? 'up' : s.d === 0 ? 'dim' : 'dn'; return '<b class="' + ok + '">' + s.sc + '</b><small class="dim">' + (s.d > 0 ? ' ▲' : s.d < 0 ? ' ▼' : '') + '</small>'; };
   const tot = r.ck.length, ckc = r.allPass ? '<span class="ict-chip go">✓ ALL ' + tot + ' PASSED</span>' : '<b class="' + (r.pass >= tot - 2 ? 'up' : r.pass >= tot / 2 ? '' : 'dn') + '">' + r.pass + '/' + tot + ' ✓</b>';
@@ -10806,8 +10835,9 @@ function lssRowHtml(r, i){
   const open = LSS.open.has(r.name), vc = r.volOk ? 'up' : 'dn', oc = r.oiOk === false ? 'dn' : r.oiOk ? 'up' : 'dim';
   let h = '<tr class="lssR" data-n="' + esc(r.name) + '" style="cursor:pointer"><td style="text-align:left"><b>' + (i + 1) + '.</b> <b>' + esc(r.name) + '</b><br><small class="dim">' + P(r.px) + '</small></td><td><span class="ict-chip ' + cls + ' ' + (T.dir > 0 ? 'l' : T.dir < 0 ? 's' : '') + '">' + st + (st !== 'NONE' ? ' ' + T.tf : '') + '</span></td><td>' + side + '</td><td style="white-space:nowrap">' + tfh + '</td><td title="' + esc('One score: 60% liquidity strategy (' + T.score + ') + 40% average of ' + (r.src.length ? r.src.map(s => s.label + ' ' + s.sc).join(', ') : 'the other scanners (none have read this coin yet)')) + '"><b style="font-size:17px">' + r.final + '</b><br><small class="dim">' + (r.src.length >= 2 ? 'LSS + ' + r.src.length + ' scanners' : 'LSS only') + '</small></td><td>' + ckc + '</td><td style="white-space:nowrap"><b class="' + vc + '">' + (r.vol != null ? esc(fmtUsd(r.vol)) : '—') + '</b><br><small class="' + oc + '">OI ' + (r.oi != null ? esc(fmtUsd(r.oi)) : '—') + '</small></td><td style="text-align:left;white-space:normal">' + sw + '</td><td style="text-align:left;white-space:nowrap">' + pools + '</td><td style="text-align:left;white-space:nowrap">' + plan + '</td><td>' + (pl && st !== 'WATCH' ? pl.rr1.toFixed(1) + ' / ' + pl.rr2.toFixed(1) : '—') + '</td><td style="white-space:nowrap">' + (lv && st !== 'WATCH' ? lv.lev + 'x<br><small class="dim">$' + Math.round(lv.margin) + ' margin</small>' : '—') + '</td><td>' + dpx + '</td></tr>';
   if (open){ const G = r.ck.map(x => '<tr><td style="text-align:left">' + (x.ok === true ? '<b style="color:#10b981">✓</b>' : x.ok === false ? '<b style="color:#ef4444">✗</b>' : '<span class="dim">·</span>') + ' ' + esc(x.nm) + '</td><td style="text-align:left;white-space:normal">' + esc(x.txt) + '</td></tr>').join('');
+    const mgmt = []; if (pl && st !== 'WATCH'){ const tfh = {'15m': ['16 candles', '4 hours'], '1h': ['8 candles', '8 hours'], '4h': ['6 candles', '24 hours']}[T.tf] || ['', '']; mgmt.push('Move the stop to breakeven only after a candle closes beyond ' + P(pl.ex) + ' (the micro-structure), not just because it is in profit.'); mgmt.push('Take a partial at TP1 ' + P(pl.tp1) + (pl.t1kind ? ' (' + pl.t1kind + ')' : '') + '; let the runner ride to TP2 ' + P(pl.tp2) + ' only if CVD and the order book still agree.'); mgmt.push('Time stop: if TP1 is not reached within ' + tfh[0] + ' (' + tfh[1] + '), close or tighten. This is a scalp.'); mgmt.push('Check funding, open interest and CVD once during the hold: if positioning flipped against you, exit early.'); }
     const cau = []; if (st === 'WATCH') cau.push('No sweep yet: this is a watch-list entry, not a trade.'); if (st === 'SWEPT') cau.push('Swept but not confirmed: wait for the candle close beyond the sweep candle.'); if (st === 'LATE') cau.push('Price already ran more than 3 ATR from the sweep: chasing it is retail behaviour.'); if (T.cr && T.cr.g * T.dir > 0) cau.push('The crowd already sits on your side of this trade.'); if (LSS.btc && LSS.btc.h4 * T.dir < 0) cau.push('Bitcoin 4h trend is against this trade.'); if (pl && !pl.t1pool) cau.push('No liquidity pool found for the target: TP1 is projected at 2R.'); if (pl && pl.limit) cau.push('Entry is a limit order at the 70% retrace: skip it if price runs without filling.'); if (!r.allPass) cau.push('Not every checklist item passed (' + r.pass + ' of ' + tot + '): size down or wait.'); cau.push('Check the macro calendar and keep scalps to the same day or the next. Not financial advice; the scanner reads candles and does not guarantee outcomes.');
-    h += '<tr class="lssD"><td colspan="13" style="text-align:left"><div class="ci-g"><div><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Checklist (' + r.pass + '/' + tot + ' passed)</th><th style="text-align:left">What the scanner sees (' + esc(T.tf) + ')</th></tr></thead><tbody>' + G + '</tbody></table></div><div><b class="warn">Caution</b><ul style="margin:4px 0 0 18px">' + cau.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' + (lv && pl ? '<p class="hint" style="margin:6px 0 0">Sizing for a $1,000 account risking 1% ($10): position about $' + Math.round(lv.notional) + ', margin about $' + Math.round(lv.margin) + ' at ' + lv.lev + 'x (liquidation kept at least 3x further than the stop). Stop is ' + (pl.stopPct * 100).toFixed(2) + '% from entry.</p>' : '') + '<p class="hint" style="margin:6px 0 0">Scanner scores (aligned to this side): ' + (r.src.length ? r.src.map(s => esc(s.label) + ' ' + s.sc + (s.d === T.dir ? ' ✓' : s.d === 0 ? ' ·' : ' ✗')).join(' · ') : 'none yet') + '. Score = 60% LSS + 40% average of the others.</p>' + (dp && dp.ok ? '<p class="hint" style="margin:6px 0 0">DPB (1h): ' + (dp.cur.d ? (dp.cur.d > 0 ? 'long ' : 'short ') + Math.round(dp.p * 100) + '% from ' + dp.m + ' past set-ups' + (dp.sig ? ', from ' + P(dp.cur.from[0]) + ' – ' + P(dp.cur.from[1]) + ' to the pool at ' + P(dp.cur.tgt) : '') : 'no sweep and structure agreement on 1h') + '.</p>' : '') + '</div></div></td></tr>'; }
+    h += '<tr class="lssD"><td colspan="13" style="text-align:left"><div class="ci-g"><div><table class="gtab sm" style="width:100%"><thead><tr><th style="text-align:left">Checklist (' + r.pass + '/' + tot + ' passed)</th><th style="text-align:left">What the scanner sees (' + esc(T.tf) + ')</th></tr></thead><tbody>' + G + '</tbody></table></div><div><b class="warn">Caution</b><ul style="margin:4px 0 0 18px">' + cau.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' + (mgmt.length ? '<b style="display:block;margin-top:8px">Trade management</b><ul style="margin:4px 0 0 18px">' + mgmt.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + (lv && pl ? '<p class="hint" style="margin:6px 0 0">Sizing for a $1,000 account risking 1% ($10): position about $' + Math.round(lv.notional) + ', margin about $' + Math.round(lv.margin) + ' at ' + lv.lev + 'x (liquidation kept at least 3x further than the stop). Stop is ' + (pl.stopPct * 100).toFixed(2) + '% from entry.</p>' : '') + '<p class="hint" style="margin:6px 0 0">Scanner scores (aligned to this side): ' + (r.src.length ? r.src.map(s => esc(s.label) + ' ' + s.sc + (s.d === T.dir ? ' ✓' : s.d === 0 ? ' ·' : ' ✗')).join(' · ') : 'none yet') + '. Score = 60% LSS + 40% average of the others.</p>' + (dp && dp.ok ? '<p class="hint" style="margin:6px 0 0">DPB (1h): ' + (dp.cur.d ? (dp.cur.d > 0 ? 'long ' : 'short ') + Math.round(dp.p * 100) + '% from ' + dp.m + ' past set-ups' + (dp.sig ? ', from ' + P(dp.cur.from[0]) + ' – ' + P(dp.cur.from[1]) + ' to the pool at ' + P(dp.cur.tgt) : '') : 'no sweep and structure agreement on 1h') + '.</p>' : '') + '</div></div></td></tr>'; }
   return h;
 }
 function lssDraw(){
